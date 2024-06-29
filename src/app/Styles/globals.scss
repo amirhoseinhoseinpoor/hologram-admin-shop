@@ -1,0 +1,16 @@
+.row {
+  margin-right: 0 !important; /* Removes the negative margin on the right */
+  margin-left: 0 !important; /* Removes the negative margin on the left */
+  /* Add any other styles you want to reset or override */
+}
+body {
+  // overflow-x: hidden;
+  background-color: white;
+  position: relative;
+  height: 100%;
+  line-height: normal;
+}
+html {
+  position: relative;
+  height: 100%;
+}
