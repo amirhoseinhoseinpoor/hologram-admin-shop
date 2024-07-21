@@ -10,21 +10,6 @@ export default function Login() {
     const router = useRouter();
     const [username, setUsername] = useState('');
     const [password, setPassword] = useState('');
-
-     //test
-     //test
-     //test
-     //test123123
-     //test
-     //test
-     //test124142
-     //test
-     //test
-     //test2412414
-     //test
-     //test124124
-
-
     
     const [errorMessage, setErrorMessage] = useState(null);
 
@@ -121,6 +106,24 @@ export default function Login() {
              
              {errorMessage && <div className="alert alert-danger mt-3">{errorMessage}</div>}
            </form>
+            {/* <div className="banner">
+            <h2>Banner</h2>
+            <form onSubmit={handleSubmit}>
+              <label htmlFor="bannerImage">Image:</label>
+              <input
+                type="file"
+                id="bannerImage"
+                onChange={handleImageChange}
+              />
+              <label htmlFor="bannerText">Text:</label>
+              <textarea
+                id="bannerText"
+                value={bannerText}
+                onChange={handleTextChange}
+              />
+              <button type="submit">Update Banner</button>
+            </form>
+          </div> */}
           
         </section>
     )

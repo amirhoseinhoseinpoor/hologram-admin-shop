@@ -10,14 +10,14 @@ function withPageAuthRequired(WrappedComponent) {
         const router = useRouter();
         
         useEffect(() => {
-            if (!authState.token) {
-                router.push('/'); 
-            }
+            // if (!authState.token) {
+            //     router.push('/'); 
+            // }
         }, [authState.token, router]);
     
-        if (!authState.token) {
-            return null;
-        }
+        // if (!authState.token) {
+        //     return null;
+        // }
 
         return <WrappedComponent {...props} />;
     }
