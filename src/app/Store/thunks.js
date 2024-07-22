@@ -20,22 +20,6 @@ export const login = createAsyncThunk(
   }
 );
 
-export const updateBannerContent = createAsyncThunk(
-  'admin/updateBanner',
-  async (formData, thunkAPI) => {
-    try {
-      const response = await axios.post('/api/admin/banner', formData, {
-        headers: {
-          'Content-Type': 'multipart/form-data',
-        },
-      });
-      return response.data; // Assuming successful update returns updated banner data
-    } catch (error) {
-      return thunkAPI.rejectWithValue(error.message);
-    }
-  }
-);
-
 export const logout = createAsyncThunk(
   'auth/logout',
   async () => {
@@ -45,3 +29,19 @@ export const logout = createAsyncThunk(
       console.error('Logout error:', error);
   }
 });
+
+
+export const Adduser = createAsyncThunk(
+  'users/Adduser',
+  async (formData, thunkAPI) => {
+    console.log(formData);
+    try {
+      const response = await axios.post('/json/tabelContent.json', formData);
+       
+      
+      return response.data; // Assuming successful update returns updated banner data
+    } catch (error) {
+      return thunkAPI.rejectWithValue(error.message);
+    }
+  }
+);

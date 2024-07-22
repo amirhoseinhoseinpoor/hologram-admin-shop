@@ -3,8 +3,8 @@ import React, { useState } from "react";
 import { Modal, Button } from "react-bootstrap";
 import styled from "styled-components";
 
-
-
+import { useDispatch , useSelector } from "react-redux";
+import {Adduser} from "../../Store/thunks"
 
 
 
@@ -61,6 +61,8 @@ const AddUserBtnstyle = styled(Button)`
 `;
 
 export default function AddUserBtn() {
+  const dispatch = useDispatch();
+
   const [newUserData, setNewUserData] = useState({
     firstName: "",
     lastName: "",
@@ -72,7 +74,7 @@ export default function AddUserBtn() {
 
   const handleInputChange = (event) => {
     const { name, value } = event.target;
-    // Corrected syntax for updating state using spread operator (...)
+   
     setNewUserData((prevUserData) => ({
       ...prevUserData,
       [name]: value,
@@ -82,24 +84,33 @@ export default function AddUserBtn() {
   const handleAddModalClose = () => setShowAddModal(false);
   const handleAddModalShow = () => setShowAddModal(true);
 
-  const handleAddUser = async () => {
+  const handleAddUser = async (event) => {
+    event.preventDefault();
     try {
       //   const response = await fetch('/public/json/tabelContent.json'); // Simulate file reading
       //   const existingUsers = await response.json();
 
-      const updatedUsers = [newUserData];
 
-      const updateResponse = await fetch("/json/tabelContent.json", {
-        method: "post", // Simulate data update
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(updatedUsers),
-      });
+
+
+      // const updatedUsers = [newUserData];
+
+      // const updateResponse = await fetch("/json/tabelContent.json", {
+      //   method: "post", // Simulate data update
+      //   headers: { "Content-Type": "application/json" },
+      //   body: JSON.stringify(updatedUsers),
+      // });
+
+
+
+      await dispatch(Adduser(newUserData))
+
 
       if (!updateResponse.ok) {
         throw new Error("Failed to update users.json");
       }
 
-      onAddUser(updatedUsers); // Pass updated users to parent component
+      onAddUser(updatedUsers); 
       handleAddModalClose();
     } catch (error) {
       console.error("Error adding user:", error);

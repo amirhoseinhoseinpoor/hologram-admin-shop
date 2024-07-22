@@ -4,42 +4,20 @@ import style from "../Styles/AdminStyle/AdminStyle.module.scss";
 import Tab from "react-bootstrap/Tab";
 import Tabs from "react-bootstrap/Tabs";
 
-import React, { useState } from "react";
-import { useSelector, useDispatch } from "react-redux";
-import { banner } from "../Store/slice.js";
-import { updateBannerContent } from "../Store/thunks.js";
+import React, { useState ,lazy, Suspense } from "react";
 
 // import components
-import DefineUser from "../eachPageComponent/DefineUser/DefineUserTable.js";
 
-
+ // lazy loading 
+ const DefineUser = lazy(() => import("../eachPageComponent/DefineUser/DefineUserTable.js"));
+ const HonorsMainComponent = lazy(() => import("../eachPageComponent/Honors/HonorsMainComponent.js")); 
 
 const AdminPanel = () => {
-  const dispatch = useDispatch();
-  const bannerV = useSelector(banner); // Access banner data from Redux store
-  const [bannerImage, setBannerImage] = useState(bannerV?.image || ""); // Set initial image state
-  const [bannerText, setBannerText] = useState(bannerV?.text || ""); // Set initial text state
-  const [activeTab, setActiveTab] = useState("Doshbord"); // Set initial active tab
 
-  // image change
-  const handleImageChange = (event) => {
-    const newImage = event.target.files[0];
-    setBannerImage(newImage);
-  };
+ 
 
-  // text change
-  const handleTextChange = (event) => {
-    setBannerText(event.target.value);
-  };
+  const [activeTab, setActiveTab] = useState("Doshbord"); 
 
-  // form submit
-  const handleSubmit = async (event) => {
-    event.preventDefault();
-    const formData = new FormData();
-    formData.append("image", bannerImage); // Append image file
-    formData.append("text", bannerText); // Append banner text
-    await dispatch(updateBannerContent(formData)); // Dispatch update thunk
-  };
 
   return (
     <section className={`h-100 ${style.adminPanel}`}>
@@ -59,28 +37,18 @@ const AdminPanel = () => {
       <div className={style.content}>
         {activeTab === "Honors" && (
           <div className={style.tabContent}>
-            <h2>Banner</h2>
-            <form onSubmit={handleSubmit}>
-              <label htmlFor="bannerImage">Image:</label>
-              <input
-                type="file"
-                id="bannerImage"
-                onChange={handleImageChange}
-              />
-              <label htmlFor="bannerText">Text:</label>
-              <textarea
-                id="bannerText"
-                value={bannerText}
-                onChange={handleTextChange}
-              />
-              <button type="submit">Update Banner</button>
-            </form>
+            <Suspense fallback={<div>loading...</div>}> 
+              <HonorsMainComponent/>
+            </Suspense>
+            
           </div>
         )}
         {activeTab === "defineUser" && (
           <div className={style.tabContent}>
-            <DefineUser/>
-           
+            <Suspense fallback={<div>Loading...</div>}>
+              <DefineUser />
+            </Suspense>
+            
           </div>
         )}
         {activeTab === "home" && (
