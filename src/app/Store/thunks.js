@@ -45,3 +45,30 @@ export const Adduser = createAsyncThunk(
     }
   }
 );
+
+
+export const updateHonor = createAsyncThunk(
+  'honors/updateHonor',
+  async(honor , {rejectWithValue}) => {
+    try {
+      const formData = new FormData();
+      formData.append('title' , honor.title);
+      formData.append('date', honor.date);
+      if (honor.newImageFile) {
+        formData.append('image', honor.newImageFile);
+      }
+
+      const response = await axios.post(`/api/updateHonor/${honor.id}`, formData, {
+        headers: {
+          'Content-Type': 'multipart/form-data',
+        },
+      });
+
+      return response.data;
+
+
+    } catch(error) {
+      return rejectWithValue(error.response.data);
+    }
+  }
+)

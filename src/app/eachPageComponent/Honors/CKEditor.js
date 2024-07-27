@@ -1,28 +1,26 @@
-import React, { useState } from 'react';
-import { CKEditor } from '@ckeditor/ckeditor5-react';
-import ClassicEditor from '@ckeditor/ckeditor5-build-classic';
+import React, { useState } from "react";
+import JoditEditor from "jodit-react";
 
 const BlogEditor = () => {
-  const [content, setContent] = useState('');
+  const [content, setContent] = useState("");
 
-  const handleEditorChange = (event, editor) => {
-    const data = editor.getData();
-    setContent(data);
+  const handleEditorChange = (newContent) => {
+    setContent(newContent);
+    console.log(newContent);
   };
 
   const handleSubmit = (event) => {
     event.preventDefault();
-   
-    console.log('Blog content:', content);
+    console.log("Blog content:", content);
   };
 
   return (
     <div>
       <h2>Create Blog Post</h2>
       <form onSubmit={handleSubmit}>
-        <CKEditor
-          editor={ClassicEditor}
-          data={content}
+        <JoditEditor
+          value={content}
+          
           onChange={handleEditorChange}
         />
         <button type="submit">Save Blog Post</button>

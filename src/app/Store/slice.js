@@ -1,5 +1,5 @@
 import { createSlice } from "@reduxjs/toolkit";
-import { login, logout, Adduser } from "./thunks";
+import { login, logout, Adduser , updateHonor } from "./thunks";
 
 const authinitialState = {
   token: null,
@@ -76,3 +76,40 @@ const adminSlice = createSlice({
 
 export const adminsliceV = adminSlice.reducer;
 export const banner = (state) => state.admin.banner;
+
+
+
+const HonorsInitialState = {
+  honors : [],
+  status : 'idle',
+  errorHonors : null,
+};
+
+const HonorsSlice = createSlice({
+  
+  name : "honors",
+  initialState : HonorsInitialState,
+  reducers : {},
+  extraReducers : (builder) => {
+    builder
+    .addCase(updateHonor.pending, (state) =>{
+      state.status = 'loading';
+    })
+    .addCase(updateHonor.fulfilled, (state , action) => {
+      state.status = 'succeeded';
+      const index = state.honors.findIndex(honor => honor.id === action.payload.id);
+      if (index !== -1) {
+        state.honors[index] = action.payload;
+      }
+    })
+    .addCase(updateHonor.rejected, (state, action) => {
+      state.status = 'failed';
+      state.errorHonors = action.payload;
+    });
+  }
+})
+
+export const HonorsSliceV = HonorsSlice.reducer;
+export const honors = (state) => state.honors.honors;
+export const status = (state) => state.honors.status;
+export const errorHonors = (state) => state.honors.errorHonors;
