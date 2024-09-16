@@ -3,23 +3,17 @@ import React from "react";
 
 // import components
 
-import DefineUserBtn from "../DefineUser/AddUserBtn"
+import DefineUserBtn from "../DefineUser/AddUserBtn";
 import EditUserBtnfunction from "./EditUserBtn";
 export default function DefineUser() {
-
-
-
   return (
     <section>
-        <div className="d-flex flex-row mb-3 justify-content-between">
-            <div>
-                مدیریت کاربر
-            </div>
-            <div>
-                <DefineUserBtn/>
-            </div>
-
+      <div className="d-flex flex-row mb-3 justify-content-between">
+        <div>مدیریت کاربر</div>
+        <div>
+          <DefineUserBtn />
         </div>
+      </div>
       <table className="table table-striped">
         <thead>
           <tr className="table-head">
@@ -40,7 +34,9 @@ export default function DefineUser() {
                 <td>{item.lastName}</td>
                 <td>{item.age}</td>
                 <td>{item.cardId}</td>
-                <td><EditUserBtnfunction/></td>
+                <td>
+                  <EditUserBtnfunction />
+                </td>
               </tr>
             </React.Fragment>
           ))}

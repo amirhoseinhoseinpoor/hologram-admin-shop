@@ -34,9 +34,8 @@ export default function HonorsMainComponent() {
   const [activekey, setActiveKey] = useState("editUserPage");
   // edit honors
   const [editedHonor, setEditedHonor] = useState(null);
-  console.log(editedHonor);
+
   const [content, setContent] = useState(""); // Added content state for editing
-  // console.log(content);
   useEffect(() => {
     // This assumes that you have a way to initialize the honors in your state.
     // You might want to dispatch a thunk to fetch honors from the server.
