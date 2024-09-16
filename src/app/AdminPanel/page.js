@@ -14,8 +14,6 @@ import React, { useState ,lazy, Suspense } from "react";
 
 const AdminPanel = () => {
 
- 
-
   const [activeTab, setActiveTab] = useState("Doshbord"); 
 
 

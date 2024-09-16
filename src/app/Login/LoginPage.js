@@ -23,9 +23,6 @@ export default function Login() {
       }catch (error) {
         console.error('login error me:' , error );
       }
-      
-      
-      
     };
     
     const handleLogi2n = async (e) => {
@@ -93,16 +90,16 @@ export default function Login() {
              <button disabled={!username || !password} type="submit" className="btn btn-primary w-100 mt-5">
                Login
              </button>
-             <Link href="/ForgetPassword">
+             {/* <Link href="/ForgetPassword">
                <button className="btn btn-primary w-100 mt-5">
                  forgot password
               </button>
-             </Link>
-             <Link href="/SignUp">
+             </Link> */}
+             {/* <Link href="/SignUp">
               <button type="submit" className="btn btn-primary w-100 mt-5">
                  signup
               </button>
-             </Link>
+             </Link> */}
              
              {errorMessage && <div className="alert alert-danger mt-3">{errorMessage}</div>}
            </form>

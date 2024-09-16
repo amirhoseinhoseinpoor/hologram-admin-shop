@@ -50,10 +50,16 @@ export const Adduser = createAsyncThunk(
 export const updateHonor = createAsyncThunk(
   'honors/updateHonor',
   async(honor , {rejectWithValue}) => {
+    console.log(honor);
     try {
       const formData = new FormData();
       formData.append('title' , honor.title);
       formData.append('date', honor.date);
+      formData.append('tags', honor.tags);
+      formData.append('src', honor.src);
+      formData.append('content', honor.content);
+
+
       if (honor.newImageFile) {
         formData.append('image', honor.newImageFile);
       }

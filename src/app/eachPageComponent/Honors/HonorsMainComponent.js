@@ -12,6 +12,8 @@ import { updateHonor } from "../../Store/thunks.js";
 import { Card, CardContent, CardMedia, Typography } from "@mui/material";
 import honorsData from "/public/json/HonorsTest.json";
 import styled from "styled-components";
+import parse from "html-react-parser";
+
 
 const CARD = styled(Card)`
   background-color: #5f5f5f !important;
@@ -32,8 +34,9 @@ export default function HonorsMainComponent() {
   const [activekey, setActiveKey] = useState("editUserPage");
   // edit honors
   const [editedHonor, setEditedHonor] = useState(null);
+  console.log(editedHonor);
   const [content, setContent] = useState(""); // Added content state for editing
-
+  // console.log(content);
   useEffect(() => {
     // This assumes that you have a way to initialize the honors in your state.
     // You might want to dispatch a thunk to fetch honors from the server.
@@ -138,6 +141,8 @@ export default function HonorsMainComponent() {
             content={content}
             setContent={setContent}
           />
+          
+          {/* <div>{parse(content)}</div> */}
         </>
       )}
     </section>
