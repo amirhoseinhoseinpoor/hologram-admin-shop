@@ -17,14 +17,14 @@
 }
 
 .butttonAddAdress {
-  border: 1.5px solid #5695f6;
-  border-radius: 6px;
-  padding: 5px 10px;
-  background-color: white;
+  border: 1.5px solid #5695f6 !important;
+  border-radius: 6px !important;
+  padding: 5px 10px !important;
+  background-color: white !important;
   margin-top: 10px;
   div {
     p {
-      color: #5695f6;
+      color: #5695f6 !important;
     }
   }
 }
@@ -117,7 +117,7 @@
     height: 49px;
   }
   .butttonAddAdress {
-    padding: 2px 5px;
+    padding: 2px 5px !important;
   }
   .MakeProperForFlex{
     grid-template-columns: 1fr;

@@ -72,15 +72,15 @@
   cursor: pointer;
 }
 .sendMessageChatBox {
-  border-radius: 4px;
-  border: none;
-  background-color: var.$arrow-background;
-  color: white;
-  padding: 2px 5px;
-  position: absolute;
-  transform: translate(50%, -50%);
-  left: -1%;
-  top: 55%;
+  border-radius: 4px !important;
+  border: none !important;
+  background-color: var.$arrow-background !important;
+  color: white !important;
+  padding: 2px 5px !important;
+  position: absolute !important;
+  transform: translate(50%, -50%) !important;
+  left: -1% !important;
+  top: 55% !important;
 }
 
 .inputChatBoxStyle:focus-visible {
