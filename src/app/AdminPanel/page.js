@@ -24,11 +24,35 @@ const OrderMainComponent = dynamic(
   }
 );
 
+const ExhibitionMainComponent = dynamic(
+  () => import("../eachPageComponent/Exhibition/ExhibitionMainComponent.js"),
+  {
+    ssr: false,
+    loading: () => <p>Loading...</p>,
+  }
+);
+
+const BlogsMainComponent = dynamic(
+  () => import("../eachPageComponent/Blogs/BlogsMainComponent.js"),
+  {
+    ssr: false,
+    loading: () => <p>Loading...</p>,
+  }
+);
+
+const VideoMainComponent = dynamic(
+  () => import("../eachPageComponent/Video/VideoMainComponent.js"),
+  {
+    ssr: false,
+    loading: () => <p>Loading...</p>,
+  }
+);
+
 const AdminPanel = () => {
   const [activeTab, setActiveTab] = useState("Doshbord");
 
   return (
-    <section className={`h-100 ${style.adminPanel}`}>
+    <section className={` ${style.adminPanel}`}>
       <aside className={style.sidebar}>
         <Tabs
           activeKey={activeTab}
@@ -38,15 +62,32 @@ const AdminPanel = () => {
         >
           <Tab eventKey="Doshbord" title="داشبورد"></Tab>
           <Tab eventKey="Orders" title="سفارشات"></Tab>
+          <Tab eventKey="Product" title="محصولات"></Tab>
+          <Tab eventKey="Blogs" title="مقالات"></Tab>
           <Tab eventKey="Honors" title="افتخارات"></Tab>
+          <Tab eventKey="Exhibition" title="نمایشگاه ها"></Tab>
+          <Tab eventKey="Video" title="ویدیو"></Tab>
           <Tab eventKey="defineUser" title="مدیریت کاربر"></Tab>
           <Tab eventKey="setting" title="تنظیمات"></Tab>
         </Tabs>
       </aside>
       <div className={style.content}>
+        {activeTab === "Doshbord" && (
+          <div className={style.tabContent}>Tab content for Settings</div>
+        )}
         {activeTab === "Orders" && (
           <div className={style.tabContent}>
-            <OrderMainComponent/>
+            <OrderMainComponent />
+          </div>
+        )}
+        {activeTab === "Product" && (
+          <div className={style.tabContent}>
+            <p>product</p>
+          </div>
+        )}
+        {activeTab === "Blogs" && (
+          <div className={style.tabContent}>
+            <BlogsMainComponent />
           </div>
         )}
         {activeTab === "Honors" && (
@@ -54,6 +95,16 @@ const AdminPanel = () => {
             <Suspense fallback={<div>loading...</div>}>
               <HonorsMainComponent />
             </Suspense>
+          </div>
+        )}
+        {activeTab === "Exhibition" && (
+          <div className={style.tabContent}>
+            <ExhibitionMainComponent />
+          </div>
+        )}
+        {activeTab === "Video" && (
+          <div className={style.tabContent}>
+            <VideoMainComponent/>
           </div>
         )}
         {activeTab === "defineUser" && (

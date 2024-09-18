@@ -5,7 +5,7 @@ import "./Styles/reset.css";
 import "./Styles/globals.scss";
 import StoreProvider from './Store/storeProvider';
 
-const myFont = localFont({ src: './Fonts/IRANSansXV.woff2' , src : './Fonts/IRANSansXV.woff' })
+const myFont = localFont({ src: './Fonts/IRANSansXVF.ttf' })
 
 
 
@@ -18,7 +18,7 @@ export const metadata = {
 export default function RootLayout({ children }) {
   return (
     <html lang="en" dir="rtl">
-      <body className={myFont.className}>
+      <body className={`${myFont.className} h-auto `}>
         <StoreProvider>
            {children}
         </StoreProvider>

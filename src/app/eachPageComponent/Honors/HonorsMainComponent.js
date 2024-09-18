@@ -95,7 +95,7 @@ export default function HonorsMainComponent() {
                     sx={{
                       width: "120px",
                       maxHeight: "100%",
-                      borderRadius: 3,
+                      borderRadius: "2px",
                     }}
                   />
                   <CardContent className="d-flex flex-column justify-content-around">

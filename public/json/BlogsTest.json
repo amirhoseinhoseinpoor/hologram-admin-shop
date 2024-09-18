@@ -1,0 +1,52 @@
+[
+    {   
+        "id" : "1",
+        "src": "/HomeImages/coin.png",
+        "title" : "اثر برتر مسابقات جهانى IHMA در سال ۲۰۱۶",
+        "date" : "5 اردیبهشت 1403",
+        "time": "زمان مطالعه: 6 دقیقه",
+        "posetives" : "قیمت , کیفیت , زمان , زیبایی ",
+        "negetive" : "گران بودن , نقطه , نقطه , نقطه , تست",
+        "product" : [
+            {
+                "src" : "/HomeImages/coin.png",
+                "title" : "هولوگرام اسکرچ براق",
+                "link" : "/هولوگرام/تخریب شونده"
+            }
+        ],
+        "tags" : "good,bad,content"
+    },
+    {   
+        "id" : "1",
+        "src": "/HomeImages/coin.png",
+        "title" : "اثر برتر مسابقات جهانى IHMA در سال ۲۰۱۶",
+        "date" : "5 اردیبهشت 1403",
+        "time": "زمان مطالعه: 6 دقیقه",
+        "posetives" : "قیمت , کیفیت , زمان , زیبایی ",
+        "negetive" : "گران بودن , نقطه , نقطه , نقطه , تست",
+        "product" : [
+            {
+                "src" : "/HomeImages/coin.png",
+                "title" : "هولوگرام اسکرچ براق",
+                "link" : "/هولوگرام/تخریب شونده"
+            }
+        ],
+        "tags" : "good,bad,content"
+    }, {   
+        "id" : "1",
+        "src": "/HomeImages/coin.png",
+        "title" : "اثر برتر مسابقات جهانى IHMA در سال ۲۰۱۶",
+        "date" : "5 اردیبهشت 1403",
+        "time": "زمان مطالعه: 6 دقیقه",
+        "posetives" : "قیمت , کیفیت , زمان , زیبایی ",
+        "negetive" : "گران بودن , نقطه , نقطه , نقطه , تست",
+        "product" : [
+            {
+                "src" : "/HomeImages/coin.png",
+                "title" : "هولوگرام اسکرچ براق",
+                "link" : "/هولوگرام/تخریب شونده"
+            }
+        ],
+        "tags" : "good,bad,content"
+    }
+]
