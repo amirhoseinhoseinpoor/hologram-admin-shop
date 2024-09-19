@@ -14,7 +14,7 @@ export const login = createAsyncThunk(
         }
       );
       const token = response.data.token; // Assuming successful login returns a token
-      
+
       return token;
     } catch (error) {
       if (error.response && error.response.status === 400) {
@@ -27,6 +27,49 @@ export const login = createAsyncThunk(
     }
   }
 );
+
+// Product
+
+export const productpot = createAsyncThunk(
+  "product/productpot",
+  async (thunkAPI) => {
+    try {
+      const response = await axios.post("http://localhost:7000/product", {
+        name: "testproduct",
+        info: {},
+        media: [{}],
+      });
+      const data = response.data;
+      console.log(data);
+
+      return data;
+    } catch (error) {
+      if (error.response && error.response.status === 400) {
+        return thunkAPI.rejectWithValue("ارور سمت من");
+      } else {
+        return thunkAPI.rejectWithValue(
+          "مشکلی به وجود امده لطفا بعدا تلاش کنید"
+        );
+      }
+    }
+  }
+);
+
+export const list = createAsyncThunk("product/list", async (thunkAPI) => {
+  try {
+    const response = await axios.get("http://localhost:7000/product/list");
+    const data = response.data;
+    console.log(data);
+
+    return data;
+  } catch (error) {
+    if (error.response && error.response.status === 400) {
+      return thunkAPI.rejectWithValue("ارور سمت من");
+    } else {
+      return thunkAPI.rejectWithValue("مشکلی به وجود امده لطفا بعدا تلاش کنید");
+    }
+  }
+});
 
 export const logout = createAsyncThunk("auth/logout", async () => {
   try {

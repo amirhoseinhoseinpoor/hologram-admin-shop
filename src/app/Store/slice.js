@@ -1,5 +1,5 @@
 import { createSlice } from "@reduxjs/toolkit";
-import { login, logout, Adduser , updateHonor } from "./thunks";
+import { login, logout, Adduser , updateHonor , list } from "./thunks";
 
 const authinitialState = {
   token: null,
@@ -45,6 +45,43 @@ export const authSliceV = authSlice.reducer;
 export const token = (state) => state.auth.token;
 export const loading = (state) => state.auth.loading;
 export const error = (state) => state.auth.error;
+
+
+
+const peoductinitialState = {
+  data: null,
+  loading: false,
+  error: null,
+};
+
+const productSlice = createSlice({
+  name: "product",
+  initialState: peoductinitialState,
+  reducers: {},
+  extraReducers: (builder) => {
+    builder
+      .addCase(list.pending, (state) => {
+        state.loading = true;
+        state.error = null;
+      })
+      .addCase(list.fulfilled, (state, action) => {
+        state.loading = false;
+        state.data = action.payload;
+      })
+      .addCase(list.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.error.message;
+      })
+      
+  },
+});
+
+export const productSliceV = productSlice.reducer;
+export const data = (state) => state.product.data;
+
+
+
+
 
 const AdminInitialState = {
   banner: null,

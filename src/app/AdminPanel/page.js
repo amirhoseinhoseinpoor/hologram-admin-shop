@@ -48,6 +48,14 @@ const VideoMainComponent = dynamic(
   }
 );
 
+const ProductMainComponent = dynamic(
+  () => import("../eachPageComponent/Product/ProductMainComponent.js"),
+  {
+    ssr: false,
+    loading: () => <p>Loading...</p>,
+  }
+);
+
 const AdminPanel = () => {
   const [activeTab, setActiveTab] = useState("Doshbord");
 
@@ -82,7 +90,7 @@ const AdminPanel = () => {
         )}
         {activeTab === "Product" && (
           <div className={style.tabContent}>
-            <p>product</p>
+            <ProductMainComponent/>
           </div>
         )}
         {activeTab === "Blogs" && (
