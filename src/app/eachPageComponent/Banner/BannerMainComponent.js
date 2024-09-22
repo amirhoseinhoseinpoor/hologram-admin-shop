@@ -39,7 +39,7 @@ export default function HonorsMainComponent() {
   }, [dispatch]);
 
   const images = useSelector(bannerImg);
-  console.log(images);
+  // console.log(images);
 
   // saving the changes
   const handleHonorSave = async (event) => {

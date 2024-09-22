@@ -1,9 +1,16 @@
 import { createSlice } from "@reduxjs/toolkit";
-import { login, logout, Adduser  , list, homePageVideo , bannerdata , addBanner } from "./thunks";
-
+import {
+  login,
+  logout,
+  Adduser,
+  list,
+  homePageVideo,
+  bannerdata,
+  addBanner,
+  uploadFile,
+} from "./thunks";
 
 // start auth slice
-
 
 const authinitialState = {
   token: null,
@@ -54,7 +61,8 @@ export const error = (state) => state.auth.error;
 // start product slice
 
 const peoductinitialState = {
-  data: null,
+  productListData: null,
+  // uploadedFiles: {},
   loading: false,
   error: null,
 };
@@ -71,23 +79,33 @@ const productSlice = createSlice({
       })
       .addCase(list.fulfilled, (state, action) => {
         state.loading = false;
-        state.data = action.payload;
+        state.productListData = action.payload;
       })
       .addCase(list.rejected, (state, action) => {
         state.loading = false;
         state.error = action.error.message;
       })
-      
+      // .addCase(uploadFile.pending, (state) => {
+      //   state.loading = true;
+      //   state.error = null;
+      // })
+      // .addCase(uploadFile.fulfilled, (state, action) => {
+      //   state.loading = false;
+      //   state.uploadedFiles[action.meta.arg.name] = action.payload;
+      // })
+      // .addCase(uploadFile.rejected, (state, action) => {
+      //   state.loading = false;
+      //   state.error = action.error.message;
+      // });
   },
 });
 
 export const productSliceV = productSlice.reducer;
-export const data = (state) => state.product.data;
+export const productListData = (state) => state.product.productListData;
 
 // end product slice
 
 // start Banner
-
 
 const bannerinitialState = {
   bannerImg: null,
@@ -112,27 +130,24 @@ const bannerSlice = createSlice({
       .addCase(bannerdata.rejected, (state, action) => {
         state.loading = false;
         state.error = action.error.message;
-      })
-      // .addCase(addBanner.pending, (state) => {
-      //   state.loading = true;
-      //   state.error = null;
-      // })
-      // .addCase(addBanner.fulfilled, (state, action) => {
-      //   state.loading = false;
-      //   state.bannerImg = action.payload;
-      // })
-      // .addCase(addBanner.rejected, (state, action) => {
-      //   state.loading = false;
-      //   state.error = action.error.message;
-      // })
-      
+      });
+    // .addCase(addBanner.pending, (state) => {
+    //   state.loading = true;
+    //   state.error = null;
+    // })
+    // .addCase(addBanner.fulfilled, (state, action) => {
+    //   state.loading = false;
+    //   state.bannerImg = action.payload;
+    // })
+    // .addCase(addBanner.rejected, (state, action) => {
+    //   state.loading = false;
+    //   state.error = action.error.message;
+    // })
   },
 });
 
 export const bannerSliceV = bannerSlice.reducer;
 export const bannerImg = (state) => state.banner.bannerImg;
-
-
 
 // end Banner
 
@@ -145,34 +160,30 @@ const homePageinitialState = {
 };
 
 const homePage = createSlice({
-  name : "homePage",
-  initialState : homePageinitialState,
-  reducers : {},
-  extraReducers : (builder) => {
+  name: "homePage",
+  initialState: homePageinitialState,
+  reducers: {},
+  extraReducers: (builder) => {
     builder
-    .addCase(homePageVideo.pending, (state) => {
-      state.loading = true;
-      state.error = null;
-    })
-    .addCase(homePageVideo.fulfilled, (state, action) => {
-      state.loading = false;
-      state.homeVideoFileName = action.payload;
-    })
-    .addCase(homePageVideo.rejected, (state, action) => {
-      state.loading = false;
-      state.error = action.error.message;
-    });
-
-  }
-})
+      .addCase(homePageVideo.pending, (state) => {
+        state.loading = true;
+        state.error = null;
+      })
+      .addCase(homePageVideo.fulfilled, (state, action) => {
+        state.loading = false;
+        state.homeVideoFileName = action.payload;
+      })
+      .addCase(homePageVideo.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.error.message;
+      });
+  },
+});
 
 export const homePageV = homePage.reducer;
 export const homeVideoFileName = (state) => state.homePage.homeVideoFileName;
 
-
-
 // end HomePageVideo
-
 
 const AdminInitialState = {
   banner: null,
@@ -205,23 +216,20 @@ const adminSlice = createSlice({
 export const adminsliceV = adminSlice.reducer;
 export const banner = (state) => state.admin.banner;
 
-
-
 const HonorsInitialState = {
-  honors : [],
-  status : 'idle',
-  errorHonors : null,
+  honors: [],
+  status: "idle",
+  errorHonors: null,
 };
 
 const HonorsSlice = createSlice({
-  name : "honors",
-  initialState : HonorsInitialState,
-  reducers : {},
-  extraReducers : (builder) => {
-    builder
-    
-  }
-})
+  name: "honors",
+  initialState: HonorsInitialState,
+  reducers: {},
+  extraReducers: (builder) => {
+    builder;
+  },
+});
 
 export const HonorsSliceV = HonorsSlice.reducer;
 export const honors = (state) => state.honors.honors;

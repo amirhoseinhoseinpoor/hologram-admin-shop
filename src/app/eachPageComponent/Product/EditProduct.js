@@ -15,12 +15,10 @@ export default function EditHonors({
   handleCancelEdit,
   handleEditImageChange,
   setEditedHonor,
-  content,
-  setContent,
+
+
 }) {
-  const handleEditorChange = (newContent) => {
-    setContent(newContent);
-  };
+  
 
   const handleTagsChange = (event) => {
     setEditedHonor({ ...editedHonor, tags: event.target.value });
@@ -28,7 +26,7 @@ export default function EditHonors({
 
   return (
     <div className="mt-3">
-      <h2>Edit Honor</h2>
+      <h2>ویرایش محصولات</h2>
       <form onSubmit={handleHonorSave}>
         <TEXTFIELD
           label="Title"
@@ -65,15 +63,7 @@ export default function EditHonors({
             />
           </Box>
         )}
-        <div>
-          <h2>Edit Blog Post Content</h2>
-          <JoditEditor
-            value={content}
-            onChange={handleEditorChange}
-            className="w-full h-[70%] mt-10 bg-white"
-          />
-          <style>{`.jodit-wysiwyg{height:300px !important}`}</style>
-        </div>
+        
         <Button className="mb-3 mt-3" variant="contained" type="submit">
           Save
         </Button>

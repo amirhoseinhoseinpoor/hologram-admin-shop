@@ -1,7 +1,6 @@
 import { createAsyncThunk } from "@reduxjs/toolkit";
 import axios from "axios";
 
-
 export const login = createAsyncThunk(
   "auth/login",
   async (credentials, thunkAPI) => {
@@ -30,20 +29,69 @@ export const login = createAsyncThunk(
 
 // Product
 
+export const uploadFile = createAsyncThunk(
+  "product/uploadFile ",
+  async ({ file, tag, type, isPublic }, thunkAPI) => {
+    const state = thunkAPI.getState();
+    const token = state.auth.token;
+
+    try {
+      // Create a FormData object
+      const formData = new FormData();
+      formData.append("files", file);
+      formData.append("tag", tag);
+      formData.append("type", type);
+      formData.append("isPublic", isPublic);
+
+      const response = await axios.post(
+        "http://localhost:7000/system/upload",
+        formData,
+        {
+          headers: {
+            Authorization: token ? `Bearer ${token}` : "",
+            "Content-Type": "multipart/form-data",
+          },
+        }
+      );
+
+      if (response.data[0].fileName) {
+        alert("افزودن عکس با موفقیت انجام شد");
+      }
+
+      return response.data[0].fileName;
+    } catch (error) {
+      if (error.response && error.response.status === 400) {
+        alert("خطا در افزودن media");
+        return thunkAPI.rejectWithValue("ارور سمت من");
+      } else {
+        return thunkAPI.rejectWithValue(
+          "مشکلی به وجود امده لطفا بعدا تلاش کنید"
+        );
+      }
+    }
+  }
+);
+
 export const productpot = createAsyncThunk(
   "product/productpot",
-  async (thunkAPI) => {
+  async (productData, thunkAPI) => {
+    const state = thunkAPI.getState();
+    const token = state.auth.token;
     try {
-      const response = await axios.post("http://localhost:7000/product", {
-        name: "testproduct",
-        info: {},
-        media: [{}],
-      });
+      const response = await axios.post(
+        "http://localhost:7000/product",
+        productData,
+        {
+          headers: {
+            Authorization: token ? `Bearer ${token}` : "",
+            "Content-Type": "application/json",
+          },
+        }
+      );
       const data = response.data;
-      
 
       return data;
-    } catch (error) {
+    } catch (error) {      
       if (error.response && error.response.status === 400) {
         return thunkAPI.rejectWithValue("ارور سمت من");
       } else {
@@ -59,7 +107,7 @@ export const list = createAsyncThunk("product/list", async (thunkAPI) => {
   try {
     const response = await axios.get("http://localhost:7000/product/list");
     const data = response.data;
-    console.log(data);
+    
 
     return data;
   } catch (error) {
@@ -95,21 +143,20 @@ export const bannerdata = createAsyncThunk(
             { responseType: "arraybuffer" }
           );
 
-           // Convert the ArrayBuffer to a Uint8Array
-           const uint8Array = new Uint8Array(imageResponse.data);
+          // Convert the ArrayBuffer to a Uint8Array
+          const uint8Array = new Uint8Array(imageResponse.data);
 
-         // Convert the Uint8Array to a base64 string
-         const base64Image = Buffer.from(uint8Array).toString('base64');
-          
+          // Convert the Uint8Array to a base64 string
+          const base64Image = Buffer.from(uint8Array).toString("base64");
+
           // Determine MIME type (assuming it's PNG for simplicity)
-          const mimeType = imageResponse.headers['content-type'] || 'image/png';
+          const mimeType = imageResponse.headers["content-type"] || "image/png";
 
           // Add the base64 string to the image object
           imagesWithBase64.push({
             ...image,
             base64Image: `data:${mimeType};base64,${base64Image}`,
           });
-
         } catch (imageError) {
           console.error("Error fetching image:", imageError);
           // Handle individual image errors here if necessary

@@ -5,16 +5,16 @@ import React, { useState, useEffect } from "react";
 import AddProduct from "./AddProduct";
 import EditProduct from "./EditProduct";
 //redux import
-import { useSelector , useDispatch } from "react-redux";
+import { useSelector, useDispatch } from "react-redux";
 import { list } from "../../Store/thunks.js";
-import { data } from "@/app/Store/slice";
+import { productListData } from "@/app/Store/slice";
 
 import { updateHonor } from "../../Store/thunks.js";
 
 import { Card, CardContent, CardMedia, Typography } from "@mui/material";
 import honorsData from "/public/json/ExhibitionTest.json";
 import styled from "styled-components";
-import parse from "html-react-parser";
+
 
 const CARD = styled(Card)`
   background-color: #5f5f5f !important;
@@ -35,12 +35,11 @@ export default function HonorsMainComponent() {
   // edit honors
   const [editedHonor, setEditedHonor] = useState(null);
 
-  const [content, setContent] = useState(""); 
+  const [content, setContent] = useState("");
 
-  const datacome = useSelector(data);
+  const datacome = useSelector(productListData);
 
-  
-  
+  // console.log(datacome);
 
   useEffect(() => {
     dispatch(list());
@@ -85,6 +84,42 @@ export default function HonorsMainComponent() {
             className="mt-3 d-flex flex-column gap-3"
             style={{ cursor: "pointer" }}
           >
+            {datacome &&
+              datacome.map((data , index) => (
+                <div key={index}>
+                  
+
+                  <CARD
+                    className="d-flex flex-row"
+                    onClick={() => {
+                      setEditedHonor(data);
+                    }}
+                  >
+                    {/* <CardMedia
+                      component="img"
+                      src={image.base64Image}
+                      alt={image.originalName}
+                      sx={{
+                        width: "120px",
+                        maxHeight: "100%",
+                        borderRadius: "2px",
+                      }}
+                    /> */}
+                    <CardContent className="d-flex flex-column justify-content-around">
+                      <Typography className="titleHonors">
+                        {data.name}
+                      </Typography>
+                      <div className="d-flex flex-row gap-2">
+                        <p>کد محصول :</p>
+                        <Typography className="dateHonors">
+                        {data.code}
+                      </Typography>
+                      </div>
+                      
+                    </CardContent>
+                  </CARD>
+                </div>
+              ))}
             {honorsData.map((honor, index) => (
               <React.Fragment key={index}>
                 <CARD
@@ -130,7 +165,7 @@ export default function HonorsMainComponent() {
           </div>
 
           <div>
-            <AddProduct dispatch={dispatch} />
+            <AddProduct/>
           </div>
         </>
       )}
@@ -142,11 +177,10 @@ export default function HonorsMainComponent() {
             handleCancelEdit={handleCancelEdit}
             handleEditImageChange={handleEditImageChange}
             setEditedHonor={setEditedHonor}
-            content={content}
-            setContent={setContent}
+            
           />
 
-          {/* <div>{parse(content)}</div> */}
+         
         </>
       )}
     </section>

@@ -1,6 +1,11 @@
 import React, { useState } from "react";
+import { useDispatch } from "react-redux";
+import { uploadFile } from "@/app/Store/thunks";
+import { productpot } from "@/app/Store/thunks";
 
-export default function AddHonors({ dispatch }) {
+export default function AddHonors() {
+  const dispatch = useDispatch();
+
   const [name, setName] = useState("");
   const [title, setTitle] = useState("");
   const [subtitle, setSubtitle] = useState("");
@@ -10,6 +15,14 @@ export default function AddHonors({ dispatch }) {
   const [media, setMedia] = useState([
     { title: "", description: "", src: "", poster: "" },
   ]);
+
+  const handleFileChange = (e, index, setFunction, state) => {
+    const file = e.target.files[0];
+    const updatedState = state.map((item, i) =>
+      i === index ? { ...item, src: file } : item
+    );
+    setFunction(updatedState);
+  };
 
   const handleAddColor = () => {
     setColors([...colors, { name: "", value: "" }]);
@@ -32,7 +45,9 @@ export default function AddHonors({ dispatch }) {
   };
 
   const handleRemoveImgData = (index) => {
-    setImgData(imgData.filter((_, i) => i !== index));
+    if (imgData.length > 1) {
+      setImgData(imgData.filter((_, i) => i !== index));
+    }
   };
 
   const handleAddMedia = () => {
@@ -46,37 +61,59 @@ export default function AddHonors({ dispatch }) {
   const handleSubmit = async (e) => {
     e.preventDefault();
 
-    // Create the info object with all fields
-    const info = {
-      title,
-      subtitle,
-      color: colors,
-      sizes,
-      imgData,
-    };
-
-    // Create the final product object
-    const productData = {
-      name,
-      info,
-      media,
-    };
-
     try {
-      const response = await fetch("/api/products", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(productData),
-      });
+      // Upload all images/videos and get the IDs
+      const uploadedImgData = await Promise.all(
+        imgData.map(async (item) => {
+          if (item.src) {
+            const tag = name;
+            const type = item.type;
+            const isPublic = true;
+            const file = item.src;
 
-      if (!response.ok) {
-        throw new Error("Failed to create new product");
-      }
+            const fileId = await dispatch(
+              uploadFile({ file, tag, type, isPublic })
+            ).unwrap();
+            console.log(fileId);
 
-      const result = await response.json();
-      console.log("Product created successfully:", result);
+            return { ...item, src: fileId }; // Replace src with the file ID
+          }
+          return item;
+        })
+      );
+
+      const uploadedMedia = await Promise.all(
+        media.map(async (item) => {
+          if (item.src) {
+            const fileId = await dispatch(uploadFile(item.src)).unwrap();
+            return { ...item, src: fileId }; // Replace src with the file ID
+          }
+          return item;
+        })
+      );
+
+      // Create the info object with all fields
+      const info = {
+        title,
+        subtitle,
+        color: colors,
+        sizes,
+        imgData: uploadedImgData, // Use uploaded image data with IDs
+      };
+
+      // Create the final product object
+      const productData = {
+        name,
+        info,
+        media: uploadedMedia, // Use uploaded media with IDs
+      };
+
+      console.log(productData);
+
+      // Dispatch the final product submission
+      await dispatch(productpot(productData));
+
+      console.log("Product created successfully");
     } catch (error) {
       console.error("Error creating product:", error);
     }
@@ -181,15 +218,9 @@ export default function AddHonors({ dispatch }) {
           {imgData.map((item, index) => (
             <div key={index}>
               <input
-                type="text"
-                placeholder="Source"
-                value={item.src}
+                type="file"
                 onChange={(e) =>
-                  setImgData(
-                    imgData.map((img, i) =>
-                      i === index ? { ...img, src: e.target.value } : img
-                    )
-                  )
+                  handleFileChange(e, index, setImgData, imgData)
                 }
                 required
               />
@@ -208,8 +239,7 @@ export default function AddHonors({ dispatch }) {
               />
               {item.type === "video" && (
                 <input
-                  type="text"
-                  placeholder="Poster (only for video)"
+                  type="file"
                   value={item.poster}
                   onChange={(e) =>
                     setImgData(
@@ -237,7 +267,7 @@ export default function AddHonors({ dispatch }) {
               <input
                 type="text"
                 placeholder="Title"
-                value={item.title}
+                value={item.title || ""}
                 onChange={(e) =>
                   setMedia(
                     media.map((m, i) =>
@@ -250,7 +280,7 @@ export default function AddHonors({ dispatch }) {
               <input
                 type="text"
                 placeholder="Description"
-                value={item.description}
+                value={item.description || ""}
                 onChange={(e) =>
                   setMedia(
                     media.map((m, i) =>
@@ -263,7 +293,7 @@ export default function AddHonors({ dispatch }) {
               <input
                 type="text"
                 placeholder="Source"
-                value={item.src}
+                value={item.src || ""}
                 onChange={(e) =>
                   setMedia(
                     media.map((m, i) =>
@@ -276,7 +306,7 @@ export default function AddHonors({ dispatch }) {
               <input
                 type="text"
                 placeholder="Poster"
-                value={item.poster}
+                value={item.poster || ""}
                 onChange={(e) =>
                   setMedia(
                     media.map((m, i) =>
