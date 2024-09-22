@@ -8,9 +8,13 @@ import EditVideo from "./EditVideo";
 import { useSelector, useDispatch } from "react-redux";
 import { honors } from "../../Store/slice.js";
 import { updateHonor } from "../../Store/thunks.js";
+import { homePageVideo } from "../../Store/thunks.js";
+import { homeVideoFileName } from "../../Store/slice.js";
 
 import { Card, CardContent, CardMedia, Typography } from "@mui/material";
+
 import honorsData from "/public/json/Video.json";
+
 import styled from "styled-components";
 import parse from "html-react-parser";
 
@@ -27,7 +31,7 @@ const CARD = styled(Card)`
 
 export default function HonorsMainComponent() {
   const dispatch = useDispatch();
-  const honorsR = useSelector(honors);
+  
 
   // add honors
   const [activekey, setActiveKey] = useState("editUserPage");
@@ -36,8 +40,7 @@ export default function HonorsMainComponent() {
 
   const [content, setContent] = useState(""); // Added content state for editing
   useEffect(() => {
-    // This assumes that you have a way to initialize the honors in your state.
-    // You might want to dispatch a thunk to fetch honors from the server.
+    dispatch(homePageVideo())
   }, [dispatch]);
 
   // saving the changes

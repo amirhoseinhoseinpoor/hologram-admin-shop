@@ -56,6 +56,14 @@ const ProductMainComponent = dynamic(
   }
 );
 
+const BannerMainComponent = dynamic(
+  () => import("../eachPageComponent/Banner/BannerMainComponent.js"),
+  {
+    ssr: false,
+    loading: () => <p>Loading...</p>,
+  }
+);
+
 const AdminPanel = () => {
   const [activeTab, setActiveTab] = useState("Doshbord");
 
@@ -74,6 +82,7 @@ const AdminPanel = () => {
           <Tab eventKey="Blogs" title="مقالات"></Tab>
           <Tab eventKey="Honors" title="افتخارات"></Tab>
           <Tab eventKey="Exhibition" title="نمایشگاه ها"></Tab>
+          <Tab eventKey="Banner" title="بنر"></Tab>
           <Tab eventKey="Video" title="ویدیو"></Tab>
           <Tab eventKey="defineUser" title="مدیریت کاربر"></Tab>
           <Tab eventKey="setting" title="تنظیمات"></Tab>
@@ -108,6 +117,11 @@ const AdminPanel = () => {
         {activeTab === "Exhibition" && (
           <div className={style.tabContent}>
             <ExhibitionMainComponent />
+          </div>
+        )}
+        {activeTab === "Banner" && (
+          <div className={style.tabContent}>
+            <BannerMainComponent />
           </div>
         )}
         {activeTab === "Video" && (

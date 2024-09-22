@@ -1,5 +1,9 @@
 import { createSlice } from "@reduxjs/toolkit";
-import { login, logout, Adduser , updateHonor , list } from "./thunks";
+import { login, logout, Adduser  , list, homePageVideo , bannerdata , addBanner } from "./thunks";
+
+
+// start auth slice
+
 
 const authinitialState = {
   token: null,
@@ -40,13 +44,14 @@ const authSlice = createSlice({
   },
 });
 
-// export default authSlice.reducer;
 export const authSliceV = authSlice.reducer;
 export const token = (state) => state.auth.token;
 export const loading = (state) => state.auth.loading;
 export const error = (state) => state.auth.error;
 
+// end auth slice
 
+// start product slice
 
 const peoductinitialState = {
   data: null,
@@ -79,8 +84,94 @@ const productSlice = createSlice({
 export const productSliceV = productSlice.reducer;
 export const data = (state) => state.product.data;
 
+// end product slice
+
+// start Banner
 
 
+const bannerinitialState = {
+  bannerImg: null,
+  loading: false,
+  error: null,
+};
+
+const bannerSlice = createSlice({
+  name: "banner",
+  initialState: bannerinitialState,
+  reducers: {},
+  extraReducers: (builder) => {
+    builder
+      .addCase(bannerdata.pending, (state) => {
+        state.loading = true;
+        state.error = null;
+      })
+      .addCase(bannerdata.fulfilled, (state, action) => {
+        state.loading = false;
+        state.bannerImg = action.payload;
+      })
+      .addCase(bannerdata.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.error.message;
+      })
+      // .addCase(addBanner.pending, (state) => {
+      //   state.loading = true;
+      //   state.error = null;
+      // })
+      // .addCase(addBanner.fulfilled, (state, action) => {
+      //   state.loading = false;
+      //   state.bannerImg = action.payload;
+      // })
+      // .addCase(addBanner.rejected, (state, action) => {
+      //   state.loading = false;
+      //   state.error = action.error.message;
+      // })
+      
+  },
+});
+
+export const bannerSliceV = bannerSlice.reducer;
+export const bannerImg = (state) => state.banner.bannerImg;
+
+
+
+// end Banner
+
+// start HomePageVideo
+
+const homePageinitialState = {
+  homeVideoFileName: null,
+  loading: false,
+  error: null,
+};
+
+const homePage = createSlice({
+  name : "homePage",
+  initialState : homePageinitialState,
+  reducers : {},
+  extraReducers : (builder) => {
+    builder
+    .addCase(homePageVideo.pending, (state) => {
+      state.loading = true;
+      state.error = null;
+    })
+    .addCase(homePageVideo.fulfilled, (state, action) => {
+      state.loading = false;
+      state.homeVideoFileName = action.payload;
+    })
+    .addCase(homePageVideo.rejected, (state, action) => {
+      state.loading = false;
+      state.error = action.error.message;
+    });
+
+  }
+})
+
+export const homePageV = homePage.reducer;
+export const homeVideoFileName = (state) => state.homePage.homeVideoFileName;
+
+
+
+// end HomePageVideo
 
 
 const AdminInitialState = {
@@ -123,26 +214,12 @@ const HonorsInitialState = {
 };
 
 const HonorsSlice = createSlice({
-  
   name : "honors",
   initialState : HonorsInitialState,
   reducers : {},
   extraReducers : (builder) => {
     builder
-    .addCase(updateHonor.pending, (state) =>{
-      state.status = 'loading';
-    })
-    .addCase(updateHonor.fulfilled, (state , action) => {
-      state.status = 'succeeded';
-      const index = state.honors.findIndex(honor => honor.id === action.payload.id);
-      if (index !== -1) {
-        state.honors[index] = action.payload;
-      }
-    })
-    .addCase(updateHonor.rejected, (state, action) => {
-      state.status = 'failed';
-      state.errorHonors = action.payload;
-    });
+    
   }
 })
 

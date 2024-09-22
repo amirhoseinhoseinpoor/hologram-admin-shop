@@ -1,5 +1,6 @@
 import { createAsyncThunk } from "@reduxjs/toolkit";
-import axios from "axios"; // Import axios for API calls
+import axios from "axios";
+
 
 export const login = createAsyncThunk(
   "auth/login",
@@ -13,8 +14,7 @@ export const login = createAsyncThunk(
           password,
         }
       );
-      const token = response.data.token; // Assuming successful login returns a token
-
+      const token = response.data.token;
       return token;
     } catch (error) {
       if (error.response && error.response.status === 400) {
@@ -40,7 +40,7 @@ export const productpot = createAsyncThunk(
         media: [{}],
       });
       const data = response.data;
-      console.log(data);
+      
 
       return data;
     } catch (error) {
@@ -71,6 +71,132 @@ export const list = createAsyncThunk("product/list", async (thunkAPI) => {
   }
 });
 
+// end product
+
+// start banner
+export const bannerdata = createAsyncThunk(
+  "banner/bannerdata",
+  async (_, thunkAPI) => {
+    try {
+      const response = await axios.get(
+        "http://localhost:7000/system/download/list/banner"
+      );
+
+      const bannerData = response.data;
+
+      // Initialize an array to store the images with base64 data
+      const imagesWithBase64 = [];
+
+      // Loop through each banner and fetch its image
+      for (let image of bannerData) {
+        try {
+          const imageResponse = await axios.get(
+            `http://localhost:7000/system/download/${image.fileName}`,
+            { responseType: "arraybuffer" }
+          );
+
+           // Convert the ArrayBuffer to a Uint8Array
+           const uint8Array = new Uint8Array(imageResponse.data);
+
+         // Convert the Uint8Array to a base64 string
+         const base64Image = Buffer.from(uint8Array).toString('base64');
+          
+          // Determine MIME type (assuming it's PNG for simplicity)
+          const mimeType = imageResponse.headers['content-type'] || 'image/png';
+
+          // Add the base64 string to the image object
+          imagesWithBase64.push({
+            ...image,
+            base64Image: `data:${mimeType};base64,${base64Image}`,
+          });
+
+        } catch (imageError) {
+          console.error("Error fetching image:", imageError);
+          // Handle individual image errors here if necessary
+        }
+      }
+
+      return imagesWithBase64;
+    } catch (error) {
+      if (error.response && error.response.status === 400) {
+        return thunkAPI.rejectWithValue("ارور سمت من");
+      } else {
+        return thunkAPI.rejectWithValue(
+          "مشکلی به وجود امده لطفا بعدا تلاش کنید"
+        );
+      }
+    }
+  }
+);
+
+export const addBanner = createAsyncThunk(
+  "banner/addBanner",
+  async ({ bannerImage }, thunkAPI) => {
+    const state = thunkAPI.getState();
+    const token = state.auth.token;
+
+    try {
+      // Create a FormData object
+      const formData = new FormData();
+      formData.append("files", bannerImage);
+      formData.append("tag", "banner");
+      formData.append("type", 1);
+      formData.append("isPublic", true);
+
+      const response = await axios.post(
+        "http://localhost:7000/system/upload",
+        formData,
+        {
+          headers: {
+            Authorization: token ? `Bearer ${token}` : "",
+            "Content-Type": "multipart/form-data",
+          },
+        }
+      );
+
+      if (response.data[0].fileName) {
+        alert("افزودن عکس با موفقیت انجام شد");
+      }
+
+      return response.data;
+    } catch (error) {
+      if (error.response && error.response.status === 400) {
+        alert("خطا در افزودن عکس");
+        return thunkAPI.rejectWithValue("ارور سمت من");
+      } else {
+        return thunkAPI.rejectWithValue(
+          "مشکلی به وجود امده لطفا بعدا تلاش کنید"
+        );
+      }
+    }
+  }
+);
+
+// end banner
+
+// start HomePageVideo
+
+export const homePageVideo = createAsyncThunk(
+  "homePage/video",
+  async (thunkAPI) => {
+    try {
+      const response = await axios.get(
+        "http://localhost:7000/system/download/list/homePage1"
+      );
+
+      console.log(response.data);
+    } catch (error) {
+      if (error.response && error.response.status === 400) {
+        return thunkAPI.rejectWithValue("ارور سمت من");
+      } else {
+        return thunkAPI.rejectWithValue(
+          "مشکلی به وجود امده لطفا بعدا تلاش کنید"
+        );
+      }
+    }
+  }
+);
+
 export const logout = createAsyncThunk("auth/logout", async () => {
   try {
     await axios.post("/api/logout"); // Assuming logout endpoint exists
@@ -89,39 +215,6 @@ export const Adduser = createAsyncThunk(
       return response.data; // Assuming successful update returns updated banner data
     } catch (error) {
       return thunkAPI.rejectWithValue(error.message);
-    }
-  }
-);
-
-export const updateHonor = createAsyncThunk(
-  "honors/updateHonor",
-  async (honor, { rejectWithValue }) => {
-    console.log(honor);
-    try {
-      const formData = new FormData();
-      formData.append("title", honor.title);
-      formData.append("date", honor.date);
-      formData.append("tags", honor.tags);
-      formData.append("src", honor.src);
-      formData.append("content", honor.content);
-
-      if (honor.newImageFile) {
-        formData.append("image", honor.newImageFile);
-      }
-
-      const response = await axios.post(
-        `/api/updateHonor/${honor.id}`,
-        formData,
-        {
-          headers: {
-            "Content-Type": "multipart/form-data",
-          },
-        }
-      );
-
-      return response.data;
-    } catch (error) {
-      return rejectWithValue(error.response.data);
     }
   }
 );
