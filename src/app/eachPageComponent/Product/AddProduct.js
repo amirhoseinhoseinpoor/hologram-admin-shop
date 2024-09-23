@@ -1,7 +1,13 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { useDispatch } from "react-redux";
 import { uploadFile } from "@/app/Store/thunks";
 import { productpot } from "@/app/Store/thunks";
+import styled from "styled-components";
+
+const BorderInputBox = styled.div`
+  border: 2px solid #28a745;
+  padding: 5px;
+`;
 
 export default function AddHonors() {
   const dispatch = useDispatch();
@@ -11,10 +17,14 @@ export default function AddHonors() {
   const [subtitle, setSubtitle] = useState("");
   const [colors, setColors] = useState([{ name: "", value: "" }]);
   const [sizes, setSizes] = useState([""]);
-  const [imgData, setImgData] = useState([{ src: "", type: "", poster: "" }]);
+  const [imgData, setImgData] = useState([{ src: "", type: "1", poster: "" }]);
   const [media, setMedia] = useState([
     { title: "", description: "", src: "", poster: "" },
   ]);
+
+  useEffect(() => {
+    console.log(media);
+  }, [media]);
 
   const handleFileChange = (e, index, setFunction, state) => {
     const file = e.target.files[0];
@@ -24,12 +34,22 @@ export default function AddHonors() {
     setFunction(updatedState);
   };
 
+  const handleFileChangePoster = (e, index, setFunction, state) => {
+    const file = e.target.files[0];
+    const updatedState = state.map((item, i) =>
+      i === index ? { ...item, poster: file } : item
+    );
+    setFunction(updatedState);
+  };
+
   const handleAddColor = () => {
     setColors([...colors, { name: "", value: "" }]);
   };
 
   const handleRemoveColor = (index) => {
-    setColors(colors.filter((_, i) => i !== index));
+    if (colors.length > 1) {
+      setColors(colors.filter((_, i) => i !== index));
+    }
   };
 
   const handleAddSize = () => {
@@ -37,7 +57,9 @@ export default function AddHonors() {
   };
 
   const handleRemoveSize = (index) => {
-    setSizes(sizes.filter((_, i) => i !== index));
+    if (sizes.length > 1) {
+      setSizes(sizes.filter((_, i) => i !== index));
+    }
   };
 
   const handleAddImgData = () => {
@@ -60,7 +82,6 @@ export default function AddHonors() {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-
     try {
       // Upload all images/videos and get the IDs
       const uploadedImgData = await Promise.all(
@@ -74,9 +95,20 @@ export default function AddHonors() {
             const fileId = await dispatch(
               uploadFile({ file, tag, type, isPublic })
             ).unwrap();
-            console.log(fileId);
 
             return { ...item, src: fileId }; // Replace src with the file ID
+          }
+          if (item.poster) {
+            const tag = name;
+            const type = 1;
+            const isPublic = true;
+            const file = item.poster;
+
+            const fileId = await dispatch(
+              uploadFile({ file, tag, type, isPublic })
+            ).unwrap();
+
+            return { ...item, poster: fileId }; // Replace src with the file ID
           }
           return item;
         })
@@ -85,8 +117,30 @@ export default function AddHonors() {
       const uploadedMedia = await Promise.all(
         media.map(async (item) => {
           if (item.src) {
-            const fileId = await dispatch(uploadFile(item.src)).unwrap();
+            const tag = name;
+            const type = 2;
+            const isPublic = true;
+            const file = item.src;
+
+            const fileId = await dispatch(
+              uploadFile({ file, tag, type, isPublic })
+            ).unwrap();
+            console.log(fileId);
+
             return { ...item, src: fileId }; // Replace src with the file ID
+          }
+          if (item.poster) {
+            const tag = name;
+            const type = 1;
+            const isPublic = true;
+            const file = item.poster;
+
+            const fileId = await dispatch(
+              uploadFile({ file, tag, type, isPublic })
+            ).unwrap();
+            console.log(fileId);
+
+            return { ...item, poster: fileId }; // Replace src with the file ID
           }
           return item;
         })
@@ -108,12 +162,11 @@ export default function AddHonors() {
         media: uploadedMedia, // Use uploaded media with IDs
       };
 
-      console.log(productData);
+      
 
       // Dispatch the final product submission
       await dispatch(productpot(productData));
-
-      console.log("Product created successfully");
+      
     } catch (error) {
       console.error("Error creating product:", error);
     }
@@ -149,10 +202,10 @@ export default function AddHonors() {
           required
         />
 
-        <div>
-          <label>Colors:</label>
+        <BorderInputBox className="mt-2">
+          <label>رنگ ها :</label>
           {colors.map((color, index) => (
-            <div key={index}>
+            <div className="mt-2" key={index}>
               <input
                 type="text"
                 placeholder="Name"
@@ -179,20 +232,24 @@ export default function AddHonors() {
                 }
                 required
               />
-              <button type="button" onClick={() => handleRemoveColor(index)}>
-                Remove
+              <button
+                className="bg-danger"
+                type="button"
+                onClick={() => handleRemoveColor(index)}
+              >
+                حذف
               </button>
             </div>
           ))}
-          <button type="button" onClick={handleAddColor}>
-            Add Color
+          <button className="mt-2" type="button" onClick={handleAddColor}>
+            اضافه کردن رنگ
           </button>
-        </div>
+        </BorderInputBox>
 
-        <div>
-          <label>Sizes:</label>
+        <BorderInputBox className="mt-3">
+          <label>سایز ها :</label>
           {sizes.map((size, index) => (
-            <div key={index}>
+            <div className="mt-2" key={index}>
               <input
                 type="text"
                 value={size}
@@ -203,30 +260,36 @@ export default function AddHonors() {
                 }
                 required
               />
-              <button type="button" onClick={() => handleRemoveSize(index)}>
-                Remove
+              <button
+                className="bg-danger"
+                type="button"
+                onClick={() => handleRemoveSize(index)}
+              >
+                حذف
               </button>
             </div>
           ))}
-          <button type="button" onClick={handleAddSize}>
-            Add Size
+          <button className="mt-2" type="button" onClick={handleAddSize}>
+            اضافه کردن سایز
           </button>
-        </div>
+        </BorderInputBox>
 
-        <div>
-          <label>Image Data:</label>
+        <BorderInputBox className="mt-3">
+          <label>عکس ها و فیلم های محصول :</label>
           {imgData.map((item, index) => (
-            <div key={index}>
-              <input
-                type="file"
-                onChange={(e) =>
-                  handleFileChange(e, index, setImgData, imgData)
-                }
-                required
-              />
-              <input
-                type="text"
-                placeholder="Type"
+            <div className="d-flex flex-row gap-2 flex-wrap mt-2" key={index}>
+              <div className="d-flex flex-column">
+                <span className="mb-1">عکس یا فیلم</span>
+                <input
+                  type="file"
+                  onChange={(e) =>
+                    handleFileChange(e, index, setImgData, imgData)
+                  }
+                  required
+                />
+              </div>
+
+              <select
                 value={item.type}
                 onChange={(e) =>
                   setImgData(
@@ -236,38 +299,44 @@ export default function AddHonors() {
                   )
                 }
                 required
-              />
-              {item.type === "video" && (
-                <input
-                  type="file"
-                  value={item.poster}
-                  onChange={(e) =>
-                    setImgData(
-                      imgData.map((img, i) =>
-                        i === index ? { ...img, poster: e.target.value } : img
-                      )
-                    )
-                  }
-                />
+              >
+                <option value={1}>عکس :</option>
+                <option value={2}>فیلم :</option>
+              </select>
+              {item.type === "2" && (
+                <div className="d-flex flex-column">
+                  <span className="mb-1">پوستر فیلم</span>
+                  <input
+                    type="file"
+                    
+                    onChange={(e) =>
+                      handleFileChangePoster(e, index, setImgData, imgData)
+                    }
+                  />
+                </div>
               )}
-              <button type="button" onClick={() => handleRemoveImgData(index)}>
-                Remove
+              <button
+                className="bg-danger"
+                type="button"
+                onClick={() => handleRemoveImgData(index)}
+              >
+                حذف
               </button>
             </div>
           ))}
-          <button type="button" onClick={handleAddImgData}>
-            Add Image/Video
+          <button className="mt-2" type="button" onClick={handleAddImgData}>
+            اضافه کردن عکس / فیلم
           </button>
-        </div>
+        </BorderInputBox>
 
-        <div>
-          <label>Media:</label>
+        <BorderInputBox className="mt-3">
+          <label>فیلم ها:</label>
           {media.map((item, index) => (
-            <div key={index}>
+            <div className="mt-2" key={index}>
               <input
                 type="text"
                 placeholder="Title"
-                value={item.title || ""}
+                value={item.title }
                 onChange={(e) =>
                   setMedia(
                     media.map((m, i) =>
@@ -280,7 +349,7 @@ export default function AddHonors() {
               <input
                 type="text"
                 placeholder="Description"
-                value={item.description || ""}
+                value={item.description }
                 onChange={(e) =>
                   setMedia(
                     media.map((m, i) =>
@@ -290,41 +359,39 @@ export default function AddHonors() {
                 }
                 required
               />
-              <input
-                type="text"
-                placeholder="Source"
-                value={item.src || ""}
-                onChange={(e) =>
-                  setMedia(
-                    media.map((m, i) =>
-                      i === index ? { ...m, src: e.target.value } : m
-                    )
-                  )
-                }
-                required
-              />
-              <input
-                type="text"
-                placeholder="Poster"
-                value={item.poster || ""}
-                onChange={(e) =>
-                  setMedia(
-                    media.map((m, i) =>
-                      i === index ? { ...m, poster: e.target.value } : m
-                    )
-                  )
-                }
-                required
-              />
-              <button type="button" onClick={() => handleRemoveMedia(index)}>
-                Remove
+              <div className="d-flex flex-column">
+                <span>فیلم :</span>
+                <input
+                  type="file"              
+                  onChange={(e) => handleFileChange(e, index, setMedia, media)}
+                  required
+                />
+              </div>
+
+              <div className="d-flex flex-column">
+                <span>پوستر فیلم :</span>
+                <input
+                  type="file"                
+                  onChange={(e) =>
+                    handleFileChangePoster(e, index, setMedia, media)
+                  }
+                  required
+                />
+              </div>
+
+              <button
+                className="bg-danger"
+                type="button"
+                onClick={() => handleRemoveMedia(index)}
+              >
+                حذف
               </button>
             </div>
           ))}
-          <button type="button" onClick={handleAddMedia}>
-            Add Media
+          <button className="mt-2" type="button" onClick={handleAddMedia}>
+            اضافه کردن ویدیو
           </button>
-        </div>
+        </BorderInputBox>
         <button type="submit" className="mt-3">
           اضافه کردن محصول
         </button>

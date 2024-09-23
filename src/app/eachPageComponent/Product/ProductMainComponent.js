@@ -12,7 +12,6 @@ import { productListData } from "@/app/Store/slice";
 import { updateHonor } from "../../Store/thunks.js";
 
 import { Card, CardContent, CardMedia, Typography } from "@mui/material";
-import honorsData from "/public/json/ExhibitionTest.json";
 import styled from "styled-components";
 
 
@@ -39,7 +38,9 @@ export default function HonorsMainComponent() {
 
   const datacome = useSelector(productListData);
 
-  // console.log(datacome);
+
+
+  console.log(datacome);
 
   useEffect(() => {
     dispatch(list());
@@ -86,6 +87,7 @@ export default function HonorsMainComponent() {
           >
             {datacome &&
               datacome.map((data , index) => (
+                
                 <div key={index}>
                   
 
@@ -95,16 +97,15 @@ export default function HonorsMainComponent() {
                       setEditedHonor(data);
                     }}
                   >
-                    {/* <CardMedia
+                    <CardMedia
                       component="img"
-                      src={image.base64Image}
-                      alt={image.originalName}
+                      src={`http://localhost:7000/system/download/${data.info.imgData[0].src}`}
                       sx={{
                         width: "120px",
                         maxHeight: "100%",
                         borderRadius: "2px",
                       }}
-                    /> */}
+                    />
                     <CardContent className="d-flex flex-column justify-content-around">
                       <Typography className="titleHonors">
                         {data.name}
@@ -120,7 +121,7 @@ export default function HonorsMainComponent() {
                   </CARD>
                 </div>
               ))}
-            {honorsData.map((honor, index) => (
+            {/* {honorsData.map((honor, index) => (
               <React.Fragment key={index}>
                 <CARD
                   className="d-flex flex-row"
@@ -146,7 +147,7 @@ export default function HonorsMainComponent() {
                   </CardContent>
                 </CARD>
               </React.Fragment>
-            ))}
+            ))} */}
           </div>
         </>
       )}
@@ -177,10 +178,7 @@ export default function HonorsMainComponent() {
             handleCancelEdit={handleCancelEdit}
             handleEditImageChange={handleEditImageChange}
             setEditedHonor={setEditedHonor}
-            
-          />
-
-         
+          />         
         </>
       )}
     </section>

@@ -18,6 +18,9 @@ export default function EditHonors({
 
 
 }) {
+
+  console.log(editedHonor);
+  
   
 
   const handleTagsChange = (event) => {

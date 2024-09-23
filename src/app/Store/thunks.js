@@ -90,6 +90,10 @@ export const productpot = createAsyncThunk(
       );
       const data = response.data;
 
+      if (data) {
+        alert("افزودن محصول با موفقیت انجام شد");
+      }
+
       return data;
     } catch (error) {      
       if (error.response && error.response.status === 400) {
