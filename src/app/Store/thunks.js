@@ -95,7 +95,43 @@ export const productpot = createAsyncThunk(
       }
 
       return data;
-    } catch (error) {      
+    } catch (error) {
+      if (error.response && error.response.status === 400) {
+        return thunkAPI.rejectWithValue("ارور سمت من");
+      } else {
+        return thunkAPI.rejectWithValue(
+          "مشکلی به وجود امده لطفا بعدا تلاش کنید"
+        );
+      }
+    }
+  }
+);
+
+export const productEdit = createAsyncThunk(
+  "product/productEdit",
+  async ({productData , code}, thunkAPI) => {
+    const state = thunkAPI.getState();
+    const token = state.auth.token;
+    try {
+      const response = await axios.patch(
+        `http://localhost:7000/product/${code}`,
+        productData,
+        {
+          headers: {
+            Authorization: token ? `Bearer ${token}` : "",
+            "Content-Type": "application/json",
+          },
+        }
+      );
+      const data = response.data;
+
+      if (data) {
+        alert("اپدیت محصول با موفقیت انجام شد");
+        console.log(data);
+      }
+
+      return data;
+    } catch (error) {
       if (error.response && error.response.status === 400) {
         return thunkAPI.rejectWithValue("ارور سمت من");
       } else {
@@ -111,7 +147,6 @@ export const list = createAsyncThunk("product/list", async (thunkAPI) => {
   try {
     const response = await axios.get("http://localhost:7000/product/list");
     const data = response.data;
-    
 
     return data;
   } catch (error) {
@@ -122,6 +157,73 @@ export const list = createAsyncThunk("product/list", async (thunkAPI) => {
     }
   }
 });
+
+export const deleted = createAsyncThunk(
+  "product/deleted",
+  async ({ code, name }, thunkAPI) => {
+    const state = thunkAPI.getState();
+    const token = state.auth.token;
+
+
+    
+    try {
+      const response2 = await axios.get(
+        `http://localhost:7000/system/download/list/${name}`
+      );
+
+      const listOfDelete = response2.data;
+
+      listOfDelete.map((item) => {
+        const responseDelete = axios.delete(
+          `http://localhost:7000/system/download/${item.fileName}`,
+          {
+            headers: {
+              Authorization: token ? `Bearer ${token}` : "",
+            },
+          }
+        );
+        console.log(responseDelete);
+        console.log(item.fileName);
+        
+
+      })
+
+      
+      
+
+      const responseDelete = await axios.delete(
+        `http://localhost:7000/system/download/${listOfDelete}`,
+        {
+          headers: {
+            Authorization: token ? `Bearer ${token}` : "",
+          },
+        }
+      );
+
+      console.log(responseDelete.data);
+
+      const response = await axios.delete(
+        `http://localhost:7000/product/${code}`,
+        {
+          headers: {
+            Authorization: token ? `Bearer ${token}` : "",
+          },
+        }
+      );
+      const data = response.data;
+
+      return data;
+    } catch (error) {
+      if (error.response && error.response.status === 400) {
+        return thunkAPI.rejectWithValue("ارور سمت من");
+      } else {
+        return thunkAPI.rejectWithValue(
+          "مشکلی به وجود امده لطفا بعدا تلاش کنید"
+        );
+      }
+    }
+  }
+);
 
 // end product
 

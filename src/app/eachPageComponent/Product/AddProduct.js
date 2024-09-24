@@ -22,9 +22,6 @@ export default function AddHonors() {
     { title: "", description: "", src: "", poster: "" },
   ]);
 
-  useEffect(() => {
-    console.log(media);
-  }, [media]);
 
   const handleFileChange = (e, index, setFunction, state) => {
     const file = e.target.files[0];

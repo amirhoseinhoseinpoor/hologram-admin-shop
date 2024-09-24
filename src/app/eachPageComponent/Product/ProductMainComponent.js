@@ -14,7 +14,6 @@ import { updateHonor } from "../../Store/thunks.js";
 import { Card, CardContent, CardMedia, Typography } from "@mui/material";
 import styled from "styled-components";
 
-
 const CARD = styled(Card)`
   background-color: #5f5f5f !important;
   color: white !important;
@@ -29,6 +28,16 @@ const CARD = styled(Card)`
 export default function HonorsMainComponent() {
   const dispatch = useDispatch();
 
+  const [name, setName] = useState("");
+  const [title, setTitle] = useState("");
+  const [subtitle, setSubtitle] = useState("");
+  const [colors, setColors] = useState([{ name: "", value: "" }]);
+  const [sizes, setSizes] = useState([""]);
+  const [imgData, setImgData] = useState([{ src: "", type: "1", poster: "" }]);
+  const [media, setMedia] = useState([
+    { title: "", description: "", src: "", poster: "" },
+  ]);
+
   // add honors
   const [activekey, setActiveKey] = useState("editUserPage");
   // edit honors
@@ -38,9 +47,7 @@ export default function HonorsMainComponent() {
 
   const datacome = useSelector(productListData);
 
-
-
-  console.log(datacome);
+  // console.log(datacome);
 
   useEffect(() => {
     dispatch(list());
@@ -86,26 +93,26 @@ export default function HonorsMainComponent() {
             style={{ cursor: "pointer" }}
           >
             {datacome &&
-              datacome.map((data , index) => (
-                
+              datacome.map((data, index) => (
                 <div key={index}>
-                  
-
                   <CARD
                     className="d-flex flex-row"
                     onClick={() => {
                       setEditedHonor(data);
                     }}
                   >
-                    <CardMedia
-                      component="img"
-                      src={`http://localhost:7000/system/download/${data.info.imgData[0].src}`}
-                      sx={{
-                        width: "120px",
-                        maxHeight: "100%",
-                        borderRadius: "2px",
-                      }}
-                    />
+                    {data.info.imgData && (
+                      <CardMedia
+                        component="img"
+                        src={`http://localhost:7000/system/download/${data.info.imgData[0].src}`}
+                        sx={{
+                          width: "120px",
+                          maxHeight: "100%",
+                          borderRadius: "2px",
+                        }}
+                      />
+                    )}
+
                     <CardContent className="d-flex flex-column justify-content-around">
                       <Typography className="titleHonors">
                         {data.name}
@@ -113,10 +120,9 @@ export default function HonorsMainComponent() {
                       <div className="d-flex flex-row gap-2">
                         <p>کد محصول :</p>
                         <Typography className="dateHonors">
-                        {data.code}
-                      </Typography>
+                          {data.code}
+                        </Typography>
                       </div>
-                      
                     </CardContent>
                   </CARD>
                 </div>
@@ -166,7 +172,7 @@ export default function HonorsMainComponent() {
           </div>
 
           <div>
-            <AddProduct/>
+            <AddProduct />
           </div>
         </>
       )}
@@ -174,11 +180,9 @@ export default function HonorsMainComponent() {
         <>
           <EditProduct
             editedHonor={editedHonor}
-            handleHonorSave={handleHonorSave}
             handleCancelEdit={handleCancelEdit}
-            handleEditImageChange={handleEditImageChange}
             setEditedHonor={setEditedHonor}
-          />         
+          />
         </>
       )}
     </section>
