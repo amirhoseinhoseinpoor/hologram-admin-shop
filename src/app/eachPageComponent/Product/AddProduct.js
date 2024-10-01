@@ -15,12 +15,14 @@ export default function AddHonors() {
   const [name, setName] = useState("");
   const [title, setTitle] = useState("");
   const [subtitle, setSubtitle] = useState("");
-  const [colors, setColors] = useState([{ name: "", value: "" }]);
+  const [colors, setColors] = useState([{ name: "", src: "" }]);
   const [sizes, setSizes] = useState([""]);
   const [imgData, setImgData] = useState([{ src: "", type: "1", poster: "" }]);
   const [media, setMedia] = useState([
     { title: "", description: "", src: "", poster: "" },
   ]);
+
+  
 
 
   const handleFileChange = (e, index, setFunction, state) => {
@@ -40,7 +42,7 @@ export default function AddHonors() {
   };
 
   const handleAddColor = () => {
-    setColors([...colors, { name: "", value: "" }]);
+    setColors([...colors, { name: "", src: "" }]);
   };
 
   const handleRemoveColor = (index) => {
@@ -60,7 +62,7 @@ export default function AddHonors() {
   };
 
   const handleAddImgData = () => {
-    setImgData([...imgData, { src: "", type: "", poster: "" }]);
+    setImgData([...imgData, { src: "", type: "1", poster: "" }]);
   };
 
   const handleRemoveImgData = (index) => {
@@ -80,12 +82,48 @@ export default function AddHonors() {
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-      // Upload all images/videos and get the IDs
+      
       const uploadedImgData = await Promise.all(
         imgData.map(async (item) => {
-          if (item.src) {
+          let updatedItem = { ...item };
+      
+          // Handle src if it's a file object
+          if (typeof item.src === "object" && item.src) {
             const tag = name;
             const type = item.type;
+            const isPublic = true;
+            const file = item.src;
+      
+            const fileId = await dispatch(
+              uploadFile({ file, tag, type, isPublic })
+            ).unwrap();
+      
+            updatedItem.src = fileId; // Update src with the file ID
+          }
+      
+          // Handle poster if it's a file object
+          if (typeof item.poster === "object" && item.poster) {
+            const tag = name;
+            const type = 1; // Assuming type 1 is for posters
+            const isPublic = true;
+            const file = item.poster;
+      
+            const fileId = await dispatch(
+              uploadFile({ file, tag, type, isPublic })
+            ).unwrap();
+      
+            updatedItem.poster = fileId; // Update poster with the file ID
+          }
+      
+          return updatedItem; // Return the updated item after all modifications
+        })
+      );
+
+      const uploadedColors = await Promise.all(
+        colors.map(async (item) => {
+          if (typeof item.src === "object" && item.src) {
+            const tag = name;
+            const type = 1;
             const isPublic = true;
             const file = item.src;
 
@@ -95,51 +133,44 @@ export default function AddHonors() {
 
             return { ...item, src: fileId }; // Replace src with the file ID
           }
-          if (item.poster) {
-            const tag = name;
-            const type = 1;
-            const isPublic = true;
-            const file = item.poster;
-
-            const fileId = await dispatch(
-              uploadFile({ file, tag, type, isPublic })
-            ).unwrap();
-
-            return { ...item, poster: fileId }; // Replace src with the file ID
-          }
+          
           return item;
         })
       );
 
       const uploadedMedia = await Promise.all(
         media.map(async (item) => {
-          if (item.src) {
+          let updatedItem = { ...item };
+      
+          // Handle src if it's a file object
+          if (typeof item.src === "object" && item.src) {
             const tag = name;
             const type = 2;
             const isPublic = true;
             const file = item.src;
-
-            const fileId = await dispatch(
+      
+            const fileIdSrc = await dispatch(
               uploadFile({ file, tag, type, isPublic })
             ).unwrap();
-            console.log(fileId);
-
-            return { ...item, src: fileId }; // Replace src with the file ID
+      
+            updatedItem.src = fileIdSrc; // Update src with the file ID
           }
-          if (item.poster) {
+      
+          // Handle poster if it's a file object
+          if (typeof item.poster === "object" && item.poster) {
             const tag = name;
             const type = 1;
             const isPublic = true;
             const file = item.poster;
-
-            const fileId = await dispatch(
+      
+            const fileIdPoster = await dispatch(
               uploadFile({ file, tag, type, isPublic })
             ).unwrap();
-            console.log(fileId);
-
-            return { ...item, poster: fileId }; // Replace src with the file ID
+      
+            updatedItem.poster = fileIdPoster; // Update poster with the file ID
           }
-          return item;
+      
+          return updatedItem;
         })
       );
 
@@ -147,7 +178,7 @@ export default function AddHonors() {
       const info = {
         title,
         subtitle,
-        color: colors,
+        color: uploadedColors,
         sizes,
         imgData: uploadedImgData, // Use uploaded image data with IDs
       };
@@ -159,6 +190,7 @@ export default function AddHonors() {
         media: uploadedMedia, // Use uploaded media with IDs
       };
 
+      console.log(productData);
       
 
       // Dispatch the final product submission
@@ -207,6 +239,7 @@ export default function AddHonors() {
                 type="text"
                 placeholder="Name"
                 value={color.name}
+                
                 onChange={(e) =>
                   setColors(
                     colors.map((c, i) =>
@@ -217,16 +250,19 @@ export default function AddHonors() {
                 required
               />
               <input
-                type="text"
-                placeholder="Value"
+                type="file"
+                
                 value={color.value}
                 onChange={(e) =>
-                  setColors(
-                    colors.map((c, i) =>
-                      i === index ? { ...c, value: e.target.value } : c
-                    )
-                  )
+                  handleFileChange(e, index, setColors, colors)
                 }
+                // onChange={(e) =>
+                //   setColors(
+                //     colors.map((c, i) =>
+                //       i === index ? { ...c, value: e.target.value } : c
+                //     )
+                //   )
+                // }
                 required
               />
               <button

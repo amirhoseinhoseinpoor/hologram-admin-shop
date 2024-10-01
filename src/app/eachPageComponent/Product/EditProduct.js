@@ -19,9 +19,13 @@ export default function EditHonors({
   const dispatch = useDispatch();
 
   const [name, setName] = useState("");
+
+
+
+
   const [title, setTitle] = useState("");
   const [subtitle, setSubtitle] = useState("");
-  const [colors, setColors] = useState([{ name: "", value: "" }]);
+  const [colors, setColors] = useState([{ name: "", src: "" }]);
   const [sizes, setSizes] = useState([""]);
   const [imgData, setImgData] = useState([{ src: "", type: "1", poster: "" }]);
   const [media, setMedia] = useState([
@@ -36,7 +40,7 @@ export default function EditHonors({
       setName(editedHonor.name || "");
       setTitle(editedHonor.info.title || "");
       setSubtitle(editedHonor.info.subtitle || "");
-      setColors(editedHonor.info.color || [{ name: "", value: "" }]);
+      setColors(editedHonor.info.color || [{ name: "", src: "" }]);
       setSizes(editedHonor.info.sizes || [""]);
       setImgData(
         editedHonor.info.imgData || [{ src: "", type: "1", poster: "" }]
@@ -82,7 +86,7 @@ export default function EditHonors({
   };
 
   const handleAddColor = () => {
-    setColors([...colors, { name: "", value: "" }]);
+    setColors([...colors, { name: "", src: "" }]);
   };
 
   const handleRemoveColor = (index) => {
@@ -144,6 +148,9 @@ export default function EditHonors({
     try {
       const uploadedImgData = await Promise.all(
         imgData.map(async (item) => {
+
+          let updatedItem = { ...item };
+
           if (typeof item.src === "object" && item.src) {
             const tag = name;
             const type = item.type;
@@ -154,7 +161,8 @@ export default function EditHonors({
               uploadFile({ file, tag, type, isPublic })
             ).unwrap();
 
-            return { ...item, src: fileId }; // Replace src with the file ID
+            updatedItem.src = fileId;
+
           } else if (typeof item.src !== "object" && item.src) {
           }
 
@@ -168,15 +176,37 @@ export default function EditHonors({
               uploadFile({ file, tag, type, isPublic })
             ).unwrap();
 
-            return { ...item, poster: fileId };
+            updatedItem.poster = fileId;
           } else if (typeof item.poster !== "object" && item.poster) {
           }
           return item;
         })
       );
 
+      const uploadedColors = await Promise.all(
+        colors.map(async (item) => {
+          if (typeof item.src === "object" && item.src) {
+            const tag = name;
+            const type = 1;
+            const isPublic = true;
+            const file = item.src;
+
+            const fileId = await dispatch(
+              uploadFile({ file, tag, type, isPublic })
+            ).unwrap();
+
+            return { ...item, src: fileId }; // Replace src with the file ID
+          }
+          
+          return item;
+        })
+      );
+
       const uploadedMedia = await Promise.all(
         media.map(async (item) => {
+
+          let updatedItem = { ...item };
+
           if (typeof item.src === "object" && item.src) {
             const tag = name;
             const type = 2;
@@ -187,7 +217,7 @@ export default function EditHonors({
               uploadFile({ file, tag, type, isPublic })
             ).unwrap();
 
-            return { ...item, src: fileId };
+            updatedItem.src = fileId;
           } else if (typeof item.src !== "object" && item.src) {
           }
 
@@ -202,7 +232,7 @@ export default function EditHonors({
             ).unwrap();
             console.log(fileId);
 
-            return { ...item, poster: fileId };
+            updatedItem.poster = fileId;
           } else if (typeof item.poster !== "object" && item.poster) {
           }
           return item;
@@ -213,7 +243,7 @@ export default function EditHonors({
       const info = {
         title,
         subtitle,
-        color: colors,
+        color: uploadedColors,
         sizes,
         imgData: uploadedImgData,
       };
@@ -279,16 +309,18 @@ export default function EditHonors({
               required
             />
             <input
-              type="text"
-              placeholder="Value"
+              type="file"
               value={color.value}
               onChange={(e) =>
-                setColors(
-                  colors.map((c, i) =>
-                    i === index ? { ...c, value: e.target.value } : c
-                  )
-                )
+                handleFileChange(e, index, setColors, colors)
               }
+              // onChange={(e) =>
+              //   setColors(
+              //     colors.map((c, i) =>
+              //       i === index ? { ...c, value: e.target.value } : c
+              //     )
+              //   )
+              // }
               required
             />
             <button
