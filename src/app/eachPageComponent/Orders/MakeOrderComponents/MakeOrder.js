@@ -1,7 +1,7 @@
 "use client";
 
 import dynamic from "next/dynamic";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import style from "../../../Styles/MakeOrderStyle/MakeOrder.module.scss";
 // import ProcessTracker from "../ProcessTracker";
 
@@ -26,7 +26,13 @@ const StepSixComponent = dynamic(() => import("./StepSixComponent"), {
 const StepSeven = dynamic(() => import("./StepSevenComponent"));
 
 export default function MakeOrder({seeOrder}) {
+  console.log(seeOrder);
+  
   const [step, setStep] = useState(1);
+
+  useEffect(() => {
+    setStep(seeOrder.step)
+  }, [seeOrder]);
 
   const [disabelInput, setDisabelInput] = useState(false);
   const [disabelInputStep2, setDisabelInputStep2] = useState(false);

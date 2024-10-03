@@ -14,6 +14,7 @@ export const login = createAsyncThunk(
         }
       );
       const token = response.data.token;
+      
       return token;
     } catch (error) {
       if (error.response && error.response.status === 400) {
@@ -109,7 +110,7 @@ export const productpot = createAsyncThunk(
 
 export const productEdit = createAsyncThunk(
   "product/productEdit",
-  async ({productData , code}, thunkAPI) => {
+  async ({ productData, code }, thunkAPI) => {
     const state = thunkAPI.getState();
     const token = state.auth.token;
     try {
@@ -164,8 +165,6 @@ export const deleted = createAsyncThunk(
     const state = thunkAPI.getState();
     const token = state.auth.token;
 
-
-    
     try {
       const response2 = await axios.get(
         `http://localhost:7000/system/download/list/${name}`
@@ -184,12 +183,7 @@ export const deleted = createAsyncThunk(
         );
         console.log(responseDelete);
         console.log(item.fileName);
-        
-
-      })
-
-      
-      
+      });
 
       const responseDelete = await axios.delete(
         `http://localhost:7000/system/download/${listOfDelete}`,
@@ -200,7 +194,6 @@ export const deleted = createAsyncThunk(
         }
       );
 
-      console.log(responseDelete.data);
 
       const response = await axios.delete(
         `http://localhost:7000/product/${code}`,
@@ -226,6 +219,91 @@ export const deleted = createAsyncThunk(
 );
 
 // end product
+
+// start order
+
+export const listorders = createAsyncThunk("order/list", async (_,thunkAPI) => {
+  const state = thunkAPI.getState();
+  const token = state.auth.token;
+  
+  try {
+    const response = await axios.get(
+      "http://localhost:7000/order/list",
+      {
+        headers: {
+          Authorization: token ? `Bearer ${token}` : "",
+        },
+      }
+
+    );
+    const data = response.data;    
+    return data;
+  } catch (error) {
+    if (error.response && error.response.status === 400) {
+      return thunkAPI.rejectWithValue("ارور سمت من");
+    } else {
+      return thunkAPI.rejectWithValue("مشکلی به وجود امده لطفا بعدا تلاش کنید");
+    }
+  }
+});
+
+export const whosOrder = createAsyncThunk("order/whosOrder", async ({id} , thunkAPI) => {
+  const state = thunkAPI.getState();
+  const token = state.auth.token;
+  
+  try {
+    const response = await axios.post(
+      "http://localhost:7000/users",
+      {id},
+      {
+        headers: {
+          Authorization: token ? `Bearer ${token}` : "",
+        },
+      }
+
+    );
+    const data = response.data;
+    return data;
+  } catch (error) {
+    if (error.response && error.response.status === 400) {
+      return thunkAPI.rejectWithValue("ارور سمت من");
+    } else {
+      return thunkAPI.rejectWithValue("مشکلی به وجود امده لطفا بعدا تلاش کنید");
+    }
+  }
+});
+
+export const updateOrderStatus = createAsyncThunk("order/updateOrderStatus", async ({code , status} , thunkAPI) => {
+  const state = thunkAPI.getState();
+  const token = state.auth.token;
+  
+  try {   
+    
+    const response = await axios.patch(
+      `http://localhost:7000/order/status/${code}/${status}`,
+      {},
+      {
+        headers: {
+          Authorization: token ? `Bearer ${token}` : "",
+        },
+      }
+
+    );
+    const data = response.data;
+    return data;
+  } catch (error) {
+    if (error.response && error.response.status === 400) {
+      return thunkAPI.rejectWithValue("ارور سمت من");
+    } else {
+      return thunkAPI.rejectWithValue("مشکلی به وجود امده لطفا بعدا تلاش کنید");
+    }
+  }
+});
+
+
+
+
+// end order
 
 // start banner
 export const bannerdata = createAsyncThunk(
