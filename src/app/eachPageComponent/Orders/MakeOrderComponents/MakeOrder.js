@@ -55,7 +55,9 @@ export default function MakeOrder({seeOrder}) {
         return (
           <div className={style.stepContent}>
             <SteponeComponent
-             
+              data={seeOrder.request}
+              code={seeOrder.code}
+              setStep={setStep}
               handleNextStep={handleNextStep}
               setDisabelInput={setDisabelInput}
               disabelInput={disabelInput}

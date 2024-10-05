@@ -300,6 +300,62 @@ export const updateOrderStatus = createAsyncThunk("order/updateOrderStatus", asy
   }
 });
 
+export const requestAdminCommnet = createAsyncThunk("order/requestAdminCommnet", async ({code , reqComment} , thunkAPI) => {
+  const state = thunkAPI.getState();
+  const token = state.auth.token;
+  
+  try {   
+    
+    const response = await axios.patch(
+      `http://localhost:7000/order/request/${code}/comment`,
+      {
+        reqComment,
+      },
+      {
+        headers: {
+          Authorization: token ? `Bearer ${token}` : "",
+        },
+      }
+
+    );
+    const data = response.data;
+    return data;
+  } catch (error) {
+    if (error.response && error.response.status === 400) {
+      return thunkAPI.rejectWithValue("ارور سمت من");
+    } else {
+      return thunkAPI.rejectWithValue("مشکلی به وجود امده لطفا بعدا تلاش کنید");
+    }
+  }
+});
+
+export const increaseStep = createAsyncThunk("order/increaseStep", async ({code , step} , thunkAPI) => {
+  const state = thunkAPI.getState();
+  const token = state.auth.token;
+  
+  try {   
+    
+    const response = await axios.patch(
+      `http://localhost:7000/order/step/${code}/${step}`,
+      {},
+      {
+        headers: {
+          Authorization: token ? `Bearer ${token}` : "",
+        },
+      }
+
+    );
+    const data = response.data;
+    return data;
+  } catch (error) {
+    if (error.response && error.response.status === 400) {
+      return thunkAPI.rejectWithValue("ارور سمت من");
+    } else {
+      return thunkAPI.rejectWithValue("مشکلی به وجود امده لطفا بعدا تلاش کنید");
+    }
+  }
+});
+
 
 
 

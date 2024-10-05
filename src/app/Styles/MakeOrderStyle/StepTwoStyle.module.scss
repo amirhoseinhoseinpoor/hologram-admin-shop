@@ -91,7 +91,7 @@
   padding: 6px 20px;
 }
 
-.SeeLastStepButton{
+.SeeLastStepButton {
   border: none;
   color: white;
   background-color: #868686;
@@ -99,7 +99,7 @@
   padding: 2px 6px;
 }
 
-.cancelOrder{
+.cancelOrder {
   border: none;
   color: white;
   background-color: red;
@@ -167,10 +167,11 @@
   width: 40%;
 }
 
-.modalStyleclass{
+.modalStyleclass {
   width: 600px;
   border-radius: 3px;
 }
+
 
 @media (max-width: 1200px) {
   .gridOfDocument {
@@ -187,7 +188,7 @@
     flex-direction: column !important;
     gap: 10px !important;
   }
-  .modalStyleclass{
+  .modalStyleclass {
     width: 500px;
   }
 }
@@ -217,10 +218,10 @@
     width: 210px;
     height: 140px;
   }
-  .onlyFitContentWidth{
+  .onlyFitContentWidth {
     width: fit-content;
   }
-  .modalStyleclass{
+  .modalStyleclass {
     width: 350px;
   }
 }
