@@ -73,6 +73,56 @@ export const uploadFile = createAsyncThunk(
   }
 );
 
+
+export const fetchPrivateImage = createAsyncThunk(
+  'image/fetchPrivateImage',
+  async ({ filename }, thunkAPI) => {
+    const state = thunkAPI.getState();
+    const token = state.auth.token;
+    console.log(token);
+    
+
+    try {
+      const response = await axios.post(
+        `http://localhost:7000/system/download/${filename}`,
+        {}, // No body is needed for this request
+        {
+          headers: {
+            Authorization: token ? `Bearer ${token}` : "", // Include the token in the Authorization header
+          },
+          responseType: 'arraybuffer', // Receive binary data
+          
+        }
+      );
+
+      const base64String = Buffer.from(response.data, 'binary').toString('base64');
+
+     console.log('base64String: ' + `data:image/png;base64,${base64String}`);
+     
+      
+
+      
+      
+      // const blob = new Blob([response.data], { type: 'image/jpeg' }); // Adjust the MIME type if needed
+      
+      // console.log(blob);
+      
+      // // Create an object URL for the blob
+      // const imageObjectURL = URL.createObjectURL(blob);
+
+      return `data:image/png;base64,${base64String}`;
+
+    } catch (error) {
+      if (error.response && error.response.status === 400) {
+        return thunkAPI.rejectWithValue('Error from server');
+      } else {
+        return thunkAPI.rejectWithValue('Something went wrong, please try again later');
+      }
+    }
+  }
+);
+
+
 export const productpot = createAsyncThunk(
   "product/productpot",
   async (productData, thunkAPI) => {
@@ -332,7 +382,6 @@ export const requestAdminCommnet = createAsyncThunk("order/requestAdminCommnet",
 export const increaseStep = createAsyncThunk("order/increaseStep", async ({code , step} , thunkAPI) => {
   const state = thunkAPI.getState();
   const token = state.auth.token;
-  
   try {   
     
     const response = await axios.patch(

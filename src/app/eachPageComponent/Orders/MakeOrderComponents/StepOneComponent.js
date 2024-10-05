@@ -130,7 +130,7 @@ export default function SteponeComponent({
           file: information.paymentImage,
           tag: "factor",
           type: 1,
-          isPublic: false,
+          isPublic: true,
         })
       ).unwrap();
 

@@ -3,6 +3,10 @@
 import React, { useState, useEffect } from "react";
 import jsPDF from "jspdf";
 
+// importing redux
+import { useSelector, useDispatch } from "react-redux";
+import { fetchPrivateImage } from "@/app/Store/thunks";
+
 import Tooltip from "@mui/material/Tooltip";
 import Radio from "@mui/material/Radio";
 import RadioGroup from "@mui/material/RadioGroup";
@@ -26,16 +30,39 @@ const ModalStyle = {
 import style from "../../../Styles/MakeOrderStyle/StepTwoStyle.module.scss";
 
 export default function StepTwoComponent({
+  dataDocument,
   handleNextStep,
   handlePreviousStep,
   setDisabelInputStep2,
   disabelInputStep2,
 }) {
+  const dispatch = useDispatch();
   const [value, setValue] = useState("خصوصی");
   const [paying, setPaying] = useState("");
   const [uploadedFiles, setUploadedFiles] = useState([]);
   const [logo, setLogo] = useState(null);
   const [isButtonDisabled, setIsButtonDisabled] = useState(false);
+
+  const [testImage, setTestImage] = useState("");
+  console.log(dataDocument);
+
+  useEffect(() => {
+    const fetchLogo = async () => {
+      const result = await dispatch(
+        fetchPrivateImage({ filename: dataDocument.uploadLogo })
+      );
+      
+        
+        console.log(result);
+        
+        setLogo(result.payload); // Set the resolved image URL to state
+        setTestImage(result.payload); // Set the resolved image URL to testImage
+      
+    };
+
+    fetchLogo();
+  }, [dispatch, dataDocument.uploadLogo]);
+
   const [data, setData] = useState({
     title: "PDF Title",
     content: "This is the content of the PDF.",
@@ -123,14 +150,6 @@ export default function StepTwoComponent({
       formData.append(`image_${index}`, fileObj.file);
       formData.append(`title_${index}`, fileObj.title);
     });
-    // Use fetch or axios to send the formData to the backend
-    // Example:
-    // fetch('your-backend-url', {
-    //   method: 'POST',
-    //   body: formData,
-    // }).then(response => {
-    //   // Handle response
-    // });
   };
 
   return (
@@ -138,8 +157,6 @@ export default function StepTwoComponent({
       <div className={`${style.resizeNewresponsive} d-flex flex-row gap-3`}>
         <div className={`${style.fixNewSizes} d-flex flex-column`}>
           <div className={style.stepContent}>
-           
-
             <div
               className={`${style.makeTheFormResponsive} d-flex flex-row gap-5 mt-3`}
             >
@@ -149,13 +166,13 @@ export default function StepTwoComponent({
                   <span className={style.StarFixReq}>*</span>
                 </div>
                 <div className="mt-2">
-                  {logo ? (
+                  {logo || dataDocument.uploadLogo ? (
                     <div
                       className={`${style.onlyFitContentWidth} position-relative`}
                     >
                       <Box
                         component="img"
-                        src={logo.imageUrl}
+                        src={testImage}
                         alt="UserLogo"
                         className={style.LogoReplaceStyle}
                       />
@@ -164,8 +181,8 @@ export default function StepTwoComponent({
                         className={style.deleteButton}
                       >
                         <svg
-                          width="17"
-                          height="17"
+                          width={17}
+                          height={17}
                           viewBox="0 0 12 12"
                           fill="none"
                           xmlns="http://www.w3.org/2000/svg"
@@ -173,32 +190,32 @@ export default function StepTwoComponent({
                           <path
                             d="M10.5 2.98828C8.835 2.82328 7.16 2.73828 5.49 2.73828C4.5 2.73828 3.51 2.78828 2.52 2.88828L1.5 2.98828"
                             stroke="#FF4F3F"
-                            stroke-linecap="round"
-                            stroke-linejoin="round"
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
                           />
                           <path
                             d="M4.25 2.485L4.36 1.83C4.44 1.355 4.5 1 5.345 1H6.655C7.5 1 7.565 1.375 7.64 1.835L7.75 2.485"
                             stroke="#FF4F3F"
-                            stroke-linecap="round"
-                            stroke-linejoin="round"
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
                           />
                           <path
                             d="M9.4252 4.57031L9.1002 9.60531C9.0452 10.3903 9.0002 11.0003 7.6052 11.0003H4.3952C3.0002 11.0003 2.9552 10.3903 2.9002 9.60531L2.5752 4.57031"
                             stroke="#FF4F3F"
-                            stroke-linecap="round"
-                            stroke-linejoin="round"
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
                           />
                           <path
                             d="M5.16504 8.25H6.83004"
                             stroke="#FF4F3F"
-                            stroke-linecap="round"
-                            stroke-linejoin="round"
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
                           />
                           <path
                             d="M4.75 6.25H7.25"
                             stroke="#FF4F3F"
-                            stroke-linecap="round"
-                            stroke-linejoin="round"
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
                           />
                         </svg>
                       </button>
@@ -380,8 +397,8 @@ export default function StepTwoComponent({
                         className={style.deleteButton}
                       >
                         <svg
-                          width="17"
-                          height="17"
+                          width={17}
+                          height={17}
                           viewBox="0 0 12 12"
                           fill="none"
                           xmlns="http://www.w3.org/2000/svg"
@@ -389,32 +406,32 @@ export default function StepTwoComponent({
                           <path
                             d="M10.5 2.98828C8.835 2.82328 7.16 2.73828 5.49 2.73828C4.5 2.73828 3.51 2.78828 2.52 2.88828L1.5 2.98828"
                             stroke="#FF4F3F"
-                            stroke-linecap="round"
-                            stroke-linejoin="round"
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
                           />
                           <path
                             d="M4.25 2.485L4.36 1.83C4.44 1.355 4.5 1 5.345 1H6.655C7.5 1 7.565 1.375 7.64 1.835L7.75 2.485"
                             stroke="#FF4F3F"
-                            stroke-linecap="round"
-                            stroke-linejoin="round"
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
                           />
                           <path
                             d="M9.4252 4.57031L9.1002 9.60531C9.0452 10.3903 9.0002 11.0003 7.6052 11.0003H4.3952C3.0002 11.0003 2.9552 10.3903 2.9002 9.60531L2.5752 4.57031"
                             stroke="#FF4F3F"
-                            stroke-linecap="round"
-                            stroke-linejoin="round"
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
                           />
                           <path
                             d="M5.16504 8.25H6.83004"
                             stroke="#FF4F3F"
-                            stroke-linecap="round"
-                            stroke-linejoin="round"
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
                           />
                           <path
                             d="M4.75 6.25H7.25"
                             stroke="#FF4F3F"
-                            stroke-linecap="round"
-                            stroke-linejoin="round"
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
                           />
                         </svg>
                       </button>
@@ -455,9 +472,12 @@ export default function StepTwoComponent({
                   onClick={handleDisabelInput}
                   className={`${style.continueButton}`}
                 >
-                 رد کردن مرحله
+                  رد کردن مرحله
                 </button>
-                <button className={style.SeeLastStepButton} onClick={handlePreviousStep}>
+                <button
+                  className={style.SeeLastStepButton}
+                  onClick={handlePreviousStep}
+                >
                   مشاهده مراحل قبلی
                 </button>
               </div>
@@ -470,8 +490,6 @@ export default function StepTwoComponent({
           <div
             className={`${style.stepContent}  ${style.resizingWebInResponsive} mt-3`}
           >
-            
-            
             <div className="mt-2 mb-2">
               <p className="NormalTextSizing">روش پرداخت</p>
             </div>

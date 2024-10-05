@@ -67,6 +67,7 @@ export default function MakeOrder({seeOrder}) {
       case 2:
         return (
           <StepTwoComponent
+            dataDocument={seeOrder.document}
             handleNextStep={handleNextStep}
             handlePreviousStep={handlePreviousStep}
             setDisabelInputStep2={setDisabelInputStep2}
