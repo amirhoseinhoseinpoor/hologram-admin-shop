@@ -43,7 +43,7 @@ const ChatBox = ({ handlePreviousStep, handleNextStep }) => {
     formData.append("isAdmin", userRole === "admin");
     if (image) formData.append("image", image);
 
-    await axios.post("http://localhost:3000/messages", formData);
+    await axios.post(`${process.env.NEXT_PUBLIC_BACK_END_SERVER}/messages`, formData);
     setMessage("");
     setImage(null);
     fetchMessages();

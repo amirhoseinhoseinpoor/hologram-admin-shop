@@ -104,7 +104,7 @@ export default function HonorsMainComponent() {
                     {data.info.imgData && (
                       <CardMedia
                         component="img"
-                        src={`http://localhost:7000/system/download/${data.info.imgData[0].src}`}
+                        src={`${process.env.NEXT_PUBLIC_BACK_END_SERVER}/system/download/${data.info.imgData[0].src}`}
                         sx={{
                           width: "120px",
                           maxHeight: "100%",

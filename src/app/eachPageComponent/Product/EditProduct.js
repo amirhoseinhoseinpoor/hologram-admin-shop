@@ -381,7 +381,7 @@ export default function EditHonors({
             {item.src && !objectUrls[index] && (
               <Box
                 component={item.type === "1" ? "img" : "video"}
-                src={`http://localhost:7000/system/download/${item.src}`}
+                src={`${process.env.NEXT_PUBLIC_BACK_END_SERVER}/system/download/${item.src}`}
                 sx={{
                   width: "140px",
                   maxHeight: "100%",
@@ -498,7 +498,7 @@ export default function EditHonors({
                 {item.src && !objectUrls[index] && (
                   <Box
                     component="video"
-                    src={`http://localhost:7000/system/download/${item.src}`}
+                    src={`${process.env.NEXT_PUBLIC_BACK_END_SERVER}/system/download/${item.src}`}
                     sx={{
                       width: "140px",
                       maxHeight: "100%",

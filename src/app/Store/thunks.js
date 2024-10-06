@@ -7,7 +7,7 @@ export const login = createAsyncThunk(
     const { username, password } = credentials;
     try {
       const response = await axios.post(
-        "http://176.120.16.221:7000/auth/login",
+        `${process.env.NEXT_PUBLIC_BACK_END_SERVER}/auth/login`,
         {
           username,
           password,
@@ -30,7 +30,7 @@ export const login = createAsyncThunk(
 
 // Product
 
-export const uploadFile = createAsyncThunk(
+export const uploanpmdFile = createAsyncThunk(
   "product/uploadFile ",
   async ({ file, tag, type, isPublic }, thunkAPI) => {
     const state = thunkAPI.getState();
@@ -45,7 +45,7 @@ export const uploadFile = createAsyncThunk(
       formData.append("isPublic", isPublic);
 
       const response = await axios.post(
-        "http://localhost:7000/system/upload",
+        `${process.env.NEXT_PUBLIC_BACK_END_SERVER}/system/upload`,
         formData,
         {
           headers: {
@@ -84,7 +84,7 @@ export const fetchPrivateImage = createAsyncThunk(
     
     try {
       const response = await axios.post(
-        `http://localhost:7000/system/download/${filename}`,
+        `${process.env.NEXT_PUBLIC_BACK_END_SERVER}/system/download/${filename}`,
         {}, // No body is needed for this request
         {
           headers: {
@@ -118,7 +118,7 @@ export const productpot = createAsyncThunk(
     const token = state.auth.token;
     try {
       const response = await axios.post(
-        "http://localhost:7000/product",
+        `${process.env.NEXT_PUBLIC_BACK_END_SERVER}/product`,
         productData,
         {
           headers: {
@@ -153,7 +153,7 @@ export const productEdit = createAsyncThunk(
     const token = state.auth.token;
     try {
       const response = await axios.patch(
-        `http://localhost:7000/product/${code}`,
+        `${process.env.NEXT_PUBLIC_BACK_END_SERVER}/product/${code}`,
         productData,
         {
           headers: {
@@ -184,7 +184,7 @@ export const productEdit = createAsyncThunk(
 
 export const list = createAsyncThunk("product/list", async (thunkAPI) => {
   try {
-    const response = await axios.get("http://localhost:7000/product/list");
+    const response = await axios.get(`${process.env.NEXT_PUBLIC_BACK_END_SERVER}/product/list`);
     const data = response.data;
 
     return data;
@@ -205,14 +205,14 @@ export const deleted = createAsyncThunk(
 
     try {
       const response2 = await axios.get(
-        `http://localhost:7000/system/download/list/${name}`
+        `${process.env.NEXT_PUBLIC_BACK_END_SERVER}/system/download/list/${name}`
       );
 
       const listOfDelete = response2.data;
 
       listOfDelete.map((item) => {
         const responseDelete = axios.delete(
-          `http://localhost:7000/system/download/${item.fileName}`,
+          `${process.env.NEXT_PUBLIC_BACK_END_SERVER}/system/download/${item.fileName}`,
           {
             headers: {
               Authorization: token ? `Bearer ${token}` : "",
@@ -224,7 +224,7 @@ export const deleted = createAsyncThunk(
       });
 
       const responseDelete = await axios.delete(
-        `http://localhost:7000/system/download/${listOfDelete}`,
+        `${process.env.NEXT_PUBLIC_BACK_END_SERVER}/system/download/${listOfDelete}`,
         {
           headers: {
             Authorization: token ? `Bearer ${token}` : "",
@@ -234,7 +234,7 @@ export const deleted = createAsyncThunk(
 
 
       const response = await axios.delete(
-        `http://localhost:7000/product/${code}`,
+        `${process.env.NEXT_PUBLIC_BACK_END_SERVER}/product/${code}`,
         {
           headers: {
             Authorization: token ? `Bearer ${token}` : "",
@@ -266,7 +266,7 @@ export const listorders = createAsyncThunk("order/list", async (_,thunkAPI) => {
   
   try {
     const response = await axios.get(
-      "http://localhost:7000/order/list",
+      `${process.env.NEXT_PUBLIC_BACK_END_SERVER}/order/list`,
       {
         headers: {
           Authorization: token ? `Bearer ${token}` : "",
@@ -291,7 +291,7 @@ export const whosOrder = createAsyncThunk("order/whosOrder", async ({id} , thunk
   
   try {
     const response = await axios.post(
-      "http://localhost:7000/users",
+      `${process.env.NEXT_PUBLIC_BACK_END_SERVER}/users`,
       {id},
       {
         headers: {
@@ -318,7 +318,7 @@ export const updateOrderStatus = createAsyncThunk("order/updateOrderStatus", asy
   try {   
     
     const response = await axios.patch(
-      `http://localhost:7000/order/status/${code}/${status}`,
+      `${process.env.NEXT_PUBLIC_BACK_END_SERVER}/order/status/${code}/${status}`,
       {},
       {
         headers: {
@@ -345,7 +345,7 @@ export const requestAdminCommnet = createAsyncThunk("order/requestAdminCommnet",
   try {   
     
     const response = await axios.patch(
-      `http://localhost:7000/order/request/${code}/comment`,
+      `${process.env.NEXT_PUBLIC_BACK_END_SERVER}/order/request/${code}/comment`,
       {
         reqComment,
       },
@@ -373,7 +373,7 @@ export const increaseStep = createAsyncThunk("order/increaseStep", async ({code 
   try {   
     
     const response = await axios.patch(
-      `http://localhost:7000/order/step/${code}/${step}`,
+      `${process.env.NEXT_PUBLIC_BACK_END_SERVER}/order/step/${code}/${step}`,
       {},
       {
         headers: {
@@ -404,7 +404,7 @@ export const bannerdata = createAsyncThunk(
   async (_, thunkAPI) => {
     try {
       const response = await axios.get(
-        "http://localhost:7000/system/download/list/banner"
+        `${process.env.NEXT_PUBLIC_BACK_END_SERVER}/system/download/list/banner`
       );
 
       const bannerData = response.data;
@@ -416,7 +416,7 @@ export const bannerdata = createAsyncThunk(
       for (let image of bannerData) {
         try {
           const imageResponse = await axios.get(
-            `http://localhost:7000/system/download/${image.fileName}`,
+            `${process.env.NEXT_PUBLIC_BACK_END_SERVER}/system/download/${image.fileName}`,
             { responseType: "arraybuffer" }
           );
 
@@ -468,7 +468,7 @@ export const addBanner = createAsyncThunk(
       formData.append("isPublic", true);
 
       const response = await axios.post(
-        "http://localhost:7000/system/upload",
+        `${process.env.NEXT_PUBLIC_BACK_END_SERVER}/system/upload`,
         formData,
         {
           headers: {
@@ -505,7 +505,7 @@ export const homePageVideo = createAsyncThunk(
   async (thunkAPI) => {
     try {
       const response = await axios.get(
-        "http://localhost:7000/system/download/list/homePage1"
+        `${process.env.NEXT_PUBLIC_BACK_END_SERVER}/system/download/list/homePage1`
       );
 
       console.log(response.data);

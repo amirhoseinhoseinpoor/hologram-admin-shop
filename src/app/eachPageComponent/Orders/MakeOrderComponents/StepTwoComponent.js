@@ -323,7 +323,7 @@ export default function StepTwoComponent({
                 <span className={style.StarFixReq}>*</span>
               </div>
               <div className={`mt-2 ${style.gridOfDocument}`}>
-                <div>
+                {/* <div>
                   <label
                     className={style.labelInsteadOfInput}
                     htmlFor="fileUpload"
@@ -369,7 +369,7 @@ export default function StepTwoComponent({
                     onChange={handleFileUpload}
                     disabled={disabelInputStep2}
                   />
-                </div>
+                </div> */}
                 {uploadedFiles.map((fileObj, index) => (
                   <div
                     key={index}
