@@ -6,17 +6,16 @@ import AddVideo from "./AddVideo";
 import EditVideo from "./EditVideo";
 //redux import
 import { useSelector, useDispatch } from "react-redux";
-import { honors } from "../../Store/slice.js";
-import { updateHonor } from "../../Store/thunks.js";
+
+// import { updateHonor } from "../../Store/thunks.js";
 import { homePageVideo } from "../../Store/thunks.js";
-import { homeVideoFileName } from "../../Store/slice.js";
+// import { homeVideoFileName } from "../../Store/slice.js";
 
 import { Card, CardContent, CardMedia, Typography } from "@mui/material";
 
-import honorsData from "/public/json/Video.json";
+// import honorsData from "/public/json/Video.json";
 
 import styled from "styled-components";
-import parse from "html-react-parser";
 
 const CARD = styled(Card)`
   background-color: #5f5f5f !important;
@@ -31,38 +30,50 @@ const CARD = styled(Card)`
 
 export default function HonorsMainComponent() {
   const dispatch = useDispatch();
-  
 
   // add honors
   const [activekey, setActiveKey] = useState("editUserPage");
   // edit honors
   const [editedHonor, setEditedHonor] = useState(null);
 
-  const [content, setContent] = useState(""); // Added content state for editing
+  // const [content, setContent] = useState("");
+
+  const [dataCome, setDataCome] = useState([]);
+
   useEffect(() => {
-    dispatch(homePageVideo())
+    const fechData = async () => {
+      try {
+        const dataComeAPI = await dispatch(homePageVideo()).unwrap();
+        console.log("Fetched data:", dataComeAPI); // Log data to inspect its structure
+        setDataCome(dataComeAPI || []); // Make sure to set dataCome as an array
+      } catch (error) {
+        console.error("Error fetching data:", error);
+      }
+    };
+
+    fechData();
   }, [dispatch]);
 
   // saving the changes
-  const handleHonorSave = async (event) => {
-    event.preventDefault();
-    await dispatch(updateHonor({ ...editedHonor, content }));
-    setEditedHonor(null);
-  };
+  // const handleHonorSave = async (event) => {
+  //   event.preventDefault();
+  //   await dispatch(updateHonor({ ...editedHonor, content }));
+  //   setEditedHonor(null);
+  // };
 
   // cancelingEdit
   const handleCancelEdit = () => {
     setEditedHonor(null);
   };
 
-  const handleEditImageChange = (event) => {
-    const newImage = event.target.files[0];
-    setEditedHonor({
-      ...editedHonor,
-      src: URL.createObjectURL(newImage),
-      newImageFile: newImage,
-    });
-  };
+  // const handleEditImageChange = (event) => {
+  //   const newImage = event.target.files[0];
+  //   setEditedHonor({
+  //     ...editedHonor,
+  //     src: URL.createObjectURL(newImage),
+  //     newImageFile: newImage,
+  //   });
+  // };
 
   return (
     <section>
@@ -78,36 +89,58 @@ export default function HonorsMainComponent() {
               </button>
             </div>
           </div>
+
           <div
             className="mt-3 d-flex flex-column gap-3"
             style={{ cursor: "pointer" }}
           >
-            {honorsData.map((honor, index) => (
-              <React.Fragment key={index}>
-                <CARD
-                  className="d-flex flex-row"
-                  onClick={() => {
-                    setEditedHonor(honor);
-                    setContent(honor.content); // Set content when editing
-                  }}
-                >
-                  <CardMedia
-                    component="img"
-                    src={honor.poster}
-                    sx={{
-                      width: "200px",
-                      borderRadius: "2px",
-                    }}
-                  />
-                  <CardContent className="d-flex flex-column justify-content-around">
-                    <Typography className="titleHonors">
-                      {honor.title}
-                    </Typography>
-                    <Typography className="dateHonors">{honor.discription}</Typography>
-                  </CardContent>
-                </CARD>
-              </React.Fragment>
-            ))}
+            {dataCome.length > 0 ? (
+              dataCome.map((data, index) => (
+                <React.Fragment key={index}>
+                  {/* Check if media exists */}
+                  {data.media ? (
+                    <CARD
+                      className="d-flex flex-row"
+                      onClick={() => {
+                        setEditedHonor(data.media);
+                      }}
+                    >
+                      {data.media.poster && (
+                        <CardMedia
+                          component="img"
+                          src={`${process.env.NEXT_PUBLIC_BACK_END_SERVER}/system/download/${data.media.poster}`}
+                          sx={{
+                            width: "120px",
+                            maxHeight: "100%",
+                            borderRadius: "2px",
+                          }}
+                        />
+                      )}
+                      <CardContent className="d-flex flex-column justify-content-around">
+                        <Typography className="titleHonors">
+                          {data.media.title}
+                        </Typography>
+                        <div className="d-flex flex-row gap-2">
+                          <p>کد محصول :</p>
+                          <Typography className="dateHonors">
+                            {data.code}
+                          </Typography>
+                        </div>
+                      </CardContent>
+                    </CARD>
+                  ) : (
+                    <div>
+                      {/* Handle when media is null */}
+                      <Typography variant="body2" color="textSecondary">
+                        No media available for code {data.code}
+                      </Typography>
+                    </div>
+                  )}
+                </React.Fragment>
+              ))
+            ) : (
+              <Typography variant="body2">No data available</Typography>
+            )}
           </div>
         </>
       )}
@@ -126,23 +159,18 @@ export default function HonorsMainComponent() {
           </div>
 
           <div>
-            <AddVideo dispatch={dispatch} />
+            <AddVideo />
           </div>
         </>
       )}
+
       {editedHonor && (
         <>
           <EditVideo
             editedHonor={editedHonor}
-            handleHonorSave={handleHonorSave}
-            handleCancelEdit={handleCancelEdit}
-            handleEditImageChange={handleEditImageChange}
+            handleCancelEdit={() => setEditedHonor(null)}
             setEditedHonor={setEditedHonor}
-            content={content}
-            setContent={setContent}
           />
-
-          {/* <div>{parse(content)}</div> */}
         </>
       )}
     </section>

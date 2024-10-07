@@ -76,16 +76,16 @@ const AdminPanel = () => {
           id="admin-tabs"
           className={style.sidebarMain}
         >
-          {/* <Tab eventKey="Doshbord" title="داشبورد"></Tab> */}
-          {/* <Tab eventKey="Orders" title="سفارشات"></Tab> */}
+          <Tab eventKey="Doshbord" title="داشبورد"></Tab>
+          <Tab eventKey="Orders" title="سفارشات"></Tab>
           <Tab eventKey="Product" title="محصولات"></Tab>
-          {/* <Tab eventKey="Blogs" title="مقالات"></Tab> */}
-          {/* <Tab eventKey="Honors" title="افتخارات"></Tab> */}
-          {/* <Tab eventKey="Exhibition" title="نمایشگاه ها"></Tab> */}
-          {/* <Tab eventKey="Banner" title="بنر"></Tab> */}
-          {/* <Tab eventKey="Video" title="ویدیو"></Tab> */}
-          {/* <Tab eventKey="defineUser" title="مدیریت کاربر"></Tab> */}
-          {/* <Tab eventKey="setting" title="تنظیمات"></Tab> */}
+          <Tab eventKey="Blogs" title="مقالات"></Tab>
+          <Tab eventKey="Honors" title="افتخارات"></Tab>
+          <Tab eventKey="Exhibition" title="نمایشگاه ها"></Tab>
+          <Tab eventKey="Banner" title="بنر"></Tab>
+          <Tab eventKey="Video" title="ویدیو"></Tab>
+          <Tab eventKey="defineUser" title="مدیریت کاربر"></Tab>
+          <Tab eventKey="setting" title="تنظیمات"></Tab>
         </Tabs>
       </aside>
       <div className={style.content}>

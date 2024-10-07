@@ -30,7 +30,7 @@ export const login = createAsyncThunk(
 
 // Product
 
-export const uploanpmdFile = createAsyncThunk(
+export const uploadFile = createAsyncThunk(
   "product/uploadFile ",
   async ({ file, tag, type, isPublic }, thunkAPI) => {
     const state = thunkAPI.getState();
@@ -257,6 +257,69 @@ export const deleted = createAsyncThunk(
 );
 
 // end product
+
+// start HomePageVideo
+
+export const homePageVideo = createAsyncThunk(
+  "homePage/video",
+  async (_,thunkAPI) => {
+    try {
+      const response = await axios.get(
+        `${process.env.NEXT_PUBLIC_BACK_END_SERVER}/video/list`
+      );
+
+      console.log(response.data);
+      return response.data;
+
+    } catch (error) {
+      if (error.response && error.response.status === 400) {
+        return thunkAPI.rejectWithValue("ارور سمت من");
+      } else {
+        return thunkAPI.rejectWithValue(
+          "مشکلی به وجود امده لطفا بعدا تلاش کنید"
+        );
+      }
+    }
+  }
+);
+
+export const videopot = createAsyncThunk(
+  "homePage/videopot",
+  async (productData, thunkAPI) => {
+    const state = thunkAPI.getState();
+    const token = state.auth.token;
+    try {
+      const response = await axios.post(
+        `${process.env.NEXT_PUBLIC_BACK_END_SERVER}/video`,
+        productData,
+        {
+          headers: {
+            Authorization: token ? `Bearer ${token}` : "",
+            "Content-Type": "application/json",
+          },
+        }
+      );
+      const data = response.data;
+
+      if (data) {
+        alert("افزودن مدیا با موفقیت انجام شد");
+      }
+
+      return data;
+    } catch (error) {
+      if (error.response && error.response.status === 400) {
+        return thunkAPI.rejectWithValue("ارور سمت من");
+      } else {
+        return thunkAPI.rejectWithValue(
+          "مشکلی به وجود امده لطفا بعدا تلاش کنید"
+        );
+      }
+    }
+  }
+);
+
+// end HomePageVideo
+
 
 // start order
 
@@ -498,28 +561,7 @@ export const addBanner = createAsyncThunk(
 
 // end banner
 
-// start HomePageVideo
 
-export const homePageVideo = createAsyncThunk(
-  "homePage/video",
-  async (thunkAPI) => {
-    try {
-      const response = await axios.get(
-        `${process.env.NEXT_PUBLIC_BACK_END_SERVER}/system/download/list/homePage1`
-      );
-
-      console.log(response.data);
-    } catch (error) {
-      if (error.response && error.response.status === 400) {
-        return thunkAPI.rejectWithValue("ارور سمت من");
-      } else {
-        return thunkAPI.rejectWithValue(
-          "مشکلی به وجود امده لطفا بعدا تلاش کنید"
-        );
-      }
-    }
-  }
-);
 
 export const logout = createAsyncThunk("auth/logout", async () => {
   try {

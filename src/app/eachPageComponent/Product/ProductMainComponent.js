@@ -9,7 +9,7 @@ import { useSelector, useDispatch } from "react-redux";
 import { list } from "../../Store/thunks.js";
 import { productListData } from "@/app/Store/slice";
 
-import { updateHonor } from "../../Store/thunks.js";
+
 
 import { Card, CardContent, CardMedia, Typography } from "@mui/material";
 import styled from "styled-components";
@@ -28,22 +28,22 @@ const CARD = styled(Card)`
 export default function HonorsMainComponent() {
   const dispatch = useDispatch();
 
-  const [name, setName] = useState("");
-  const [title, setTitle] = useState("");
-  const [subtitle, setSubtitle] = useState("");
-  const [colors, setColors] = useState([{ name: "", value: "" }]);
-  const [sizes, setSizes] = useState([""]);
-  const [imgData, setImgData] = useState([{ src: "", type: "1", poster: "" }]);
-  const [media, setMedia] = useState([
-    { title: "", description: "", src: "", poster: "" },
-  ]);
+  // const [name, setName] = useState("");
+  // const [title, setTitle] = useState("");
+  // const [subtitle, setSubtitle] = useState("");
+  // const [colors, setColors] = useState([{ name: "", value: "" }]);
+  // const [sizes, setSizes] = useState([""]);
+  // const [imgData, setImgData] = useState([{ src: "", type: "1", poster: "" }]);
+  // const [media, setMedia] = useState([
+  //   { title: "", description: "", src: "", poster: "" },
+  // ]);
 
   // add honors
   const [activekey, setActiveKey] = useState("editUserPage");
   // edit honors
   const [editedHonor, setEditedHonor] = useState(null);
 
-  const [content, setContent] = useState("");
+  // const [content, setContent] = useState("");
 
   const datacome = useSelector(productListData);
 
@@ -54,25 +54,25 @@ export default function HonorsMainComponent() {
   }, [dispatch]);
 
   // saving the changes
-  const handleHonorSave = async (event) => {
-    event.preventDefault();
-    await dispatch(updateHonor({ ...editedHonor, content }));
-    setEditedHonor(null);
-  };
+  // const handleHonorSave = async (event) => {
+  //   event.preventDefault();
+  //   await dispatch(updateHonor({ ...editedHonor, content }));
+  //   setEditedHonor(null);
+  // };
 
   // cancelingEdit
   const handleCancelEdit = () => {
     setEditedHonor(null);
   };
 
-  const handleEditImageChange = (event) => {
-    const newImage = event.target.files[0];
-    setEditedHonor({
-      ...editedHonor,
-      src: URL.createObjectURL(newImage),
-      newImageFile: newImage,
-    });
-  };
+  // const handleEditImageChange = (event) => {
+  //   const newImage = event.target.files[0];
+  //   setEditedHonor({
+  //     ...editedHonor,
+  //     src: URL.createObjectURL(newImage),
+  //     newImageFile: newImage,
+  //   });
+  // };
 
   return (
     <section>
