@@ -3,6 +3,8 @@ import { Box } from "@mui/material";
 import styled from "styled-components";
 import { useDispatch } from "react-redux";
 import { uploadFile } from "@/app/Store/thunks";
+import { videoEdit } from "@/app/Store/thunks";
+import { HomePageVideoDeleted } from "@/app/Store/thunks";
 
 const BorderInputBox = styled.div`
   border: 2px solid #28a745;
@@ -24,7 +26,7 @@ export default function EditHonors({
   useEffect(() => {
     if (editedHonor) {
       // Set the media based on the edited honor
-      setMedia([editedHonor]); // Wrap editedHonor in an array
+      setMedia([editedHonor.media]); // Wrap editedHonor in an array
     }
   }, [editedHonor]);
 
@@ -64,6 +66,20 @@ export default function EditHonors({
     setMedia(media.filter((_, i) => i !== index));
   };
 
+  const handleDelete = async (e) => {
+    e.preventDefault();
+
+    try {
+      const deleteVideo = await dispatch(HomePageVideoDeleted({code: editedHonor.code}))
+      if (deleteVideo.payload.message === "Success") {
+        alert("محصول باموفقیت حذف شد");
+      }
+      
+    } catch (error) {
+      console.error("Error deleting product:", error);
+    }
+  };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
@@ -93,8 +109,16 @@ export default function EditHonors({
             updatedItem.poster = fileIdPoster; // Update poster with the file ID
           }
 
+          const finalMedia = {
+            media : updatedItem
+          }
+
+          await dispatch(videoEdit({
+            media :finalMedia,
+            code: editedHonor.code
+          }));
           console.log(`Uploaded media:`, updatedItem);
-          // Once both `src` and `poster` are uploaded, dispatch the final action
+         
         })
       );
       console.log("All media successfully uploaded and saved.");
@@ -147,7 +171,7 @@ export default function EditHonors({
                     onChange={(e) =>
                       handleFileChange(e, index, setMedia, media)
                     }
-                    required
+                    
                   />
                   {item.src && !objectUrls[index] && (
                     <Box
@@ -185,7 +209,7 @@ export default function EditHonors({
                     onChange={(e) =>
                       handleFileChangePoster(e, index, setMedia, media)
                     }
-                    required
+                   
                   />
                   {item.poster && !posterObjectUrls[index] && (
                     <Box
@@ -229,7 +253,7 @@ export default function EditHonors({
         <button type="submit" className="mt-3">
           ویرایش محصول
         </button>
-        <button className="bg-danger mt-2 mb-2" type="button">
+        <button onClick={handleDelete} className="bg-danger mt-2 mb-2" type="button">
           حذف محصول
         </button>
         <button onClick={handleCancelEdit}>انصراف</button>

@@ -14,11 +14,11 @@ const BorderInputBox = styled.div`
 export default function AddHonors() {
   const dispatch = useDispatch();
 
-  const [content, setContent] = useState("");
-  const [bannerImage, setBannerImage] = useState(null);
-  const [bannerTitle, setBannerTitle] = useState("");
-  const [bannerDate, setBannerDate] = useState("");
-  const [bannerTags, setBannerTags] = useState("");
+  // const [content, setContent] = useState("");
+  // const [bannerImage, setBannerImage] = useState(null);
+  // const [bannerTitle, setBannerTitle] = useState("");
+  // const [bannerDate, setBannerDate] = useState("");
+  // const [bannerTags, setBannerTags] = useState("");
 
   const [media, setMedia] = useState([
     { title: "", description: "", src: "", poster: "" },

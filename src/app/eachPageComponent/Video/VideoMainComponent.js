@@ -44,7 +44,6 @@ export default function HonorsMainComponent() {
     const fechData = async () => {
       try {
         const dataComeAPI = await dispatch(homePageVideo()).unwrap();
-        console.log("Fetched data:", dataComeAPI); // Log data to inspect its structure
         setDataCome(dataComeAPI || []); // Make sure to set dataCome as an array
       } catch (error) {
         console.error("Error fetching data:", error);
@@ -102,7 +101,7 @@ export default function HonorsMainComponent() {
                     <CARD
                       className="d-flex flex-row"
                       onClick={() => {
-                        setEditedHonor(data.media);
+                        setEditedHonor(data);
                       }}
                     >
                       {data.media.poster && (
