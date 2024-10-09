@@ -5,12 +5,12 @@ import React, { useState, useEffect } from "react";
 import AddHonors from "./AddHonors";
 import EditHonors from "./EditHoors";
 //redux import
-import { useSelector, useDispatch } from "react-redux";
-import { honors } from "../../Store/slice.js";
+import { useDispatch } from "react-redux";
 import { updateHonor } from "../../Store/thunks.js";
+import { honorsList } from "../../Store/thunks.js";
 
 import { Card, CardContent, CardMedia, Typography } from "@mui/material";
-import honorsData from "/public/json/HonorsTest.json";
+
 import styled from "styled-components";
 import parse from "html-react-parser";
 
@@ -28,17 +28,27 @@ const CARD = styled(Card)`
 
 export default function HonorsMainComponent() {
   const dispatch = useDispatch();
-  const honorsR = useSelector(honors);
+  
 
-  // add honors
+ 
   const [activekey, setActiveKey] = useState("editUserPage");
-  // edit honors
+ 
   const [editedHonor, setEditedHonor] = useState(null);
 
-  const [content, setContent] = useState(""); // Added content state for editing
-  useEffect(() => {
-    // This assumes that you have a way to initialize the honors in your state.
-    // You might want to dispatch a thunk to fetch honors from the server.
+  const [content, setContent] = useState(""); 
+  const [dataCome, setDataCome] = useState([]);
+
+ useEffect(() => {
+    const fechData = async () => {
+      try {
+        const dataComeAPI = await dispatch(honorsList()).unwrap();
+        setDataCome(dataComeAPI || []); 
+      } catch (error) {
+        console.error("Error fetching data:", error);
+      }
+    };
+
+    fechData();
   }, [dispatch]);
 
   // saving the changes
@@ -80,18 +90,19 @@ export default function HonorsMainComponent() {
             className="mt-3 d-flex flex-column gap-3"
             style={{ cursor: "pointer" }}
           >
-            {honorsData.map((honor, index) => (
+            {dataCome.length > 0 ? (
+            dataCome.map((data, index) => (
               <React.Fragment key={index}>
                 <CARD
                   className="d-flex flex-row"
                   onClick={() => {
-                    setEditedHonor(honor);
-                    setContent(honor.content); // Set content when editing
+                    setEditedHonor(data);
+                    setContent(data.content); // Set content when editing
                   }}
                 >
                   <CardMedia
                     component="img"
-                    src={honor.src}
+                    src={data.src}
                     sx={{
                       width: "120px",
                       maxHeight: "100%",
@@ -100,13 +111,16 @@ export default function HonorsMainComponent() {
                   />
                   <CardContent className="d-flex flex-column justify-content-around">
                     <Typography className="titleHonors">
-                      {honor.title}
+                      {data.title}
                     </Typography>
-                    <Typography className="dateHonors">{honor.date}</Typography>
+                    <Typography className="dateHonors">{data.date}</Typography>
                   </CardContent>
                 </CARD>
               </React.Fragment>
-            ))}
+            ))
+          ) : (
+            <Typography variant="body2">No data available</Typography>
+          )}
           </div>
         </>
       )}
@@ -125,7 +139,7 @@ export default function HonorsMainComponent() {
           </div>
 
           <div>
-            <AddHonors dispatch={dispatch} />
+            <AddHonors/>
           </div>
         </>
       )}

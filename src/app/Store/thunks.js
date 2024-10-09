@@ -37,6 +37,8 @@ export const uploadFile = createAsyncThunk(
     const token = state.auth.token;
 
     try {
+      console.log(token);
+      
       // Create a FormData object
       const formData = new FormData();
       formData.append("files", file);
@@ -384,6 +386,64 @@ export const HomePageVideoDeleted = createAsyncThunk(
 );
 
 // end HomePageVideo
+
+// start honors
+
+
+export const honorsList = createAsyncThunk("honor/honorsList", async (_,thunkAPI) => {
+  try {
+    const response = await axios.get(
+      `${process.env.NEXT_PUBLIC_BACK_END_SERVER}/honors/list`
+    );
+    const data = response.data;
+
+    return data;
+  } catch (error) {
+    if (error.response && error.response.status === 400) {
+      return thunkAPI.rejectWithValue("ارور سمت من");
+    } else {
+      return thunkAPI.rejectWithValue("مشکلی به وجود امده لطفا بعدا تلاش کنید");
+    }
+  }
+});
+
+export const honorspot = createAsyncThunk(
+  "homePage/honorspot",
+  async (formData, thunkAPI) => {
+    const state = thunkAPI.getState();
+    const token = state.auth.token;
+    try {
+      const response = await axios.post(
+        `${process.env.NEXT_PUBLIC_BACK_END_SERVER}/honors`,
+        formData,
+        {
+          headers: {
+            Authorization: token ? `Bearer ${token}` : "",
+            "Content-Type": "application/json",
+          },
+        }
+      );
+      const data = response.data;
+
+      if (data) {
+        alert("افزودن افتخار با موفقیت انجام شد");
+      }
+
+      return data;
+    } catch (error) {
+      if (error.response && error.response.status === 400) {
+        return thunkAPI.rejectWithValue("ارور سمت من");
+      } else {
+        return thunkAPI.rejectWithValue(
+          "مشکلی به وجود امده لطفا بعدا تلاش کنید"
+        );
+      }
+    }
+  }
+);
+
+
+// end honors
 
 // start order
 

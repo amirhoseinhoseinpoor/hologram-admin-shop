@@ -1,103 +1,137 @@
-import React, { useState, useMemo } from "react";
-import { useDispatch } from "react-redux";
-import JoditEditor from "jodit-react";
-import { updateBannerContent } from "../../Store/thunks.js";
+import React, { useState } from "react";
+import { Editor } from "@tinymce/tinymce-react";
+// import redux
+import { useDispatch, useSelector } from "react-redux";
+import { uploadFile } from "@/app/Store/thunks"; 
+import { honorspot } from "@/app/Store/thunks";
+import { token } from "@/app/Store/slice"; 
 
-export default function AddHonors({ dispatch }) {
-  // editor
-  const [content, setContent] = useState("");
-  const [bannerImage, setBannerImage] = useState(null);
+export default function AddHonors() {
+  const dispatch = useDispatch();
+  const tokenCome = useSelector(token); // Get token from Redux store
+  const [content, setContent] = useState(""); // Editor content state
   const [bannerTitle, setBannerTitle] = useState("");
-  const [bannerDate, setBannerDate] = useState("");
   const [bannerTags, setBannerTags] = useState("");
+  const [bannerImage, setBannerImage] = useState(null);
 
   const handleEditorChange = (newContent) => {
     setContent(newContent);
-  };
-
-  const handleImageChange = (event) => {
-    const newImage = event.target.files[0];
-    setBannerImage(newImage);
   };
 
   const handleTitleChange = (event) => {
     setBannerTitle(event.target.value);
   };
 
-  const handleDateChange = (event) => {
-    setBannerDate(event.target.value);
-  };
-
   const handleTagsChange = (event) => {
     setBannerTags(event.target.value);
   };
 
-  // form submit
-  const handleSubmit = async (event) => {
-    event.preventDefault();
-    const formData = new FormData();
-    formData.append("image", bannerImage); // Append image file
-    formData.append("title", bannerTitle); // Append title
-    formData.append("date", bannerDate); // Append date
-    formData.append("tags", bannerTags); // Append tags
-    formData.append("content", content); // Append editor content
-    await dispatch(updateBannerContent(formData)); // Dispatch update thunk
+
+  const handleImageUpload = async (blobInfo, success, failure) => {
+    const file = blobInfo.blob(); // Get the image blob from TinyMCE
+    const tag = "editorImageHonors";
+    const type = 1; // Adjust based on your backend logic
+    const isPublic = true;
+  
+    try {
+      // Upload the file using your thunk
+      const fileId = await dispatch(uploadFile({ file, tag, type, isPublic })).unwrap();
+  
+      // Construct the valid image URL based on your backend API response
+      const imageUrl = `${process.env.NEXT_PUBLIC_BACK_END_SERVER}/system/download/${fileId}`;
+      
+      // Ensure the image URL is valid and log it for debugging purposes
+      console.log("Uploaded image URL:", imageUrl);
+      const editor = tinymce.activeEditor; // Get the active editor instance
+      editor.insertContent(`<img src="${imageUrl}" alt="Image" />`);
+  
+      // success(imageUrl); 
+    } catch (error) {
+      console.error("Error uploading image:", error);
+      failure("Image upload failed"); // Return an error to TinyMCE if the upload fails
+    }
   };
 
-  const config = useMemo(
-    () => ({
-      buttons: [
-        'source', '|',
-        'bold', 'italic', 'underline', '|',
-        'ul', 'ol', '|',
-        'outdent', '|', // Removed 'indent'
-        'image', 'table', '|',
-        'link', '|',
-        'hr', '|',
-        'align', 'undo', 'redo', '|',
-        'fullsize', 'print',
-      ],
-      removeButtons: ['audio', 'font'],
-    }),
-    []
-  );
+
+  // Handle file input change
+  const handleBannerImageUpload = async (event) => {
+    const file = event.target.files[0]; // Get the selected file
+    const tag = "bannerImage";
+    const type = 1; // Adjust based on your backend logic
+    const isPublic = true;
+
+    try {
+      // Dispatch the uploadFile thunk
+      const fileId = await dispatch(uploadFile({ file, tag, type, isPublic })).unwrap();
+
+      // Get the URL of the uploaded image
+      const imageUrl = `${process.env.NEXT_PUBLIC_BACK_END_SERVER}/system/download/${fileId}`;
+      setBannerImage(imageUrl); // Store the URL of the uploaded image
+    } catch (error) {
+      console.error("Error uploading banner image:", error);
+    }
+  };
+
+    // Form submit logic
+    const handleSubmit = async (event) => {
+      event.preventDefault();
+  
+      // Construct the data to be sent to the backend
+      const formData = {
+        title: bannerTitle,
+        src: bannerImage,
+        tags: bannerTags,
+        content: content // This will include the content with images inserted as <img src="...">
+      };
+
+      console.log(formData);
+      
+  
+      try {
+        // Send the data to the backend
+        const fetchData = await dispatch(honorspot(formData)).unwrap();
+        console.log(fetchData);
+        
+      } catch (error) {
+        console.error("Error submitting data:", error);
+      }
+    };
 
   return (
     <>
       <form onSubmit={handleSubmit}>
-        <label htmlFor="bannerImage">Image:</label>
-        <input type="file" id="bannerImage" onChange={handleImageChange} />
-        <label htmlFor="bannerTitle">عنوان :</label>
-        <input
-          id="bannerTitle"
-          value={bannerTitle}
-          onChange={handleTitleChange}
-        />
-        <label htmlFor="bannerDate">تاریخ :</label>
-        <input
-          type="date"
-          id="bannerDate"
-          value={bannerDate}
-          onChange={handleDateChange}
-        />
-        <label htmlFor="bannerTags">برچسب‌ها :</label>
-        <input
-          id="bannerTags"
-          value={bannerTags}
-          onChange={handleTagsChange}
-        />
+        <label htmlFor="bannerTitle">Title:</label>
+        <input id="bannerTitle" value={bannerTitle} onChange={handleTitleChange} />
+        <label htmlFor="bannerImage">Select Image:</label>
+        <input type="file" id="bannerImage" onChange={handleBannerImageUpload} />
+
+        <label htmlFor="bannerTags">Tags:</label>
+        <input id="bannerTags" value={bannerTags} onChange={handleTagsChange} />
 
         <div>
           <h2>Create Blog Post</h2>
-          <JoditEditor
+          <Editor
+            apiKey="3akk9p7jow7ksa3txzom0c8qr4e59rtg6xy1fzvux8vysqs0" // Replace with your TinyMCE API key
             value={content}
-            config={config}
-            onChange={handleEditorChange}
-            className="w-full h-[70%] mt-10 bg-white"
+            onEditorChange={handleEditorChange}
+            init={{
+              height: 500,
+              menubar: false,
+              plugins: [
+                "advlist", "autolink", "lists", "link", "image", "charmap",  "preview", "anchor",
+                "searchreplace", "visualblocks", "code", "fullscreen",
+                "insertdatetime", "media", "table", "help", "wordcount"
+              ],
+              toolbar:
+                "undo redo | formatselect | bold italic backcolor | \
+                alignleft aligncenter alignright alignjustify | \
+                bullist numlist outdent indent | removeformat | image",
+              images_upload_handler: handleImageUpload
+            }}
           />
-          <style>{`.jodit-wysiwyg{height:300px !important}`}</style>
         </div>
-        <button type="submit">اضافه کردن افتخار</button>
+
+        <button type="submit">Submit</button>
       </form>
     </>
   );
