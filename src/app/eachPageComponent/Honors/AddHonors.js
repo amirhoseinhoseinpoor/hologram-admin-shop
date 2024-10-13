@@ -8,8 +8,9 @@ import { token } from "@/app/Store/slice";
 
 export default function AddHonors() {
   const dispatch = useDispatch();
-  const tokenCome = useSelector(token); // Get token from Redux store
-  const [content, setContent] = useState(""); // Editor content state
+  // const tokenCome = useSelector(token); 
+  
+  const [content, setContent] = useState("");
   const [bannerTitle, setBannerTitle] = useState("");
   const [bannerTags, setBannerTags] = useState("");
   const [bannerImage, setBannerImage] = useState(null);

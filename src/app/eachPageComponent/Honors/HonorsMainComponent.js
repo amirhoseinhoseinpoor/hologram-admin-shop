@@ -6,13 +6,10 @@ import AddHonors from "./AddHonors";
 import EditHonors from "./EditHoors";
 //redux import
 import { useDispatch } from "react-redux";
-import { updateHonor } from "../../Store/thunks.js";
 import { honorsList } from "../../Store/thunks.js";
-
 import { Card, CardContent, CardMedia, Typography } from "@mui/material";
-
+import { formatPersianDate } from "@/app/utils/persionDateUtils";
 import styled from "styled-components";
-import parse from "html-react-parser";
 
 
 const CARD = styled(Card)`
@@ -29,13 +26,9 @@ const CARD = styled(Card)`
 export default function HonorsMainComponent() {
   const dispatch = useDispatch();
   
-
- 
   const [activekey, setActiveKey] = useState("editUserPage");
- 
   const [editedHonor, setEditedHonor] = useState(null);
-
-  const [content, setContent] = useState(""); 
+  // const [content, setContent] = useState(""); 
   const [dataCome, setDataCome] = useState([]);
 
  useEffect(() => {
@@ -51,26 +44,20 @@ export default function HonorsMainComponent() {
     fechData();
   }, [dispatch]);
 
-  // saving the changes
-  const handleHonorSave = async (event) => {
-    event.preventDefault();
-    await dispatch(updateHonor({ ...editedHonor, content }));
-    setEditedHonor(null);
-  };
 
-  // cancelingEdit
+
   const handleCancelEdit = () => {
     setEditedHonor(null);
   };
 
-  const handleEditImageChange = (event) => {
-    const newImage = event.target.files[0];
-    setEditedHonor({
-      ...editedHonor,
-      src: URL.createObjectURL(newImage),
-      newImageFile: newImage,
-    });
-  };
+  // const handleEditImageChange = (event) => {
+  //   const newImage = event.target.files[0];
+  //   setEditedHonor({
+  //     ...editedHonor,
+  //     src: URL.createObjectURL(newImage),
+  //     newImageFile: newImage,
+  //   });
+  // };
 
   return (
     <section>
@@ -97,7 +84,7 @@ export default function HonorsMainComponent() {
                   className="d-flex flex-row"
                   onClick={() => {
                     setEditedHonor(data);
-                    setContent(data.content); // Set content when editing
+                    // setContent(data.content); // Set content when editing
                   }}
                 >
                   <CardMedia
@@ -113,7 +100,7 @@ export default function HonorsMainComponent() {
                     <Typography className="titleHonors">
                       {data.title}
                     </Typography>
-                    <Typography className="dateHonors">{data.date}</Typography>
+                    <Typography className="dateHonors">{formatPersianDate(data.date)}</Typography>
                   </CardContent>
                 </CARD>
               </React.Fragment>
@@ -147,12 +134,11 @@ export default function HonorsMainComponent() {
         <>
           <EditHonors
             editedHonor={editedHonor}
-            handleHonorSave={handleHonorSave}
             handleCancelEdit={handleCancelEdit}
-            handleEditImageChange={handleEditImageChange}
+            // handleEditImageChange={handleEditImageChange}
             setEditedHonor={setEditedHonor}
-            content={content}
-            setContent={setContent}
+            // content={content}
+            // setContent={setContent}
           />
           
           {/* <div>{parse(content)}</div> */}
