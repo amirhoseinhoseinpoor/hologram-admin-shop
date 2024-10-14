@@ -511,10 +511,132 @@ export const honorsDeleted = createAsyncThunk(
     }
   }
 );
-
-
-
 // end honors
+
+
+// start exhibition
+
+
+export const exhibitionList = createAsyncThunk("exhibition/exhibitionList", async (_,thunkAPI) => {
+  try {
+    const response = await axios.get(
+      `${process.env.NEXT_PUBLIC_BACK_END_SERVER}/exhibition/list`
+    );
+    const data = response.data;
+
+    return data;
+  } catch (error) {
+    if (error.response && error.response.status === 400) {
+      return thunkAPI.rejectWithValue("ارور سمت من");
+    } else {
+      return thunkAPI.rejectWithValue("مشکلی به وجود امده لطفا بعدا تلاش کنید");
+    }
+  }
+});
+
+export const exhibitionpot = createAsyncThunk(
+  "exhibition/exhibitionpot",
+  async (formData, thunkAPI) => {
+    const state = thunkAPI.getState();
+    const token = state.auth.token;
+    try {
+      const response = await axios.post(
+        `${process.env.NEXT_PUBLIC_BACK_END_SERVER}/exhibition`,
+        formData,
+        {
+          headers: {
+            Authorization: token ? `Bearer ${token}` : "",
+            "Content-Type": "application/json",
+          },
+        }
+      );
+      const data = response.data;
+
+      if (data) {
+        alert("افزودن نمایشگاه با موفقیت انجام شد");
+      }
+
+      return data;
+    } catch (error) {
+      if (error.response && error.response.status === 400) {
+        return thunkAPI.rejectWithValue("ارور سمت من");
+      } else {
+        return thunkAPI.rejectWithValue(
+          "مشکلی به وجود امده لطفا بعدا تلاش کنید"
+        );
+      }
+    }
+  }
+);
+
+export const exhibitionEdit = createAsyncThunk(
+  "exhibition/exhibitionEdit",
+  async ({ exhibition, code }, thunkAPI) => {
+    const state = thunkAPI.getState();
+    const token = state.auth.token;
+    try {
+      const response = await axios.patch(
+        `${process.env.NEXT_PUBLIC_BACK_END_SERVER}/exhibition/${code}`,
+        exhibition,
+        {
+          headers: {
+            Authorization: token ? `Bearer ${token}` : "",
+            "Content-Type": "application/json",
+          },
+        }
+      );
+      const data = response.data;
+
+      if (data) {
+        alert("اپدیت نمایشگاه با موفقیت انجام شد");
+      }
+
+      return data;
+    } catch (error) {
+      if (error.response && error.response.status === 400) {
+        return thunkAPI.rejectWithValue("ارور سمت من");
+      } else {
+        return thunkAPI.rejectWithValue(
+          "مشکلی به وجود امده لطفا بعدا تلاش کنید"
+        );
+      }
+    }
+  }
+);
+
+export const exhibitionDeleted = createAsyncThunk(
+  "exhibition/exhibitionDeleted",
+  async ({ code }, thunkAPI) => {
+    const state = thunkAPI.getState();
+    const token = state.auth.token;
+
+    try {
+      const response = await axios.delete(
+        `${process.env.NEXT_PUBLIC_BACK_END_SERVER}/exhibition/${code}`,
+
+        {
+          headers: {
+            Authorization: token ? `Bearer ${token}` : "",
+          },
+        }
+      );
+      const data = response.data;
+      console.log(data);
+
+      return data;
+    } catch (error) {
+      if (error.response && error.response.status === 400) {
+        return thunkAPI.rejectWithValue("ارور سمت من");
+      } else {
+        return thunkAPI.rejectWithValue(
+          "مشکلی به وجود امده لطفا بعدا تلاش کنید"
+        );
+      }
+    }
+  }
+);
+
+// end exhibition
 
 // start order
 
@@ -767,8 +889,8 @@ export const addBanner = createAsyncThunk(
     }
   }
 );
-
 // end banner
+
 
 export const logout = createAsyncThunk("auth/logout", async () => {
   try {

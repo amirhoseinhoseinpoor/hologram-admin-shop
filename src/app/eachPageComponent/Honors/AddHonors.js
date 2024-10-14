@@ -2,14 +2,14 @@ import React, { useState } from "react";
 import { Editor } from "@tinymce/tinymce-react";
 // import redux
 import { useDispatch, useSelector } from "react-redux";
-import { uploadFile } from "@/app/Store/thunks"; 
+import { uploadFile } from "@/app/Store/thunks";
 import { honorspot } from "@/app/Store/thunks";
-import { token } from "@/app/Store/slice"; 
+import { token } from "@/app/Store/slice";
 
 export default function AddHonors() {
   const dispatch = useDispatch();
-  // const tokenCome = useSelector(token); 
-  
+  // const tokenCome = useSelector(token);
+
   const [content, setContent] = useState("");
   const [bannerTitle, setBannerTitle] = useState("");
   const [bannerTags, setBannerTags] = useState("");
@@ -27,32 +27,32 @@ export default function AddHonors() {
     setBannerTags(event.target.value);
   };
 
-
   const handleImageUpload = async (blobInfo, success, failure) => {
     const file = blobInfo.blob(); // Get the image blob from TinyMCE
     const tag = "editorImageHonors";
     const type = 1; // Adjust based on your backend logic
     const isPublic = true;
-  
+
     try {
       // Upload the file using your thunk
-      const fileId = await dispatch(uploadFile({ file, tag, type, isPublic })).unwrap();
-  
+      const fileId = await dispatch(
+        uploadFile({ file, tag, type, isPublic })
+      ).unwrap();
+
       // Construct the valid image URL based on your backend API response
       const imageUrl = `${process.env.NEXT_PUBLIC_BACK_END_SERVER}/system/download/${fileId}`;
-      
+
       // Ensure the image URL is valid and log it for debugging purposes
       console.log("Uploaded image URL:", imageUrl);
       const editor = tinymce.activeEditor; // Get the active editor instance
       editor.insertContent(`<img src="${imageUrl}" alt="Image" />`);
-  
-      // success(imageUrl); 
+
+      // success(imageUrl);
     } catch (error) {
       console.error("Error uploading image:", error);
       failure("Image upload failed"); // Return an error to TinyMCE if the upload fails
     }
   };
-
 
   // Handle file input change
   const handleBannerImageUpload = async (event) => {
@@ -63,7 +63,9 @@ export default function AddHonors() {
 
     try {
       // Dispatch the uploadFile thunk
-      const fileId = await dispatch(uploadFile({ file, tag, type, isPublic })).unwrap();
+      const fileId = await dispatch(
+        uploadFile({ file, tag, type, isPublic })
+      ).unwrap();
 
       // Get the URL of the uploaded image
       const imageUrl = `${process.env.NEXT_PUBLIC_BACK_END_SERVER}/system/download/${fileId}`;
@@ -73,38 +75,44 @@ export default function AddHonors() {
     }
   };
 
-    // Form submit logic
-    const handleSubmit = async (event) => {
-      event.preventDefault();
-  
-      // Construct the data to be sent to the backend
-      const formData = {
-        title: bannerTitle,
-        src: bannerImage,
-        tags: bannerTags,
-        content: content // This will include the content with images inserted as <img src="...">
-      };
+  // Form submit logic
+  const handleSubmit = async (event) => {
+    event.preventDefault();
 
-      console.log(formData);
-      
-  
-      try {
-        // Send the data to the backend
-        const fetchData = await dispatch(honorspot(formData)).unwrap();
-        console.log(fetchData);
-        
-      } catch (error) {
-        console.error("Error submitting data:", error);
-      }
+    // Construct the data to be sent to the backend
+    const formData = {
+      title: bannerTitle,
+      src: bannerImage,
+      tags: bannerTags,
+      content: content, // This will include the content with images inserted as <img src="...">
     };
+
+    console.log(formData);
+
+    try {
+      // Send the data to the backend
+      const fetchData = await dispatch(honorspot(formData)).unwrap();
+      console.log(fetchData);
+    } catch (error) {
+      console.error("Error submitting data:", error);
+    }
+  };
 
   return (
     <>
       <form onSubmit={handleSubmit}>
         <label htmlFor="bannerTitle">Title:</label>
-        <input id="bannerTitle" value={bannerTitle} onChange={handleTitleChange} />
+        <input
+          id="bannerTitle"
+          value={bannerTitle}
+          onChange={handleTitleChange}
+        />
         <label htmlFor="bannerImage">Select Image:</label>
-        <input type="file" id="bannerImage" onChange={handleBannerImageUpload} />
+        <input
+          type="file"
+          id="bannerImage"
+          onChange={handleBannerImageUpload}
+        />
 
         <label htmlFor="bannerTags">Tags:</label>
         <input id="bannerTags" value={bannerTags} onChange={handleTagsChange} />
@@ -119,15 +127,29 @@ export default function AddHonors() {
               height: 500,
               menubar: false,
               plugins: [
-                "advlist", "autolink", "lists", "link", "image", "charmap",  "preview", "anchor",
-                "searchreplace", "visualblocks", "code", "fullscreen",
-                "insertdatetime", "media", "table", "help", "wordcount"
+                "advlist",
+                "autolink",
+                "lists",
+                "link",
+                "image",
+                "charmap",
+                "preview",
+                "anchor",
+                "searchreplace",
+                "visualblocks",
+                "code",
+                "fullscreen",
+                "insertdatetime",
+                "media",
+                "table",
+                "help",
+                "wordcount",
               ],
               toolbar:
                 "undo redo | formatselect | bold italic backcolor | \
                 alignleft aligncenter alignright alignjustify | \
                 bullist numlist outdent indent | removeformat | image",
-              images_upload_handler: handleImageUpload
+              images_upload_handler: handleImageUpload,
             }}
           />
         </div>

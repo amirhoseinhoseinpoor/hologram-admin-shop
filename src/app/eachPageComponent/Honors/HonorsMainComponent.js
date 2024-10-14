@@ -28,7 +28,6 @@ export default function HonorsMainComponent() {
   
   const [activekey, setActiveKey] = useState("editUserPage");
   const [editedHonor, setEditedHonor] = useState(null);
-  // const [content, setContent] = useState(""); 
   const [dataCome, setDataCome] = useState([]);
 
  useEffect(() => {
@@ -45,19 +44,9 @@ export default function HonorsMainComponent() {
   }, [dispatch]);
 
 
-
   const handleCancelEdit = () => {
     setEditedHonor(null);
   };
-
-  // const handleEditImageChange = (event) => {
-  //   const newImage = event.target.files[0];
-  //   setEditedHonor({
-  //     ...editedHonor,
-  //     src: URL.createObjectURL(newImage),
-  //     newImageFile: newImage,
-  //   });
-  // };
 
   return (
     <section>
@@ -141,7 +130,7 @@ export default function HonorsMainComponent() {
             // setContent={setContent}
           />
           
-          {/* <div>{parse(content)}</div> */}
+        
         </>
       )}
     </section>
