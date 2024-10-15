@@ -638,6 +638,128 @@ export const exhibitionDeleted = createAsyncThunk(
 
 // end exhibition
 
+// start blog 
+
+export const blogsList = createAsyncThunk("blog/blogsList", async (_,thunkAPI) => {
+  try {
+    const response = await axios.get(
+      `${process.env.NEXT_PUBLIC_BACK_END_SERVER}/blogs/list`
+    );
+    const data = response.data;
+
+    return data;
+  } catch (error) {
+    if (error.response && error.response.status === 400) {
+      return thunkAPI.rejectWithValue("ارور سمت من");
+    } else {
+      return thunkAPI.rejectWithValue("مشکلی به وجود امده لطفا بعدا تلاش کنید");
+    }
+  }
+});
+
+export const blogspot = createAsyncThunk(
+  "blog/blogspot",
+  async (formData, thunkAPI) => {
+    const state = thunkAPI.getState();
+    const token = state.auth.token;
+    try {
+      const response = await axios.post(
+        `${process.env.NEXT_PUBLIC_BACK_END_SERVER}/blogs`,
+        formData,
+        {
+          headers: {
+            Authorization: token ? `Bearer ${token}` : "",
+            "Content-Type": "application/json",
+          },
+        }
+      );
+      const data = response.data;
+
+      if (data) {
+        alert("افزودن وبلاگ با موفقیت انجام شد");
+      }
+
+      return data;
+    } catch (error) {
+      if (error.response && error.response.status === 400) {
+        return thunkAPI.rejectWithValue("ارور سمت من");
+      } else {
+        return thunkAPI.rejectWithValue(
+          "مشکلی به وجود امده لطفا بعدا تلاش کنید"
+        );
+      }
+    }
+  }
+);
+
+export const blogsEdit = createAsyncThunk(
+  "blog/blogsEdit",
+  async ({ exhibition, code }, thunkAPI) => {
+    const state = thunkAPI.getState();
+    const token = state.auth.token;
+    try {
+      const response = await axios.patch(
+        `${process.env.NEXT_PUBLIC_BACK_END_SERVER}/blogs/${code}`,
+        exhibition,
+        {
+          headers: {
+            Authorization: token ? `Bearer ${token}` : "",
+            "Content-Type": "application/json",
+          },
+        }
+      );
+      const data = response.data;
+
+      if (data) {
+        alert("اپدیت نمایشگاه با موفقیت انجام شد");
+      }
+
+      return data;
+    } catch (error) {
+      if (error.response && error.response.status === 400) {
+        return thunkAPI.rejectWithValue("ارور سمت من");
+      } else {
+        return thunkAPI.rejectWithValue(
+          "مشکلی به وجود امده لطفا بعدا تلاش کنید"
+        );
+      }
+    }
+  }
+);
+
+export const blogsDeleted = createAsyncThunk(
+  "blog/blogsDeleted",
+  async ({ code }, thunkAPI) => {
+    const state = thunkAPI.getState();
+    const token = state.auth.token;
+
+    try {
+      const response = await axios.delete(
+        `${process.env.NEXT_PUBLIC_BACK_END_SERVER}/blogs/${code}`,
+
+        {
+          headers: {
+            Authorization: token ? `Bearer ${token}` : "",
+          },
+        }
+      );
+      const data = response.data;
+      console.log(data);
+
+      return data;
+    } catch (error) {
+      if (error.response && error.response.status === 400) {
+        return thunkAPI.rejectWithValue("ارور سمت من");
+      } else {
+        return thunkAPI.rejectWithValue(
+          "مشکلی به وجود امده لطفا بعدا تلاش کنید"
+        );
+      }
+    }
+  }
+);
+// end blog 
+
 // start order
 
 export const listorders = createAsyncThunk(

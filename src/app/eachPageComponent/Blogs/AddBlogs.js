@@ -1,143 +1,327 @@
-import React, { useState, useMemo } from "react";
-import { useDispatch } from "react-redux";
-import JoditEditor from "jodit-react";
-import { updateBannerContent } from "../../Store/thunks.js";
+import React, { useState, useEffect } from "react";
+import { Editor } from "@tinymce/tinymce-react";
+import { Checkbox, FormControlLabel, TextField, Button } from "@mui/material";
+import styled from "styled-components";
 
-export default function AddHonors({ dispatch }) {
-  // editor
+const TEXTFIELD = styled(TextField)`
+  .MuiInputBase-input {
+    padding: 10px;
+  }
+  .css-14s5rfu-MuiFormLabel-root-MuiInputLabel-root {
+    transform: translate(50%, 50%);
+  }
+`;
+
+const FORMCONTROLLABEL = styled(FormControlLabel)`
+  .css-ahj2mt-MuiTypography-root {
+    font-family: unset;
+  }
+`;
+
+// import redux
+import { useDispatch } from "react-redux";
+import { uploadFile } from "@/app/Store/thunks";
+import { blogspot } from "@/app/Store/thunks";
+
+export default function AddHonors() {
+  const dispatch = useDispatch();
+
   const [content, setContent] = useState("");
-  const [bannerImage, setBannerImage] = useState(null);
   const [bannerTitle, setBannerTitle] = useState("");
-  const [bannerDate, setBannerDate] = useState("");
-  const [BlogTime, setBlogTime] = useState("");
+  const [blogTime, setBlogTime] = useState("");
+  const [blogType, setBlogType] = useState("");
+  const [bannerTags, setBannerTags] = useState("");
+  const [bannerImage, setBannerImage] = useState(null);
+  const [notify, setNotify] = useState(false);
   const [posetives, setposetives] = useState("");
   const [negetive, setnegetive] = useState("");
-
-
-
-  const [bannerTags, setBannerTags] = useState("");
+  // product
+  const [productTitle, setproductTitle] = useState("");
+  const [productSrc, setproductSrc] = useState("");
+  const [productLink, setproductLink] = useState("");
 
   const handleEditorChange = (newContent) => {
     setContent(newContent);
-  };
-
-  const handleImageChange = (event) => {
-    const newImage = event.target.files[0];
-    setBannerImage(newImage);
   };
 
   const handleTitleChange = (event) => {
     setBannerTitle(event.target.value);
   };
 
-  const handleDateChange = (event) => {
-    setBannerDate(event.target.value);
-  };
-
   const handleTimeChange = (event) => {
     setBlogTime(event.target.value);
   };
 
-  const handleposetivesChange = (event) => {
-    setposetives(event.target.value);
+  const handleTypeChange = (event) => {
+    setBlogType(event.target.value);
   };
-
-  const handlenegetiveChange = (event) => {
-    setnegetive(event.target.value);
-  };
-
 
   const handleTagsChange = (event) => {
     setBannerTags(event.target.value);
   };
 
-  // form submit
-  const handleSubmit = async (event) => {
-    event.preventDefault();
-    const formData = new FormData();
-    formData.append("image", bannerImage); // Append image file
-    formData.append("title", bannerTitle); // Append title
-    formData.append("date", bannerDate); // Append date
-    formData.append("tags", bannerTags); // Append tags
-    formData.append("content", content); // Append editor content
-    await dispatch(updateBannerContent(formData)); // Dispatch update thunk
+  const handlePosetivesChange = (event) => {
+    setposetives(event.target.value);
   };
 
-  const config = useMemo(
-    () => ({
-      buttons: [
-        'source', '|',
-        'bold', 'italic', 'underline', '|',
-        'ul', 'ol', '|',
-        'outdent', '|', // Removed 'indent'
-        'image', 'table', '|',
-        'link', '|',
-        'hr', '|',
-        'align', 'undo', 'redo', '|',
-        'fullsize', 'print',
-      ],
-      removeButtons: ['audio', 'font'],
-    }),
-    []
-  );
+  const handleNegetivesChange = (event) => {
+    setnegetive(event.target.value);
+  };
+
+  const handleProductTitleChange = (event) => {
+    setproductTitle(event.target.value);
+  };
+
+  const handleProductLinkChange = (event) => {
+    setproductLink(event.target.value);
+  };
+
+  const handleNotifyChange = (event) => {
+    setNotify(event.target.checked); // Update the notify state
+  };
+
+  const handleImageUpload = async (blobInfo, success, failure) => {
+    const file = blobInfo.blob(); // Get the image blob from TinyMCE
+    const tag = "editorImageBlogs";
+    const type = 1; // Adjust based on your backend logic
+    const isPublic = true;
+
+    try {
+      // Upload the file using your thunk
+      const fileId = await dispatch(
+        uploadFile({ file, tag, type, isPublic })
+      ).unwrap();
+
+      // Construct the valid image URL based on your backend API response
+      const imageUrl = `${process.env.NEXT_PUBLIC_BACK_END_SERVER}/system/download/${fileId}`;
+
+      // Ensure the image URL is valid and log it for debugging purposes
+      console.log("Uploaded image URL:", imageUrl);
+      const editor = tinymce.activeEditor; // Get the active editor instance
+      editor.insertContent(`<img src="${imageUrl}" alt="Image" />`);
+
+      // success(imageUrl);
+    } catch (error) {
+      console.error("Error uploading image:", error);
+      failure("Image upload failed"); // Return an error to TinyMCE if the upload fails
+    }
+  };
+
+  // Handle file input change
+  const handleBannerImageUpload = async (event) => {
+    const file = event.target.files[0]; // Get the selected file
+    const tag = "blogMainSrc";
+    const type = 1; // Adjust based on your backend logic
+    const isPublic = true;
+
+    try {
+      // Dispatch the uploadFile thunk
+      const fileId = await dispatch(
+        uploadFile({ file, tag, type, isPublic })
+      ).unwrap();
+
+      // Get the URL of the uploaded image
+      const imageUrl = `${process.env.NEXT_PUBLIC_BACK_END_SERVER}/system/download/${fileId}`;
+      setBannerImage(imageUrl); // Store the URL of the uploaded image
+    } catch (error) {
+      console.error("Error uploading banner image:", error);
+    }
+  };
+
+  const handleProductSrcChange = async (event) => {
+    const file = event.target.files[0]; // Get the selected file
+    const tag = "blogProductSrc";
+    const type = 1; // Adjust based on your backend logic
+    const isPublic = true;
+
+    try {
+      // Dispatch the uploadFile thunk
+      const fileId = await dispatch(
+        uploadFile({ file, tag, type, isPublic })
+      ).unwrap();
+
+      // Get the URL of the uploaded image
+      const imageUrl = `${process.env.NEXT_PUBLIC_BACK_END_SERVER}/system/download/${fileId}`;
+      setproductSrc(imageUrl);
+    } catch (error) {
+      console.error("Error uploading banner image:", error);
+    }
+  };
+
+  // Form submit logic
+  const handleSubmit = async (event) => {
+    event.preventDefault();
+
+  
+    const formData = {
+      title: bannerTitle,
+      time: blogTime,
+      priority: notify,
+      imageSrc: bannerImage,
+      tags: bannerTags,
+      content: content,
+      posetives: posetives,
+      negetive: negetive,
+      product: {
+        title: productTitle,
+        src: productSrc,
+        link: productLink,
+      },
+    };
+
+    const finalData = {
+      content: formData
+    }
+
+    console.log(finalData);
+
+    try {
+      const fetchData = await dispatch(blogspot(finalData)).unwrap();
+      console.log(fetchData);
+    } catch (error) {
+      console.error("Error submitting data:", error);
+    }
+  };
 
   return (
     <>
-      <form onSubmit={handleSubmit}>
-        <label htmlFor="bannerImage">Image:</label>
-        <input type="file" id="bannerImage" onChange={handleImageChange} />
-        <label htmlFor="bannerTitle">عنوان :</label>
-        <input
-          id="bannerTitle"
+      <form onSubmit={handleSubmit} className="p-3">
+        <TEXTFIELD
+          className="textFieldClass"
+          fullWidth
+          label="Title"
           value={bannerTitle}
           onChange={handleTitleChange}
+          margin="normal"
         />
-        <label htmlFor="bannerDate">تاریخ :</label>
-        <input
-          type="date"
-          id="bannerDate"
-          value={bannerDate}
-          onChange={handleDateChange}
-        />
-        <label htmlFor="BlogTime">زمان مطالعه :</label>
-        <input
-          type="text"
-          id="BlogTime"
-          value={BlogTime}
+        <TEXTFIELD
+          fullWidth
+          label="زمان مطالعه"
+          value={blogTime}
           onChange={handleTimeChange}
+          margin="normal"
         />
-        <label htmlFor="posetives">نکات مثبت</label>
-        <input
-          type="text"
-          id="posetives"
-          value={posetives}
-          onChange={handleposetivesChange}
+        <TEXTFIELD
+          fullWidth
+          label="Type"
+          value={blogType}
+          onChange={handleTypeChange}
+          margin="normal"
         />
-        <label htmlFor="negetive">نکات منفی :</label>
+        <label htmlFor="bannerImage">Select Image:</label>
         <input
-          type="text"
-          id="negetive"
-          value={negetive}
-          onChange={handlenegetiveChange}
-        />
-        <label htmlFor="bannerTags">تگ ها :</label>
-        <input
-          id="bannerTags"
-          value={bannerTags}
-          onChange={handleTagsChange}
+          type="file"
+          id="bannerImage"
+          onChange={handleBannerImageUpload}
         />
 
-        <div className="mt-4">
-          
-          <JoditEditor
+        <TEXTFIELD
+          fullWidth
+          label="posetives"
+          value={posetives}
+          onChange={handlePosetivesChange}
+          margin="normal"
+        />
+
+        <TEXTFIELD
+          fullWidth
+          label="negetive"
+          value={negetive}
+          onChange={handleNegetivesChange}
+          margin="normal"
+        />
+
+        <TEXTFIELD
+          fullWidth
+          label="productTitle"
+          value={productTitle}
+          onChange={handleProductTitleChange}
+          margin="normal"
+        />
+
+        <label htmlFor="ProductImage">Select Image Product:</label>
+        <input
+          type="file"
+          id="ProductImage"
+          onChange={handleProductSrcChange}
+        />
+
+        <TEXTFIELD
+          fullWidth
+          label="productLink"
+          value={productLink}
+          onChange={handleProductLinkChange}
+          margin="normal"
+        />
+
+        <TEXTFIELD
+          fullWidth
+          label="Tags"
+          value={bannerTags}
+          onChange={handleTagsChange}
+          margin="normal"
+        />
+
+        <FORMCONTROLLABEL
+          sx={{ fontFamily: "unset" }}
+          control={<Checkbox checked={notify} onChange={handleNotifyChange} />}
+          label="ایا مقاله مهم و در صفحه اصلی است"
+        />
+
+        <div>
+          <h2>Create Blog Post</h2>
+          <Editor
+            apiKey="3akk9p7jow7ksa3txzom0c8qr4e59rtg6xy1fzvux8vysqs0" // Replace with your TinyMCE API key
             value={content}
-            config={config}
-            onChange={handleEditorChange}
-            className="w-full h-[70%] mt-10 bg-white"
+            onEditorChange={handleEditorChange}
+            init={{
+              height: 500,
+              menubar: false,
+              plugins: [
+                "advlist",
+                "autolink",
+                "lists",
+                "link",
+                "image",
+                "charmap",
+                "preview",
+                "anchor",
+                "searchreplace",
+                "visualblocks",
+                "code",
+                "fullscreen",
+                "insertdatetime",
+                "media",
+                "table",
+                "help",
+                "wordcount",
+              ],
+              
+              toolbar:
+                "undo redo | formatselect | bold italic backcolor | \
+                alignleft aligncenter alignright alignjustify | \
+                bullist numlist outdent indent | removeformat | image | \ h1 h2 h3 h4 h5 h6",
+                style_formats: [
+                  { title: 'Header 1', block: 'h1' },
+                  { title: 'Header 2', block: 'h2' },
+                  { title: 'Header 3', block: 'h3' },
+                  { title: 'Header 4', block: 'h4' },
+                  { title: 'Header 5', block: 'h5' },
+                  { title: 'Header 6', block: 'h6' }
+                ],
+              images_upload_handler: handleImageUpload,
+            }}
           />
-          <style>{`.jodit-wysiwyg{height:300px !important}`}</style>
         </div>
-        <button type="submit">اضافه کردن افتخار</button>
+
+        <Button
+          type="submit"
+          variant="contained"
+          color="primary"
+          className="mt-3"
+        >
+          Submit
+        </Button>
       </form>
     </>
   );

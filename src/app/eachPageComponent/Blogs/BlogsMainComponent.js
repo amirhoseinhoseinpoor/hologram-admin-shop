@@ -4,16 +4,14 @@ import React, { useState, useEffect } from "react";
 
 import AddBlogs from "./AddBlogs";
 import EditBlogs from "./EditBlogs";
-//redux import
-import { useSelector, useDispatch } from "react-redux";
-import { honors } from "../../Store/slice.js";
-import { updateHonor } from "../../Store/thunks.js";
-
 import { Card, CardContent, CardMedia, Typography } from "@mui/material";
 import honorsData from "/public/json/BlogsTest.json";
 import styled from "styled-components";
-import parse from "html-react-parser";
+import { formatPersianDate } from "@/app/utils/persionDateUtils";
 
+//redux import
+import { useSelector, useDispatch } from "react-redux";
+import { blogsList } from "@/app/Store/thunks";
 
 const CARD = styled(Card)`
   background-color: #5f5f5f !important;
@@ -28,39 +26,48 @@ const CARD = styled(Card)`
 
 export default function HonorsMainComponent() {
   const dispatch = useDispatch();
-  const honorsR = useSelector(honors);
 
-  // add honors
   const [activekey, setActiveKey] = useState("editUserPage");
-  // edit honors
   const [editedHonor, setEditedHonor] = useState(null);
+  const [dataCome, setDataCome] = useState([]);
 
-  const [content, setContent] = useState(""); // Added content state for editing
+  
+
   useEffect(() => {
-    // This assumes that you have a way to initialize the honors in your state.
-    // You might want to dispatch a thunk to fetch honors from the server.
+    const fechData = async () => {
+      try {
+        const dataComeAPI = await dispatch(blogsList()).unwrap();
+        setDataCome(dataComeAPI || []);
+      } catch (error) {
+        console.error("Error fetching data:", error);
+      }
+    };
+
+    fechData();
   }, [dispatch]);
 
-  // saving the changes
-  const handleHonorSave = async (event) => {
-    event.preventDefault();
-    await dispatch(updateHonor({ ...editedHonor, content }));
-    setEditedHonor(null);
-  };
+
+
+  // // saving the changes
+  // const handleHonorSave = async (event) => {
+  //   event.preventDefault();
+  //   await dispatch(updateHonor({ ...editedHonor, content }));
+  //   setEditedHonor(null);
+  // };
 
   // cancelingEdit
   const handleCancelEdit = () => {
     setEditedHonor(null);
   };
 
-  const handleEditImageChange = (event) => {
-    const newImage = event.target.files[0];
-    setEditedHonor({
-      ...editedHonor,
-      src: URL.createObjectURL(newImage),
-      newImageFile: newImage,
-    });
-  };
+  // const handleEditImageChange = (event) => {
+  //   const newImage = event.target.files[0];
+  //   setEditedHonor({
+  //     ...editedHonor,
+  //     src: URL.createObjectURL(newImage),
+  //     newImageFile: newImage,
+  //   });
+  // };
 
   return (
     <section>
@@ -80,33 +87,38 @@ export default function HonorsMainComponent() {
             className="mt-3 d-flex flex-column gap-3"
             style={{ cursor: "pointer" }}
           >
-            {honorsData.map((honor, index) => (
-              <React.Fragment key={index}>
-                <CARD
-                  className="d-flex flex-row"
-                  onClick={() => {
-                    setEditedHonor(honor);
-                    setContent(honor.content); // Set content when editing
-                  }}
-                >
-                  <CardMedia
-                    component="img"
-                    src={honor.src}
-                    sx={{
-                      width: "120px",
-                      maxHeight: "100%",
-                      borderRadius: "2px",
+            {dataCome.length > 0 ? (
+              dataCome.map((honor, index) => (
+                <React.Fragment key={index}>
+                  <CARD
+                    className="d-flex flex-row"
+                    onClick={() => {
+                      setEditedHonor(honor);
                     }}
-                  />
-                  <CardContent className="d-flex flex-column justify-content-around">
-                    <Typography className="titleHonors">
-                      {honor.title}
-                    </Typography>
-                    <Typography className="dateHonors">{honor.date}</Typography>
-                  </CardContent>
-                </CARD>
-              </React.Fragment>
-            ))}
+                  >
+                    <CardMedia
+                      component="img"
+                      src={honor.content.imageSrc}
+                      sx={{
+                        width: "120px",
+                        maxHeight: "100%",
+                        borderRadius: "2px",
+                      }}
+                    />
+                    <CardContent className="d-flex flex-column justify-content-around">
+                      <Typography className="titleHonors">
+                        {honor.content.title}
+                      </Typography>
+                      <Typography className="dateHonors">
+                        {formatPersianDate(honor.date)}
+                      </Typography>
+                    </CardContent>
+                  </CARD>
+                </React.Fragment>
+              ))
+            ) : (
+              <Typography variant="body2">No data available</Typography>
+            )}
           </div>
         </>
       )}
@@ -115,17 +127,17 @@ export default function HonorsMainComponent() {
         <>
           <div className="d-flex flex-row justify-content-between mb-2">
             <div>
-              <h2 className="m-0"> افزودن افتخارات</h2>
+              <h2 className="m-0"> افزودن مقالات</h2>
             </div>
             <div>
               <button onClick={() => setActiveKey("editUserPage")}>
-                ویرایش افتخارات
+                ویرایش مقالات
               </button>
             </div>
           </div>
 
           <div>
-            <AddBlogs dispatch={dispatch} />
+            <AddBlogs/>
           </div>
         </>
       )}
@@ -133,15 +145,13 @@ export default function HonorsMainComponent() {
         <>
           <EditBlogs
             editedHonor={editedHonor}
-            handleHonorSave={handleHonorSave}
+            // handleHonorSave={handleHonorSave}
             handleCancelEdit={handleCancelEdit}
-            handleEditImageChange={handleEditImageChange}
+            // handleEditImageChange={handleEditImageChange}
             setEditedHonor={setEditedHonor}
-            content={content}
-            setContent={setContent}
+            // content={content}
+            // setContent={setContent}
           />
-          
-          {/* <div>{parse(content)}</div> */}
         </>
       )}
     </section>
