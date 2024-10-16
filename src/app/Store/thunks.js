@@ -694,13 +694,13 @@ export const blogspot = createAsyncThunk(
 
 export const blogsEdit = createAsyncThunk(
   "blog/blogsEdit",
-  async ({ exhibition, code }, thunkAPI) => {
+  async ({ content, code }, thunkAPI) => {
     const state = thunkAPI.getState();
     const token = state.auth.token;
     try {
       const response = await axios.patch(
         `${process.env.NEXT_PUBLIC_BACK_END_SERVER}/blogs/${code}`,
-        exhibition,
+        content,
         {
           headers: {
             Authorization: token ? `Bearer ${token}` : "",
@@ -711,7 +711,7 @@ export const blogsEdit = createAsyncThunk(
       const data = response.data;
 
       if (data) {
-        alert("اپدیت نمایشگاه با موفقیت انجام شد");
+        alert("اپدیت وبلاگ با موفقیت انجام شد");
       }
 
       return data;

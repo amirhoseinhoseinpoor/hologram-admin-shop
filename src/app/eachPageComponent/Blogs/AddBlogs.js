@@ -154,6 +154,7 @@ export default function AddHonors() {
 
   
     const formData = {
+      type: blogType,
       title: bannerTitle,
       time: blogTime,
       priority: notify,
@@ -187,7 +188,6 @@ export default function AddHonors() {
     <>
       <form onSubmit={handleSubmit} className="p-3">
         <TEXTFIELD
-          className="textFieldClass"
           fullWidth
           label="Title"
           value={bannerTitle}
