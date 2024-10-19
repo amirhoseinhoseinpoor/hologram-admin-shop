@@ -129,8 +129,6 @@ export default function HonorsMainComponent() {
             // content={content}
             // setContent={setContent}
           />
-          
-        
         </>
       )}
     </section>

@@ -11,7 +11,11 @@ const TEXTFIELD = styled(TextField)`
   }
 `;
 
-export default function EditHonors({ editedHonor, handleCancelEdit, setEditedHonor }) {
+export default function EditHonors({
+  editedHonor,
+  handleCancelEdit,
+  setEditedHonor,
+}) {
   const dispatch = useDispatch();
 
   const [content, setContent] = useState(""); // No array, just a string
@@ -47,7 +51,9 @@ export default function EditHonors({ editedHonor, handleCancelEdit, setEditedHon
     const isPublic = true;
 
     try {
-      const fileId = await dispatch(uploadFile({ file, tag, type, isPublic })).unwrap();
+      const fileId = await dispatch(
+        uploadFile({ file, tag, type, isPublic })
+      ).unwrap();
       const imageUrl = `${process.env.NEXT_PUBLIC_BACK_END_SERVER}/system/download/${fileId}`;
       const editor = tinymce.activeEditor;
       editor.insertContent(`<img src="${imageUrl}" alt="Image" />`);
@@ -58,12 +64,14 @@ export default function EditHonors({ editedHonor, handleCancelEdit, setEditedHon
 
   const handleBannerImageUpload = async (event) => {
     const file = event.target.files[0];
-    const tag = "bannerImage";
+    const tag = "honorImage";
     const type = 1;
     const isPublic = true;
 
     try {
-      const fileId = await dispatch(uploadFile({ file, tag, type, isPublic })).unwrap();
+      const fileId = await dispatch(
+        uploadFile({ file, tag, type, isPublic })
+      ).unwrap();
       const imageUrl = `${process.env.NEXT_PUBLIC_BACK_END_SERVER}/system/download/${fileId}`;
       setBannerImage(imageUrl);
     } catch (error) {
@@ -74,7 +82,9 @@ export default function EditHonors({ editedHonor, handleCancelEdit, setEditedHon
   const handleDelete = async (e) => {
     e.preventDefault();
     try {
-      const deleteVideo = await dispatch(honorsDeleted({ code: editedHonor.code }));
+      const deleteVideo = await dispatch(
+        honorsDeleted({ code: editedHonor.code })
+      );
       if (deleteVideo.payload.message === "Success") {
         alert("Honor deleted successfully");
       }
@@ -92,7 +102,9 @@ export default function EditHonors({ editedHonor, handleCancelEdit, setEditedHon
       content: content, // Send the content state directly
     };
     try {
-      const fetchData = await dispatch(honorsEdit({ honor: formData, code: editedHonor.code })).unwrap();
+      const fetchData = await dispatch(
+        honorsEdit({ honor: formData, code: editedHonor.code })
+      ).unwrap();
       console.log(fetchData);
     } catch (error) {
       console.error("Error submitting data:", error);
@@ -103,12 +115,32 @@ export default function EditHonors({ editedHonor, handleCancelEdit, setEditedHon
     <div className="mt-3">
       <h2>Edit Honor</h2>
       <form onSubmit={handleSubmit}>
-        <TEXTFIELD label="Title" value={bannerTitle} onChange={handleTitleChange} fullWidth margin="normal" />
-        <TEXTFIELD label="Tags" value={bannerTags} onChange={handleTagsChange} fullWidth margin="normal" />
-        <input type="file" onChange={handleBannerImageUpload} accept="image/*" />
+        <TEXTFIELD
+          label="Title"
+          value={bannerTitle}
+          onChange={handleTitleChange}
+          fullWidth
+          margin="normal"
+        />
+        <TEXTFIELD
+          label="Tags"
+          value={bannerTags}
+          onChange={handleTagsChange}
+          fullWidth
+          margin="normal"
+        />
+        <input
+          type="file"
+          onChange={handleBannerImageUpload}
+          accept="image/*"
+        />
         {bannerImage && (
           <Box sx={{ width: "100px", height: "100px", marginTop: "10px" }}>
-            <CardMedia component="img" src={bannerImage} sx={{ width: "100%", height: "100%", borderRadius: 3 }} />
+            <CardMedia
+              component="img"
+              src={bannerImage}
+              sx={{ width: "100%", height: "100%", borderRadius: 3 }}
+            />
           </Box>
         )}
 
@@ -122,9 +154,23 @@ export default function EditHonors({ editedHonor, handleCancelEdit, setEditedHon
               height: 500,
               menubar: false,
               plugins: [
-                "advlist", "autolink", "lists", "link", "image", "charmap", "preview",
-                "anchor", "searchreplace", "visualblocks", "code", "fullscreen",
-                "insertdatetime", "media", "table", "help", "wordcount",
+                "advlist",
+                "autolink",
+                "lists",
+                "link",
+                "image",
+                "charmap",
+                "preview",
+                "anchor",
+                "searchreplace",
+                "visualblocks",
+                "code",
+                "fullscreen",
+                "insertdatetime",
+                "media",
+                "table",
+                "help",
+                "wordcount",
               ],
               toolbar:
                 "undo redo | formatselect | bold italic backcolor | " +
@@ -138,7 +184,11 @@ export default function EditHonors({ editedHonor, handleCancelEdit, setEditedHon
         <Button className="mb-3 mt-3" variant="contained" type="submit">
           Save
         </Button>
-        <button className="bg-danger mt-2 mb-2" type="button" onClick={handleDelete}>
+        <button
+          className="bg-danger mt-2 mb-2"
+          type="button"
+          onClick={handleDelete}
+        >
           Delete Honor
         </button>
         <Button variant="contained" onClick={handleCancelEdit}>

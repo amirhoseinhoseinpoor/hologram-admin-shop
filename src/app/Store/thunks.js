@@ -638,6 +638,131 @@ export const exhibitionDeleted = createAsyncThunk(
 
 // end exhibition
 
+// start banner 
+
+
+export const bannerList = createAsyncThunk("banner/bannerList", async (_,thunkAPI) => {
+  try {
+    const response = await axios.get(
+      `${process.env.NEXT_PUBLIC_BACK_END_SERVER}/banner/list`
+    );
+    const data = response.data;
+
+    return data;
+  } catch (error) {
+    if (error.response && error.response.status === 400) {
+      return thunkAPI.rejectWithValue("ارور سمت من");
+    } else {
+      return thunkAPI.rejectWithValue("مشکلی به وجود امده لطفا بعدا تلاش کنید");
+    }
+  }
+});
+
+export const bannerpot = createAsyncThunk(
+  "banner/bannerpot",
+  async (formData, thunkAPI) => {
+    const state = thunkAPI.getState();
+    const token = state.auth.token;
+    try {
+      const response = await axios.post(
+        `${process.env.NEXT_PUBLIC_BACK_END_SERVER}/banner`,
+        formData,
+        {
+          headers: {
+            Authorization: token ? `Bearer ${token}` : "",
+            "Content-Type": "application/json",
+          },
+        }
+      );
+      const data = response.data;
+
+      if (data) {
+        alert("افزودن بنر با موفقیت انجام شد");
+      }
+
+      return data;
+    } catch (error) {
+      if (error.response && error.response.status === 400) {
+        return thunkAPI.rejectWithValue("ارور سمت من");
+      } else {
+        return thunkAPI.rejectWithValue(
+          "مشکلی به وجود امده لطفا بعدا تلاش کنید"
+        );
+      }
+    }
+  }
+);
+
+export const bannerEdit = createAsyncThunk(
+  "banner/bannerEdit",
+  async ({ banner, code }, thunkAPI) => {
+    const state = thunkAPI.getState();
+    const token = state.auth.token;
+    try {
+      const response = await axios.patch(
+        `${process.env.NEXT_PUBLIC_BACK_END_SERVER}/banner/${code}`,
+        banner,
+        {
+          headers: {
+            Authorization: token ? `Bearer ${token}` : "",
+            "Content-Type": "application/json",
+          },
+        }
+      );
+      const data = response.data;
+
+      if (data) {
+        alert("اپدیت بنر با موفقیت انجام شد");
+      }
+
+      return data;
+    } catch (error) {
+      if (error.response && error.response.status === 400) {
+        return thunkAPI.rejectWithValue("ارور سمت من");
+      } else {
+        return thunkAPI.rejectWithValue(
+          "مشکلی به وجود امده لطفا بعدا تلاش کنید"
+        );
+      }
+    }
+  }
+);
+
+export const bannerDeleted = createAsyncThunk(
+  "banner/bannerDeleted",
+  async ({ code }, thunkAPI) => {
+    const state = thunkAPI.getState();
+    const token = state.auth.token;
+
+    try {
+      const response = await axios.delete(
+        `${process.env.NEXT_PUBLIC_BACK_END_SERVER}/banner/${code}`,
+
+        {
+          headers: {
+            Authorization: token ? `Bearer ${token}` : "",
+          },
+        }
+      );
+      const data = response.data;
+      console.log(data);
+
+      return data;
+    } catch (error) {
+      if (error.response && error.response.status === 400) {
+        return thunkAPI.rejectWithValue("ارور سمت من");
+      } else {
+        return thunkAPI.rejectWithValue(
+          "مشکلی به وجود امده لطفا بعدا تلاش کنید"
+        );
+      }
+    }
+  }
+);
+
+
+// end banner 
+
 // start blog 
 
 export const blogsList = createAsyncThunk("blog/blogsList", async (_,thunkAPI) => {
@@ -915,102 +1040,102 @@ export const increaseStep = createAsyncThunk(
 // end order
 
 // start banner
-export const bannerdata = createAsyncThunk(
-  "banner/bannerdata",
-  async (_, thunkAPI) => {
-    try {
-      const response = await axios.get(
-        `${process.env.NEXT_PUBLIC_BACK_END_SERVER}/system/download/list/banner`
-      );
+// export const bannerdata = createAsyncThunk(
+//   "banner/bannerdata",
+//   async (_, thunkAPI) => {
+//     try {
+//       const response = await axios.get(
+//         `${process.env.NEXT_PUBLIC_BACK_END_SERVER}/system/download/list/banner`
+//       );
 
-      const bannerData = response.data;
+//       const bannerData = response.data;
 
-      // Initialize an array to store the images with base64 data
-      const imagesWithBase64 = [];
+//       // Initialize an array to store the images with base64 data
+//       const imagesWithBase64 = [];
 
-      // Loop through each banner and fetch its image
-      for (let image of bannerData) {
-        try {
-          const imageResponse = await axios.get(
-            `${process.env.NEXT_PUBLIC_BACK_END_SERVER}/system/download/${image.fileName}`,
-            { responseType: "arraybuffer" }
-          );
+//       // Loop through each banner and fetch its image
+//       for (let image of bannerData) {
+//         try {
+//           const imageResponse = await axios.get(
+//             `${process.env.NEXT_PUBLIC_BACK_END_SERVER}/system/download/${image.fileName}`,
+//             { responseType: "arraybuffer" }
+//           );
 
-          // Convert the ArrayBuffer to a Uint8Array
-          const uint8Array = new Uint8Array(imageResponse.data);
+//           // Convert the ArrayBuffer to a Uint8Array
+//           const uint8Array = new Uint8Array(imageResponse.data);
 
-          // Convert the Uint8Array to a base64 string
-          const base64Image = Buffer.from(uint8Array).toString("base64");
+//           // Convert the Uint8Array to a base64 string
+//           const base64Image = Buffer.from(uint8Array).toString("base64");
 
-          // Determine MIME type (assuming it's PNG for simplicity)
-          const mimeType = imageResponse.headers["content-type"] || "image/png";
+//           // Determine MIME type (assuming it's PNG for simplicity)
+//           const mimeType = imageResponse.headers["content-type"] || "image/png";
 
-          // Add the base64 string to the image object
-          imagesWithBase64.push({
-            ...image,
-            base64Image: `data:${mimeType};base64,${base64Image}`,
-          });
-        } catch (imageError) {
-          console.error("Error fetching image:", imageError);
-          // Handle individual image errors here if necessary
-        }
-      }
+//           // Add the base64 string to the image object
+//           imagesWithBase64.push({
+//             ...image,
+//             base64Image: `data:${mimeType};base64,${base64Image}`,
+//           });
+//         } catch (imageError) {
+//           console.error("Error fetching image:", imageError);
+//           // Handle individual image errors here if necessary
+//         }
+//       }
 
-      return imagesWithBase64;
-    } catch (error) {
-      if (error.response && error.response.status === 400) {
-        return thunkAPI.rejectWithValue("ارور سمت من");
-      } else {
-        return thunkAPI.rejectWithValue(
-          "مشکلی به وجود امده لطفا بعدا تلاش کنید"
-        );
-      }
-    }
-  }
-);
+//       return imagesWithBase64;
+//     } catch (error) {
+//       if (error.response && error.response.status === 400) {
+//         return thunkAPI.rejectWithValue("ارور سمت من");
+//       } else {
+//         return thunkAPI.rejectWithValue(
+//           "مشکلی به وجود امده لطفا بعدا تلاش کنید"
+//         );
+//       }
+//     }
+//   }
+// );
 
-export const addBanner = createAsyncThunk(
-  "banner/addBanner",
-  async ({ bannerImage }, thunkAPI) => {
-    const state = thunkAPI.getState();
-    const token = state.auth.token;
+// export const addBanner = createAsyncThunk(
+//   "banner/addBanner",
+//   async ({ bannerImage }, thunkAPI) => {
+//     const state = thunkAPI.getState();
+//     const token = state.auth.token;
 
-    try {
-      // Create a FormData object
-      const formData = new FormData();
-      formData.append("files", bannerImage);
-      formData.append("tag", "banner");
-      formData.append("type", 1);
-      formData.append("isPublic", true);
+//     try {
+//       // Create a FormData object
+//       const formData = new FormData();
+//       formData.append("files", bannerImage);
+//       formData.append("tag", "banner");
+//       formData.append("type", 1);
+//       formData.append("isPublic", true);
 
-      const response = await axios.post(
-        `${process.env.NEXT_PUBLIC_BACK_END_SERVER}/system/upload`,
-        formData,
-        {
-          headers: {
-            Authorization: token ? `Bearer ${token}` : "",
-            "Content-Type": "multipart/form-data",
-          },
-        }
-      );
+//       const response = await axios.post(
+//         `${process.env.NEXT_PUBLIC_BACK_END_SERVER}/system/upload`,
+//         formData,
+//         {
+//           headers: {
+//             Authorization: token ? `Bearer ${token}` : "",
+//             "Content-Type": "multipart/form-data",
+//           },
+//         }
+//       );
 
-      if (response.data[0].fileName) {
-        alert("افزودن عکس با موفقیت انجام شد");
-      }
+//       if (response.data[0].fileName) {
+//         alert("افزودن عکس با موفقیت انجام شد");
+//       }
 
-      return response.data;
-    } catch (error) {
-      if (error.response && error.response.status === 400) {
-        alert("خطا در افزودن عکس");
-        return thunkAPI.rejectWithValue("ارور سمت من");
-      } else {
-        return thunkAPI.rejectWithValue(
-          "مشکلی به وجود امده لطفا بعدا تلاش کنید"
-        );
-      }
-    }
-  }
-);
+//       return response.data;
+//     } catch (error) {
+//       if (error.response && error.response.status === 400) {
+//         alert("خطا در افزودن عکس");
+//         return thunkAPI.rejectWithValue("ارور سمت من");
+//       } else {
+//         return thunkAPI.rejectWithValue(
+//           "مشکلی به وجود امده لطفا بعدا تلاش کنید"
+//         );
+//       }
+//     }
+//   }
+// );
 // end banner
 
 
