@@ -64,6 +64,14 @@ const BannerMainComponent = dynamic(
   }
 );
 
+const HeaderMainComponent = dynamic(
+  () => import("../eachPageComponent/Header/HeaderMainComponent.js"),
+  {
+    ssr: false,
+    loading: () => <p>Loading...</p>,
+  }
+);
+
 const AdminPanel = () => {
   const [activeTab, setActiveTab] = useState("Product");
 
@@ -78,6 +86,7 @@ const AdminPanel = () => {
         >
           <Tab eventKey="Doshbord" title="داشبورد"></Tab>
           <Tab eventKey="Orders" title="سفارشات"></Tab>
+          <Tab eventKey="header" title="ساخت هدر"></Tab>
           <Tab eventKey="Product" title="محصولات"></Tab>
           <Tab eventKey="Blogs" title="مقالات"></Tab>
           <Tab eventKey="Honors" title="افتخارات"></Tab>
@@ -95,6 +104,11 @@ const AdminPanel = () => {
         {activeTab === "Orders" && (
           <div className={style.tabContent}>
             <OrderMainComponent />
+          </div>
+        )}
+        {activeTab === "header" && (
+          <div className={style.tabContent}>
+            <HeaderMainComponent />
           </div>
         )}
         {activeTab === "Product" && (

@@ -5,7 +5,6 @@ import React, { useState, useEffect } from "react";
 import AddBlogs from "./AddBlogs";
 import EditBlogs from "./EditBlogs";
 import { Card, CardContent, CardMedia, Typography } from "@mui/material";
-import honorsData from "/public/json/BlogsTest.json";
 import styled from "styled-components";
 import { formatPersianDate } from "@/app/utils/persionDateUtils";
 
