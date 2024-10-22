@@ -1,77 +1,262 @@
-import React from "react";
-import { Button, TextField, Box, CardMedia } from "@mui/material";
+import React, { useState, useEffect } from "react";
+import { Box } from "@mui/material";
 import styled from "styled-components";
-import JoditEditor from "jodit-react";
+import { useDispatch } from "react-redux";
+import { uploadFile } from "@/app/Store/thunks";
+import { videoEdit } from "@/app/Store/thunks";
+import { HomePageVideoDeleted } from "@/app/Store/thunks";
 
-const TEXTFIELD = styled(TextField)`
-  .MuiInputBase-input {
-    margin-bottom: 0;
-  }
+const BorderInputBox = styled.div`
+  border: 2px solid #28a745;
+  padding: 5px;
 `;
 
 export default function EditHonors({
   editedHonor,
-  handleHonorSave,
   handleCancelEdit,
-  handleEditImageChange,
   setEditedHonor,
-  content,
-  setContent,
 }) {
-  const handleEditorChange = (newContent) => {
-    setContent(newContent);
+  const dispatch = useDispatch();
+
+  const [media, setMedia] = useState([{ title: "", description: "", src: "", poster: "" }]);
+
+  const [objectUrls, setObjectUrls] = useState({});
+  const [posterObjectUrls, setPosterObjectUrls] = useState({});
+
+  useEffect(() => {
+    if (editedHonor) {
+      // Set the media based on the edited honor
+      setMedia([editedHonor.media]); // Wrap editedHonor in an array
+    }
+  }, [editedHonor]);
+
+  const handleFileChange = (e, index, setFunction, state) => {
+    const file = e.target.files[0];
+    const objectUrl = URL.createObjectURL(file);
+
+    const updatedState = state.map((item, i) =>
+      i === index ? { ...item, src: file } : item
+    );
+    setFunction(updatedState);
+    setObjectUrls((prev) => ({
+      ...prev,
+      [index]: objectUrl,
+    }));
   };
 
-  const handleTagsChange = (event) => {
-    setEditedHonor({ ...editedHonor, tags: event.target.value });
+  const handleFileChangePoster = (e, index, setFunction, state) => {
+    const file = e.target.files[0];
+    const objectUrl = URL.createObjectURL(file);
+
+    const updatedState = state.map((item, i) =>
+      i === index ? { ...item, poster: file } : item
+    );
+    setFunction(updatedState);
+    setPosterObjectUrls((prev) => ({
+      ...prev,
+      [index]: objectUrl,
+    }));
+  };
+
+  const handleAddMedia = () => {
+    setMedia([...media, { title: "", description: "", src: "", poster: "" }]);
+  };
+
+  const handleRemoveMedia = (index) => {
+    setMedia(media.filter((_, i) => i !== index));
+  };
+
+  const handleDelete = async (e) => {
+    e.preventDefault();
+
+    try {
+      const deleteVideo = await dispatch(HomePageVideoDeleted({code: editedHonor.code}))
+      if (deleteVideo.payload.message === "Success") {
+        alert("محصول باموفقیت حذف شد");
+      }
+      
+    } catch (error) {
+      console.error("Error deleting product:", error);
+    }
+  };
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    try {
+      await Promise.all(
+        media.map(async (item) => {
+          let updatedItem = { ...item };
+
+          // Upload src (video) if it's a file object
+          if (item.src && typeof item.src === "object") {
+            const tag = "homePageVideo";
+            const type = 2;
+            const isPublic = true;
+            const fileIdSrc = await dispatch(
+              uploadFile({ file: item.src, tag, type, isPublic })
+            ).unwrap();
+            updatedItem.src = fileIdSrc; // Update src with the file ID
+          }
+
+          // Upload poster if it's a file object
+          if (item.poster && typeof item.poster === "object") {
+            const tag = "homePageVideoPoster";
+            const type = 1;
+            const isPublic = true;
+            const fileIdPoster = await dispatch(
+              uploadFile({ file: item.poster, tag, type, isPublic })
+            ).unwrap();
+            updatedItem.poster = fileIdPoster; // Update poster with the file ID
+          }
+
+          const finalMedia = {
+            media : updatedItem
+          }
+
+          await dispatch(videoEdit({
+            media :finalMedia,
+            code: editedHonor.code
+          }));
+          console.log(`Uploaded media:`, updatedItem);
+         
+        })
+      );
+      console.log("All media successfully uploaded and saved.");
+    } catch (error) {
+      console.error("Error creating product:", error);
+    }
   };
 
   return (
     <div className="mt-3">
       <h2>ادیت ویدیو</h2>
-      <form onSubmit={handleHonorSave}>
-        <TEXTFIELD
-          label="Title"
-          value={editedHonor.title}
-          onChange={(e) =>
-            setEditedHonor({ ...editedHonor, title: e.target.value })
-          }
-          fullWidth
-          margin="normal"
-        />
-       
-        <TEXTFIELD
-          label="discription"
-          value={editedHonor.discription}
-          onChange={handleTagsChange}
-          fullWidth
-          margin="normal"
-        />
-        <input type="file" onChange={handleEditImageChange} accept="image/*" />
-        {editedHonor.poster && (
-          <Box sx={{ width: "100px", height: "100px", marginTop: "10px" }}>
-            <CardMedia
-              component="img"
-              src={editedHonor.poster}
-              sx={{ width: "100%", height: "100%", borderRadius: 3 }}
-            />
-          </Box>
-        )}
-        <div className="mt-3">
-         
-          <JoditEditor
-            value={content}
-            onChange={handleEditorChange}
-            className="w-full h-[70%] mt-10 bg-white"
-          />
-          <style>{`.jodit-wysiwyg{height:300px !important}`}</style>
-        </div>
-        <Button className="mb-3 mt-3" variant="contained" type="submit">
-          Save
-        </Button>
-        <Button variant="contained" onClick={handleCancelEdit}>
-          Cancel
-        </Button>
+      <form onSubmit={handleSubmit}>
+        <BorderInputBox className="mt-3">
+          <label>فیلم ها:</label>
+          {media.map((item, index) => (
+            <div className="mt-2" key={index}>
+              <input
+                type="text"
+                placeholder="Title"
+                value={item.title} // Use item.title instead of media.title
+                onChange={(e) =>
+                  setMedia(
+                    media.map((m, i) =>
+                      i === index ? { ...m, title: e.target.value } : m
+                    )
+                  )
+                }
+                required
+              />
+
+              <input
+                type="text"
+                placeholder="Description"
+                value={item.description} // Use item.description instead of media.description
+                onChange={(e) =>
+                  setMedia(
+                    media.map((m, i) =>
+                      i === index ? { ...m, description: e.target.value } : m
+                    )
+                  )
+                }
+                required
+              />
+
+              <div className="d-flex flex-column">
+                <span>فیلم :</span>
+                <div>
+                  <input
+                    type="file"
+                    onChange={(e) =>
+                      handleFileChange(e, index, setMedia, media)
+                    }
+                    
+                  />
+                  {item.src && !objectUrls[index] && (
+                    <Box
+                      component="video"
+                      src={`${process.env.NEXT_PUBLIC_BACK_END_SERVER}/system/download/${item.src}`}
+                      sx={{
+                        width: "140px",
+                        maxHeight: "100%",
+                        borderRadius: "2px",
+                      }}
+                      controls
+                    />
+                  )}
+
+                  {objectUrls[index] && (
+                    <Box
+                      component="video"
+                      src={objectUrls[index]}
+                      sx={{
+                        width: "140px",
+                        maxHeight: "100%",
+                        borderRadius: "2px",
+                      }}
+                      controls
+                    />
+                  )}
+                </div>
+              </div>
+
+              <div className="d-flex flex-column">
+                <span>پوستر فیلم :</span>
+                <div>
+                  <input
+                    type="file"
+                    onChange={(e) =>
+                      handleFileChangePoster(e, index, setMedia, media)
+                    }
+                   
+                  />
+                  {item.poster && !posterObjectUrls[index] && (
+                    <Box
+                      component="img"
+                      src={`${process.env.NEXT_PUBLIC_BACK_END_SERVER}/system/download/${item.poster}`}
+                      sx={{
+                        width: "140px",
+                        maxHeight: "100%",
+                        borderRadius: "2px",
+                      }}
+                    />
+                  )}
+
+                  {posterObjectUrls[index] && (
+                    <Box
+                      component="img"
+                      src={posterObjectUrls[index]}
+                      sx={{
+                        width: "140px",
+                        maxHeight: "100%",
+                        borderRadius: "2px",
+                      }}
+                    />
+                  )}
+                </div>
+              </div>
+
+              <button
+                className="bg-danger"
+                type="button"
+                onClick={() => handleRemoveMedia(index)}
+              >
+                حذف
+              </button>
+            </div>
+          ))}
+          <button className="mt-2" type="button" onClick={handleAddMedia}>
+            اضافه کردن ویدیو
+          </button>
+        </BorderInputBox>
+        <button type="submit" className="mt-3">
+          ویرایش محصول
+        </button>
+        <button onClick={handleDelete} className="bg-danger mt-2 mb-2" type="button">
+          حذف محصول
+        </button>
+        <button onClick={handleCancelEdit}>انصراف</button>
       </form>
     </div>
   );

@@ -6,13 +6,12 @@ import AddBanner from "./AddBanner";
 import EditBanner from "./EditBanner";
 //redux import
 import { useSelector, useDispatch } from "react-redux";
-
-import { bannerdata } from "@/app/Store/thunks";
-import { bannerImg } from "@/app/Store/slice";
+import { UploadFile } from "@mui/icons-material";
+import { bannerList } from "@/app/Store/thunks";
 
 import { Card, CardContent, CardMedia, Typography } from "@mui/material";
-import honorsData from "/public/json/ExhibitionTest.json";
 import styled from "styled-components";
+import { formatPersianDate } from "@/app/utils/persionDateUtils";
 
 const CARD = styled(Card)`
   background-color: #5f5f5f !important;
@@ -28,39 +27,35 @@ const CARD = styled(Card)`
 export default function HonorsMainComponent() {
   const dispatch = useDispatch();
 
-  // add honors
   const [activekey, setActiveKey] = useState("editUserPage");
-  // edit honors
   const [editedHonor, setEditedHonor] = useState(null);
+  const [dataCome, setDataCome] = useState([]);
 
-  const [content, setContent] = useState(""); // Added content state for editing
   useEffect(() => {
-    dispatch(bannerdata());
+    const fechData = async () => {
+      try {
+        const dataComeAPI = await dispatch(bannerList()).unwrap();
+        setDataCome(dataComeAPI || []);
+      } catch (error) {
+        console.error("Error fetching data:", error);
+      }
+    };
+
+    fechData();
   }, [dispatch]);
 
-  const images = useSelector(bannerImg);
-  // console.log(images);
-
-  // saving the changes
-  const handleHonorSave = async (event) => {
-    event.preventDefault();
-    await dispatch(updateHonor({ ...editedHonor, content }));
-    setEditedHonor(null);
-  };
-
-  // cancelingEdit
   const handleCancelEdit = () => {
     setEditedHonor(null);
   };
 
-  const handleEditImageChange = (event) => {
-    const newImage = event.target.files[0];
-    setEditedHonor({
-      ...editedHonor,
-      src: URL.createObjectURL(newImage),
-      newImageFile: newImage,
-    });
-  };
+  // const handleEditImageChange = (event) => {
+  //   const newImage = event.target.files[0];
+  //   setEditedHonor({
+  //     ...editedHonor,
+  //     src: URL.createObjectURL(newImage),
+  //     newImageFile: newImage,
+  //   });
+  // };
 
   return (
     <section>
@@ -80,51 +75,41 @@ export default function HonorsMainComponent() {
             className="mt-3 d-flex flex-column gap-3"
             style={{ cursor: "pointer" }}
           >
-            {images &&
-              images.map((image) => (
-                <div key={image.fileName}>
-                  {/* <img
-                    src={`http://localhost:7000/system/download/file/${image.fileName}`}
-                    alt={image.originalName}
-                    style={{ width: "150px", cursor: "pointer" }}
-                    onClick={() => handleImageClick(image)}
-                  /> */}
-                  {/* <input
-                    type="file"
-                    id={`fileInput-${image.fileName}`}
-                    style={{ display: "none" }}
-                    onChange={(e) => handleImageChange(e, image)}
-                  /> */}
-
+            {dataCome.length > 0 ? (
+              dataCome.map((data, index) => (
+                <React.Fragment key={index}>
                   <CARD
                     className="d-flex flex-row"
-                    // onClick={() => {
-                    //   setEditedHonor(honor);
-                    //   setContent(honor.content); // Set content when editing
-                    // }}
+                    onClick={() => {
+                      setEditedHonor(data);
+                      // setContent(data.content); // Set content when editing
+                    }}
                   >
                     <CardMedia
                       component="img"
-                      src={image.base64Image}
-                      alt={image.originalName}
+                      src={data.src}
                       sx={{
                         width: "120px",
                         maxHeight: "100%",
                         borderRadius: "2px",
                       }}
                     />
-                    {/* <CardContent className="d-flex flex-column justify-content-around">
+                    <CardContent className="d-flex flex-column justify-content-around">
                       <Typography className="titleHonors">
-                        {honor.title}
+                        {data.title}
                       </Typography>
                       <Typography className="dateHonors">
-                        {honor.date}
+                        {formatPersianDate(data.date)}
                       </Typography>
-                    </CardContent> */}
+                    </CardContent>
                   </CARD>
-                </div>
-              ))}
-            {honorsData.map((honor, index) => (
+                </React.Fragment>
+              ))
+            ) : (
+              <Typography variant="body2">No data available</Typography>
+            )}
+
+            {/* {honorsData.map((honor, index) => (
               <React.Fragment key={index}>
                 <CARD
                   className="d-flex flex-row"
@@ -150,7 +135,7 @@ export default function HonorsMainComponent() {
                   </CardContent>
                 </CARD>
               </React.Fragment>
-            ))}
+            ))} */}
           </div>
         </>
       )}
@@ -177,15 +162,9 @@ export default function HonorsMainComponent() {
         <>
           <EditBanner
             editedHonor={editedHonor}
-            handleHonorSave={handleHonorSave}
             handleCancelEdit={handleCancelEdit}
-            handleEditImageChange={handleEditImageChange}
             setEditedHonor={setEditedHonor}
-            content={content}
-            setContent={setContent}
           />
-
-          {/* <div>{parse(content)}</div> */}
         </>
       )}
     </section>

@@ -1,7 +1,14 @@
-import React from "react";
+import React, { useState, useEffect } from "react";
 import { Button, TextField, Box, CardMedia } from "@mui/material";
 import styled from "styled-components";
-import JoditEditor from "jodit-react";
+import { Editor } from "@tinymce/tinymce-react";
+// improt redux
+import { useDispatch } from "react-redux";
+import {
+  exhibitionDeleted,
+  uploadFile,
+  exhibitionEdit,
+} from "@/app/Store/thunks";
 
 const TEXTFIELD = styled(TextField)`
   .MuiInputBase-input {
@@ -11,72 +18,183 @@ const TEXTFIELD = styled(TextField)`
 
 export default function EditHonors({
   editedHonor,
-  handleHonorSave,
   handleCancelEdit,
-  handleEditImageChange,
   setEditedHonor,
-  content,
-  setContent,
 }) {
+  const dispatch = useDispatch();
+
+  const [content, setContent] = useState(""); // No array, just a string
+  const [bannerTitle, setBannerTitle] = useState("");
+  const [bannerTags, setBannerTags] = useState("");
+  const [bannerImage, setBannerImage] = useState(null);
+
+  useEffect(() => {
+    if (editedHonor) {
+      setContent(editedHonor.content); // Set content directly
+      setBannerTitle(editedHonor.title);
+      setBannerTags(editedHonor.tags);
+      setBannerImage(editedHonor.src);
+    }
+  }, [editedHonor]);
+
   const handleEditorChange = (newContent) => {
-    setContent(newContent);
+    setContent(newContent); // Update content state
+  };
+
+  const handleTitleChange = (event) => {
+    setBannerTitle(event.target.value);
   };
 
   const handleTagsChange = (event) => {
-    setEditedHonor({ ...editedHonor, tags: event.target.value });
+    setBannerTags(event.target.value);
+  };
+
+  const handleImageUpload = async (blobInfo, success, failure) => {
+    const file = blobInfo.blob();
+    const tag = "editorImageExhibition";
+    const type = 1;
+    const isPublic = true;
+
+    try {
+      const fileId = await dispatch(
+        uploadFile({ file, tag, type, isPublic })
+      ).unwrap();
+      const imageUrl = `${process.env.NEXT_PUBLIC_BACK_END_SERVER}/system/download/${fileId}`;
+      const editor = tinymce.activeEditor;
+      editor.insertContent(`<img src="${imageUrl}" alt="Image" />`);
+    } catch (error) {
+      failure("Image upload failed");
+    }
+  };
+
+  const handleBannerImageUpload = async (event) => {
+    const file = event.target.files[0];
+    const tag = "exhibitionMainImage";
+    const type = 1;
+    const isPublic = true;
+
+    try {
+      const fileId = await dispatch(
+        uploadFile({ file, tag, type, isPublic })
+      ).unwrap();
+      const imageUrl = `${process.env.NEXT_PUBLIC_BACK_END_SERVER}/system/download/${fileId}`;
+      setBannerImage(imageUrl);
+    } catch (error) {
+      console.error("Error uploading banner image:", error);
+    }
+  };
+
+  const handleDelete = async (e) => {
+    e.preventDefault();
+    try {
+      const deleteVideo = await dispatch(
+        exhibitionDeleted({ code: editedHonor.code })
+      );
+      if (deleteVideo.payload.message === "Success") {
+        alert("Honor deleted successfully");
+      }
+    } catch (error) {
+      console.error("Error deleting honors:", error);
+    }
+  };
+
+  const handleSubmit = async (event) => {
+    event.preventDefault();
+    const formData = {
+      title: bannerTitle,
+      src: bannerImage,
+      tags: bannerTags,
+      content: content, // Send the content state directly
+    };
+    try {
+      const fetchData = await dispatch(
+        exhibitionEdit({ exhibition: formData, code: editedHonor.code })
+      ).unwrap();
+    } catch (error) {
+      console.error("Error submitting data:", error);
+    }
   };
 
   return (
     <div className="mt-3">
-      <h2>Edit Honor</h2>
-      <form onSubmit={handleHonorSave}>
+      <h2>Edit exhibition</h2>
+      <form onSubmit={handleSubmit}>
         <TEXTFIELD
           label="Title"
-          value={editedHonor.title}
-          onChange={(e) =>
-            setEditedHonor({ ...editedHonor, title: e.target.value })
-          }
-          fullWidth
-          margin="normal"
-        />
-        <TEXTFIELD
-          label="Date"
-          value={editedHonor.date}
-          onChange={(e) =>
-            setEditedHonor({ ...editedHonor, date: e.target.value })
-          }
+          value={bannerTitle}
+          onChange={handleTitleChange}
           fullWidth
           margin="normal"
         />
         <TEXTFIELD
           label="Tags"
-          value={editedHonor.tags}
+          value={bannerTags}
           onChange={handleTagsChange}
           fullWidth
           margin="normal"
         />
-        <input type="file" onChange={handleEditImageChange} accept="image/*" />
-        {editedHonor.src && (
+        <input
+          type="file"
+          onChange={handleBannerImageUpload}
+          accept="image/*"
+        />
+        {bannerImage && (
           <Box sx={{ width: "100px", height: "100px", marginTop: "10px" }}>
             <CardMedia
               component="img"
-              src={editedHonor.src}
+              src={bannerImage}
               sx={{ width: "100%", height: "100%", borderRadius: 3 }}
             />
           </Box>
         )}
+
         <div>
-          <h2>Edit Blog Post Content</h2>
-          <JoditEditor
-            value={content}
-            onChange={handleEditorChange}
-            className="w-full h-[70%] mt-10 bg-white"
+          <h2>Create Blog Post</h2>
+          <Editor
+            apiKey="3akk9p7jow7ksa3txzom0c8qr4e59rtg6xy1fzvux8vysqs0"
+            value={content} // Set the content state directly
+            onEditorChange={handleEditorChange} // Update content state on change
+            init={{
+              height: 500,
+              menubar: false,
+              plugins: [
+                "advlist",
+                "autolink",
+                "lists",
+                "link",
+                "image",
+                "charmap",
+                "preview",
+                "anchor",
+                "searchreplace",
+                "visualblocks",
+                "code",
+                "fullscreen",
+                "insertdatetime",
+                "media",
+                "table",
+                "help",
+                "wordcount",
+              ],
+              toolbar:
+                "undo redo | formatselect | bold italic backcolor | " +
+                "alignleft aligncenter alignright alignjustify | " +
+                "bullist numlist outdent indent | removeformat | image",
+              images_upload_handler: handleImageUpload,
+            }}
           />
-          <style>{`.jodit-wysiwyg{height:300px !important}`}</style>
         </div>
+
         <Button className="mb-3 mt-3" variant="contained" type="submit">
           Save
         </Button>
+        <button
+          className="bg-danger mt-2 mb-2"
+          type="button"
+          onClick={handleDelete}
+        >
+          Delete Honor
+        </button>
         <Button variant="contained" onClick={handleCancelEdit}>
           Cancel
         </Button>

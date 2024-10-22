@@ -107,47 +107,47 @@ export const productListData = (state) => state.product.productListData;
 
 // start Banner
 
-const bannerinitialState = {
-  bannerImg: null,
-  loading: false,
-  error: null,
-};
+// const bannerinitialState = {
+//   bannerImg: null,
+//   loading: false,
+//   error: null,
+// };
 
-const bannerSlice = createSlice({
-  name: "banner",
-  initialState: bannerinitialState,
-  reducers: {},
-  extraReducers: (builder) => {
-    builder
-      .addCase(bannerdata.pending, (state) => {
-        state.loading = true;
-        state.error = null;
-      })
-      .addCase(bannerdata.fulfilled, (state, action) => {
-        state.loading = false;
-        state.bannerImg = action.payload;
-      })
-      .addCase(bannerdata.rejected, (state, action) => {
-        state.loading = false;
-        state.error = action.error.message;
-      });
-    // .addCase(addBanner.pending, (state) => {
-    //   state.loading = true;
-    //   state.error = null;
-    // })
-    // .addCase(addBanner.fulfilled, (state, action) => {
-    //   state.loading = false;
-    //   state.bannerImg = action.payload;
-    // })
-    // .addCase(addBanner.rejected, (state, action) => {
-    //   state.loading = false;
-    //   state.error = action.error.message;
-    // })
-  },
-});
+// const bannerSlice = createSlice({
+//   name: "banner",
+//   initialState: bannerinitialState,
+//   reducers: {},
+//   extraReducers: (builder) => {
+//     builder
+//       .addCase(bannerdata.pending, (state) => {
+//         state.loading = true;
+//         state.error = null;
+//       })
+//       .addCase(bannerdata.fulfilled, (state, action) => {
+//         state.loading = false;
+//         state.bannerImg = action.payload;
+//       })
+//       .addCase(bannerdata.rejected, (state, action) => {
+//         state.loading = false;
+//         state.error = action.error.message;
+//       });
+//     // .addCase(addBanner.pending, (state) => {
+//     //   state.loading = true;
+//     //   state.error = null;
+//     // })
+//     // .addCase(addBanner.fulfilled, (state, action) => {
+//     //   state.loading = false;
+//     //   state.bannerImg = action.payload;
+//     // })
+//     // .addCase(addBanner.rejected, (state, action) => {
+//     //   state.loading = false;
+//     //   state.error = action.error.message;
+//     // })
+//   },
+// });
 
-export const bannerSliceV = bannerSlice.reducer;
-export const bannerImg = (state) => state.banner.bannerImg;
+// export const bannerSliceV = bannerSlice.reducer;
+// export const bannerImg = (state) => state.banner.bannerImg;
 
 // end Banner
 
