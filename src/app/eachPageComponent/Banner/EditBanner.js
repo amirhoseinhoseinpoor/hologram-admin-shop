@@ -40,8 +40,10 @@ export default function EditHonors({
       const fileId = await dispatch(
         uploadFile({ file, tag, type, isPublic })
       ).unwrap();
-      const imageUrl = `${process.env.NEXT_PUBLIC_BACK_END_SERVER}/system/download/${fileId}`;
-      setBannerImage(imageUrl);
+
+      // const imageUrl = `${process.env.NEXT_PUBLIC_BACK_END_SERVER}/system/download/${fileId}`;
+      
+      setBannerImage(fileId);
     } catch (error) {
       console.error("Error uploading banner image:", error);
     }
@@ -117,7 +119,7 @@ export default function EditHonors({
           <Box sx={{ width: "100px", height: "100px", marginTop: "10px" }}>
             <CardMedia
               component="img"
-              src={bannerImage}
+              src={`${process.env.NEXT_PUBLIC_BACK_END_SERVER}/system/download/${bannerImage}`}
               sx={{ width: "100%", height: "100%", borderRadius: 3 }}
             />
           </Box>

@@ -121,7 +121,7 @@ export default function EditHonors({
       ).unwrap();
 
       // Construct the valid image URL based on your backend API response
-      const imageUrl = `${process.env.NEXT_PUBLIC_BACK_END_SERVER}/system/download/${fileId}`;
+      const imageUrl = `http://176.120.16.221:7000/system/download/${fileId}`;
 
       // Ensure the image URL is valid and log it for debugging purposes
       console.log("Uploaded image URL:", imageUrl);
@@ -149,8 +149,8 @@ export default function EditHonors({
       ).unwrap();
 
       // Get the URL of the uploaded image
-      const imageUrl = `${process.env.NEXT_PUBLIC_BACK_END_SERVER}/system/download/${fileId}`;
-      setBannerImage(imageUrl); // Store the URL of the uploaded image
+      // const imageUrl = `http://176.120.16.221/system/download/${fileId}`;
+      setBannerImage(fileId); // Store the URL of the uploaded image
     } catch (error) {
       console.error("Error uploading banner image:", error);
     }
@@ -169,8 +169,8 @@ export default function EditHonors({
       ).unwrap();
 
       // Get the URL of the uploaded image
-      const imageUrl = `${process.env.NEXT_PUBLIC_BACK_END_SERVER}/system/download/${fileId}`;
-      setproductSrc(imageUrl);
+      // const imageUrl = `${process.env.NEXT_PUBLIC_BACK_END_SERVER}/system/download/${fileId}`;
+      setproductSrc(fileId);
     } catch (error) {
       console.error("Error uploading image:", error);
     }
@@ -258,7 +258,7 @@ export default function EditHonors({
           <Box sx={{ width: "100px", height: "100px", marginTop: "10px" }}>
             <CardMedia
               component="img"
-              src={bannerImage}
+              src={`${process.env.NEXT_PUBLIC_BACK_END_SERVER}/system/download/${bannerImage}`}
               sx={{ width: "100%", height: "100%", borderRadius: 3 }}
             />
           </Box>
@@ -298,7 +298,7 @@ export default function EditHonors({
           <Box sx={{ width: "100px", height: "100px", marginTop: "10px" }}>
             <CardMedia
               component="img"
-              src={productSrc}
+              src={`${process.env.NEXT_PUBLIC_BACK_END_SERVER}/system/download/${productSrc}`}
               sx={{ width: "100%", height: "100%", borderRadius: 3 }}
             />
           </Box>

@@ -83,7 +83,7 @@ export default function HonorsMainComponent() {
               <h2 className="m-0">ویرایش محصولات</h2>
             </div>
             <div>
-              <button onClick={() => setActiveKey("addUser")}>
+              <button style={{backgroundColor: "green"}} onClick={() => setActiveKey("addUser")}>
                 افزودن محصول
               </button>
             </div>
@@ -162,7 +162,7 @@ export default function HonorsMainComponent() {
         <>
           <div className="d-flex flex-row justify-content-between mb-2">
             <div>
-              <h2 className="m-0"> افزودن محصول</h2>
+              <h2  className="m-0"> افزودن محصول</h2>
             </div>
             <div>
               <button onClick={() => setActiveKey("editUserPage")}>
