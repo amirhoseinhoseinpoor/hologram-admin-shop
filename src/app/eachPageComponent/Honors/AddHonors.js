@@ -40,7 +40,7 @@ export default function AddHonors() {
       ).unwrap();
 
       // Construct the valid image URL based on your backend API response
-      const imageUrl = `http://176.120.16.221/system/download/${fileId}`;
+      const imageUrl = `http://176.120.16.221:7000/system/download/${fileId}`;
 
       // Ensure the image URL is valid and log it for debugging purposes
       console.log("Uploaded image URL:", imageUrl);
