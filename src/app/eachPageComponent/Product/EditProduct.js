@@ -310,18 +310,9 @@ export default function EditHonors({
             />
             <input
               type="file"
-              value={color.value}
               onChange={(e) =>
                 handleFileChange(e, index, setColors, colors)
               }
-              // onChange={(e) =>
-              //   setColors(
-              //     colors.map((c, i) =>
-              //       i === index ? { ...c, value: e.target.value } : c
-              //     )
-              //   )
-              // }
-              required
             />
             <button
               className="bg-danger"
@@ -493,7 +484,6 @@ export default function EditHonors({
                 <input
                   type="file"
                   onChange={(e) => handleFileChange(e, index, setMedia, media)}
-                  required
                 />
                 {item.src && !objectUrls[index] && (
                   <Box
@@ -531,7 +521,6 @@ export default function EditHonors({
                   onChange={(e) =>
                     handleFileChangePoster(e, index, setMedia, media)
                   }
-                  required
                 />
                 {posterObjectUrls[index] && (
                   <Box
