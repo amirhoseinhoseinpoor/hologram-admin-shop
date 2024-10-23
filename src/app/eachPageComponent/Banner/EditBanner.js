@@ -40,8 +40,10 @@ export default function EditHonors({
       const fileId = await dispatch(
         uploadFile({ file, tag, type, isPublic })
       ).unwrap();
-      const imageUrl = `${process.env.NEXT_PUBLIC_BACK_END_SERVER}/system/download/${fileId}`;
-      setBannerImage(imageUrl);
+
+      // const imageUrl = `${process.env.NEXT_PUBLIC_BACK_END_SERVER}/system/download/${fileId}`;
+      
+      setBannerImage(fileId);
     } catch (error) {
       console.error("Error uploading banner image:", error);
     }

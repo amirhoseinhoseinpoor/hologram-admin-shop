@@ -38,8 +38,10 @@ export default function AddHonors() {
       ).unwrap();
 
       // Get the URL of the uploaded image
-      const imageUrl = `${process.env.NEXT_PUBLIC_BACK_END_SERVER}/system/download/${fileId}`;
-      setBannerImage(imageUrl); // Store the URL of the uploaded image
+      // const imageUrl = `${process.env.NEXT_PUBLIC_BACK_END_SERVER}/system/download/${fileId}`;
+
+      setBannerImage(fileId); 
+
     } catch (error) {
       console.error("Error uploading banner image:", error);
     }

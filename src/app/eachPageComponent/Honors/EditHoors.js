@@ -54,7 +54,7 @@ export default function EditHonors({
       const fileId = await dispatch(
         uploadFile({ file, tag, type, isPublic })
       ).unwrap();
-      const imageUrl = `${process.env.NEXT_PUBLIC_BACK_END_SERVER}/system/download/${fileId}`;
+      const imageUrl = `http://176.120.16.221/system/download/${fileId}`;
       const editor = tinymce.activeEditor;
       editor.insertContent(`<img src="${imageUrl}" alt="Image" />`);
     } catch (error) {
@@ -72,8 +72,8 @@ export default function EditHonors({
       const fileId = await dispatch(
         uploadFile({ file, tag, type, isPublic })
       ).unwrap();
-      const imageUrl = `${process.env.NEXT_PUBLIC_BACK_END_SERVER}/system/download/${fileId}`;
-      setBannerImage(imageUrl);
+      // const imageUrl = `${process.env.NEXT_PUBLIC_BACK_END_SERVER}/system/download/${fileId}`;
+      setBannerImage(fileId);
     } catch (error) {
       console.error("Error uploading banner image:", error);
     }

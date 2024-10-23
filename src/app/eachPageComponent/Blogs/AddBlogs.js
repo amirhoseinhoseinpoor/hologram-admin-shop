@@ -93,7 +93,7 @@ export default function AddHonors() {
       ).unwrap();
 
       // Construct the valid image URL based on your backend API response
-      const imageUrl = `${process.env.NEXT_PUBLIC_BACK_END_SERVER}/system/download/${fileId}`;
+      const imageUrl = `http://176.120.16.221/system/download/${fileId}`;
 
       // Ensure the image URL is valid and log it for debugging purposes
       console.log("Uploaded image URL:", imageUrl);
@@ -121,8 +121,8 @@ export default function AddHonors() {
       ).unwrap();
 
       // Get the URL of the uploaded image
-      const imageUrl = `${process.env.NEXT_PUBLIC_BACK_END_SERVER}/system/download/${fileId}`;
-      setBannerImage(imageUrl); // Store the URL of the uploaded image
+      // const imageUrl = `${process.env.NEXT_PUBLIC_BACK_END_SERVER}/system/download/${fileId}`;
+      setBannerImage(fileId); // Store the URL of the uploaded image
     } catch (error) {
       console.error("Error uploading banner image:", error);
     }
@@ -141,8 +141,8 @@ export default function AddHonors() {
       ).unwrap();
 
       // Get the URL of the uploaded image
-      const imageUrl = `${process.env.NEXT_PUBLIC_BACK_END_SERVER}/system/download/${fileId}`;
-      setproductSrc(imageUrl);
+      // const imageUrl = `${process.env.NEXT_PUBLIC_BACK_END_SERVER}/system/download/${fileId}`;
+      setproductSrc(fileId);
     } catch (error) {
       console.error("Error uploading banner image:", error);
     }
