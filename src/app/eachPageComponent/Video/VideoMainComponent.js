@@ -53,26 +53,11 @@ export default function HonorsMainComponent() {
     fechData();
   }, [dispatch]);
 
-  // saving the changes
-  // const handleHonorSave = async (event) => {
-  //   event.preventDefault();
-  //   await dispatch(updateHonor({ ...editedHonor, content }));
-  //   setEditedHonor(null);
-  // };
-
   // cancelingEdit
   const handleCancelEdit = () => {
     setEditedHonor(null);
   };
 
-  // const handleEditImageChange = (event) => {
-  //   const newImage = event.target.files[0];
-  //   setEditedHonor({
-  //     ...editedHonor,
-  //     src: URL.createObjectURL(newImage),
-  //     newImageFile: newImage,
-  //   });
-  // };
 
   return (
     <section>
@@ -83,7 +68,7 @@ export default function HonorsMainComponent() {
               <h2 className="m-0"> ویرایش ویدیو</h2>
             </div>
             <div>
-              <button onClick={() => setActiveKey("addUser")}>
+              <button style={{backgroundColor: "green"}} onClick={() => setActiveKey("addUser")}>
                 افزودن ویدیو
               </button>
             </div>

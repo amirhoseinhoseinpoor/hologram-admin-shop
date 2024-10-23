@@ -77,7 +77,7 @@ export default function HonorsMainComponent() {
               <h2 className="m-0"> ویرایش مقالات</h2>
             </div>
             <div>
-              <button onClick={() => setActiveKey("addUser")}>
+              <button style={{backgroundColor: "green"}} onClick={() => setActiveKey("addUser")}>
                 افزودن افتخارات
               </button>
             </div>
@@ -97,7 +97,7 @@ export default function HonorsMainComponent() {
                   >
                     <CardMedia
                       component="img"
-                      src={honor.content.imageSrc}
+                      src={`${process.env.NEXT_PUBLIC_BACK_END_SERVER}/system/download/${honor.content.imageSrc}`}
                       sx={{
                         width: "120px",
                         maxHeight: "100%",
