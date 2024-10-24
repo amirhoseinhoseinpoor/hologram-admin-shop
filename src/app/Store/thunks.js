@@ -27,6 +27,72 @@ export const login = createAsyncThunk(
     }
   }
 );
+// user managment
+export const addUser = createAsyncThunk(
+  "userManagment/addUser",
+  async (credentials, thunkAPI) => {
+    const { firstName , lastName, username, password, gender, domain ,roleIdsC} = credentials;
+    try {
+      const response = await axios.post(
+        `${process.env.NEXT_PUBLIC_BACK_END_SERVER}/auth/register`,
+        {
+          firstName,
+          lastName,
+          username,
+          gender,
+          password,
+          domain,
+          roleIds: [
+            parseInt(roleIdsC)
+          ]
+
+        }
+      );
+      const token = response.data.token;
+
+      return token;
+    } catch (error) {
+      if (error.response && error.response.status === 400) {
+        return thunkAPI.rejectWithValue("شماره همراه یا پسورد اشتباه است");
+      } else {
+        return thunkAPI.rejectWithValue(
+          "مشکلی به وجود امده لطفا بعدا تلاش کنید"
+        );
+      }
+    }
+  }
+);
+
+export const getuser = createAsyncThunk(
+  "userManagment/getuser",
+  async (_, thunkAPI) => {
+    const state = thunkAPI.getState();
+    const token = state.auth.token;
+    
+    try {
+      const response = await axios.post(
+        `${process.env.NEXT_PUBLIC_BACK_END_SERVER}/users`,
+        {},
+        {
+          headers: {
+            Authorization: token ? `Bearer ${token}` : "",
+            "Content-Type": "multipart/form-data",
+          },
+        }
+      );
+      const data = response.data;
+      return data;
+    } catch (error) {
+      if (error.response && error.response.status === 400) {
+        return thunkAPI.rejectWithValue("error");
+      } else {
+        return thunkAPI.rejectWithValue(
+          "مشکلی به وجود امده لطفا بعدا تلاش کنید"
+        );
+      }
+    }
+  }
+);
 
 // Product
 
@@ -1204,16 +1270,3 @@ export const logout = createAsyncThunk("auth/logout", async () => {
   }
 });
 
-export const Adduser = createAsyncThunk(
-  "users/Adduser",
-  async (formData, thunkAPI) => {
-    console.log(formData);
-    try {
-      const response = await axios.post("/json/tabelContent.json", formData);
-
-      return response.data; // Assuming successful update returns updated banner data
-    } catch (error) {
-      return thunkAPI.rejectWithValue(error.message);
-    }
-  }
-);

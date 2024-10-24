@@ -1,10 +1,12 @@
 "use client";
-import React, { useState } from "react";
+import React, { useState , useEffect } from "react";
 import { Modal, Button } from "react-bootstrap";
 import styled from "styled-components";
 
+// import redux
 import { useDispatch , useSelector } from "react-redux";
-import {Adduser} from "../../Store/thunks"
+import { addUser } from "@/app/Store/thunks";
+import { getuser } from "@/app/Store/thunks";
 
 
 
@@ -66,11 +68,15 @@ export default function AddUserBtn() {
   const [newUserData, setNewUserData] = useState({
     firstName: "",
     lastName: "",
-    age: "",
-    cardId: "",
+    username: "",
+    password: "",
+    gender: "u",
+    domain: "",
+    roleIdsC: "",
   });
-  console.log(newUserData);
   const [showAddModal, setShowAddModal] = useState(false);
+
+  const [dataCome , setDataCome] = useState([]);
 
   const handleInputChange = (event) => {
     const { name, value } = event.target;
@@ -84,39 +90,28 @@ export default function AddUserBtn() {
   const handleAddModalClose = () => setShowAddModal(false);
   const handleAddModalShow = () => setShowAddModal(true);
 
+  useEffect(() => {
+    const fetchData = async () => {
+      const dataComeAPI = await dispatch(getuser()).unwrap();
+      setDataCome(dataComeAPI);
+    }
+    fetchData();
+   
+  }, [dispatch]);
+
   const handleAddUser = async (event) => {
     event.preventDefault();
     try {
-      //   const response = await fetch('/public/json/tabelContent.json'); // Simulate file reading
-      //   const existingUsers = await response.json();
-
-
-
-
-      // const updatedUsers = [newUserData];
-
-      // const updateResponse = await fetch("/json/tabelContent.json", {
-      //   method: "post", // Simulate data update
-      //   headers: { "Content-Type": "application/json" },
-      //   body: JSON.stringify(updatedUsers),
-      // });
-
-
-
-      await dispatch(Adduser(newUserData))
-
-
-      if (!updateResponse.ok) {
-        throw new Error("Failed to update users.json");
-      }
-
-      onAddUser(updatedUsers); 
+      await dispatch(addUser(newUserData))
+      console.log(newUserData);
       handleAddModalClose();
     } catch (error) {
       console.error("Error adding user:", error);
-      // Handle errors appropriately, e.g., display an error message to the user
     }
   };
+
+  console.log(dataCome);
+  
   return (
     <section className="mb-3">
       <AddUserBtnstyle variant="primary" onClick={handleAddModalShow}>
@@ -154,7 +149,7 @@ export default function AddUserBtn() {
                 onChange={handleInputChange}
               />
             </div>
-            <div className="form-group">
+            {/* <div className="form-group">
             <label className="mb-1 me-1" htmlFor="age">سن</label>
               <input
                 type="number"
@@ -165,20 +160,79 @@ export default function AddUserBtn() {
                 value={newUserData.age}
                 onChange={handleInputChange}
               />
-            </div>
+            </div> */}
 
             <div className="form-group">
-            <label className="mb-1 me-1" htmlFor="cardId">کد ملی</label>
+            <label className="mb-1 me-1" htmlFor="username">شماره همراه</label>
               <input
                 type="number"
-                id="cardId"
-                name="cardId"
-                placeholder="کد ملی"
+                id="username"
+                name="username"
+                placeholder="شماره همراه"
                 className="form-control"
                 value={newUserData.cardId}
                 onChange={handleInputChange}
               />
             </div>
+
+            <div className="form-group">
+            <label className="mb-1 me-1" htmlFor="password">رمز</label>
+              <input
+                type="password"
+                id="password"
+                name="password"
+                placeholder="رمز"
+                className="form-control"
+                value={newUserData.password}
+                onChange={handleInputChange}
+              />
+            </div>
+
+            <div className="form-group">  
+              <label className="mb-1 me-1" htmlFor="gender">جنسیت</label>  
+              <select  
+                id="gender"  
+                name="gender"  
+                className="form-control"  
+                value={newUserData.gender}  
+                onChange={handleInputChange}  
+              >  
+                <option value="" disabled>انتخاب کنید</option>  
+                <option value="m">مرد</option>  
+                <option value="f">زن</option>  
+              </select>  
+            </div> 
+            
+            <div className="form-group">  
+              <label className="mb-1 me-1" htmlFor="domain">امکان دسترسی</label>  
+              <select  
+                id="domain"  
+                name="domain"  
+                className="form-control"  
+                value={newUserData.domain}  
+                onChange={handleInputChange}  
+              >  
+                <option value="" disabled>انتخاب کنید</option>  
+                <option value="2">ویرایشگر</option>  
+                <option value="1">بیننده</option>  
+              </select>  
+            </div>
+
+            <div className="form-group">  
+              <label className="mb-1 me-1" htmlFor="roleIdsC">نوع کاربر</label>  
+              <select  
+                id="roleIdsC"  
+                name="roleIdsC"  
+                className="form-control"  
+                value={newUserData.roleIdsC}  
+                onChange={handleInputChange}  
+              >  
+                <option value="" disabled>انتخاب کنید</option>  
+                <option value="3">مدیر</option>  
+                <option value="2">ادمین</option>  
+                <option value="1">مشتری</option>  
+              </select>  
+            </div>   
           </form>
         </Modal.Body>
         <Modal.Footer>
