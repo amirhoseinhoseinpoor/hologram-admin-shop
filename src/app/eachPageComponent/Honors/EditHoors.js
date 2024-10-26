@@ -113,7 +113,7 @@ export default function EditHonors({
 
   return (
     <div className="mt-3">
-      <h2>Edit Honor</h2>
+      <h2>ویرایش افتخارات</h2>
       <form onSubmit={handleSubmit}>
         <TEXTFIELD
           label="Title"
@@ -145,7 +145,7 @@ export default function EditHonors({
         )}
 
         <div>
-          <h2>Create Blog Post</h2>
+          
           <Editor
             apiKey="3akk9p7jow7ksa3txzom0c8qr4e59rtg6xy1fzvux8vysqs0"
             value={content} // Set the content state directly
@@ -189,10 +189,10 @@ export default function EditHonors({
           type="button"
           onClick={handleDelete}
         >
-          Delete Honor
+          حذف افتخار
         </button>
-        <Button variant="contained" onClick={handleCancelEdit}>
-          Cancel
+        <Button style={{fontFamily: "unset"}} className="bg-warning" variant="contained" onClick={handleCancelEdit}>
+          لغو
         </Button>
       </form>
     </div>

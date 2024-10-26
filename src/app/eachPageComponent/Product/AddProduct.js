@@ -256,13 +256,7 @@ export default function AddHonors() {
                 onChange={(e) =>
                   handleFileChange(e, index, setColors, colors)
                 }
-                // onChange={(e) =>
-                //   setColors(
-                //     colors.map((c, i) =>
-                //       i === index ? { ...c, value: e.target.value } : c
-                //     )
-                //   )
-                // }
+                
                 required
               />
               <button
@@ -274,7 +268,7 @@ export default function AddHonors() {
               </button>
             </div>
           ))}
-          <button className="mt-2" type="button" onClick={handleAddColor}>
+          <button className="mt-2 bg-success" type="button" onClick={handleAddColor}>
             اضافه کردن رنگ
           </button>
         </BorderInputBox>
@@ -302,7 +296,7 @@ export default function AddHonors() {
               </button>
             </div>
           ))}
-          <button className="mt-2" type="button" onClick={handleAddSize}>
+          <button className="mt-2 bg-success" type="button" onClick={handleAddSize}>
             اضافه کردن سایز
           </button>
         </BorderInputBox>
@@ -357,7 +351,7 @@ export default function AddHonors() {
               </button>
             </div>
           ))}
-          <button className="mt-2" type="button" onClick={handleAddImgData}>
+          <button className="mt-2 bg-success" type="button" onClick={handleAddImgData}>
             اضافه کردن عکس / فیلم
           </button>
         </BorderInputBox>
@@ -421,11 +415,11 @@ export default function AddHonors() {
               </button>
             </div>
           ))}
-          <button className="mt-2" type="button" onClick={handleAddMedia}>
+          <button className="mt-2 bg-success" type="button" onClick={handleAddMedia}>
             اضافه کردن ویدیو
           </button>
         </BorderInputBox>
-        <button type="submit" className="mt-3">
+        <button type="submit" className="mt-3 bg-success">
           اضافه کردن محصول
         </button>
       </form>

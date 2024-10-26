@@ -320,7 +320,7 @@ export default function AddHonors() {
           color="primary"
           className="mt-3"
         >
-          Submit
+          تایید
         </Button>
       </form>
     </>

@@ -351,7 +351,7 @@ export default function EditHonors({
             </button>
           </div>
         ))}
-        <button className="mt-2" type="button" onClick={handleAddSize}>
+        <button className="mt-2 bg-success" type="button" onClick={handleAddSize}>
           اضافه کردن سایز
         </button>
       </BorderInputBox>
@@ -442,7 +442,7 @@ export default function EditHonors({
             </button>
           </div>
         ))}
-        <button className="mt-2" type="button" onClick={handleAddImgData}>
+        <button className="mt-2 bg-success"  type="button" onClick={handleAddImgData}>
           اضافه کردن عکس / فیلم
         </button>
       </BorderInputBox>
@@ -480,7 +480,7 @@ export default function EditHonors({
             />
             <div className="d-flex flex-column">
               <span>فیلم :</span>
-              <div>
+              <div className=" d-flex flex-row align-items-center">
                 <input
                   type="file"
                   onChange={(e) => handleFileChange(e, index, setMedia, media)}
@@ -537,7 +537,7 @@ export default function EditHonors({
             </div>
 
             <button
-              className="bg-danger"
+              className="bg-danger mt-2 mb-2"
               type="button"
               onClick={() => handleRemoveMedia(index)}
             >
@@ -545,11 +545,11 @@ export default function EditHonors({
             </button>
           </div>
         ))}
-        <button className="mt-2" type="button" onClick={handleAddMedia}>
+        <button className="mt-2 bg-success" type="button" onClick={handleAddMedia}>
           اضافه کردن ویدیو
         </button>
       </BorderInputBox>
-      <button type="submit" className="mt-3">
+      <button type="submit" className="mt-3 bg-success">
         ویرایش محصول
       </button>
       <button
@@ -559,7 +559,7 @@ export default function EditHonors({
       >
         حذف محصول
       </button>
-      <button onClick={handleCancelEdit}>انصراف</button>
+      <button className="bg-warning" onClick={handleCancelEdit}>انصراف</button>
     </form>
 
     // <div className="mt-3">

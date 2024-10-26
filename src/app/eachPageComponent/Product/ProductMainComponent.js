@@ -28,15 +28,6 @@ const CARD = styled(Card)`
 export default function HonorsMainComponent() {
   const dispatch = useDispatch();
 
-  // const [name, setName] = useState("");
-  // const [title, setTitle] = useState("");
-  // const [subtitle, setSubtitle] = useState("");
-  // const [colors, setColors] = useState([{ name: "", value: "" }]);
-  // const [sizes, setSizes] = useState([""]);
-  // const [imgData, setImgData] = useState([{ src: "", type: "1", poster: "" }]);
-  // const [media, setMedia] = useState([
-  //   { title: "", description: "", src: "", poster: "" },
-  // ]);
 
   // add honors
   const [activekey, setActiveKey] = useState("editUserPage");

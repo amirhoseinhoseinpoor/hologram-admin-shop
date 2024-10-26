@@ -74,7 +74,7 @@ export default function HonorsMainComponent() {
         <>
           <div className="d-flex flex-row justify-content-between mb-2">
             <div>
-              <h2 className="m-0"> ویرایش مقالات</h2>
+              <h2 className="m-0 "> ویرایش مقالات</h2>
             </div>
             <div>
               <button style={{backgroundColor: "green"}} onClick={() => setActiveKey("addUser")}>
@@ -129,7 +129,7 @@ export default function HonorsMainComponent() {
               <h2 className="m-0"> افزودن مقالات</h2>
             </div>
             <div>
-              <button onClick={() => setActiveKey("editUserPage")}>
+              <button className="bg-success" onClick={() => setActiveKey("editUserPage")}>
                 ویرایش مقالات
               </button>
             </div>

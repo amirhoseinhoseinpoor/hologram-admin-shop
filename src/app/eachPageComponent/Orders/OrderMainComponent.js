@@ -99,6 +99,7 @@ export default function OrderMainComponent() {
                   <td>{formatPersianDate(item.date)}</td>
                   <td>
                     <button
+                      className="bg-success"
                       onClick={() => {
                         setActiveKey("seeOrder");
                         setSeeOrder(item);

@@ -154,7 +154,7 @@ export default function AddHonors() {
           />
         </div>
 
-        <button type="submit">Submit</button>
+        <button className="bg-success" type="submit">تایید</button>
       </form>
     </>
   );
