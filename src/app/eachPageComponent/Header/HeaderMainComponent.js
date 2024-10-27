@@ -6,133 +6,16 @@ import { HeaderList, headerEdit } from "@/app/Store/thunks";
 import styled, { keyframes } from "styled-components";
 import { Modal, Box, Button as MUIButton, Typography } from "@mui/material"; // Import MUI components
 import DeleteIcon from "@mui/icons-material/Delete";
+import ConfirmModal from "@/app/BaseComponent/confirmmodal";
+import ErrorModal from "@/app/BaseComponent/ErrorModal";
+import AreYouShureModal from "@/app/BaseComponent/AreYouSureModal";
 
 // Styled components
 const Container = styled.div`
   padding: 20px;
 `;
 
-const animateSuccessLong = keyframes`  
-  0% {  
-    width: 0;  
-    right: 46px;  
-    top: 54px;  
-  }  
-  65% {  
-    width: 0;  
-    right: 46px;  
-    top: 54px;  
-  }  
-  84% {  
-    width: 55px;  
-    right: 0;  
-    top: 35px;  
-  }  
-  100% {  
-    width: 47px;  
-    right: 8px;  
-    top: 38px;  
-  }  
-`;
 
-const animateSuccessTip = keyframes`  
-  0% {  
-    width: 0;  
-    left: 1px;  
-    top: 19px;  
-  }  
-  54% {  
-    width: 0;  
-    left: 1px;  
-    top: 19px;  
-  }  
-  70% {  
-    width: 50px;  
-    left: -8px;  
-    top: 37px;  
-  }  
-  84% {  
-    width: 17px;  
-    left: 21px;  
-    top: 48px;  
-  }  
-  100% {  
-    width: 25px;  
-    left: 14px;  
-    top: 45px;  
-  }  
-`;
-
-const rotatePlaceholder = keyframes`  
-  0% {  
-    transform: rotate(-45deg);  
-  }  
-  5% {  
-    transform: rotate(-45deg);  
-  }  
-  12% {  
-    transform: rotate(-405deg);  
-  }  
-  100% {  
-    transform: rotate(-405deg);  
-  }  
-`;
-
-// Styled component
-const ConfirmAnimation = styled.div`
-  width: 82px;
-  height: 80px;
-  position: relative;
-
-  .swal-icon--success__ring {
-    width: 80px;
-    height: 80px;
-    border: 4px solid hsla(98, 55%, 69%, 0.2);
-    border-radius: 50%;
-    position: absolute;
-    left: 0px;
-    top: 0px;
-    z-index: 2;
-  }
-
-  .swal-icon--success__line {
-    background-color: #a5dc86;
-    display: block;
-    border-radius: 2px;
-    position: absolute;
-    z-index: 2;
-  }
-
-  .swal-icon--success__line--tip {
-    animation: ${animateSuccessTip} 0.75s forwards;
-    height: 5px; /* Ensure it has a height */
-    left: 14px;
-    top: 46px;
-    transform: rotate(45deg);
-  }
-
-  .swal-icon--success__line--long {
-    animation: ${animateSuccessLong} 0.75s forwards;
-    height: 5px; /* Ensure it has a height */
-    right: 8px;
-    top: 38px;
-    transform: rotate(-45deg);
-  }
-
-  &::before {
-    content: "";
-    position: absolute;
-    width: 60px;
-    height: 60px;
-    border: 4px solid #fff;
-    border-radius: 50%;
-    z-index: 1;
-    animation: ${rotatePlaceholder} 4.25s ease-in forwards;
-  }
-`;
-const TYPOGRAPHY = styled(Typography)`
-  font-family: unset !important;
-`;
 
 const Title = styled.h1`
   color: #333;
@@ -141,7 +24,7 @@ const Title = styled.h1`
 
 const InputField = styled.input`
   padding: 10px;
-  width: 200px;
+  width: 36%;
   margin-right: 10px;
   border: 1px solid #ccc;
   border-radius: 5px;
@@ -279,6 +162,7 @@ export default function HeaderMainComponent() {
 
               {/* Button to add sub-items recursively */}
               <Button
+                className="me-1"
                 $secondary
                 onClick={() => selectSubItemForSubItem(headerIndex, newPath)}
               >
@@ -437,7 +321,8 @@ export default function HeaderMainComponent() {
 
                 {/* Button to add sub-items */}
                 <Button
-                  $secondary
+                 className="me-1"
+                   $secondary
                   onClick={() => selectHeaderForSubItem(index)}
                 >
                   اضافه کردن ساب ایتم به {item.title}
@@ -470,7 +355,7 @@ export default function HeaderMainComponent() {
             value={newSubItem.link}
             onChange={handleSubInputChange}
           />
-          <Button $secondary onClick={addSubItem}>
+          <Button className="me-1" $secondary onClick={addSubItem}>
             اضافه کردن ساب ایتم
           </Button>
         </div>
@@ -482,77 +367,12 @@ export default function HeaderMainComponent() {
       </Button>
 
       {/* Modal for confirming header or sub-item removal */}
-      <Modal
-        open={openModal}
-        onClose={closeModal}
-        aria-labelledby="modal-modal-title"
-        aria-describedby="modal-modal-description"
-      >
-        <Box sx={modalStyle}>
-          <TYPOGRAPHY id="modal-modal-title" variant="h6" component="h2">
-            دیلیت
-          </TYPOGRAPHY>
-          <TYPOGRAPHY id="modal-modal-description" sx={{ mt: 2 }}>
-            Are you sure you want to delete this{" "}
-            {isRemovingHeader ? "header" : "sub-item"}?
-          </TYPOGRAPHY>
-          <div style={{ marginTop: "20px" }}>
-            <MUIButton
-              variant="contained"
-              color="error"
-              onClick={confirmRemove}
-            >
-              تایید
-            </MUIButton>
-            <MUIButton
-              variant="contained"
-              onClick={closeModal}
-              style={{ marginLeft: "10px" }}
-            >
-              لغو
-            </MUIButton>
-          </div>
-        </Box>
-      </Modal>
-      <Modal
-        open={openModal2}
-        onClose={closeModal2}
-        aria-labelledby="modal-modal-title2"
-        aria-describedby="modal-modal-description2"
-      >
-        <Box sx={modalStyle}>
-          <TYPOGRAPHY id="modal-modal-title2" variant="h6" component="h2">
-            لطفا جفت تایتل و لینک را وارد کنید
-          </TYPOGRAPHY>
-
-          <div style={{ marginTop: "20px" }}>
-            <MUIButton
-              variant="contained"
-              onClick={closeModal2}
-              style={{ marginLeft: "10px", fontFamily: "unset" }}
-            >
-              لغو
-            </MUIButton>
-          </div>
-        </Box>
-      </Modal>
-      <Modal
-        open={openModal3}
-        onClose={closeModal3}
-        aria-labelledby="modal-modal-title3"
-        aria-describedby="modal-modal-description3"
-      >
-        <Box sx={modalStyle}>
-          <div className="w-100 d-flex justify-content-center">
-            <ConfirmAnimation>
-              <div className="swal-icon--success__ring" />
-              <span className="swal-icon--success__line swal-icon--success__line--long" />
-              <span className="swal-icon--success__line swal-icon--success__line--tip" />
-            </ConfirmAnimation>
-          </div>
-          <p className="mt-3 text-center">هدر با موفقیت تغییر یافت</p>
-        </Box>
-      </Modal>
+      
+      <AreYouShureModal open={openModal} onClose={closeModal} func={confirmRemove} text={`از حذف ${' '}${isRemovingHeader ? "هدر" : "ساب ایتم"}${" "}مطمعن هستید`} />
+      
+      <ErrorModal open={openModal2} onClose={closeModal2} text={'لطفا تایتل و لینک را وارد کنید'}/>
+      <ConfirmModal open={openModal3} onClose={closeModal3} text={'هدر با موفقیت تغییر یافت'}/>
+      
     </Container>
   );
 }

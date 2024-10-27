@@ -102,9 +102,7 @@ export const uploadFile = createAsyncThunk(
     const state = thunkAPI.getState();
     const token = state.auth.token;
 
-    try {
-      console.log(token);
-      
+    try {     
       // Create a FormData object
       const formData = new FormData();
       formData.append("files", file);
@@ -122,10 +120,6 @@ export const uploadFile = createAsyncThunk(
           },
         }
       );
-
-      if (response.data[0].fileName) {
-        alert("افزودن عکس با موفقیت انجام شد");
-      }
 
       return response.data[0].fileName;
     } catch (error) {
@@ -191,11 +185,6 @@ export const productpot = createAsyncThunk(
         }
       );
       const data = response.data;
-
-      if (data) {
-        alert("افزودن محصول با موفقیت انجام شد");
-      }
-
       return data;
     } catch (error) {
       if (error.response && error.response.status === 400) {
@@ -865,11 +854,6 @@ export const headerEdit = createAsyncThunk(
         }
       );
       const data = response.data;
-
-      if (data) {
-        alert("اپدیت هدر با موفقیت انجام شد");
-      }
-
       return data;
     } catch (error) {
       if (error.response && error.response.status === 400) {

@@ -156,7 +156,7 @@ export default function HonorsMainComponent() {
               <h2  className="m-0"> افزودن محصول</h2>
             </div>
             <div>
-              <button onClick={() => setActiveKey("editUserPage")}>
+              <button className="bg-success" onClick={() => setActiveKey("editUserPage")}>
                 ویرایش محصولات
               </button>
             </div>
