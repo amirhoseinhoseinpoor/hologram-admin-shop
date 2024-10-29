@@ -124,7 +124,6 @@ export const uploadFile = createAsyncThunk(
       return response.data[0].fileName;
     } catch (error) {
       if (error.response && error.response.status === 400) {
-        alert("خطا در افزودن media");
         return thunkAPI.rejectWithValue("ارور سمت من");
       } else {
         return thunkAPI.rejectWithValue(
@@ -215,12 +214,6 @@ export const productEdit = createAsyncThunk(
         }
       );
       const data = response.data;
-
-      if (data) {
-        alert("اپدیت محصول با موفقیت انجام شد");
-        console.log(data);
-      }
-
       return data;
     } catch (error) {
       if (error.response && error.response.status === 400) {
@@ -352,11 +345,6 @@ export const videopot = createAsyncThunk(
         }
       );
       const data = response.data;
-
-      if (data) {
-        alert("افزودن مدیا با موفقیت انجام شد");
-      }
-
       return data;
     } catch (error) {
       if (error.response && error.response.status === 400) {
@@ -376,8 +364,6 @@ export const videoEdit = createAsyncThunk(
     const state = thunkAPI.getState();
     const token = state.auth.token;
     try {
-      console.log(media);
-
       const response = await axios.patch(
         `${process.env.NEXT_PUBLIC_BACK_END_SERVER}/video/${code}`,
         media,
@@ -389,12 +375,6 @@ export const videoEdit = createAsyncThunk(
         }
       );
       const data = response.data;
-
-      if (data) {
-        alert("اپدیت ویدیو با موفقیت انجام شد");
-        console.log(data);
-      }
-
       return data;
     } catch (error) {
       if (error.response && error.response.status === 400) {
@@ -479,11 +459,6 @@ export const honorspot = createAsyncThunk(
         }
       );
       const data = response.data;
-
-      if (data) {
-        alert("افزودن افتخار با موفقیت انجام شد");
-      }
-
       return data;
     } catch (error) {
       if (error.response && error.response.status === 400) {
@@ -503,8 +478,6 @@ export const honorsEdit = createAsyncThunk(
     const state = thunkAPI.getState();
     const token = state.auth.token;
     try {
-      console.log(honor);
-
       const response = await axios.patch(
         `${process.env.NEXT_PUBLIC_BACK_END_SERVER}/honors/${code}`,
         honor,
@@ -516,12 +489,6 @@ export const honorsEdit = createAsyncThunk(
         }
       );
       const data = response.data;
-
-      if (data) {
-        alert("اپدیت ویدیو با موفقیت انجام شد");
-        console.log(data);
-      }
-
       return data;
     } catch (error) {
       if (error.response && error.response.status === 400) {
@@ -552,8 +519,6 @@ export const honorsDeleted = createAsyncThunk(
         }
       );
       const data = response.data;
-      console.log(data);
-
       return data;
     } catch (error) {
       if (error.response && error.response.status === 400) {
@@ -606,11 +571,6 @@ export const exhibitionpot = createAsyncThunk(
         }
       );
       const data = response.data;
-
-      if (data) {
-        alert("افزودن نمایشگاه با موفقیت انجام شد");
-      }
-
       return data;
     } catch (error) {
       if (error.response && error.response.status === 400) {
@@ -641,11 +601,6 @@ export const exhibitionEdit = createAsyncThunk(
         }
       );
       const data = response.data;
-
-      if (data) {
-        alert("اپدیت نمایشگاه با موفقیت انجام شد");
-      }
-
       return data;
     } catch (error) {
       if (error.response && error.response.status === 400) {
@@ -676,7 +631,6 @@ export const exhibitionDeleted = createAsyncThunk(
         }
       );
       const data = response.data;
-      console.log(data);
 
       return data;
     } catch (error) {
@@ -730,11 +684,6 @@ export const bannerpot = createAsyncThunk(
         }
       );
       const data = response.data;
-
-      if (data) {
-        alert("افزودن بنر با موفقیت انجام شد");
-      }
-
       return data;
     } catch (error) {
       if (error.response && error.response.status === 400) {
@@ -765,11 +714,6 @@ export const bannerEdit = createAsyncThunk(
         }
       );
       const data = response.data;
-
-      if (data) {
-        alert("اپدیت بنر با موفقیت انجام شد");
-      }
-
       return data;
     } catch (error) {
       if (error.response && error.response.status === 400) {
@@ -906,11 +850,6 @@ export const blogspot = createAsyncThunk(
         }
       );
       const data = response.data;
-
-      if (data) {
-        alert("افزودن وبلاگ با موفقیت انجام شد");
-      }
-
       return data;
     } catch (error) {
       if (error.response && error.response.status === 400) {
@@ -942,10 +881,6 @@ export const blogsEdit = createAsyncThunk(
       );
       const data = response.data;
 
-      if (data) {
-        alert("اپدیت وبلاگ با موفقیت انجام شد");
-      }
-
       return data;
     } catch (error) {
       if (error.response && error.response.status === 400) {
@@ -976,8 +911,6 @@ export const blogsDeleted = createAsyncThunk(
         }
       );
       const data = response.data;
-      console.log(data);
-
       return data;
     } catch (error) {
       if (error.response && error.response.status === 400) {

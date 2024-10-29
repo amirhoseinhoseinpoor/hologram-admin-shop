@@ -8,15 +8,14 @@ import EditProduct from "./EditProduct";
 import { useSelector, useDispatch } from "react-redux";
 import { list } from "../../Store/thunks.js";
 import { productListData } from "@/app/Store/slice";
-
-
-
 import { Card, CardContent, CardMedia, Typography } from "@mui/material";
 import styled from "styled-components";
 
 const CARD = styled(Card)`
-  background-color: #5f5f5f !important;
-  color: white !important;
+  background-color: #dfdcdc !important;
+  color: black !important;
+  border: 1px solid #ddd;
+  box-shadow: unset;
   .MuiCardContent-root {
     .titleHonors {
       font-size: 20px;
@@ -25,9 +24,13 @@ const CARD = styled(Card)`
   }
 `;
 
+const TYPOGRAPHY = styled(Typography)`
+  font-family: unset !important;
+  font-size: 17px !important;
+`;
+
 export default function HonorsMainComponent() {
   const dispatch = useDispatch();
-
 
   // add honors
   const [activekey, setActiveKey] = useState("editUserPage");
@@ -74,7 +77,10 @@ export default function HonorsMainComponent() {
               <h2 className="m-0">ویرایش محصولات</h2>
             </div>
             <div>
-              <button style={{backgroundColor: "green"}} onClick={() => setActiveKey("addUser")}>
+              <button
+                style={{ backgroundColor: "green" }}
+                onClick={() => setActiveKey("addUser")}
+              >
                 افزودن محصول
               </button>
             </div>
@@ -97,7 +103,7 @@ export default function HonorsMainComponent() {
                         component="img"
                         src={`${process.env.NEXT_PUBLIC_BACK_END_SERVER}/system/download/${data.info.imgData[0].src}`}
                         sx={{
-                          width: "120px",
+                          width: "150px",
                           maxHeight: "100%",
                           borderRadius: "2px",
                         }}
@@ -105,14 +111,14 @@ export default function HonorsMainComponent() {
                     )}
 
                     <CardContent className="d-flex flex-column justify-content-around">
-                      <Typography className="titleHonors">
+                      <TYPOGRAPHY className="titleHonors">
                         {data.name}
-                      </Typography>
+                      </TYPOGRAPHY>
                       <div className="d-flex flex-row gap-2">
                         <p>کد محصول :</p>
-                        <Typography className="dateHonors">
+                        <TYPOGRAPHY className="dateHonors">
                           {data.code}
-                        </Typography>
+                        </TYPOGRAPHY>
                       </div>
                     </CardContent>
                   </CARD>
@@ -153,10 +159,13 @@ export default function HonorsMainComponent() {
         <>
           <div className="d-flex flex-row justify-content-between mb-2">
             <div>
-              <h2  className="m-0"> افزودن محصول</h2>
+              <h2 className="m-0"> افزودن محصول</h2>
             </div>
             <div>
-              <button className="bg-success" onClick={() => setActiveKey("editUserPage")}>
+              <button
+                className="bg-success"
+                onClick={() => setActiveKey("editUserPage")}
+              >
                 ویرایش محصولات
               </button>
             </div>

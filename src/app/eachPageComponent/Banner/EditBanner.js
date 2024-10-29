@@ -4,11 +4,19 @@ import styled from "styled-components";
 // import redux
 import { useDispatch } from "react-redux";
 import { bannerEdit, bannerDeleted, uploadFile } from "@/app/Store/thunks";
+// import modals
+import ConfirmModal from "@/app/BaseComponent/Confirmmodal";
+import ErrorModal from "@/app/BaseComponent/ErrorModal";
+import AreYouShureModal from "@/app/BaseComponent/AreYouSureModal";
 
 const TEXTFIELD = styled(TextField)`
   .MuiInputBase-input {
     margin-bottom: 0;
   }
+`;
+
+const BUTTON = styled(Button)`
+  font-family: unset !important;
 `;
 
 export default function EditHonors({
@@ -21,6 +29,17 @@ export default function EditHonors({
   const [bannerTitle, setBannerTitle] = useState("");
   const [bannerLink, setBannerLink] = useState("");
   const [bannerImage, setBannerImage] = useState(null);
+
+  // modal state
+  const [openModal, setOpenModal] = useState(false);
+  const [openModal2, setOpenModal2] = useState(false);
+  const [openModal3, setOpenModal3] = useState(false);
+  const [openModal4, setOpenModal4] = useState(false);
+  // Close modal
+  const closeModal = () => setOpenModal(false);
+  const closeModal2 = () => setOpenModal2(false);
+  const closeModal3 = () => setOpenModal3(false);
+  const closeModal4 = () => setOpenModal4(false);
 
   useEffect(() => {
     if (editedHonor) {
@@ -42,7 +61,7 @@ export default function EditHonors({
       ).unwrap();
 
       // const imageUrl = `${process.env.NEXT_PUBLIC_BACK_END_SERVER}/system/download/${fileId}`;
-      
+
       setBannerImage(fileId);
     } catch (error) {
       console.error("Error uploading banner image:", error);
@@ -59,20 +78,42 @@ export default function EditHonors({
 
   const handleDelete = async (e) => {
     e.preventDefault();
+    setOpenModal4(false);
     try {
       const deleteVideo = await dispatch(
         bannerDeleted({ code: editedHonor.code })
       );
       if (deleteVideo.payload.message === "Success") {
-        alert("banner deleted successfully");
+        setOpenModal2(true);
+        closeModalOnTimeout();
+      } else {
+        setOpenModal3(true);
       }
     } catch (error) {
       console.error("Error deleting honors:", error);
     }
   };
 
+  const areYouShureFunction = (e) => {
+    e.preventDefault();
+    setOpenModal(true);
+  };
+
+  const areYouShureFunction2 = (e) => {
+    e.preventDefault();
+    setOpenModal4(true);
+  };
+
+  function closeModalOnTimeout() {
+    setTimeout(() => {
+      setOpenModal2(false);
+    }, 3000);
+  }
+
   const handleSubmit = async (event) => {
     event.preventDefault();
+    setOpenModal(false);
+
     const formData = {
       title: bannerTitle,
       src: bannerImage,
@@ -82,16 +123,18 @@ export default function EditHonors({
       const fetchData = await dispatch(
         bannerEdit({ banner: formData, code: editedHonor.code })
       ).unwrap();
-      console.log(fetchData);
+      setOpenModal2(true);
+      closeModalOnTimeout();
     } catch (error) {
+      setOpenModal3(true);
       console.error("Error submitting data:", error);
     }
   };
 
   return (
     <div className="mt-3">
-      <h2>Edit Banner</h2>
-      <form onSubmit={handleSubmit}>
+      <h2>ویرایش بنر</h2>
+      <form onSubmit={areYouShureFunction}>
         <TEXTFIELD
           label="Title"
           value={bannerTitle}
@@ -125,19 +168,42 @@ export default function EditHonors({
           </Box>
         )}
 
-        <Button className="mb-3 mt-3" variant="contained" type="submit">
-          Save
-        </Button>
-        <button
+        <BUTTON className="mt-4" variant="contained" type="submit">
+          تایید
+        </BUTTON>
+        <BUTTON
           className="bg-danger mt-2 mb-2"
           type="button"
-          onClick={handleDelete}
+          onClick={areYouShureFunction2}
         >
-          Delete Banner
-        </button>
-        <Button variant="contained" onClick={handleCancelEdit}>
-          Cancel
-        </Button>
+          حذف بنر
+        </BUTTON>
+        <BUTTON className="bg-warning" variant="contained" onClick={handleCancelEdit}>
+          انصراف
+        </BUTTON>
+        {/* modal  */}
+        <AreYouShureModal
+          open={openModal}
+          onClose={closeModal}
+          text={"ایا از ویرایش بنر مطمعن هستید"}
+          func={handleSubmit}
+        />
+        <AreYouShureModal
+          open={openModal4}
+          onClose={closeModal4}
+          text={"ایا از حذف بنر مطمعن هستید"}
+          func={handleDelete}
+        />
+        <ConfirmModal
+          open={openModal2}
+          onClose={closeModal2}
+          text={"عملیات با موفقیت انجام شد"}
+        />
+        <ErrorModal
+          open={openModal3}
+          onClose={closeModal3}
+          text={"خطا از لاگین بودن خود اطمینان حاصل فرمایید"}
+        />
       </form>
     </div>
   );

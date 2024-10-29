@@ -6,7 +6,7 @@ import { HeaderList, headerEdit } from "@/app/Store/thunks";
 import styled, { keyframes } from "styled-components";
 import { Modal, Box, Button as MUIButton, Typography } from "@mui/material"; // Import MUI components
 import DeleteIcon from "@mui/icons-material/Delete";
-import ConfirmModal from "@/app/BaseComponent/confirmmodal";
+import ConfirmModal from "@/app/BaseComponent/Confirmmodal";
 import ErrorModal from "@/app/BaseComponent/ErrorModal";
 import AreYouShureModal from "@/app/BaseComponent/AreYouSureModal";
 

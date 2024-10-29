@@ -110,8 +110,6 @@ export default function Login() {
   const handleVerifyOtp = async (otp) => {
     setErrorMessage(null);
     try {
-      alert("your OTP   " + otp);
-
       router.push("/AdminPanel");
 
       // const response = await fetch("/api/verify-otp", {

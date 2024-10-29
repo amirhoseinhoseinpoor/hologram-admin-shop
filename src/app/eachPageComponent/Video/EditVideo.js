@@ -5,6 +5,10 @@ import { useDispatch } from "react-redux";
 import { uploadFile } from "@/app/Store/thunks";
 import { videoEdit } from "@/app/Store/thunks";
 import { HomePageVideoDeleted } from "@/app/Store/thunks";
+// import modals
+import ConfirmModal from "@/app/BaseComponent/Confirmmodal";
+import ErrorModal from "@/app/BaseComponent/ErrorModal";
+import AreYouShureModal from "@/app/BaseComponent/AreYouSureModal";
 
 const BorderInputBox = styled.div`
   border: 2px solid #28a745;
@@ -18,10 +22,23 @@ export default function EditHonors({
 }) {
   const dispatch = useDispatch();
 
-  const [media, setMedia] = useState([{ title: "", description: "", src: "", poster: "" }]);
+  const [media, setMedia] = useState([
+    { title: "", description: "", src: "", poster: "" },
+  ]);
 
   const [objectUrls, setObjectUrls] = useState({});
   const [posterObjectUrls, setPosterObjectUrls] = useState({});
+
+  // modal state
+  const [openModal, setOpenModal] = useState(false);
+  const [openModal2, setOpenModal2] = useState(false);
+  const [openModal3, setOpenModal3] = useState(false);
+  const [openModal4, setOpenModal4] = useState(false);
+  // Close modal
+  const closeModal = () => setOpenModal(false);
+  const closeModal2 = () => setOpenModal2(false);
+  const closeModal3 = () => setOpenModal3(false);
+  const closeModal4 = () => setOpenModal4(false);
 
   useEffect(() => {
     if (editedHonor) {
@@ -68,20 +85,41 @@ export default function EditHonors({
 
   const handleDelete = async (e) => {
     e.preventDefault();
-
+    setOpenModal4(false);
     try {
-      const deleteVideo = await dispatch(HomePageVideoDeleted({code: editedHonor.code}))
+      const deleteVideo = await dispatch(
+        HomePageVideoDeleted({ code: editedHonor.code })
+      );
       if (deleteVideo.payload.message === "Success") {
-        alert("محصول باموفقیت حذف شد");
+        setOpenModal2(true);
+        closeModalOnTimeout();
+      } else {
+        setOpenModal3(true);
       }
-      
     } catch (error) {
       console.error("Error deleting product:", error);
     }
   };
 
+  const areYouShureFunction = (e) => {
+    e.preventDefault();
+    setOpenModal(true);
+  };
+
+  const areYouShureFunction2 = (e) => {
+    e.preventDefault();
+    setOpenModal4(true);
+  };
+
+  function closeModalOnTimeout() {
+    setTimeout(() => {
+      setOpenModal2(false);
+    }, 3000);
+  }
+
   const handleSubmit = async (e) => {
     e.preventDefault();
+    setOpenModal(false);
     try {
       await Promise.all(
         media.map(async (item) => {
@@ -110,19 +148,21 @@ export default function EditHonors({
           }
 
           const finalMedia = {
-            media : updatedItem
-          }
+            media: updatedItem,
+          };
 
-          await dispatch(videoEdit({
-            media :finalMedia,
-            code: editedHonor.code
-          }));
-          console.log(`Uploaded media:`, updatedItem);
-         
+          await dispatch(
+            videoEdit({
+              media: finalMedia,
+              code: editedHonor.code,
+            })
+          );
         })
       );
-      console.log("All media successfully uploaded and saved.");
+      setOpenModal2(true);
+      closeModalOnTimeout();
     } catch (error) {
+      setOpenModal3(true);
       console.error("Error creating product:", error);
     }
   };
@@ -130,48 +170,51 @@ export default function EditHonors({
   return (
     <div className="mt-3">
       <h2>ادیت ویدیو</h2>
-      <form onSubmit={handleSubmit}>
+      <form onSubmit={areYouShureFunction}>
         <BorderInputBox className="mt-3">
           <label>فیلم ها:</label>
           {media.map((item, index) => (
             <div className="mt-2" key={index}>
-              <input
-                type="text"
-                placeholder="Title"
-                value={item.title} // Use item.title instead of media.title
-                onChange={(e) =>
-                  setMedia(
-                    media.map((m, i) =>
-                      i === index ? { ...m, title: e.target.value } : m
+              <div className="d-flex flex-row align-items-center flex-wrap gap-2">
+                <input
+                  style={{ width: "40%" }}
+                  type="text"
+                  placeholder="Title"
+                  value={item.title} // Use item.title instead of media.title
+                  onChange={(e) =>
+                    setMedia(
+                      media.map((m, i) =>
+                        i === index ? { ...m, title: e.target.value } : m
+                      )
                     )
-                  )
-                }
-                required
-              />
+                  }
+                  required
+                />
 
-              <input
-                type="text"
-                placeholder="Description"
-                value={item.description} // Use item.description instead of media.description
-                onChange={(e) =>
-                  setMedia(
-                    media.map((m, i) =>
-                      i === index ? { ...m, description: e.target.value } : m
+                <input
+                  style={{ width: "40%" }}
+                  type="text"
+                  placeholder="Description"
+                  value={item.description} // Use item.description instead of media.description
+                  onChange={(e) =>
+                    setMedia(
+                      media.map((m, i) =>
+                        i === index ? { ...m, description: e.target.value } : m
+                      )
                     )
-                  )
-                }
-                required
-              />
+                  }
+                  required
+                />
+              </div>
 
               <div className="d-flex flex-column">
                 <span>فیلم :</span>
-                <div>
+                <div className="d-flex flex-row flex-wrap align-items-center gap-2">
                   <input
                     type="file"
                     onChange={(e) =>
                       handleFileChange(e, index, setMedia, media)
                     }
-                    
                   />
                   {item.src && !objectUrls[index] && (
                     <Box
@@ -203,13 +246,12 @@ export default function EditHonors({
 
               <div className="d-flex flex-column">
                 <span>پوستر فیلم :</span>
-                <div>
+                <div className="d-flex flex-row flex-wrap align-items-center gap-2">
                   <input
                     type="file"
                     onChange={(e) =>
                       handleFileChangePoster(e, index, setMedia, media)
                     }
-                   
                   />
                   {item.poster && !posterObjectUrls[index] && (
                     <Box
@@ -238,7 +280,7 @@ export default function EditHonors({
               </div>
 
               <button
-                className="bg-danger"
+                className="bg-danger mt-1"
                 type="button"
                 onClick={() => handleRemoveMedia(index)}
               >
@@ -246,17 +288,50 @@ export default function EditHonors({
               </button>
             </div>
           ))}
-          <button className="mt-2" type="button" onClick={handleAddMedia}>
+          <button
+            className="mt-2 bg-success"
+            type="button"
+            onClick={handleAddMedia}
+          >
             اضافه کردن ویدیو
           </button>
         </BorderInputBox>
-        <button type="submit" className="mt-3">
+        <button type="submit" className="mt-3 bg-success">
           ویرایش محصول
         </button>
-        <button onClick={handleDelete} className="bg-danger mt-2 mb-2" type="button">
+        <button
+          onClick={areYouShureFunction2}
+          className="bg-danger mt-2 mb-2"
+          type="button"
+        >
           حذف محصول
         </button>
-        <button onClick={handleCancelEdit}>انصراف</button>
+        <button className="bg-warning" onClick={handleCancelEdit}>
+          انصراف
+        </button>
+        {/* modal  */}
+        <AreYouShureModal
+          open={openModal}
+          onClose={closeModal}
+          text={"ایا از ویرایش ویدیو مطمعن هستید"}
+          func={handleSubmit}
+        />
+        <AreYouShureModal
+          open={openModal4}
+          onClose={closeModal4}
+          text={"ایا از حذف ویدیو مطمعن هستید"}
+          func={handleDelete}
+        />
+        <ConfirmModal
+          open={openModal2}
+          onClose={closeModal2}
+          text={"عملیات با موفقیت انجام شد"}
+        />
+        <ErrorModal
+          open={openModal3}
+          onClose={closeModal3}
+          text={"خطا از لاگین بودن خود اطمینان حاصل فرمایید"}
+        />
       </form>
     </div>
   );

@@ -4,16 +4,27 @@ import { Editor } from "@tinymce/tinymce-react";
 import { useDispatch, useSelector } from "react-redux";
 import { uploadFile } from "@/app/Store/thunks";
 import { honorspot } from "@/app/Store/thunks";
-import { token } from "@/app/Store/slice";
+// import modals
+import AreYouShureModal from "@/app/BaseComponent/AreYouSureModal";
+import ConfirmModal from "@/app/BaseComponent/Confirmmodal";
+import ErrorModal from "@/app/BaseComponent/ErrorModal";
 
 export default function AddHonors() {
   const dispatch = useDispatch();
-  // const tokenCome = useSelector(token);
 
   const [content, setContent] = useState("");
   const [bannerTitle, setBannerTitle] = useState("");
   const [bannerTags, setBannerTags] = useState("");
   const [bannerImage, setBannerImage] = useState(null);
+
+  // modal state
+  const [openModal, setOpenModal] = useState(false);
+  const [openModal2, setOpenModal2] = useState(false);
+  const [openModal3, setOpenModal3] = useState(false);
+  // Close modal
+  const closeModal = () => setOpenModal(false);
+  const closeModal2 = () => setOpenModal2(false);
+  const closeModal3 = () => setOpenModal3(false);
 
   const handleEditorChange = (newContent) => {
     setContent(newContent);
@@ -75,9 +86,21 @@ export default function AddHonors() {
     }
   };
 
+  const areYouShureFunction = (e) => {
+    e.preventDefault();
+    setOpenModal(true);
+  };
+
+  function closeModalOnTimeout() {
+    setTimeout(() => {
+      setOpenModal2(false);
+    }, 3000);
+  }
+
   // Form submit logic
   const handleSubmit = async (event) => {
     event.preventDefault();
+    setOpenModal(false);
 
     // Construct the data to be sent to the backend
     const formData = {
@@ -87,38 +110,38 @@ export default function AddHonors() {
       content: content, // This will include the content with images inserted as <img src="...">
     };
 
-    console.log(formData);
-
     try {
-      // Send the data to the backend
       const fetchData = await dispatch(honorspot(formData)).unwrap();
-      console.log(fetchData);
+      if (fetchData) {
+        setOpenModal2(true);
+        closeModalOnTimeout();
+      }
     } catch (error) {
+      setOpenModal3(true);
       console.error("Error submitting data:", error);
     }
   };
 
   return (
     <>
-      <form onSubmit={handleSubmit}>
-        <label htmlFor="bannerTitle">Title:</label>
+      <form onSubmit={areYouShureFunction}>
+        <label htmlFor="bannerTitle">تایتل :</label>
         <input
           id="bannerTitle"
           value={bannerTitle}
           onChange={handleTitleChange}
         />
-        <label htmlFor="bannerImage">Select Image:</label>
+        <label className="mt-2" htmlFor="bannerImage">عکس اصلی :</label>
         <input
           type="file"
           id="bannerImage"
           onChange={handleBannerImageUpload}
         />
 
-        <label htmlFor="bannerTags">Tags:</label>
+        <label className="mt-2" htmlFor="bannerTags">تگ ها :</label>
         <input id="bannerTags" value={bannerTags} onChange={handleTagsChange} />
 
-        <div>
-          <h2>Create Blog Post</h2>
+        <div className="mt-4">
           <Editor
             apiKey="3akk9p7jow7ksa3txzom0c8qr4e59rtg6xy1fzvux8vysqs0" // Replace with your TinyMCE API key
             value={content}
@@ -154,7 +177,26 @@ export default function AddHonors() {
           />
         </div>
 
-        <button className="bg-success" type="submit">تایید</button>
+        <button className="bg-success mt-2" type="submit">
+          تایید
+        </button>
+        {/* modals */}
+        <AreYouShureModal
+          open={openModal}
+          onClose={closeModal}
+          text={"ایا از اضافه کردن افتخار مطمعن هستید"}
+          func={handleSubmit}
+        />
+        <ConfirmModal
+          open={openModal2}
+          onClose={closeModal2}
+          text={"افتخار با موفقیت اضافه شد"}
+        />
+        <ErrorModal
+          open={openModal3}
+          onClose={closeModal3}
+          text={"خطا از لاگین بودن خود اطمینان حاصل فرمایید"}
+        />
       </form>
     </>
   );

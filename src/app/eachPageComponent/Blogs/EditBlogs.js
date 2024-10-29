@@ -9,6 +9,9 @@ import {
 } from "@mui/material";
 import styled from "styled-components";
 import { Editor } from "@tinymce/tinymce-react";
+import ConfirmModal from "@/app/BaseComponent/Confirmmodal";
+import ErrorModal from "@/app/BaseComponent/ErrorModal";
+import AreYouShureModal from "@/app/BaseComponent/AreYouSureModal";
 
 // import redux
 import { useDispatch } from "react-redux";
@@ -17,6 +20,9 @@ import { blogsEdit } from "@/app/Store/thunks";
 import { blogsDeleted } from "@/app/Store/thunks";
 
 const TEXTFIELD = styled(TextField)`
+  .MuiInputBase-root {
+    font-family: unset !important;
+  }
   .MuiInputBase-input {
     padding: 10px;
   }
@@ -27,9 +33,14 @@ const TEXTFIELD = styled(TextField)`
 
 const FORMCONTROLLABEL = styled(FormControlLabel)`
   .css-ahj2mt-MuiTypography-root {
-    font-family: unset;
+    font-family: unset !important;
   }
 `;
+
+const BUTTON = styled(Button)`
+  font-family: unset !important;
+`;
+
 export default function EditHonors({
   editedHonor,
   handleCancelEdit,
@@ -50,6 +61,17 @@ export default function EditHonors({
   const [productTitle, setproductTitle] = useState("");
   const [productSrc, setproductSrc] = useState("");
   const [productLink, setproductLink] = useState("");
+
+  // modal state
+  const [openModal, setOpenModal] = useState(false);
+  const [openModal2, setOpenModal2] = useState(false);
+  const [openModal3, setOpenModal3] = useState(false);
+  const [openModal4, setOpenModal4] = useState(false);
+  // Close modal
+  const closeModal = () => setOpenModal(false);
+  const closeModal2 = () => setOpenModal2(false);
+  const closeModal3 = () => setOpenModal3(false);
+  const closeModal4 = () => setOpenModal4(false);
 
   useEffect(() => {
     if (editedHonor) {
@@ -178,20 +200,41 @@ export default function EditHonors({
 
   const handleDelete = async (e) => {
     e.preventDefault();
+    setOpenModal4(false);
     try {
       const deleteVideo = await dispatch(
         blogsDeleted({ code: editedHonor.code })
       );
       if (deleteVideo.payload.message === "Success") {
-        alert("blogs deleted successfully");
+        setOpenModal2(true);
+        closeModalOnTimeout();
+      } else {
+        setOpenModal3(true);
       }
     } catch (error) {
       console.error("Error deleting honors:", error);
     }
   };
 
+  const areYouShureFunction = (e) => {
+    e.preventDefault();
+    setOpenModal(true);
+  };
+
+  const areYouShureFunction2 = (e) => {
+    e.preventDefault();
+    setOpenModal4(true);
+  };
+
+  function closeModalOnTimeout() {
+    setTimeout(() => {
+      setOpenModal2(false);
+    }, 3000);
+  }
+
   const handleSubmit = async (event) => {
     event.preventDefault();
+    setOpenModal(false);
 
     const formData = {
       title: bannerTitle,
@@ -213,12 +256,14 @@ export default function EditHonors({
       content: formData,
     };
 
-    console.log(finalData);
-
     try {
-      const fetchData = await dispatch(blogsEdit({ content: finalData, code: editedHonor.code })).unwrap();
-      console.log(fetchData);
+      const fetchData = await dispatch(
+        blogsEdit({ content: finalData, code: editedHonor.code })
+      ).unwrap();
+      setOpenModal2(true);
+      closeModalOnTimeout();
     } catch (error) {
+      setOpenModal3(true);
       console.error("Error submitting data:", error);
     }
   };
@@ -226,7 +271,7 @@ export default function EditHonors({
   return (
     <div className="mt-3">
       <h2>ویرایش وبلاگ</h2>
-      <form onSubmit={handleSubmit} className="p-3">
+      <form onSubmit={areYouShureFunction} className="p-3">
         <TEXTFIELD
           fullWidth
           label="Title"
@@ -327,7 +372,6 @@ export default function EditHonors({
         />
 
         <div>
-          <h2>Create Blog Post</h2>
           <Editor
             apiKey="3akk9p7jow7ksa3txzom0c8qr4e59rtg6xy1fzvux8vysqs0" // Replace with your TinyMCE API key
             value={content}
@@ -372,24 +416,47 @@ export default function EditHonors({
           />
         </div>
 
-        <Button
+        <BUTTON
           type="submit"
           variant="contained"
           color="primary"
           className="mt-3"
         >
-          Submit
-        </Button>
-        <button
+          تایید
+        </BUTTON>
+        <BUTTON
           className="bg-danger mt-2 mb-2"
           type="button"
-          onClick={handleDelete}
+          onClick={areYouShureFunction2}
         >
-          Delete blog
-        </button>
-        <Button variant="contained" onClick={handleCancelEdit}>
-          Cancel
-        </Button>
+          حذف وبلاگ
+        </BUTTON>
+        <BUTTON variant="contained" onClick={handleCancelEdit}>
+          انصراف
+        </BUTTON>
+        {/* modal  */}
+        <AreYouShureModal
+          open={openModal}
+          onClose={closeModal}
+          text={"ایا از ویرایش وبلاگ مطمعن هستید"}
+          func={handleSubmit}
+        />
+        <AreYouShureModal
+          open={openModal4}
+          onClose={closeModal4}
+          text={"ایا از حذف وبلاگ مطمعن هستید"}
+          func={handleDelete}
+        />
+        <ConfirmModal
+          open={openModal2}
+          onClose={closeModal2}
+          text={"عملیات با موفقیت انجام شد"}
+        />
+        <ErrorModal
+          open={openModal3}
+          onClose={closeModal3}
+          text={"خطا از لاگین بودن خود اطمینان حاصل فرمایید"}
+        />
       </form>
     </div>
   );

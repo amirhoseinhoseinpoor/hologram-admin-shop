@@ -4,7 +4,7 @@ import { uploadFile } from "@/app/Store/thunks";
 import { productpot } from "@/app/Store/thunks";
 import styled from "styled-components";
 import AreYouShureModal from "@/app/BaseComponent/AreYouSureModal";
-import ConfirmModal from "@/app/BaseComponent/confirmmodal";
+import ConfirmModal from "@/app/BaseComponent/Confirmmodal";
 
 const BorderInputBox = styled.div`
   border: 2px solid #28a745;
@@ -23,9 +23,10 @@ export default function AddHonors() {
   const [media, setMedia] = useState([
     { title: "", description: "", src: "", poster: "" },
   ]);
+
+  // modal state
   const [openModal, setOpenModal] = useState(false);
   const [openModal2, setOpenModal2] = useState(false);
-
   // Close modal
   const closeModal = () => setOpenModal(false);
   const closeModal2 = () => setOpenModal2(false);

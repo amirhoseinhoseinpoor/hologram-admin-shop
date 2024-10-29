@@ -4,7 +4,10 @@ import React, { useState } from "react";
 import { useDispatch } from "react-redux";
 import { uploadFile } from "@/app/Store/thunks";
 import { bannerpot } from "@/app/Store/thunks";
-
+// import modals
+import ConfirmModal from "@/app/BaseComponent/Confirmmodal";
+import ErrorModal from "@/app/BaseComponent/ErrorModal";
+import AreYouShureModal from "@/app/BaseComponent/AreYouSureModal";
 
 
 export default function AddHonors() {
@@ -14,6 +17,15 @@ export default function AddHonors() {
   const [bannerTitle, setBannerTitle] = useState("");
   const [bannerLink, setBannerLink] = useState("");
   const [bannerImage, setBannerImage] = useState(null);
+
+   // modal state
+   const [openModal, setOpenModal] = useState(false);
+   const [openModal2, setOpenModal2] = useState(false);
+   const [openModal3, setOpenModal3] = useState(false);
+   // Close modal
+   const closeModal = () => setOpenModal(false);
+   const closeModal2 = () => setOpenModal2(false);
+   const closeModal3 = () => setOpenModal3(false);
   
 
   const handleTitleChange = (event) => {
@@ -47,10 +59,21 @@ export default function AddHonors() {
     }
   };
 
+  const areYouShureFunction = (e) => {
+    e.preventDefault();
+    setOpenModal(true);
+  };
+
+  function closeModalOnTimeout() {
+    setTimeout(() => {
+      setOpenModal2(false);
+    }, 3000);
+  }
 
   // Form submit logic
   const handleSubmit = async (event) => {
     event.preventDefault();
+    setOpenModal(false);
 
     // Construct the data to be sent to the backend
     const formData = {
@@ -58,13 +81,14 @@ export default function AddHonors() {
       src: bannerImage,
       link: bannerLink,
     };
-
-    console.log(formData);
-
     try {
       const fetchData = await dispatch(bannerpot(formData)).unwrap();
-      console.log(fetchData);
+      if (fetchData) {
+        setOpenModal2(true);
+        closeModalOnTimeout();
+      }
     } catch (error) {
+      setOpenModal3(true);
       console.error("Error submitting data:", error);
     }
   };
@@ -72,23 +96,39 @@ export default function AddHonors() {
 
   return (
     <>
-      <form onSubmit={handleSubmit}>
+      <form onSubmit={areYouShureFunction}>
         <label htmlFor="bannerImage">عکس :</label>
         <input type="file" id="bannerImage" onChange={handleBannerImageUpload} />
-        <label htmlFor="bannerTitle">Title:</label>
+        <label className="mt-2" htmlFor="bannerTitle">عنوان: </label>
         <input
           id="bannerTitle"
           value={bannerTitle}
           onChange={handleTitleChange}
         />
-        <label htmlFor="bannerLink">Link:</label>
+        <label className="mt-2 mb-2" htmlFor="bannerLink"> لینک : ( اگه خالی بزاریم بنر بدون دکمه میشه )</label>
         <input
           id="bannerLink"
           value={bannerLink}
           onChange={handleLinkChange}
         />
-
-        <button type="submit">اضافه کردن بنر</button>
+        <button className="mt-3 bg-success" type="submit">اضافه کردن بنر</button>
+        {/* modals */}
+        <AreYouShureModal
+          open={openModal}
+          onClose={closeModal}
+          text={"ایا از اضافه کردن بلاگ مطمعن هستید"}
+          func={handleSubmit}
+        />
+        <ConfirmModal
+          open={openModal2}
+          onClose={closeModal2}
+          text={"بلاگ با موفقیت اضافه شد"}
+        />
+        <ErrorModal
+          open={openModal3}
+          onClose={closeModal3}
+          text={"خطا از لاگین بودن خود اطمینان حاصل فرمایید"}
+        />
       </form>
     </>
   );

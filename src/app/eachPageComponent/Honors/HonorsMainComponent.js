@@ -13,14 +13,21 @@ import styled from "styled-components";
 
 
 const CARD = styled(Card)`
-  background-color: #5f5f5f !important;
-  color: white !important;
+  background-color: #dfdcdc !important;
+  color: black !important;
+  border: 1px solid #ddd;
+  box-shadow: unset;
   .MuiCardContent-root {
     .titleHonors {
       font-size: 20px;
       font-weight: 500;
     }
   }
+`;
+
+const TYPOGRAPHY = styled(Typography)`
+  font-family: unset !important;
+  font-size: 17px !important;
 `;
 
 export default function HonorsMainComponent() {
@@ -80,16 +87,16 @@ export default function HonorsMainComponent() {
                     component="img"
                     src={`${process.env.NEXT_PUBLIC_BACK_END_SERVER}/system/download/${data.src}`}
                     sx={{
-                      width: "120px",
+                      width: "150px",
                       maxHeight: "100%",
                       borderRadius: "2px",
                     }}
                   />
                   <CardContent className="d-flex flex-column justify-content-around">
-                    <Typography className="titleHonors">
+                    <TYPOGRAPHY className="titleHonors">
                       {data.title}
-                    </Typography>
-                    <Typography className="dateHonors">{formatPersianDate(data.date)}</Typography>
+                    </TYPOGRAPHY>
+                    <TYPOGRAPHY className="dateHonors">{formatPersianDate(data.date)}</TYPOGRAPHY>
                   </CardContent>
                 </CARD>
               </React.Fragment>
@@ -108,7 +115,7 @@ export default function HonorsMainComponent() {
               <h2 className="m-0"> افزودن افتخارات</h2>
             </div>
             <div>
-              <button onClick={() => setActiveKey("editUserPage")}>
+              <button className="bg-success" onClick={() => setActiveKey("editUserPage")}>
                 ویرایش افتخارات
               </button>
             </div>
