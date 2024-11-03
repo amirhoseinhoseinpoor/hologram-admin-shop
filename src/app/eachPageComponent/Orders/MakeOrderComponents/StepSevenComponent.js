@@ -27,7 +27,7 @@ export default function StepSevenComponent() {
 
   return (
     <section className={style.stepContent}>
-      <div className={style.InnerDiv}>
+      {/* <div className={style.InnerDiv}>
         <div className="d-flex flex-column">
           <div className="text-center">
             <svg
@@ -129,12 +129,15 @@ export default function StepSevenComponent() {
             </div>
             <div className="mt-4">
               <p className="discription">شما میتوانید سفارش خود را در صفحه پیگیری سفارش مشاهده کنید و پس از آماده شدن و تحویل به پست نهایت تا 48 ساعت بعد کد رهگیری براتون پیامک میشود.</p>
-            </div>
+            </div> */}
             {/* <div className="d-flex justify-content-center">
               <button onClick={() => handelNavigate('seeOrder')} type="button" className={style.buttonNavigatePeigiri}>انتقال به صفحه پیگیری سفارش (12)</button>
             </div> */}
-          </div>
+          {/* </div>
         </div>
+      </div> */}
+      <div>
+        <p>اتمام سفارش</p>
       </div>
     </section>
   );

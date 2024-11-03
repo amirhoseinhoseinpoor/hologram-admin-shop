@@ -4,6 +4,9 @@ import MakeOrder from "./MakeOrderComponents/MakeOrder";
 import { useDispatch } from "react-redux";
 import { listorders, whosOrder, updateOrderStatus } from "@/app/Store/thunks";
 import { Select, MenuItem, FormControl, InputLabel } from "@mui/material";
+import ConfirmingModal from "@/app/BaseComponent/ConfirmingModal";
+import ErrorModal from "@/app/BaseComponent/ErrorModal";
+
 
 export default function OrderMainComponent() {
   const dispatch = useDispatch();
@@ -13,6 +16,12 @@ export default function OrderMainComponent() {
   const [orders, setOrders] = useState(null);
   const [usersData, setUsersData] = useState({}); // To store user data
   const [selectedStatus, setSelectedStatus] = useState({});
+    // modal state
+    const [openModal2, setOpenModal2] = useState(false);
+    const [openModal3, setOpenModal3] = useState(false);
+    // Close modal
+    const closeModal2 = () => setOpenModal2(false);
+    const closeModal3 = () => setOpenModal3(false);
 
   const formatPersianDate = (isoDate) => {
     const date = new Date(isoDate);
@@ -58,14 +67,23 @@ export default function OrderMainComponent() {
     fetchData();
   }, [dispatch]);
 
+
+  function closeModalOnTimeout() {
+    setTimeout(() => {
+      setOpenModal2(false);
+    }, 3000);
+  }
+
   // Handle status change
   const handleStatusChange = async (orderCode, newStatus) => {
     try {
-      await dispatch(updateOrderStatus({ code: orderCode, status: newStatus })).unwrap();
-      console.log("Status updated successfully!");
-      alert("وضعیت سفارش با موفقیت تغییر یافت");
-
+      await dispatch(
+        updateOrderStatus({ code: orderCode, status: newStatus })
+      ).unwrap();
+      setOpenModal2(true);
+      closeModalOnTimeout();
     } catch (error) {
+      setOpenModal3(true)
       console.error("Error updating status:", error);
     }
   };
@@ -115,7 +133,7 @@ export default function OrderMainComponent() {
                       size="small"
                       sx={{ minWidth: 100 }}
                     >
-                      <InputLabel>Status</InputLabel>
+                      <InputLabel sx={{ fontFamily: "unset" }}>وضعیت</InputLabel>
                       <Select
                         sx={{
                           fontFamily: "unset",
@@ -158,6 +176,17 @@ export default function OrderMainComponent() {
         </>
       )}
       {activekey === "seeOrder" && <MakeOrder seeOrder={seeOrder} />}
+       {/* modals */}
+        <ConfirmingModal
+          open={openModal2}
+          onClose={closeModal2}
+          text={"وضعیت با موفقیت تغییر یافت"}
+        />
+        <ErrorModal
+          open={openModal3}
+          onClose={closeModal3}
+          text={"خطا در تغییر وضعیت "}
+        />
     </section>
   );
 }
