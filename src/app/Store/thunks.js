@@ -927,6 +927,37 @@ export const blogsDeleted = createAsyncThunk(
 
 // start order
 
+
+export const sendNewMessage = createAsyncThunk(
+  "order/sendNewMessage",
+  async ({ code, newMessageSend }, thunkAPI) => {
+    const state = thunkAPI.getState();
+    const token = state.auth.token;
+
+    try {
+      const response = await axios.patch(
+        `${process.env.NEXT_PUBLIC_BACK_END_SERVER}/order/chat/${code}`,
+        {
+          chat : newMessageSend},
+        {
+          headers: {
+            Authorization: token ? `Bearer ${token}` : "",
+          },
+        }
+      );
+      return response.data;
+    } catch (error) {
+      if (error.response && error.response.status === 400) {
+        return thunkAPI.rejectWithValue("ارور سمت من");
+      } else {
+        return thunkAPI.rejectWithValue(
+          "مشکلی به وجود امده لطفا بعدا تلاش کنید"
+        );
+      }
+    }
+  }
+);
+
 export const listorders = createAsyncThunk(
   "order/list",
   async (_, thunkAPI) => {

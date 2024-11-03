@@ -132,7 +132,7 @@ const modalStyle = {
   borderRadius: 2,
 };
 
-export default function ConfirmModal({ open, onClose, text }) {
+export default function ConfirmingModal({ open, onClose, text }) {
   return (
     <section>
       <Modal

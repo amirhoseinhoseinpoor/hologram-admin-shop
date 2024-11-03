@@ -5,7 +5,7 @@ import { useDispatch } from "react-redux";
 import { uploadFile } from "@/app/Store/thunks";
 import { bannerpot } from "@/app/Store/thunks";
 // import modals
-import ConfirmModal from "@/app/BaseComponent/Confirmmodal";
+import ConfirmModal from "@/app/BaseComponent/ConfirmingModal";
 import ErrorModal from "@/app/BaseComponent/ErrorModal";
 import AreYouShureModal from "@/app/BaseComponent/AreYouSureModal";
 

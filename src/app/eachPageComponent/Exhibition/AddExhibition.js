@@ -7,7 +7,7 @@ import { uploadFile } from "../../Store/thunks.js";
 import { exhibitionpot } from "../../Store/thunks.js";
 // imports modals
 import ErrorModal from "@/app/BaseComponent/ErrorModal.js";
-import ConfirmModal from "@/app/BaseComponent/Confirmmodal.js";
+import ConfirmModal from "@/app/BaseComponent/ConfirmingModal.js";
 import AreYouShureModal from "@/app/BaseComponent/AreYouSureModal.js";
 
 

@@ -5,7 +5,7 @@ import { videopot } from "@/app/Store/thunks";
 import { uploadFile } from "@/app/Store/thunks";
 // import modals
 import AreYouShureModal from "@/app/BaseComponent/AreYouSureModal";
-import ConfirmModal from "@/app/BaseComponent/Confirmmodal";
+import ConfirmModal from "@/app/BaseComponent/ConfirmingModal";
 import ErrorModal from "@/app/BaseComponent/ErrorModal";
 
 import styled from "styled-components";

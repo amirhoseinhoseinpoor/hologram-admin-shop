@@ -9,7 +9,7 @@ import {
 } from "@mui/material";
 import styled from "styled-components";
 import { Editor } from "@tinymce/tinymce-react";
-import ConfirmModal from "@/app/BaseComponent/Confirmmodal";
+import ConfirmModal from "@/app/BaseComponent/ConfirmingModal";
 import ErrorModal from "@/app/BaseComponent/ErrorModal";
 import AreYouShureModal from "@/app/BaseComponent/AreYouSureModal";
 

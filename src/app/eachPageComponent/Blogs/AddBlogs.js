@@ -3,7 +3,7 @@ import { Editor } from "@tinymce/tinymce-react";
 import { Checkbox, FormControlLabel, TextField, Button } from "@mui/material";
 import styled from "styled-components";
 import AreYouShureModal from "@/app/BaseComponent/AreYouSureModal";
-import ConfirmModal from "@/app/BaseComponent/Confirmmodal";
+import ConfirmModal from "@/app/BaseComponent/ConfirmingModal";
 import ErrorModal from "@/app/BaseComponent/ErrorModal";
 
 const TEXTFIELD = styled(TextField)`

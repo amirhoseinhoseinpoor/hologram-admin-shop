@@ -6,7 +6,7 @@ import { uploadFile } from "@/app/Store/thunks";
 import { videoEdit } from "@/app/Store/thunks";
 import { HomePageVideoDeleted } from "@/app/Store/thunks";
 // import modals
-import ConfirmModal from "@/app/BaseComponent/Confirmmodal";
+import ConfirmModal from "@/app/BaseComponent/ConfirmingModal";
 import ErrorModal from "@/app/BaseComponent/ErrorModal";
 import AreYouShureModal from "@/app/BaseComponent/AreYouSureModal";
 

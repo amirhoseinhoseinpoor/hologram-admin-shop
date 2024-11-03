@@ -4,7 +4,7 @@ import { uploadFile } from "@/app/Store/thunks";
 import { productpot } from "@/app/Store/thunks";
 import styled from "styled-components";
 import AreYouShureModal from "@/app/BaseComponent/AreYouSureModal";
-import ConfirmModal from "@/app/BaseComponent/Confirmmodal";
+import ConfirmModal from "@/app/BaseComponent/ConfirmingModal";
 
 const BorderInputBox = styled.div`
   border: 2px solid #28a745;

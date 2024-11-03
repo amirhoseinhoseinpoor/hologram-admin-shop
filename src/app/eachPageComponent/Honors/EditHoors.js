@@ -7,7 +7,7 @@ import { honorsDeleted, uploadFile, honorsEdit } from "@/app/Store/thunks";
 // import modals
 import ErrorModal from "@/app/BaseComponent/ErrorModal";
 import AreYouShureModal from "@/app/BaseComponent/AreYouSureModal";
-import ConfirmModal from "@/app/BaseComponent/Confirmmodal";
+import ConfirmModal from "@/app/BaseComponent/ConfirmingModal";
 
 const TEXTFIELD = styled(TextField)`
   .MuiInputBase-input {

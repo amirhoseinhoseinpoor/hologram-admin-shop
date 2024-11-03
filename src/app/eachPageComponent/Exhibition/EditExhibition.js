@@ -12,7 +12,7 @@ import {
 // import modals
 import AreYouShureModal from "@/app/BaseComponent/AreYouSureModal";
 import ErrorModal from "@/app/BaseComponent/ErrorModal";
-import ConfirmModal from "@/app/BaseComponent/Confirmmodal";
+import ConfirmModal from "@/app/BaseComponent/ConfirmingModal";
 
 const TEXTFIELD = styled(TextField)`
  .MuiInputBase-root {

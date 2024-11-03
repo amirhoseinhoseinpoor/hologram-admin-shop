@@ -5,7 +5,7 @@ import styled from "styled-components";
 import { useDispatch } from "react-redux";
 import { bannerEdit, bannerDeleted, uploadFile } from "@/app/Store/thunks";
 // import modals
-import ConfirmModal from "@/app/BaseComponent/Confirmmodal";
+import ConfirmModal from "@/app/BaseComponent/ConfirmingModal";
 import ErrorModal from "@/app/BaseComponent/ErrorModal";
 import AreYouShureModal from "@/app/BaseComponent/AreYouSureModal";
 

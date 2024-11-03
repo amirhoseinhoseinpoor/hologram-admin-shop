@@ -3,9 +3,7 @@
 import dynamic from "next/dynamic";
 import React, { useEffect, useState } from "react";
 import style from "../../../Styles/MakeOrderStyle/MakeOrder.module.scss";
-// import ProcessTracker from "../ProcessTracker";
-
-
+import ProcessTracker from "../ProcessTracker";
 import PusherChat from "./Talkjs";
 
 const SteponeComponent = dynamic(() => import("./StepOneComponent"));
@@ -26,7 +24,6 @@ const StepSixComponent = dynamic(() => import("./StepSixComponent"), {
 const StepSeven = dynamic(() => import("./StepSevenComponent"));
 
 export default function MakeOrder({seeOrder}) {
-  console.log(seeOrder);
   
   const [step, setStep] = useState(1);
 
@@ -77,6 +74,8 @@ export default function MakeOrder({seeOrder}) {
       case 3:
         return (
           <PusherChat
+            chatData={seeOrder.chat}
+            code={seeOrder.code}
             handleNextStep={handleNextStep}
             handlePreviousStep={handlePreviousStep}
           />
@@ -107,7 +106,7 @@ export default function MakeOrder({seeOrder}) {
   };
   return (
     <section>
-      {/* <ProcessTracker currentStep={step} /> */}
+      <ProcessTracker currentStep={step} />
       {renderStepContent()}
     </section>
   );

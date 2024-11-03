@@ -6,8 +6,8 @@ import { uploadFile } from "@/app/Store/thunks";
 import { honorspot } from "@/app/Store/thunks";
 // import modals
 import AreYouShureModal from "@/app/BaseComponent/AreYouSureModal";
-import ConfirmModal from "@/app/BaseComponent/Confirmmodal";
 import ErrorModal from "@/app/BaseComponent/ErrorModal";
+import ConfirmModal from "@/app/BaseComponent/ConfirmingModal";
 
 export default function AddHonors() {
   const dispatch = useDispatch();

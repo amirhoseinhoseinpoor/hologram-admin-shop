@@ -3,17 +3,43 @@
 .adminMessage {
   display: flex;
   flex-direction: column;
-  align-items: end;
+  align-items: start;
 }
 
 .userMessage {
   display: flex;
   flex-direction: column;
-  align-items: start;
+  align-items: end;
 }
 
 .mainChatBox {
   border-radius: 5px;
+}
+
+.confirmImage{
+  background-color: #F7F8FC;
+  border: 1px solid #DDE0E4;
+  padding: 17px;
+  border-radius: 5px;
+  margin: 0 13px;
+}
+
+
+
+.confirmFirstButton{
+  background-color: #5695F6;
+  color: white;
+  border-radius: 4px;
+  border: none;
+  padding: 6px 9px;
+}
+.confirmSecondButton{
+  background-color: white;
+  color: #5695F6;
+  border: none;
+  border-radius: 4px;
+  padding: 5px 9px;
+  border: 1.5px solid #5695F6;
 }
 
 .headerChatBox {
@@ -28,7 +54,8 @@
 .allTextStyle {
   background-color: #e7ecf0;
   border-radius: 4px;
-  padding: 7px;
+  padding: 5px;
+  margin-top: 10px;
   width: fit-content;
   color: var.$social-media-color;
   display: flex;
@@ -58,6 +85,28 @@
   border-radius: 4px;
 }
 
+.selectedImageForSend{
+  width: 20%;
+  resize: none;
+  border-radius: 4px;
+  height: 100%;
+}
+
+.cancelSendingImage{
+  padding: 3px 7px;
+  color: #5695F6 !important;
+  border: 1.5px solid #5695F6 !important;
+  border-radius: 4px;
+  // position: absolute;
+  // transform: translate(50%, -50%);
+  // left: 0%;
+  // top: 70%;
+}
+
+.mainDivSelectedImage{
+  background-color: #E7ECF0;
+}
+
 .inputChatBoxStyle {
   width: 100%;
   resize: none;
@@ -67,20 +116,32 @@
 .LabelFileUpload {
   position: absolute;
   left: 0%;
-  top: 20%;
+  top: 46%;
   transform: translate(50%, -50%);
   cursor: pointer;
 }
 .sendMessageChatBox {
-  border-radius: 4px !important;
-  border: none !important;
-  background-color: var.$arrow-background !important;
-  color: white !important;
-  padding: 2px 5px !important;
-  position: absolute !important;
-  transform: translate(50%, -50%) !important;
-  left: -1% !important;
-  top: 55% !important;
+  border-radius: 4px;
+  border: none;
+  background-color: #5695F6;
+  color: white;
+  padding: 4px 7px;
+  // position: absolute;
+  // transform: translate(50%, -50%);
+  // left: -1%;
+  // top: 47%;
+}
+
+.sendMessageChatBox2 {
+  border-radius: 4px;
+  border: none;
+  background-color: #5695F6;
+  color: white;
+  padding: 4px 7px;
+  position: absolute;
+  transform: translate(50%, -50%);
+  left: -1%;
+  top: 47%;
 }
 
 .inputChatBoxStyle:focus-visible {
@@ -88,11 +149,11 @@
 }
 
 .SeeLastStepButton{
-  border: none;
-  color: white;
-  background-color: #868686;
+  border: 1.5px solid #5695F6 !important;
+  color: #5695F6 !important;
+  background-color: transparent !important;
   border-radius: 4px;
-  padding: 2px 6px;
+  padding: 2px 8px;
 }
 
 .continueButton {
@@ -115,6 +176,7 @@
   background-color: white;
   height: 100%;
   border-radius: 5px;
+  padding-bottom: 17px;
 }
 
 /* Customize scrollbar for WebKit browsers */

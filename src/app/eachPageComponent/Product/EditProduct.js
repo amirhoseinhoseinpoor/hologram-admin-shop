@@ -6,7 +6,7 @@ import { deleted } from "@/app/Store/thunks";
 import { uploadFile, productEdit } from "@/app/Store/thunks";
 import { Box } from "@mui/material";
 import AreYouShureModal from "@/app/BaseComponent/AreYouSureModal";
-import ConfirmModal from "@/app/BaseComponent/Confirmmodal";
+import ConfirmModal from "@/app/BaseComponent/ConfirmingModal";
 import ErrorModal from "@/app/BaseComponent/ErrorModal";
 
 const BorderInputBox = styled.div`
