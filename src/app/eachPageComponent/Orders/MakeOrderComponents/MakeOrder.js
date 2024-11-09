@@ -29,6 +29,8 @@ export default function MakeOrder({seeOrder}) {
 
   useEffect(() => {
     setStep(seeOrder.step)
+    console.log(seeOrder);
+    
   }, [seeOrder]);
 
   const [disabelInput, setDisabelInput] = useState(false);
@@ -52,6 +54,8 @@ export default function MakeOrder({seeOrder}) {
         return (
           <div className={style.stepContent}>
             <SteponeComponent
+              reqComment={seeOrder.reqComment}
+              step={seeOrder.step}
               data={seeOrder.request}
               code={seeOrder.code}
               setStep={setStep}
@@ -64,7 +68,10 @@ export default function MakeOrder({seeOrder}) {
       case 2:
         return (
           <StepTwoComponent
+            step={seeOrder.step}
+            code={seeOrder.code}
             dataDocument={seeOrder.document}
+            setStep={setStep}
             handleNextStep={handleNextStep}
             handlePreviousStep={handlePreviousStep}
             setDisabelInputStep2={setDisabelInputStep2}

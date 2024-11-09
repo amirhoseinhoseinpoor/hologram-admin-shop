@@ -1,17 +1,23 @@
 import React, { useState, useEffect } from "react";
-
 import style from "../../../Styles/MakeOrderStyle/StepOneStyle.module.scss";
 import { Box } from "@mui/system";
-
+import ErrorModal from "@/app/BaseComponent/ErrorModal";
 // import redux
-import { useSelector, useDispatch } from "react-redux";
-import { uploadFile, requestAdminCommnet , increaseStep } from "@/app/Store/thunks";
+import { useDispatch } from "react-redux";
+import {
+  uploadFile,
+  requestAdminCommnet,
+  increaseStep,
+  fetchPrivateImage,
+} from "@/app/Store/thunks";
 
 export default function SteponeComponent({
   data,
   code,
+  step,
   setStep,
   handleNextStep,
+  reqComment,
   setDisabelInput,
   disabelInput,
 }) {
@@ -19,11 +25,14 @@ export default function SteponeComponent({
   const [selectedSize, setSelectedSize] = useState("");
   const [selectedShape, setSelectedShape] = useState("");
   const [serialtype, setSerialtype] = useState(false);
+
   // const [inputFields, setInputFields] = useState([{ title: "", price: "" }]);
   const [disablenextStep, setDisableNextStep] = useState(true);
   const [statusTraking, setStatusTraking] = useState(false);
+  const [moveForward, setMoveForward] = useState(false);
 
   const [logo, setLogo] = useState(null);
+
   const [formData, setFormData] = useState({
     feature: "",
     color: "",
@@ -36,7 +45,31 @@ export default function SteponeComponent({
     useCase: "",
     serial: "",
     information: "",
+    prodName: "",
+    prodCode: "",
   });
+
+  useEffect(() => {
+    if (step > 1) {
+      setMoveForward(true);
+    }
+  }, [step]);
+
+  useEffect(() => {
+    const gettingImageFactor = async () => {
+      const returnFactor = await dispatch(
+        fetchPrivateImage({ filename: reqComment.paymentImage })
+      ).unwrap();
+      setLogo({ imageUrl: returnFactor || null });
+      console.log(returnFactor);
+    };
+    gettingImageFactor();
+  }, [reqComment, dispatch]);
+
+  // modal state
+  const [openModal3, setOpenModal3] = useState(false);
+  // Close modal
+  const closeModal3 = () => setOpenModal3(false);
 
   const [information, setInformation] = useState({
     docInfo: "",
@@ -56,6 +89,15 @@ export default function SteponeComponent({
       setStatusTraking(true);
     }
   }, [data]);
+
+  useEffect(() => {
+    if (reqComment) {
+      setInformation({
+        ...information,
+        docInfo: reqComment.docInfo || "",
+      });
+    }
+  }, [reqComment]);
 
   const handleDisabelInput = () => {
     // setDisabelInput(true);
@@ -122,7 +164,6 @@ export default function SteponeComponent({
 
   const handleSubmit = async () => {
     const updatedData = { request: { ...formData } };
-    console.log(updatedData);
 
     try {
       const uploadFactor = await dispatch(
@@ -130,11 +171,9 @@ export default function SteponeComponent({
           file: information.paymentImage,
           tag: "factor",
           type: 1,
-          isPublic: true,
+          isPublic: false,
         })
       ).unwrap();
-
-      console.log("Upload factor:", uploadFactor);
 
       // Directly use the uploadFactor for the next API call, instead of waiting for the state to update
       const updatedInformation = {
@@ -148,22 +187,21 @@ export default function SteponeComponent({
       );
 
       if (uploadDocumentUser.payload.message == "Success") {
-        const increaseStepOrder = await dispatch(increaseStep({code , step : 2}));
+        const increaseStepOrder = await dispatch(
+          increaseStep({ code, step: 2 })
+        );
 
-        console.log(increaseStepOrder);
 
         if (increaseStepOrder.payload.message == "Success") {
           setStep(2);
         }
-        
       }
-
-      
 
       // Optionally, you can update the state if needed later
       setInformation(updatedInformation);
     } catch (error) {
       console.error("Error uploading file:", error);
+      setOpenModal3(true);
     }
   };
 
@@ -682,6 +720,7 @@ export default function SteponeComponent({
           <textarea
             className={`${style.formInputNumber} ${style.textAreaDocument} form-control discription`}
             cols="40"
+            value={information.docInfo}
             rows="2"
             id="docInfo"
             name="docInfo"
@@ -689,13 +728,32 @@ export default function SteponeComponent({
           ></textarea>
         </div>
       </div>
+      <div className="d-flex flex-row gap-3 align-items-center">
+        <button
+          type="button"
+          onClick={handleDisabelInput}
+          // disabled={disablenextStep}
+          className={`${style.continueButton} mt-3 mb-2`}
+        >
+          تایید
+        </button>
+        {moveForward && (
+          <button
+            type="button"
+            onClick={handleNextStep}
+            className={`${style.continueButton} mt-3 mb-2`}
+          >
+            رد کردن
+          </button>
+        )}
+      </div>
 
-      <button
-        onClick={handleDisabelInput}
-        className={`${style.continueButton} mt-3 mb-2`}
-      >
-        رد کردن مرحله
-      </button>
+      {/* modals */}
+      <ErrorModal
+        open={openModal3}
+        onClose={closeModal3}
+        text={"مشکلی به وجود آمده است، لطفا بعدا تلاش کنید."}
+      />
     </>
   );
 }
