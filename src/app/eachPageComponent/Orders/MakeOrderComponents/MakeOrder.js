@@ -23,15 +23,14 @@ const StepSixComponent = dynamic(() => import("./StepSixComponent"), {
 
 const StepSeven = dynamic(() => import("./StepSevenComponent"));
 
-export default function MakeOrder({seeOrder}) {
+export default function MakeOrder({seeOrder , setActiveKey}) {
   
   const [step, setStep] = useState(1);
 
   useEffect(() => {
-    setStep(seeOrder.step)
-    console.log(seeOrder);
-    
+    setStep(seeOrder.step)    
   }, [seeOrder]);
+  console.log(seeOrder);
 
   const [disabelInput, setDisabelInput] = useState(false);
   const [disabelInputStep2, setDisabelInputStep2] = useState(false);
@@ -113,6 +112,9 @@ export default function MakeOrder({seeOrder}) {
   };
   return (
     <section>
+      <div className={`${style.makeorderHeader} mb-4 d-flex justify-content-end`}> 
+        <p onClick={() => setActiveKey("seeTable")} className={`discription ${style.seeOrderButtonStyle}`}>بازگشت به سفارشات</p>
+      </div>
       <ProcessTracker currentStep={step} />
       {renderStepContent()}
     </section>

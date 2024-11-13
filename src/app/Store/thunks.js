@@ -141,9 +141,7 @@ export const fetchPrivateImage = createAsyncThunk(
     const token = state.auth.token;
 
     try {
-      console.log(filename);
-      
-      
+
       const response = await axios.post(
         `${process.env.NEXT_PUBLIC_BACK_END_SERVER}/system/download/${filename}`,
         {}, // No body is needed for this request
@@ -156,9 +154,6 @@ export const fetchPrivateImage = createAsyncThunk(
       );
 
       const imageObjectURL = URL.createObjectURL(response.data);
-
-      console.log(imageObjectURL);
-      
 
       return imageObjectURL;
     } catch (error) {

@@ -97,7 +97,7 @@ const AdminPanel = () => {
           <Tab eventKey="setting" title="تنظیمات"></Tab>
         </Tabs>
       </aside>
-      <div className={style.content}>
+      <div className={`${style.content}`}>
         {activeTab === "Doshbord" && (
           <div className={style.tabContent}>Tab content for Settings</div>
         )}

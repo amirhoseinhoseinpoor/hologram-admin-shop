@@ -206,7 +206,12 @@
   color: white;
   background-color: #5695f6;
   border-radius: 4px;
-  padding: 7px 29px;
+  padding: 7px 29px !important;
+}
+
+
+.SecondSectionStyle{
+  width: 60%;
 }
 
 .FactorStyle{

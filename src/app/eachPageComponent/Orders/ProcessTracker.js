@@ -14,7 +14,7 @@ const ProcessTracker = ({ currentStep }) => {
   ];
   return (
     <>
-      <div className={`${style.processTracker}`}>
+      <div className={`${style.processTracker} container`}>
         {steps.map((step, index) => (
           <div
             key={step.id}
