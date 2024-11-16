@@ -38,8 +38,6 @@ export default function StepTwoComponent({
   setStep,
   code,
 }) {
-  console.log(dataDocument);
-
   const hasData = Object.keys(dataDocument).length > 0;
 
   const dispatch = useDispatch();

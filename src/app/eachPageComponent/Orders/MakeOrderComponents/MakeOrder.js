@@ -80,8 +80,10 @@ export default function MakeOrder({seeOrder , setActiveKey}) {
       case 3:
         return (
           <PusherChat
+            data={seeOrder.request}
             chatData={seeOrder.chat}
             code={seeOrder.code}
+            step={seeOrder.step}
             handleNextStep={handleNextStep}
             handlePreviousStep={handlePreviousStep}
           />
