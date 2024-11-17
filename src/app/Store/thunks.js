@@ -27,6 +27,72 @@ export const login = createAsyncThunk(
     }
   }
 );
+// user managment
+export const addUser = createAsyncThunk(
+  "userManagment/addUser",
+  async (credentials, thunkAPI) => {
+    const { firstName , lastName, username, password, gender, domain ,roleIdsC} = credentials;
+    try {
+      const response = await axios.post(
+        `${process.env.NEXT_PUBLIC_BACK_END_SERVER}/auth/register`,
+        {
+          firstName,
+          lastName,
+          username,
+          gender,
+          password,
+          domain,
+          roleIds: [
+            parseInt(roleIdsC)
+          ]
+
+        }
+      );
+      const token = response.data.token;
+
+      return token;
+    } catch (error) {
+      if (error.response && error.response.status === 400) {
+        return thunkAPI.rejectWithValue("شماره همراه یا پسورد اشتباه است");
+      } else {
+        return thunkAPI.rejectWithValue(
+          "مشکلی به وجود امده لطفا بعدا تلاش کنید"
+        );
+      }
+    }
+  }
+);
+
+export const getuser = createAsyncThunk(
+  "userManagment/getuser",
+  async (_, thunkAPI) => {
+    const state = thunkAPI.getState();
+    const token = state.auth.token;
+    
+    try {
+      const response = await axios.post(
+        `${process.env.NEXT_PUBLIC_BACK_END_SERVER}/users`,
+        {},
+        {
+          headers: {
+            Authorization: token ? `Bearer ${token}` : "",
+            "Content-Type": "multipart/form-data",
+          },
+        }
+      );
+      const data = response.data;
+      return data;
+    } catch (error) {
+      if (error.response && error.response.status === 400) {
+        return thunkAPI.rejectWithValue("error");
+      } else {
+        return thunkAPI.rejectWithValue(
+          "مشکلی به وجود امده لطفا بعدا تلاش کنید"
+        );
+      }
+    }
+  }
+);
 
 // Product
 
@@ -36,9 +102,7 @@ export const uploadFile = createAsyncThunk(
     const state = thunkAPI.getState();
     const token = state.auth.token;
 
-    try {
-      console.log(token);
-      
+    try {     
       // Create a FormData object
       const formData = new FormData();
       formData.append("files", file);
@@ -57,14 +121,9 @@ export const uploadFile = createAsyncThunk(
         }
       );
 
-      if (response.data[0].fileName) {
-        alert("افزودن عکس با موفقیت انجام شد");
-      }
-
       return response.data[0].fileName;
     } catch (error) {
       if (error.response && error.response.status === 400) {
-        alert("خطا در افزودن media");
         return thunkAPI.rejectWithValue("ارور سمت من");
       } else {
         return thunkAPI.rejectWithValue(
@@ -82,6 +141,7 @@ export const fetchPrivateImage = createAsyncThunk(
     const token = state.auth.token;
 
     try {
+
       const response = await axios.post(
         `${process.env.NEXT_PUBLIC_BACK_END_SERVER}/system/download/${filename}`,
         {}, // No body is needed for this request
@@ -125,11 +185,6 @@ export const productpot = createAsyncThunk(
         }
       );
       const data = response.data;
-
-      if (data) {
-        alert("افزودن محصول با موفقیت انجام شد");
-      }
-
       return data;
     } catch (error) {
       if (error.response && error.response.status === 400) {
@@ -160,12 +215,6 @@ export const productEdit = createAsyncThunk(
         }
       );
       const data = response.data;
-
-      if (data) {
-        alert("اپدیت محصول با موفقیت انجام شد");
-        console.log(data);
-      }
-
       return data;
     } catch (error) {
       if (error.response && error.response.status === 400) {
@@ -297,11 +346,6 @@ export const videopot = createAsyncThunk(
         }
       );
       const data = response.data;
-
-      if (data) {
-        alert("افزودن مدیا با موفقیت انجام شد");
-      }
-
       return data;
     } catch (error) {
       if (error.response && error.response.status === 400) {
@@ -321,8 +365,6 @@ export const videoEdit = createAsyncThunk(
     const state = thunkAPI.getState();
     const token = state.auth.token;
     try {
-      console.log(media);
-
       const response = await axios.patch(
         `${process.env.NEXT_PUBLIC_BACK_END_SERVER}/video/${code}`,
         media,
@@ -334,12 +376,6 @@ export const videoEdit = createAsyncThunk(
         }
       );
       const data = response.data;
-
-      if (data) {
-        alert("اپدیت ویدیو با موفقیت انجام شد");
-        console.log(data);
-      }
-
       return data;
     } catch (error) {
       if (error.response && error.response.status === 400) {
@@ -424,11 +460,6 @@ export const honorspot = createAsyncThunk(
         }
       );
       const data = response.data;
-
-      if (data) {
-        alert("افزودن افتخار با موفقیت انجام شد");
-      }
-
       return data;
     } catch (error) {
       if (error.response && error.response.status === 400) {
@@ -448,8 +479,6 @@ export const honorsEdit = createAsyncThunk(
     const state = thunkAPI.getState();
     const token = state.auth.token;
     try {
-      console.log(honor);
-
       const response = await axios.patch(
         `${process.env.NEXT_PUBLIC_BACK_END_SERVER}/honors/${code}`,
         honor,
@@ -461,12 +490,6 @@ export const honorsEdit = createAsyncThunk(
         }
       );
       const data = response.data;
-
-      if (data) {
-        alert("اپدیت ویدیو با موفقیت انجام شد");
-        console.log(data);
-      }
-
       return data;
     } catch (error) {
       if (error.response && error.response.status === 400) {
@@ -497,8 +520,6 @@ export const honorsDeleted = createAsyncThunk(
         }
       );
       const data = response.data;
-      console.log(data);
-
       return data;
     } catch (error) {
       if (error.response && error.response.status === 400) {
@@ -551,11 +572,6 @@ export const exhibitionpot = createAsyncThunk(
         }
       );
       const data = response.data;
-
-      if (data) {
-        alert("افزودن نمایشگاه با موفقیت انجام شد");
-      }
-
       return data;
     } catch (error) {
       if (error.response && error.response.status === 400) {
@@ -586,11 +602,6 @@ export const exhibitionEdit = createAsyncThunk(
         }
       );
       const data = response.data;
-
-      if (data) {
-        alert("اپدیت نمایشگاه با موفقیت انجام شد");
-      }
-
       return data;
     } catch (error) {
       if (error.response && error.response.status === 400) {
@@ -621,7 +632,6 @@ export const exhibitionDeleted = createAsyncThunk(
         }
       );
       const data = response.data;
-      console.log(data);
 
       return data;
     } catch (error) {
@@ -675,11 +685,6 @@ export const bannerpot = createAsyncThunk(
         }
       );
       const data = response.data;
-
-      if (data) {
-        alert("افزودن بنر با موفقیت انجام شد");
-      }
-
       return data;
     } catch (error) {
       if (error.response && error.response.status === 400) {
@@ -710,11 +715,6 @@ export const bannerEdit = createAsyncThunk(
         }
       );
       const data = response.data;
-
-      if (data) {
-        alert("اپدیت بنر با موفقیت انجام شد");
-      }
-
       return data;
     } catch (error) {
       if (error.response && error.response.status === 400) {
@@ -799,11 +799,6 @@ export const headerEdit = createAsyncThunk(
         }
       );
       const data = response.data;
-
-      if (data) {
-        alert("اپدیت هدر با موفقیت انجام شد");
-      }
-
       return data;
     } catch (error) {
       if (error.response && error.response.status === 400) {
@@ -856,11 +851,6 @@ export const blogspot = createAsyncThunk(
         }
       );
       const data = response.data;
-
-      if (data) {
-        alert("افزودن وبلاگ با موفقیت انجام شد");
-      }
-
       return data;
     } catch (error) {
       if (error.response && error.response.status === 400) {
@@ -892,10 +882,6 @@ export const blogsEdit = createAsyncThunk(
       );
       const data = response.data;
 
-      if (data) {
-        alert("اپدیت وبلاگ با موفقیت انجام شد");
-      }
-
       return data;
     } catch (error) {
       if (error.response && error.response.status === 400) {
@@ -926,8 +912,6 @@ export const blogsDeleted = createAsyncThunk(
         }
       );
       const data = response.data;
-      console.log(data);
-
       return data;
     } catch (error) {
       if (error.response && error.response.status === 400) {
@@ -943,6 +927,37 @@ export const blogsDeleted = createAsyncThunk(
 // end blog 
 
 // start order
+
+
+export const sendNewMessage = createAsyncThunk(
+  "order/sendNewMessage",
+  async ({ code, newMessageSend }, thunkAPI) => {
+    const state = thunkAPI.getState();
+    const token = state.auth.token;
+
+    try {
+      const response = await axios.patch(
+        `${process.env.NEXT_PUBLIC_BACK_END_SERVER}/order/chat/${code}`,
+        {
+          chat : newMessageSend},
+        {
+          headers: {
+            Authorization: token ? `Bearer ${token}` : "",
+          },
+        }
+      );
+      return response.data;
+    } catch (error) {
+      if (error.response && error.response.status === 400) {
+        return thunkAPI.rejectWithValue("ارور سمت من");
+      } else {
+        return thunkAPI.rejectWithValue(
+          "مشکلی به وجود امده لطفا بعدا تلاش کنید"
+        );
+      }
+    }
+  }
+);
 
 export const listorders = createAsyncThunk(
   "order/list",
@@ -1204,16 +1219,3 @@ export const logout = createAsyncThunk("auth/logout", async () => {
   }
 });
 
-export const Adduser = createAsyncThunk(
-  "users/Adduser",
-  async (formData, thunkAPI) => {
-    console.log(formData);
-    try {
-      const response = await axios.post("/json/tabelContent.json", formData);
-
-      return response.data; // Assuming successful update returns updated banner data
-    } catch (error) {
-      return thunkAPI.rejectWithValue(error.message);
-    }
-  }
-);

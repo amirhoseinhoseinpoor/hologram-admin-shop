@@ -7,7 +7,7 @@ import theme from './theme';
 export default function Home() {
   
   return (
-    <main>
+    <main className="h-100">
       <ThemeProvider theme={theme}>
         <LoginPage/>
       </ThemeProvider>

@@ -5,6 +5,9 @@ import { useDispatch } from "react-redux";
 import { deleted } from "@/app/Store/thunks";
 import { uploadFile, productEdit } from "@/app/Store/thunks";
 import { Box } from "@mui/material";
+import AreYouShureModal from "@/app/BaseComponent/AreYouSureModal";
+import ConfirmModal from "@/app/BaseComponent/ConfirmingModal";
+import ErrorModal from "@/app/BaseComponent/ErrorModal";
 
 const BorderInputBox = styled.div`
   border: 2px solid #28a745;
@@ -20,9 +23,6 @@ export default function EditHonors({
 
   const [name, setName] = useState("");
 
-
-
-
   const [title, setTitle] = useState("");
   const [subtitle, setSubtitle] = useState("");
   const [colors, setColors] = useState([{ name: "", src: "" }]);
@@ -31,6 +31,17 @@ export default function EditHonors({
   const [media, setMedia] = useState([
     { title: "", description: "", src: "", poster: "" },
   ]);
+
+  // modal state
+  const [openModal, setOpenModal] = useState(false);
+  const [openModal2, setOpenModal2] = useState(false);
+  const [openModal3, setOpenModal3] = useState(false);
+  const [openModal4, setOpenModal4] = useState(false);
+  // Close modal
+  const closeModal = () => setOpenModal(false);
+  const closeModal2 = () => setOpenModal2(false);
+  const closeModal3 = () => setOpenModal3(false);
+  const closeModal4 = () => setOpenModal4(false);
 
   const [objectUrls, setObjectUrls] = useState({});
   const [posterObjectUrls, setPosterObjectUrls] = useState({});
@@ -130,25 +141,45 @@ export default function EditHonors({
 
   const handleDelete = async (e) => {
     e.preventDefault();
+    setOpenModal4(false);
     try {
       const deleteProduct = await dispatch(
         deleted({ code: editedHonor.code, name: editedHonor.name })
       );
 
       if (deleteProduct.payload.message === "Success") {
-        alert("محصول باموفقیت حذف شد");
+        setOpenModal2(true);
+        closeModalOnTimeout();
+      } else {
+        setOpenModal3(true);
       }
     } catch (error) {
       console.error("Error deleting product:", error);
     }
   };
 
+  const areYouShureFunction = (e) => {
+    e.preventDefault();
+    setOpenModal(true);
+  };
+
+  const areYouShureFunction2 = (e) => {
+    e.preventDefault();
+    setOpenModal4(true);
+  };
+
+  function closeModalOnTimeout() {
+    setTimeout(() => {
+      setOpenModal2(false);
+    }, 3000);
+  }
+
   const handleSubmit = async (e) => {
     e.preventDefault();
+    setOpenModal(false);
     try {
       const uploadedImgData = await Promise.all(
         imgData.map(async (item) => {
-
           let updatedItem = { ...item };
 
           if (typeof item.src === "object" && item.src) {
@@ -162,7 +193,6 @@ export default function EditHonors({
             ).unwrap();
 
             updatedItem.src = fileId;
-
           } else if (typeof item.src !== "object" && item.src) {
           }
 
@@ -197,14 +227,13 @@ export default function EditHonors({
 
             return { ...item, src: fileId }; // Replace src with the file ID
           }
-          
+
           return item;
         })
       );
 
       const uploadedMedia = await Promise.all(
         media.map(async (item) => {
-
           let updatedItem = { ...item };
 
           if (typeof item.src === "object" && item.src) {
@@ -255,15 +284,23 @@ export default function EditHonors({
         media: uploadedMedia,
       };
 
-      // Dispatch the final product submission
-      await dispatch(productEdit({ productData, code: editedHonor.code }));
+      const dataConfirmComing = await dispatch(
+        productEdit({ productData, code: editedHonor.code })
+      );
+
+      if (dataConfirmComing.error) {
+        setOpenModal3(true);
+      } else {
+        setOpenModal2(true);
+        closeModalOnTimeout();
+      }
     } catch (error) {
       console.error("Error creating product:", error);
     }
   };
 
   return (
-    <form onSubmit={handleSubmit}>
+    <form onSubmit={areYouShureFunction}>
       {/* <label htmlFor="bannerImage">Image:</label>
         <input type="file" id="bannerImage" onChange={handleImageChange} /> */}
       <label htmlFor="name">اسم محصول :</label>
@@ -296,6 +333,7 @@ export default function EditHonors({
         {colors.map((color, index) => (
           <div className="mt-2" key={index}>
             <input
+              className="w-50"
               type="text"
               placeholder="Name"
               value={color.name}
@@ -310,21 +348,10 @@ export default function EditHonors({
             />
             <input
               type="file"
-              value={color.value}
-              onChange={(e) =>
-                handleFileChange(e, index, setColors, colors)
-              }
-              // onChange={(e) =>
-              //   setColors(
-              //     colors.map((c, i) =>
-              //       i === index ? { ...c, value: e.target.value } : c
-              //     )
-              //   )
-              // }
-              required
+              onChange={(e) => handleFileChange(e, index, setColors, colors)}
             />
             <button
-              className="bg-danger"
+              className="bg-danger me-2"
               type="button"
               onClick={() => handleRemoveColor(index)}
             >
@@ -332,7 +359,11 @@ export default function EditHonors({
             </button>
           </div>
         ))}
-        <button className="mt-2" type="button" onClick={handleAddColor}>
+        <button
+          className="mt-2 bg-success"
+          type="button"
+          onClick={handleAddColor}
+        >
           اضافه کردن رنگ
         </button>
       </BorderInputBox>
@@ -342,6 +373,7 @@ export default function EditHonors({
         {sizes.map((size, index) => (
           <div className="mt-2" key={index}>
             <input
+              className="w-50"
               type="text"
               value={size}
               onChange={(e) =>
@@ -352,7 +384,7 @@ export default function EditHonors({
               required
             />
             <button
-              className="bg-danger"
+              className="bg-danger me-2"
               type="button"
               onClick={() => handleRemoveSize(index)}
             >
@@ -360,7 +392,11 @@ export default function EditHonors({
             </button>
           </div>
         ))}
-        <button className="mt-2" type="button" onClick={handleAddSize}>
+        <button
+          className="mt-2 bg-success"
+          type="button"
+          onClick={handleAddSize}
+        >
           اضافه کردن سایز
         </button>
       </BorderInputBox>
@@ -368,7 +404,10 @@ export default function EditHonors({
       <BorderInputBox className="mt-3">
         <label>عکس ها و فیلم های محصول :</label>
         {imgData.map((item, index) => (
-          <div className="d-flex flex-row gap-2 flex-wrap mt-2" key={index}>
+          <div
+            className="d-flex flex-row gap-2 flex-wrap mt-2 align-items-center"
+            key={index}
+          >
             <div className="d-flex flex-column">
               <span className="mb-1">عکس یا فیلم</span>
               <input
@@ -443,7 +482,7 @@ export default function EditHonors({
               </>
             )}
             <button
-              className="bg-danger"
+              className="bg-danger me-2"
               type="button"
               onClick={() => handleRemoveImgData(index)}
             >
@@ -451,7 +490,11 @@ export default function EditHonors({
             </button>
           </div>
         ))}
-        <button className="mt-2" type="button" onClick={handleAddImgData}>
+        <button
+          className="mt-2 bg-success"
+          type="button"
+          onClick={handleAddImgData}
+        >
           اضافه کردن عکس / فیلم
         </button>
       </BorderInputBox>
@@ -460,40 +503,44 @@ export default function EditHonors({
         <label>فیلم ها:</label>
         {media.map((item, index) => (
           <div className="mt-2" key={index}>
-            <input
-              type="text"
-              placeholder="Title"
-              value={item.title}
-              onChange={(e) =>
-                setMedia(
-                  media.map((m, i) =>
-                    i === index ? { ...m, title: e.target.value } : m
+            <div className="d-flex flex-row gap-2 flex-wrap">
+              <input
+                style={{width: "40%"}}
+                type="text"
+                placeholder="Title"
+                value={item.title}
+                onChange={(e) =>
+                  setMedia(
+                    media.map((m, i) =>
+                      i === index ? { ...m, title: e.target.value } : m
+                    )
                   )
-                )
-              }
-              required
-            />
+                }
+                required
+              />
 
-            <input
-              type="text"
-              placeholder="Description"
-              value={item.description}
-              onChange={(e) =>
-                setMedia(
-                  media.map((m, i) =>
-                    i === index ? { ...m, description: e.target.value } : m
+              <input
+                style={{width: "40%"}}
+                type="text"
+                placeholder="Description"
+                value={item.description}
+                onChange={(e) =>
+                  setMedia(
+                    media.map((m, i) =>
+                      i === index ? { ...m, description: e.target.value } : m
+                    )
                   )
-                )
-              }
-              required
-            />
+                }
+                required
+              />
+            </div>
+
             <div className="d-flex flex-column">
               <span>فیلم :</span>
-              <div>
+              <div className=" d-flex flex-row align-items-center">
                 <input
                   type="file"
                   onChange={(e) => handleFileChange(e, index, setMedia, media)}
-                  required
                 />
                 {item.src && !objectUrls[index] && (
                   <Box
@@ -531,7 +578,6 @@ export default function EditHonors({
                   onChange={(e) =>
                     handleFileChangePoster(e, index, setMedia, media)
                   }
-                  required
                 />
                 {posterObjectUrls[index] && (
                   <Box
@@ -548,7 +594,7 @@ export default function EditHonors({
             </div>
 
             <button
-              className="bg-danger"
+              className="bg-danger mt-2 mb-2"
               type="button"
               onClick={() => handleRemoveMedia(index)}
             >
@@ -556,63 +602,50 @@ export default function EditHonors({
             </button>
           </div>
         ))}
-        <button className="mt-2" type="button" onClick={handleAddMedia}>
+        <button
+          className="mt-2 bg-success"
+          type="button"
+          onClick={handleAddMedia}
+        >
           اضافه کردن ویدیو
         </button>
       </BorderInputBox>
-      <button type="submit" className="mt-3">
+      <button type="submit" className="mt-3 bg-success">
         ویرایش محصول
       </button>
       <button
         className="bg-danger mt-2 mb-2"
         type="button"
-        onClick={handleDelete}
+        onClick={areYouShureFunction2}
       >
         حذف محصول
       </button>
-      <button onClick={handleCancelEdit}>انصراف</button>
+      <button className="bg-warning" onClick={handleCancelEdit}>
+        انصراف
+      </button>
+      {/* modal  */}
+      <AreYouShureModal
+        open={openModal}
+        onClose={closeModal}
+        text={"ایا از ویرایش محصول مطمعن هستید"}
+        func={handleSubmit}
+      />
+      <AreYouShureModal
+        open={openModal4}
+        onClose={closeModal4}
+        text={"ایا از حذف محصول مطمعن هستید"}
+        func={handleDelete}
+      />
+      <ConfirmModal
+        open={openModal2}
+        onClose={closeModal2}
+        text={"عملیات با موفقیت انجام شد"}
+      />
+      <ErrorModal
+        open={openModal3}
+        onClose={closeModal3}
+        text={"خطا از لاگین بودن خود اطمینان حاصل فرمایید"}
+      />
     </form>
-
-    // <div className="mt-3">
-    //   <h2>ویرایش محصولات</h2>
-    //   <form onSubmit={handleHonorSave}>
-    //     <TEXTFIELD
-    //       label="Title"
-    //       value={editedHonor.title}
-    //       onChange={(e) =>
-    //         setEditedHonor({ ...editedHonor, title: e.target.value })
-    //       }
-    //       fullWidth
-    //       margin="normal"
-    //     />
-    //     <TEXTFIELD
-    //       label="Date"
-    //       value={editedHonor.date}
-    //       onChange={(e) =>
-    //         setEditedHonor({ ...editedHonor, date: e.target.value })
-    //       }
-    //       fullWidth
-    //       margin="normal"
-    //     />
-    //     <TEXTFIELD
-    //       label="Tags"
-    //       value={editedHonor.tags}
-    //       onChange={handleTagsChange}
-    //       fullWidth
-    //       margin="normal"
-    //     />
-    //     <input type="file" onChange={handleEditImageChange} accept="image/*" />
-    //     {editedHonor.src && (
-    //       <Box sx={{ width: "100px", height: "100px", marginTop: "10px" }}>
-    //         <CardMedia
-    //           component="img"
-    //           src={editedHonor.src}
-    //           sx={{ width: "100%", height: "100%", borderRadius: 3 }}
-    //         />
-    //       </Box>
-    //     )}
-
-    //   </form>
-    // </div>
   );
 }

@@ -3,9 +3,7 @@
 import dynamic from "next/dynamic";
 import React, { useEffect, useState } from "react";
 import style from "../../../Styles/MakeOrderStyle/MakeOrder.module.scss";
-// import ProcessTracker from "../ProcessTracker";
-
-
+import ProcessTracker from "../ProcessTracker";
 import PusherChat from "./Talkjs";
 
 const SteponeComponent = dynamic(() => import("./StepOneComponent"));
@@ -25,14 +23,14 @@ const StepSixComponent = dynamic(() => import("./StepSixComponent"), {
 
 const StepSeven = dynamic(() => import("./StepSevenComponent"));
 
-export default function MakeOrder({seeOrder}) {
-  console.log(seeOrder);
+export default function MakeOrder({seeOrder , setActiveKey}) {
   
   const [step, setStep] = useState(1);
 
   useEffect(() => {
-    setStep(seeOrder.step)
+    setStep(seeOrder.step)    
   }, [seeOrder]);
+  console.log(seeOrder);
 
   const [disabelInput, setDisabelInput] = useState(false);
   const [disabelInputStep2, setDisabelInputStep2] = useState(false);
@@ -55,6 +53,8 @@ export default function MakeOrder({seeOrder}) {
         return (
           <div className={style.stepContent}>
             <SteponeComponent
+              reqComment={seeOrder.reqComment}
+              step={seeOrder.step}
               data={seeOrder.request}
               code={seeOrder.code}
               setStep={setStep}
@@ -67,7 +67,10 @@ export default function MakeOrder({seeOrder}) {
       case 2:
         return (
           <StepTwoComponent
+            step={seeOrder.step}
+            code={seeOrder.code}
             dataDocument={seeOrder.document}
+            setStep={setStep}
             handleNextStep={handleNextStep}
             handlePreviousStep={handlePreviousStep}
             setDisabelInputStep2={setDisabelInputStep2}
@@ -77,6 +80,10 @@ export default function MakeOrder({seeOrder}) {
       case 3:
         return (
           <PusherChat
+            data={seeOrder.request}
+            chatData={seeOrder.chat}
+            code={seeOrder.code}
+            step={seeOrder.step}
             handleNextStep={handleNextStep}
             handlePreviousStep={handlePreviousStep}
           />
@@ -107,7 +114,10 @@ export default function MakeOrder({seeOrder}) {
   };
   return (
     <section>
-      {/* <ProcessTracker currentStep={step} /> */}
+      <div className={`${style.makeorderHeader} mb-4 d-flex justify-content-end`}> 
+        <p onClick={() => setActiveKey("seeTable")} className={`discription ${style.seeOrderButtonStyle}`}>بازگشت به سفارشات</p>
+      </div>
+      <ProcessTracker currentStep={step} />
       {renderStepContent()}
     </section>
   );

@@ -1,15 +1,21 @@
-'use client';
+"use client";
 
 import React, { useState, useEffect } from "react";
 import { useDispatch } from "react-redux";
 import { HeaderList, headerEdit } from "@/app/Store/thunks";
-import styled from "styled-components";
+import styled, { keyframes } from "styled-components";
 import { Modal, Box, Button as MUIButton, Typography } from "@mui/material"; // Import MUI components
+import DeleteIcon from "@mui/icons-material/Delete";
+import ConfirmModal from "@/app/BaseComponent/ConfirmingModal";
+import ErrorModal from "@/app/BaseComponent/ErrorModal";
+import AreYouShureModal from "@/app/BaseComponent/AreYouSureModal";
 
 // Styled components
 const Container = styled.div`
   padding: 20px;
 `;
+
+
 
 const Title = styled.h1`
   color: #333;
@@ -18,7 +24,7 @@ const Title = styled.h1`
 
 const InputField = styled.input`
   padding: 10px;
-  width: 200px;
+  width: 36%;
   margin-right: 10px;
   border: 1px solid #ccc;
   border-radius: 5px;
@@ -35,7 +41,8 @@ const Button = styled.button`
   border: none;
   border-radius: 5px;
   cursor: pointer;
-  margin-left: ${(props) => (props.$danger || props.$secondary ? "10px" : "0px")};
+  margin-left: ${(props) =>
+    props.$danger || props.$secondary ? "10px" : "0px"};
 
   &:hover {
     opacity: 0.9;
@@ -93,7 +100,10 @@ export default function HeaderMainComponent() {
   const [nestedPath, setNestedPath] = useState([]);
   const [isRemovingHeader, setIsRemovingHeader] = useState(false); // Track if removing a header or sub-item
 
-  const [openModal, setOpenModal] = useState(false); // Modal state
+  const [openModal, setOpenModal] = useState(false);
+  const [openModal2, setOpenModal2] = useState(false);
+  const [openModal3, setOpenModal3] = useState(false);
+
   const [selectedPath, setSelectedPath] = useState([]); // Store the selected sub-item path
 
   // Fetch header data from API on mount
@@ -124,7 +134,7 @@ export default function HeaderMainComponent() {
       setHeaderData([...headerData, { ...newItem, subItems: [] }]);
       setNewItem({ title: "", link: "", subItems: [] });
     } else {
-      alert("Please enter both a title and a link.");
+      setOpenModal2(true);
     }
   };
 
@@ -136,20 +146,27 @@ export default function HeaderMainComponent() {
           const newPath = [...currentPath, subIndex];
           return (
             <SubItem key={subIndex}>
-              <StrongText>{subItem.title}</StrongText>
-              <Button
-                $danger
-                onClick={() => openRemoveModal(newPath, false)}
-              >
-                Remove Sub-item
-              </Button>
+              <div className="d-flex flex-row align-items-center">
+                <StrongText>{subItem.title}</StrongText>
+                <Button
+                  style={{ background: "unset" }}
+                  onClick={() => openRemoveModal(newPath, false)}
+                >
+                  <DeleteIcon className="text-danger" />
+                </Button>
+              </div>
 
               {/* Render nested sub-items recursively */}
-              {subItem.subItems.length > 0 && renderSubItems(subItem.subItems, headerIndex, newPath)}
+              {subItem.subItems.length > 0 &&
+                renderSubItems(subItem.subItems, headerIndex, newPath)}
 
               {/* Button to add sub-items recursively */}
-              <Button $secondary onClick={() => selectSubItemForSubItem(headerIndex, newPath)}>
-                Add Sub-item to {subItem.title}
+              <Button
+                className="me-1"
+                $secondary
+                onClick={() => selectSubItemForSubItem(headerIndex, newPath)}
+              >
+                اضافه کردن ساب ایتم به {subItem.title}
               </Button>
             </SubItem>
           );
@@ -167,6 +184,14 @@ export default function HeaderMainComponent() {
 
   // Close modal
   const closeModal = () => setOpenModal(false);
+  const closeModal2 = () => setOpenModal2(false);
+  const closeModal3 = () => setOpenModal3(false);
+
+  function closeModalOnTimeout() {
+    setTimeout(() => {
+      setOpenModal3(false);
+    }, 3000);
+  }
 
   // Confirm sub-item or header removal
   const confirmRemove = () => {
@@ -208,7 +233,7 @@ export default function HeaderMainComponent() {
       setHeaderData(updatedHeader);
       setNewSubItem({ title: "", link: "" });
     } else {
-      alert("Please enter both a title and link for the sub-item.");
+      setOpenModal2(true);
     }
   };
 
@@ -229,7 +254,9 @@ export default function HeaderMainComponent() {
       for (let i = 0; i < path.length - 1; i++) {
         target = target.subItems[path[i]];
       }
-      target.subItems = target.subItems.filter((_, i) => i !== path[path.length - 1]);
+      target.subItems = target.subItems.filter(
+        (_, i) => i !== path[path.length - 1]
+      );
     }
 
     setHeaderData(updatedHeader);
@@ -241,8 +268,11 @@ export default function HeaderMainComponent() {
       const finalDataSending = {
         content: headerData,
       };
-      const response = await dispatch(headerEdit({ header: finalDataSending })).unwrap();
-      alert("Header data successfully submitted!");
+      const response = await dispatch(
+        headerEdit({ header: finalDataSending })
+      ).unwrap();
+      setOpenModal3(true);
+      closeModalOnTimeout();
     } catch (error) {
       console.error("Error submitting header data:", error);
       alert("Failed to submit header data.");
@@ -251,7 +281,7 @@ export default function HeaderMainComponent() {
 
   return (
     <Container>
-      <Title>Header Editor</Title>
+      <Title>هدر خود را بسازید</Title>
 
       {/* Input for new header item */}
       <div style={{ marginBottom: "20px" }}>
@@ -269,7 +299,13 @@ export default function HeaderMainComponent() {
           value={newItem.link}
           onChange={handleInputChange}
         />
-        <Button onClick={addItem}>Add Header Item</Button>
+        <Button
+          className="me-2"
+          style={{ backgroundColor: "#007bff" }}
+          onClick={addItem}
+        >
+          اضافه کردن هدر اصلی
+        </Button>
       </div>
 
       {/* Render the current header structure */}
@@ -284,17 +320,21 @@ export default function HeaderMainComponent() {
                 {renderSubItems(item.subItems, index, [])}
 
                 {/* Button to add sub-items */}
-                <Button $secondary onClick={() => selectHeaderForSubItem(index)}>
-                  Add Sub-item to {item.title}
+                <Button
+                 className="me-1"
+                   $secondary
+                  onClick={() => selectHeaderForSubItem(index)}
+                >
+                  اضافه کردن ساب ایتم به {item.title}
                 </Button>
                 <Button $danger onClick={() => openRemoveModal([index], true)}>
-                  Remove Header Item
+                  حذف هدر اصلی
                 </Button>
               </HeaderItem>
             ))}
           </HeaderListWrapper>
         ) : (
-          <p>No header items added yet.</p>
+          <p>هدر خود را بسازید</p>
         )}
       </div>
 
@@ -315,41 +355,24 @@ export default function HeaderMainComponent() {
             value={newSubItem.link}
             onChange={handleSubInputChange}
           />
-          <Button $secondary onClick={addSubItem}>
-            Add Sub-item
+          <Button className="me-1" $secondary onClick={addSubItem}>
+            اضافه کردن ساب ایتم
           </Button>
         </div>
       )}
 
       {/* Submit Button */}
       <Button onClick={submitHeaderData} style={{ marginTop: "20px" }}>
-        Submit Header Data
+        تایید هدر
       </Button>
 
       {/* Modal for confirming header or sub-item removal */}
-      <Modal
-        open={openModal}
-        onClose={closeModal}
-        aria-labelledby="modal-modal-title"
-        aria-describedby="modal-modal-description"
-      >
-        <Box sx={modalStyle}>
-          <Typography id="modal-modal-title" variant="h6" component="h2">
-            Confirm Deletion
-          </Typography>
-          <Typography id="modal-modal-description" sx={{ mt: 2 }}>
-            Are you sure you want to delete this {isRemovingHeader ? "header" : "sub-item"}?
-          </Typography>
-          <div style={{ marginTop: "20px" }}>
-            <MUIButton variant="contained" color="error" onClick={confirmRemove}>
-              Confirm
-            </MUIButton>
-            <MUIButton variant="contained" onClick={closeModal} style={{ marginLeft: "10px" }}>
-              Cancel
-            </MUIButton>
-          </div>
-        </Box>
-      </Modal>
+      
+      <AreYouShureModal open={openModal} onClose={closeModal} func={confirmRemove} text={`از حذف ${' '}${isRemovingHeader ? "هدر" : "ساب ایتم"}${" "}مطمعن هستید`} />
+      
+      <ErrorModal open={openModal2} onClose={closeModal2} text={'لطفا تایتل و لینک را وارد کنید'}/>
+      <ConfirmModal open={openModal3} onClose={closeModal3} text={'هدر با موفقیت تغییر یافت'}/>
+      
     </Container>
   );
 }

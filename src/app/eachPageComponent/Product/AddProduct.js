@@ -3,6 +3,8 @@ import { useDispatch } from "react-redux";
 import { uploadFile } from "@/app/Store/thunks";
 import { productpot } from "@/app/Store/thunks";
 import styled from "styled-components";
+import AreYouShureModal from "@/app/BaseComponent/AreYouSureModal";
+import ConfirmModal from "@/app/BaseComponent/ConfirmingModal";
 
 const BorderInputBox = styled.div`
   border: 2px solid #28a745;
@@ -22,8 +24,12 @@ export default function AddHonors() {
     { title: "", description: "", src: "", poster: "" },
   ]);
 
-  
-
+  // modal state
+  const [openModal, setOpenModal] = useState(false);
+  const [openModal2, setOpenModal2] = useState(false);
+  // Close modal
+  const closeModal = () => setOpenModal(false);
+  const closeModal2 = () => setOpenModal2(false);
 
   const handleFileChange = (e, index, setFunction, state) => {
     const file = e.target.files[0];
@@ -79,42 +85,53 @@ export default function AddHonors() {
     setMedia(media.filter((_, i) => i !== index));
   };
 
+  const areYouShureFunction = (e) => {
+    e.preventDefault();
+    setOpenModal(true);
+  };
+
+  function closeModalOnTimeout() {
+    setTimeout(() => {
+      setOpenModal2(false);
+    }, 3000);
+  }
+
   const handleSubmit = async (e) => {
     e.preventDefault();
+    setOpenModal(false);
     try {
-      
       const uploadedImgData = await Promise.all(
         imgData.map(async (item) => {
           let updatedItem = { ...item };
-      
+
           // Handle src if it's a file object
           if (typeof item.src === "object" && item.src) {
             const tag = name;
             const type = item.type;
             const isPublic = true;
             const file = item.src;
-      
+
             const fileId = await dispatch(
               uploadFile({ file, tag, type, isPublic })
             ).unwrap();
-      
+
             updatedItem.src = fileId; // Update src with the file ID
           }
-      
+
           // Handle poster if it's a file object
           if (typeof item.poster === "object" && item.poster) {
             const tag = name;
             const type = 1; // Assuming type 1 is for posters
             const isPublic = true;
             const file = item.poster;
-      
+
             const fileId = await dispatch(
               uploadFile({ file, tag, type, isPublic })
             ).unwrap();
-      
+
             updatedItem.poster = fileId; // Update poster with the file ID
           }
-      
+
           return updatedItem; // Return the updated item after all modifications
         })
       );
@@ -133,7 +150,7 @@ export default function AddHonors() {
 
             return { ...item, src: fileId }; // Replace src with the file ID
           }
-          
+
           return item;
         })
       );
@@ -141,35 +158,35 @@ export default function AddHonors() {
       const uploadedMedia = await Promise.all(
         media.map(async (item) => {
           let updatedItem = { ...item };
-      
+
           // Handle src if it's a file object
           if (typeof item.src === "object" && item.src) {
             const tag = name;
             const type = 2;
             const isPublic = true;
             const file = item.src;
-      
+
             const fileIdSrc = await dispatch(
               uploadFile({ file, tag, type, isPublic })
             ).unwrap();
-      
+
             updatedItem.src = fileIdSrc; // Update src with the file ID
           }
-      
+
           // Handle poster if it's a file object
           if (typeof item.poster === "object" && item.poster) {
             const tag = name;
             const type = 1;
             const isPublic = true;
             const file = item.poster;
-      
+
             const fileIdPoster = await dispatch(
               uploadFile({ file, tag, type, isPublic })
             ).unwrap();
-      
+
             updatedItem.poster = fileIdPoster; // Update poster with the file ID
           }
-      
+
           return updatedItem;
         })
       );
@@ -190,12 +207,12 @@ export default function AddHonors() {
         media: uploadedMedia, // Use uploaded media with IDs
       };
 
-      console.log(productData);
-      
-
       // Dispatch the final product submission
-      await dispatch(productpot(productData));
-      
+      const dataConfirmComing = await dispatch(productpot(productData));
+      if (dataConfirmComing) {
+        setOpenModal2(true);
+        closeModalOnTimeout();
+      }
     } catch (error) {
       console.error("Error creating product:", error);
     }
@@ -203,7 +220,7 @@ export default function AddHonors() {
 
   return (
     <>
-      <form onSubmit={handleSubmit}>
+      <form onSubmit={areYouShureFunction}>
         {/* <label htmlFor="bannerImage">Image:</label>
         <input type="file" id="bannerImage" onChange={handleImageChange} /> */}
         <label htmlFor="name">اسم محصول :</label>
@@ -239,7 +256,6 @@ export default function AddHonors() {
                 type="text"
                 placeholder="Name"
                 value={color.name}
-                
                 onChange={(e) =>
                   setColors(
                     colors.map((c, i) =>
@@ -251,18 +267,8 @@ export default function AddHonors() {
               />
               <input
                 type="file"
-                
                 value={color.value}
-                onChange={(e) =>
-                  handleFileChange(e, index, setColors, colors)
-                }
-                // onChange={(e) =>
-                //   setColors(
-                //     colors.map((c, i) =>
-                //       i === index ? { ...c, value: e.target.value } : c
-                //     )
-                //   )
-                // }
+                onChange={(e) => handleFileChange(e, index, setColors, colors)}
                 required
               />
               <button
@@ -274,7 +280,11 @@ export default function AddHonors() {
               </button>
             </div>
           ))}
-          <button className="mt-2" type="button" onClick={handleAddColor}>
+          <button
+            className="mt-2 bg-success"
+            type="button"
+            onClick={handleAddColor}
+          >
             اضافه کردن رنگ
           </button>
         </BorderInputBox>
@@ -302,7 +312,11 @@ export default function AddHonors() {
               </button>
             </div>
           ))}
-          <button className="mt-2" type="button" onClick={handleAddSize}>
+          <button
+            className="mt-2 bg-success"
+            type="button"
+            onClick={handleAddSize}
+          >
             اضافه کردن سایز
           </button>
         </BorderInputBox>
@@ -341,7 +355,6 @@ export default function AddHonors() {
                   <span className="mb-1">پوستر فیلم</span>
                   <input
                     type="file"
-                    
                     onChange={(e) =>
                       handleFileChangePoster(e, index, setImgData, imgData)
                     }
@@ -357,7 +370,11 @@ export default function AddHonors() {
               </button>
             </div>
           ))}
-          <button className="mt-2" type="button" onClick={handleAddImgData}>
+          <button
+            className="mt-2 bg-success"
+            type="button"
+            onClick={handleAddImgData}
+          >
             اضافه کردن عکس / فیلم
           </button>
         </BorderInputBox>
@@ -366,36 +383,41 @@ export default function AddHonors() {
           <label>فیلم ها:</label>
           {media.map((item, index) => (
             <div className="mt-2" key={index}>
-              <input
-                type="text"
-                placeholder="Title"
-                value={item.title }
-                onChange={(e) =>
-                  setMedia(
-                    media.map((m, i) =>
-                      i === index ? { ...m, title: e.target.value } : m
+              <div className="d-flex flex-row align-items-center gap-3 flex-wrap">
+                <input
+                  style={{width: "45%"}}
+                  type="text"
+                  placeholder="Title"
+                  value={item.title}
+                  onChange={(e) =>
+                    setMedia(
+                      media.map((m, i) =>
+                        i === index ? { ...m, title: e.target.value } : m
+                      )
                     )
-                  )
-                }
-                required
-              />
-              <input
-                type="text"
-                placeholder="Description"
-                value={item.description }
-                onChange={(e) =>
-                  setMedia(
-                    media.map((m, i) =>
-                      i === index ? { ...m, description: e.target.value } : m
+                  }
+                  required
+                />
+                <input
+                  style={{width: "45%"}}
+                  type="text"
+                  placeholder="Description"
+                  value={item.description}
+                  onChange={(e) =>
+                    setMedia(
+                      media.map((m, i) =>
+                        i === index ? { ...m, description: e.target.value } : m
+                      )
                     )
-                  )
-                }
-                required
-              />
+                  }
+                  required
+                />
+              </div>
+
               <div className="d-flex flex-column">
                 <span>فیلم :</span>
                 <input
-                  type="file"              
+                  type="file"
                   onChange={(e) => handleFileChange(e, index, setMedia, media)}
                   required
                 />
@@ -404,7 +426,7 @@ export default function AddHonors() {
               <div className="d-flex flex-column">
                 <span>پوستر فیلم :</span>
                 <input
-                  type="file"                
+                  type="file"
                   onChange={(e) =>
                     handleFileChangePoster(e, index, setMedia, media)
                   }
@@ -421,13 +443,29 @@ export default function AddHonors() {
               </button>
             </div>
           ))}
-          <button className="mt-2" type="button" onClick={handleAddMedia}>
+          <button
+            className="mt-2 bg-success"
+            type="button"
+            onClick={handleAddMedia}
+          >
             اضافه کردن ویدیو
           </button>
         </BorderInputBox>
-        <button type="submit" className="mt-3">
+        <button type="submit" className="mt-3 bg-success">
           اضافه کردن محصول
         </button>
+        {/* modal  */}
+        <AreYouShureModal
+          open={openModal}
+          onClose={closeModal}
+          text={"ایا از اضافه کردن محصول مطمعن هستید"}
+          func={handleSubmit}
+        />
+        <ConfirmModal
+          open={openModal2}
+          onClose={closeModal2}
+          text={"محصول با موفقیت اضافه شد"}
+        />
       </form>
     </>
   );

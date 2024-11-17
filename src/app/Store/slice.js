@@ -191,30 +191,30 @@ const AdminInitialState = {
   error: null,
 };
 
-const adminSlice = createSlice({
-  name: "users",
-  initialState: AdminInitialState,
-  reducers: {},
-  extraReducers: (builder) => {
-    builder
+// const adminSlice = createSlice({
+//   name: "users",
+//   initialState: AdminInitialState,
+//   reducers: {},
+//   extraReducers: (builder) => {
+//     builder
 
-      .addCase(Adduser.pending, (state) => {
-        state.loading = true;
-        state.error = null;
-      })
-      .addCase(Adduser.fulfilled, (state, action) => {
-        state.loading = false;
-        state.banner = action.payload;
-      })
-      .addCase(Adduser.rejected, (state, action) => {
-        state.loading = false;
-        state.error = action.error.message;
-      });
-  },
-});
+//       .addCase(Adduser.pending, (state) => {
+//         state.loading = true;
+//         state.error = null;
+//       })
+//       .addCase(Adduser.fulfilled, (state, action) => {
+//         state.loading = false;
+//         state.banner = action.payload;
+//       })
+//       .addCase(Adduser.rejected, (state, action) => {
+//         state.loading = false;
+//         state.error = action.error.message;
+//       });
+//   },
+// });
 
-export const adminsliceV = adminSlice.reducer;
-export const banner = (state) => state.admin.banner;
+// export const adminsliceV = adminSlice.reducer;
+// export const banner = (state) => state.admin.banner;
 
 const HonorsInitialState = {
   honors: [],

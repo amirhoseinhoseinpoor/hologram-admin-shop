@@ -5,6 +5,11 @@ import { Editor } from "@tinymce/tinymce-react";
 import { useDispatch } from "react-redux";
 import { uploadFile } from "../../Store/thunks.js";
 import { exhibitionpot } from "../../Store/thunks.js";
+// imports modals
+import ErrorModal from "@/app/BaseComponent/ErrorModal.js";
+import ConfirmModal from "@/app/BaseComponent/ConfirmingModal.js";
+import AreYouShureModal from "@/app/BaseComponent/AreYouSureModal.js";
+
 
 export default function AddHonors() {
   const dispatch = useDispatch();
@@ -13,6 +18,15 @@ export default function AddHonors() {
   const [bannerTitle, setBannerTitle] = useState("");
   const [bannerTags, setBannerTags] = useState("");
   const [bannerImage, setBannerImage] = useState(null);
+
+  // modal state
+  const [openModal, setOpenModal] = useState(false);
+  const [openModal2, setOpenModal2] = useState(false);
+  const [openModal3, setOpenModal3] = useState(false);
+  // Close modal
+  const closeModal = () => setOpenModal(false);
+  const closeModal2 = () => setOpenModal2(false);
+  const closeModal3 = () => setOpenModal3(false);
 
   const handleEditorChange = (newContent) => {
     setContent(newContent);
@@ -75,9 +89,21 @@ export default function AddHonors() {
     }
   };
 
+  const areYouShureFunction = (e) => {
+    e.preventDefault();
+    setOpenModal(true);
+  };
+
+  function closeModalOnTimeout() {
+    setTimeout(() => {
+      setOpenModal2(false);
+    }, 3000);
+  }
+
   // Form submit logic
   const handleSubmit = async (event) => {
     event.preventDefault();
+    setOpenModal(false);
 
     // Construct the data to be sent to the backend
     const formData = {
@@ -90,35 +116,37 @@ export default function AddHonors() {
     console.log(formData);
 
     try {
-      // Send the data to the backend
       const fetchData = await dispatch(exhibitionpot(formData)).unwrap();
-      console.log(fetchData);
+      if (fetchData) {
+        setOpenModal2(true);
+        closeModalOnTimeout();
+      }
     } catch (error) {
+      setOpenModal3(true);
       console.error("Error submitting data:", error);
     }
   };
 
   return (
     <>
-      <form onSubmit={handleSubmit}>
-        <label htmlFor="bannerTitle">Title:</label>
+      <form onSubmit={areYouShureFunction}>
+        <label className="mt-1" htmlFor="bannerTitle">عنوان: </label>
         <input
           id="bannerTitle"
           value={bannerTitle}
           onChange={handleTitleChange}
         />
-        <label htmlFor="bannerImage">Select Image:</label>
+        <label className="mt-3" htmlFor="bannerImage">عکس اصلی :</label>
         <input
           type="file"
           id="bannerImage"
           onChange={handleBannerImageUpload}
         />
 
-        <label htmlFor="bannerTags">Tags:</label>
+        <label className="mt-3" htmlFor="bannerTags">تگ ها : (با , ازهم جدا شوند)</label>
         <input id="bannerTags" value={bannerTags} onChange={handleTagsChange} />
 
-        <div>
-          <h2>Create Blog Post</h2>
+        <div className="mt-4">
           <Editor
             apiKey="3akk9p7jow7ksa3txzom0c8qr4e59rtg6xy1fzvux8vysqs0" // Replace with your TinyMCE API key
             value={content}
@@ -153,8 +181,24 @@ export default function AddHonors() {
             }}
           />
         </div>
-
-        <button type="submit">اضافه کردن افتخار</button>
+        <button className="bg-success mt-3" type="submit">اضافه کردن نمایشگاه</button>
+        {/* modals */}
+        <AreYouShureModal
+          open={openModal}
+          onClose={closeModal}
+          text={"ایا از اضافه کردن نمایشگاه مطمعن هستید"}
+          func={handleSubmit}
+        />
+        <ConfirmModal
+          open={openModal2}
+          onClose={closeModal2}
+          text={"نمایشگاه با موفقیت اضافه شد"}
+        />
+        <ErrorModal
+          open={openModal3}
+          onClose={closeModal3}
+          text={"خطا از لاگین بودن خود اطمینان حاصل فرمایید"}
+        />
       </form>
     </>
   );

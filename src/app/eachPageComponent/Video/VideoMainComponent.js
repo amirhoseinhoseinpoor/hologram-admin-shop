@@ -5,27 +5,28 @@ import React, { useState, useEffect } from "react";
 import AddVideo from "./AddVideo";
 import EditVideo from "./EditVideo";
 //redux import
-import { useSelector, useDispatch } from "react-redux";
-
-// import { updateHonor } from "../../Store/thunks.js";
+import { useDispatch } from "react-redux";
 import { homePageVideo } from "../../Store/thunks.js";
-// import { homeVideoFileName } from "../../Store/slice.js";
-
 import { Card, CardContent, CardMedia, Typography } from "@mui/material";
-
-// import honorsData from "/public/json/Video.json";
 
 import styled from "styled-components";
 
 const CARD = styled(Card)`
-  background-color: #5f5f5f !important;
-  color: white !important;
+  background-color: #dfdcdc !important;
+  color: black !important;
+  border: 1px solid #ddd;
+  box-shadow: unset;
   .MuiCardContent-root {
     .titleHonors {
       font-size: 20px;
       font-weight: 500;
     }
   }
+`;
+
+const TYPOGRAPHY = styled(Typography)`
+  font-family: unset !important;
+  font-size: 17px !important;
 `;
 
 export default function HonorsMainComponent() {
@@ -58,7 +59,6 @@ export default function HonorsMainComponent() {
     setEditedHonor(null);
   };
 
-
   return (
     <section>
       {activekey === "editUserPage" && !editedHonor && (
@@ -68,7 +68,10 @@ export default function HonorsMainComponent() {
               <h2 className="m-0"> ویرایش ویدیو</h2>
             </div>
             <div>
-              <button style={{backgroundColor: "green"}} onClick={() => setActiveKey("addUser")}>
+              <button
+                style={{ backgroundColor: "green" }}
+                onClick={() => setActiveKey("addUser")}
+              >
                 افزودن ویدیو
               </button>
             </div>
@@ -94,36 +97,36 @@ export default function HonorsMainComponent() {
                           component="img"
                           src={`${process.env.NEXT_PUBLIC_BACK_END_SERVER}/system/download/${data.media.poster}`}
                           sx={{
-                            width: "120px",
+                            width: "150px",
                             maxHeight: "100%",
                             borderRadius: "2px",
                           }}
                         />
                       )}
                       <CardContent className="d-flex flex-column justify-content-around">
-                        <Typography className="titleHonors">
+                        <TYPOGRAPHY className="titleHonors">
                           {data.media.title}
-                        </Typography>
+                        </TYPOGRAPHY>
                         <div className="d-flex flex-row gap-2">
                           <p>کد محصول :</p>
-                          <Typography className="dateHonors">
+                          <TYPOGRAPHY className="dateHonors">
                             {data.code}
-                          </Typography>
+                          </TYPOGRAPHY>
                         </div>
                       </CardContent>
                     </CARD>
                   ) : (
                     <div>
                       {/* Handle when media is null */}
-                      <Typography variant="body2" color="textSecondary">
+                      <TYPOGRAPHY variant="body2" color="textSecondary">
                         No media available for code {data.code}
-                      </Typography>
+                      </TYPOGRAPHY>
                     </div>
                   )}
                 </React.Fragment>
               ))
             ) : (
-              <Typography variant="body2">No data available</Typography>
+              <TYPOGRAPHY variant="body2">No data available</TYPOGRAPHY>
             )}
           </div>
         </>
@@ -135,8 +138,8 @@ export default function HonorsMainComponent() {
             <div>
               <h2 className="m-0"> افزودن ویدیو</h2>
             </div>
-            <div>
-              <button onClick={() => setActiveKey("editUserPage")}>
+            <div> 
+              <button className="bg-success" onClick={() => setActiveKey("editUserPage")}>
                 ویرایش ویدیو
               </button>
             </div>

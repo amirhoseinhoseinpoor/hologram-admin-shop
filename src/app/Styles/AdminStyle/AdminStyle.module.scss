@@ -1,11 +1,9 @@
 @use "../variable" as var;
 
-
-
 .adminPanel {
   display: flex;
-  height: 100%;
-  min-height: 100vh;
+  height: fit-content;
+  min-height: 100%;
 }
 
 .sidebar {
@@ -49,7 +47,7 @@
 
 .content {
   flex: 1;
-  padding: 20px;
+  // padding: 17px;
   overflow-y: auto;
 }
 

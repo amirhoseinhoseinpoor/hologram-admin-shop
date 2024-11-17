@@ -8,7 +8,7 @@ export const makeStore = () => {
       product : productSliceV,
       // banner : bannerSliceV,
       homePage : homePageV,
-      admin: adminsliceV,
+      // admin: adminsliceV,
       honors : HonorsSliceV,
     }
   })

@@ -2,6 +2,9 @@ import React, { useState, useEffect } from "react";
 import { Editor } from "@tinymce/tinymce-react";
 import { Checkbox, FormControlLabel, TextField, Button } from "@mui/material";
 import styled from "styled-components";
+import AreYouShureModal from "@/app/BaseComponent/AreYouSureModal";
+import ConfirmModal from "@/app/BaseComponent/ConfirmingModal";
+import ErrorModal from "@/app/BaseComponent/ErrorModal";
 
 const TEXTFIELD = styled(TextField)`
   .MuiInputBase-input {
@@ -39,6 +42,15 @@ export default function AddHonors() {
   const [productTitle, setproductTitle] = useState("");
   const [productSrc, setproductSrc] = useState("");
   const [productLink, setproductLink] = useState("");
+
+  // modal state
+  const [openModal, setOpenModal] = useState(false);
+  const [openModal2, setOpenModal2] = useState(false);
+  const [openModal3, setOpenModal3] = useState(false);
+  // Close modal
+  const closeModal = () => setOpenModal(false);
+  const closeModal2 = () => setOpenModal2(false);
+  const closeModal3 = () => setOpenModal3(false);
 
   const handleEditorChange = (newContent) => {
     setContent(newContent);
@@ -148,11 +160,22 @@ export default function AddHonors() {
     }
   };
 
+  const areYouShureFunction = (e) => {
+    e.preventDefault();
+    setOpenModal(true);
+  };
+
+  function closeModalOnTimeout() {
+    setTimeout(() => {
+      setOpenModal2(false);
+    }, 3000);
+  }
+
   // Form submit logic
   const handleSubmit = async (event) => {
     event.preventDefault();
+    setOpenModal(false);
 
-  
     const formData = {
       type: blogType,
       title: bannerTitle,
@@ -171,22 +194,24 @@ export default function AddHonors() {
     };
 
     const finalData = {
-      content: formData
-    }
-
-    console.log(finalData);
+      content: formData,
+    };
 
     try {
       const fetchData = await dispatch(blogspot(finalData)).unwrap();
-      console.log(fetchData);
+      if (fetchData) {
+        setOpenModal2(true);
+        closeModalOnTimeout();
+      }
     } catch (error) {
+      setOpenModal3(true);
       console.error("Error submitting data:", error);
     }
   };
 
   return (
     <>
-      <form onSubmit={handleSubmit} className="p-3">
+      <form onSubmit={areYouShureFunction} className="p-3">
         <TEXTFIELD
           fullWidth
           label="Title"
@@ -269,7 +294,6 @@ export default function AddHonors() {
         />
 
         <div>
-          <h2>Create Blog Post</h2>
           <Editor
             apiKey="3akk9p7jow7ksa3txzom0c8qr4e59rtg6xy1fzvux8vysqs0" // Replace with your TinyMCE API key
             value={content}
@@ -296,32 +320,50 @@ export default function AddHonors() {
                 "help",
                 "wordcount",
               ],
-              
+
               toolbar:
                 "undo redo | formatselect | bold italic backcolor | \
                 alignleft aligncenter alignright alignjustify | \
-                bullist numlist outdent indent | removeformat | image | \ h1 h2 h3 h4 h5 h6",
-                style_formats: [
-                  { title: 'Header 1', block: 'h1' },
-                  { title: 'Header 2', block: 'h2' },
-                  { title: 'Header 3', block: 'h3' },
-                  { title: 'Header 4', block: 'h4' },
-                  { title: 'Header 5', block: 'h5' },
-                  { title: 'Header 6', block: 'h6' }
-                ],
+                bullist numlist outdent indent | removeformat | image |  h1 h2 h3 h4 h5 h6",
+              style_formats: [
+                { title: "Header 1", block: "h1" },
+                { title: "Header 2", block: "h2" },
+                { title: "Header 3", block: "h3" },
+                { title: "Header 4", block: "h4" },
+                { title: "Header 5", block: "h5" },
+                { title: "Header 6", block: "h6" },
+              ],
               images_upload_handler: handleImageUpload,
             }}
           />
         </div>
 
         <Button
+          style={{ fontFamily: "unset" }}
           type="submit"
           variant="contained"
           color="primary"
           className="mt-3"
         >
-          Submit
+          تایید
         </Button>
+        {/* modals */}
+        <AreYouShureModal
+          open={openModal}
+          onClose={closeModal}
+          text={"ایا از اضافه کردن بلاگ مطمعن هستید"}
+          func={handleSubmit}
+        />
+        <ConfirmModal
+          open={openModal2}
+          onClose={closeModal2}
+          text={"بلاگ با موفقیت اضافه شد"}
+        />
+        <ErrorModal
+          open={openModal3}
+          onClose={closeModal3}
+          text={"خطا از لاگین بودن خود اطمینان حاصل فرمایید"}
+        />
       </form>
     </>
   );
