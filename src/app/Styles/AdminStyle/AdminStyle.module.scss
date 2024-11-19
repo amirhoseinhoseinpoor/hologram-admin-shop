@@ -16,8 +16,14 @@
 .navbaritemheader{
   background-color: rgb(26,32,53);
   width: 250px !important;
+  overflow-y: auto;
+  scrollbar-width: none;
+  -ms-overflow-style: none;
 }
 
+.navbaritemheader::-webkit-scrollbar {
+  display: none;
+}
 
 .sidebar {
   width: 19%;

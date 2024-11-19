@@ -7,7 +7,7 @@ import { Offcanvas, Navbar, Nav } from "react-bootstrap";
 import React, { useState, lazy, Suspense } from "react";
 import dynamic from "next/dynamic";
 import CustomCloseButton from "../BaseComponent/CustomCloseButton.js";
-import NavBarToggleBurgerButton from "../BaseComponent/NavBarToggleBurgerButton.js";
+
 // mui icons import
 import SpaceDashboardIcon from "@mui/icons-material/SpaceDashboard";
 import ListAltIcon from "@mui/icons-material/ListAlt";
@@ -219,7 +219,6 @@ const AdminPanel = () => {
               className={`${style.offcanvasheader} ${style.nextoffcanvas}`}
               closeButton={false}
             >
-              
               <Offcanvas.Title style={{color: "white"}}>لوگو</Offcanvas.Title>
               <CustomCloseButton onClick={() => handleClose("main")} />
             </Offcanvas.Header>
@@ -329,50 +328,50 @@ const AdminPanel = () => {
         )}
         {activeTab === "Orders" && (
           <div className={style.tabContent}>
-            <OrderMainComponent  toggleShow={toggleShow}/>
+            <OrderMainComponent toggleShow={toggleShow}/>
           </div>
         )}
         {activeTab === "header" && (
           <div className={style.tabContent}>
-            <HeaderMainComponent />
+            <HeaderMainComponent toggleShow={toggleShow}/>
           </div>
         )}
         {activeTab === "Product" && (
           <div className={style.tabContent}>
-            <ProductMainComponent />
+            <ProductMainComponent toggleShow={toggleShow}/>
           </div>
         )}
         {activeTab === "Blogs" && (
           <div className={style.tabContent}>
-            <BlogsMainComponent />
+            <BlogsMainComponent toggleShow={toggleShow}/>
           </div>
         )}
         {activeTab === "Honors" && (
           <div className={style.tabContent}>
             <Suspense fallback={<div>loading...</div>}>
-              <HonorsMainComponent />
+              <HonorsMainComponent toggleShow={toggleShow}/>
             </Suspense>
           </div>
         )}
         {activeTab === "Exhibition" && (
           <div className={style.tabContent}>
-            <ExhibitionMainComponent />
+            <ExhibitionMainComponent toggleShow={toggleShow}/>
           </div>
         )}
         {activeTab === "Banner" && (
           <div className={style.tabContent}>
-            <BannerMainComponent />
+            <BannerMainComponent toggleShow={toggleShow}/>
           </div>
         )}
         {activeTab === "Video" && (
           <div className={style.tabContent}>
-            <VideoMainComponent />
+            <VideoMainComponent toggleShow={toggleShow}/>
           </div>
         )}
         {activeTab === "defineUser" && (
           <div className={style.tabContent}>
             <Suspense fallback={<div>Loading...</div>}>
-              <DefineUser />
+              <DefineUser toggleShow={toggleShow}/>
             </Suspense>
           </div>
         )}

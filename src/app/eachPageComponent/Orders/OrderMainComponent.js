@@ -11,14 +11,24 @@ import styled from "styled-components";
 import NavBarToggleBurgerButton from "@/app/BaseComponent/NavBarToggleBurgerButton";
 
 const HeadermakeOrder = styled.div`
-  background-color: rgb(26, 32, 53);
+  background-color: white;
   padding: 10px;
   color: white;
+  .textHeaderStyle {
+    color: black;
+  }
+
+  @media (max-width: 980px) {
+    background-color: rgb(26, 32, 53) !important;
+    .textHeaderStyle {
+      color: white !important;
+    }
+  }
 `;
 
 const SeeOrderButton = styled.button`
- background-color: #1572e8;
-`
+  background-color: #1572e8;
+`;
 
 export default function OrderMainComponent({ toggleShow }) {
   const dispatch = useDispatch();
@@ -107,7 +117,7 @@ export default function OrderMainComponent({ toggleShow }) {
             <div className="d-block d-lg-none">
               <NavBarToggleBurgerButton func={() => toggleShow("main")} />
             </div>
-            <div className="NormalTextSizing d-flex align-items-center">
+            <div className="NormalTextSizing textHeaderStyle d-flex align-items-center">
               مدیریت سفارشات
             </div>
           </HeadermakeOrder>
