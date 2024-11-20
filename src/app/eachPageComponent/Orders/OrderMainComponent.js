@@ -213,7 +213,7 @@ export default function OrderMainComponent({ toggleShow }) {
         </>
       )}
       {activekey === "seeOrder" && (
-        <MakeOrder setActiveKey={setActiveKey} seeOrder={seeOrder} />
+        <MakeOrder toggleShow={toggleShow} setActiveKey={setActiveKey} seeOrder={seeOrder} />
       )}
       {/* modals */}
       <ConfirmingModal

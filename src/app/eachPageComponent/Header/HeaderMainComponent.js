@@ -13,6 +13,32 @@ import ErrorModal from "@/app/BaseComponent/ErrorModal";
 import AreYouShureModal from "@/app/BaseComponent/AreYouSureModal";
 
 // Styled components
+
+const MainTitleDiv = styled.div`
+  margin-bottom: 20px;
+  display: flex;
+  flex-direction: row;
+  .firstTwoInput {
+    width: 65%;
+    display: flex;
+    flex-direction: row;
+    input {
+      width: 100%;
+    }
+  }
+
+  @media (max-width: 768px) {
+    flex-direction: column;
+    .buttonMainHeaderCreate {
+      width: fit-content;
+      margin-top: 15px;
+    }
+    .firstTwoInput {
+      width: 100%;
+    }
+  }
+`;
+
 const Container = styled.div`
   padding: 20px;
 `;
@@ -302,29 +328,32 @@ export default function HeaderMainComponent({ toggleShow }) {
       </HeadermakeOrder>
       <Container>
         {/* Input for new header item */}
-        <div style={{ marginBottom: "20px" }}>
-          <InputField
-            type="text"
-            name="title"
-            placeholder="Header Title"
-            value={newItem.title}
-            onChange={handleInputChange}
-          />
-          <InputField
-            type="text"
-            name="link"
-            placeholder="Header Link"
-            value={newItem.link}
-            onChange={handleInputChange}
-          />
+        <MainTitleDiv>
+          <div className="firstTwoInput">
+            <InputField
+              type="text"
+              name="title"
+              placeholder="عنوان هدر"
+              value={newItem.title}
+              onChange={handleInputChange}
+            />
+            <InputField
+              type="text"
+              name="link"
+              placeholder="لینک هدر"
+              value={newItem.link}
+              onChange={handleInputChange}
+            />
+          </div>
+
           <Button
-            className="me-2"
+            className="me-2 buttonMainHeaderCreate"
             style={{ backgroundColor: "#007bff" }}
             onClick={addItem}
           >
             اضافه کردن هدر اصلی
           </Button>
-        </div>
+        </MainTitleDiv>
 
         {/* Render the current header structure */}
         <div>

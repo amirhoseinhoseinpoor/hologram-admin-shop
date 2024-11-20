@@ -5,9 +5,62 @@ import { productpot } from "@/app/Store/thunks";
 import styled from "styled-components";
 import AreYouShureModal from "@/app/BaseComponent/AreYouSureModal";
 import ConfirmModal from "@/app/BaseComponent/ConfirmingModal";
+import { Box } from "@mui/material";
+
+const DivAdjustColorDivs = styled.div`
+  display: grid;
+  grid-template-columns: ${(props) => props.columns || '1fr'};;
+  grid-gap: 20px;
+  width: fit-content;
+  .labelInsteadOfInput {
+    border: 1px solid #c0c0c0;
+    border-radius: 4px;
+    padding: 10px;
+    width: 100%;
+    height: 77%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+  }
+  .colorTheInputFile {
+    color: #404040;
+  }
+  @media (max-width: 768px) {
+    grid-template-columns: repeat(1, 1fr);
+  }
+`;
+
+const DivAdjustImageAndVideoDivs = styled.div`
+  display: grid;
+  grid-template-columns: repeat(1, 1fr);
+  grid-gap: 20px;
+  width: fit-content;
+  .labelInsteadOfInput {
+    border: 1px solid #c0c0c0;
+    border-radius: 4px;
+    padding: 10px;
+    width: 100%;
+    height: 77%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+  }
+  .colorTheInputFile {
+    color: #404040;
+  }
+  @media (max-width: 768px) {
+    grid-template-columns: repeat(1, 1fr);
+  }
+`;
+
+const BOX = styled(Box)`
+  max-width: 200px;
+  max-height: 200px;
+  border-radius: 4px;
+`;
 
 const BorderInputBox = styled.div`
-  border: 2px solid #28a745;
+  border: 2px solid rgb(26, 32, 53);
   padding: 5px;
 `;
 
@@ -219,7 +272,7 @@ export default function AddHonors() {
   };
 
   return (
-    <>
+    <div className="container">
       <form onSubmit={areYouShureFunction}>
         {/* <label htmlFor="bannerImage">Image:</label>
         <input type="file" id="bannerImage" onChange={handleImageChange} /> */}
@@ -250,36 +303,106 @@ export default function AddHonors() {
 
         <BorderInputBox className="mt-2">
           <label>رنگ ها :</label>
-          {colors.map((color, index) => (
-            <div className="mt-2" key={index}>
-              <input
-                type="text"
-                placeholder="Name"
-                value={color.name}
-                onChange={(e) =>
-                  setColors(
-                    colors.map((c, i) =>
-                      i === index ? { ...c, name: e.target.value } : c
-                    )
-                  )
-                }
-                required
-              />
-              <input
-                type="file"
-                value={color.value}
-                onChange={(e) => handleFileChange(e, index, setColors, colors)}
-                required
-              />
-              <button
-                className="bg-danger"
-                type="button"
-                onClick={() => handleRemoveColor(index)}
-              >
-                حذف
-              </button>
-            </div>
-          ))}
+          <DivAdjustColorDivs columns="repeat(2, 1fr)">
+            {colors.map((color, index) => (
+              <div style={{ height: "fit-content" }} key={index}>
+                {color?.src === "" ? (
+                  <>
+                    <label className="labelInsteadOfInput" htmlFor="imageColor">
+                      <div className="d-flex flex-column text-center p-1">
+                        <div>
+                          <svg
+                            width={21}
+                            height={21}
+                            viewBox="0 0 18 18"
+                            fill="none"
+                            xmlns="http://www.w3.org/2000/svg"
+                          >
+                            <path
+                              d="M2.25 11.25C2.25 13.3713 2.25 14.432 2.90901 15.091C3.56802 15.75 4.62868 15.75 6.75 15.75H11.25C13.3713 15.75 14.432 15.75 15.091 15.091C15.75 14.432 15.75 13.3713 15.75 11.25"
+                              stroke="#404040"
+                              strokeLinecap="round"
+                              strokeLinejoin="round"
+                            />
+                            <path
+                              d="M9 12V2.25M9 2.25L12 5.53125M9 2.25L6 5.53125"
+                              stroke="#404040"
+                              strokeLinecap="round"
+                              strokeLinejoin="round"
+                            />
+                          </svg>
+                        </div>
+                        <p className={`colorTheInputFile discription`}>
+                          بارگذاری فایل .png یا .jpg
+                        </p>
+                        <p className={`colorTheInputFile discription`}>
+                          حداکثر تا 5 مگابایت
+                        </p>
+                      </div>
+                    </label>
+                    <input
+                      type="text"
+                      placeholder="اسم رنگ"
+                      value={color.name}
+                      onChange={(e) =>
+                        setColors(
+                          colors.map((c, i) =>
+                            i === index ? { ...c, name: e.target.value } : c
+                          )
+                        )
+                      }
+                      required
+                    />
+                    <input
+                      className="d-none"
+                      id="imageColor"
+                      accept={`${process.env.NEXT_PUBLIC_INPUT_IMAGE_FORMAT}`}
+                      type="file"
+                      value={color.value}
+                      onChange={(e) =>
+                        handleFileChange(e, index, setColors, colors)
+                      }
+                      required
+                    />
+                  </>
+                ) : (
+                  <div
+                    className="d-flex flex-column"
+                    style={{ width: "fit-content" }}
+                  >
+                    <BOX
+                      // onClick={() => handleOpen(logo)}
+                      component="img"
+                      src={URL.createObjectURL(color?.src) || ""}
+                      alt="UserColorImage"
+                    />
+                    <input
+                      className="mt-2"
+                      type="text"
+                      placeholder="اسم رنگ"
+                      value={color.name}
+                      onChange={(e) =>
+                        setColors(
+                          colors.map((c, i) =>
+                            i === index ? { ...c, name: e.target.value } : c
+                          )
+                        )
+                      }
+                      required
+                    />
+                  </div>
+                )}
+
+                <button
+                  className="bg-danger mt-1 me-1"
+                  type="button"
+                  onClick={() => handleRemoveColor(index)}
+                >
+                  حذف
+                </button>
+              </div>
+            ))}
+          </DivAdjustColorDivs>
           <button
             className="mt-2 bg-success"
             type="button"
@@ -304,7 +427,7 @@ export default function AddHonors() {
                 required
               />
               <button
-                className="bg-danger"
+                className="me-1 bg-danger"
                 type="button"
                 onClick={() => handleRemoveSize(index)}
               >
@@ -323,53 +446,175 @@ export default function AddHonors() {
 
         <BorderInputBox className="mt-3">
           <label>عکس ها و فیلم های محصول :</label>
-          {imgData.map((item, index) => (
-            <div className="d-flex flex-row gap-2 flex-wrap mt-2" key={index}>
-              <div className="d-flex flex-column">
-                <span className="mb-1">عکس یا فیلم</span>
-                <input
-                  type="file"
+          <DivAdjustColorDivs columns="repeat(1, 1fr)">
+            {imgData.map((item, index) => (
+              <div
+                style={{ height: "fit-content" }}
+                className="d-flex flex-row gap-2 flex-wrap mt-2 align-items-center"
+                key={index}
+              >
+                <div className="d-flex flex-column">
+                  <span className="mb-1 NormalTextSizing">عکس یا فیلم</span>
+                  {item?.src === "" ? (
+                    <>
+                      <label
+                        className="labelInsteadOfInput"
+                        htmlFor="ImageVideoForProduct"
+                      >
+                        <div className="d-flex flex-column text-center p-1">
+                          <div>
+                            <svg
+                              width={21}
+                              height={21}
+                              viewBox="0 0 18 18"
+                              fill="none"
+                              xmlns="http://www.w3.org/2000/svg"
+                            >
+                              <path
+                                d="M2.25 11.25C2.25 13.3713 2.25 14.432 2.90901 15.091C3.56802 15.75 4.62868 15.75 6.75 15.75H11.25C13.3713 15.75 14.432 15.75 15.091 15.091C15.75 14.432 15.75 13.3713 15.75 11.25"
+                                stroke="#404040"
+                                strokeLinecap="round"
+                                strokeLinejoin="round"
+                              />
+                              <path
+                                d="M9 12V2.25M9 2.25L12 5.53125M9 2.25L6 5.53125"
+                                stroke="#404040"
+                                strokeLinecap="round"
+                                strokeLinejoin="round"
+                              />
+                            </svg>
+                          </div>
+                          <p className={`colorTheInputFile discription`}>
+                            بارگذاری فایل .png یا .jpg
+                          </p>
+                          <p className={`colorTheInputFile discription`}>
+                            حداکثر تا 5 مگابایت
+                          </p>
+                        </div>
+                      </label>
+                      <input
+                        className="d-none"
+                        id="ImageVideoForProduct"
+                        type="file"
+                        onChange={(e) =>
+                          handleFileChange(e, index, setImgData, imgData)
+                        }
+                        required
+                      />
+                    </>
+                  ) : (
+                    <>
+                      <div
+                        className="d-flex flex-column"
+                        style={{ width: "fit-content" }}
+                      >
+                        <BOX
+                          // onClick={() => handleOpen(logo)}
+                          component="img"
+                          src={URL.createObjectURL(item?.src) || ""}
+                          alt="UserColorImage"
+                        />
+                      </div>
+                    </>
+                  )}
+                </div>
+
+                <select
+                  value={item.type}
                   onChange={(e) =>
-                    handleFileChange(e, index, setImgData, imgData)
+                    setImgData(
+                      imgData.map((img, i) =>
+                        i === index ? { ...img, type: e.target.value } : img
+                      )
+                    )
                   }
                   required
-                />
+                >
+                  <option value={1}>عکس :</option>
+                  <option value={2}>فیلم :</option>
+                </select>
+                {item.type === "2" && (
+                  <div className="d-flex flex-column">
+                    <span className="mb-1 NormalTextSizing">پوستر فیلم</span>
+                    {item?.poster === "" ? (
+                      <>
+                        <label
+                          className="labelInsteadOfInput"
+                          htmlFor="posterFilm"
+                        >
+                          <div className="d-flex flex-column text-center p-1">
+                            <div>
+                              <svg
+                                width={21}
+                                height={21}
+                                viewBox="0 0 18 18"
+                                fill="none"
+                                xmlns="http://www.w3.org/2000/svg"
+                              >
+                                <path
+                                  d="M2.25 11.25C2.25 13.3713 2.25 14.432 2.90901 15.091C3.56802 15.75 4.62868 15.75 6.75 15.75H11.25C13.3713 15.75 14.432 15.75 15.091 15.091C15.75 14.432 15.75 13.3713 15.75 11.25"
+                                  stroke="#404040"
+                                  strokeLinecap="round"
+                                  strokeLinejoin="round"
+                                />
+                                <path
+                                  d="M9 12V2.25M9 2.25L12 5.53125M9 2.25L6 5.53125"
+                                  stroke="#404040"
+                                  strokeLinecap="round"
+                                  strokeLinejoin="round"
+                                />
+                              </svg>
+                            </div>
+                            <p className={`colorTheInputFile discription`}>
+                              بارگذاری فایل .png یا .jpg
+                            </p>
+                            <p className={`colorTheInputFile discription`}>
+                              حداکثر تا 5 مگابایت
+                            </p>
+                          </div>
+                        </label>
+                        <input
+                          accept={`${process.env.NEXT_PUBLIC_INPUT_IMAGE_FORMAT}`}
+                          className="d-none"
+                          id="posterFilm"
+                          type="file"
+                          onChange={(e) =>
+                            handleFileChangePoster(
+                              e,
+                              index,
+                              setImgData,
+                              imgData
+                            )
+                          }
+                        />
+                      </>
+                    ) : (
+                      <>
+                        <div
+                          className="d-flex flex-column"
+                          style={{ width: "fit-content" }}
+                        >
+                          <BOX
+                            // onClick={() => handleOpen(logo)}
+                            component="img"
+                            src={URL.createObjectURL(item?.poster) || ""}
+                            alt="UserColorImage"
+                          />
+                        </div>
+                      </>
+                    )}
+                  </div>
+                )}
+                <button
+                  className="bg-danger"
+                  type="button"
+                  onClick={() => handleRemoveImgData(index)}
+                >
+                  حذف
+                </button>
               </div>
-
-              <select
-                value={item.type}
-                onChange={(e) =>
-                  setImgData(
-                    imgData.map((img, i) =>
-                      i === index ? { ...img, type: e.target.value } : img
-                    )
-                  )
-                }
-                required
-              >
-                <option value={1}>عکس :</option>
-                <option value={2}>فیلم :</option>
-              </select>
-              {item.type === "2" && (
-                <div className="d-flex flex-column">
-                  <span className="mb-1">پوستر فیلم</span>
-                  <input
-                    type="file"
-                    onChange={(e) =>
-                      handleFileChangePoster(e, index, setImgData, imgData)
-                    }
-                  />
-                </div>
-              )}
-              <button
-                className="bg-danger"
-                type="button"
-                onClick={() => handleRemoveImgData(index)}
-              >
-                حذف
-              </button>
-            </div>
-          ))}
+            ))}
+          </DivAdjustColorDivs>
           <button
             className="mt-2 bg-success"
             type="button"
@@ -381,13 +626,14 @@ export default function AddHonors() {
 
         <BorderInputBox className="mt-3">
           <label>فیلم ها:</label>
+          <DivAdjustColorDivs style={{width: "100%"}} columns="repeat(1, 1fr)">
           {media.map((item, index) => (
             <div className="mt-2" key={index}>
               <div className="d-flex flex-row align-items-center gap-3 flex-wrap">
                 <input
-                  style={{width: "45%"}}
+                  style={{ width: "45%" }}
                   type="text"
-                  placeholder="Title"
+                  placeholder="عنوان فیلم"
                   value={item.title}
                   onChange={(e) =>
                     setMedia(
@@ -399,9 +645,9 @@ export default function AddHonors() {
                   required
                 />
                 <input
-                  style={{width: "45%"}}
+                  style={{ width: "45%" }}
                   type="text"
-                  placeholder="Description"
+                  placeholder="توضیحات"
                   value={item.description}
                   onChange={(e) =>
                     setMedia(
@@ -413,9 +659,9 @@ export default function AddHonors() {
                   required
                 />
               </div>
-
+              <DivAdjustColorDivs className="mt-2 mb-2"  columns="repeat(2, 1fr)">
               <div className="d-flex flex-column">
-                <span>فیلم :</span>
+                <span className="NormalTextSizing">فیلم :</span>
                 <input
                   type="file"
                   onChange={(e) => handleFileChange(e, index, setMedia, media)}
@@ -424,8 +670,9 @@ export default function AddHonors() {
               </div>
 
               <div className="d-flex flex-column">
-                <span>پوستر فیلم :</span>
+                <span className="NormalTextSizing">پوستر فیلم :</span>
                 <input
+                  accept={`${process.env.NEXT_PUBLIC_INPUT_IMAGE_FORMAT}`}
                   type="file"
                   onChange={(e) =>
                     handleFileChangePoster(e, index, setMedia, media)
@@ -433,7 +680,7 @@ export default function AddHonors() {
                   required
                 />
               </div>
-
+              </DivAdjustColorDivs>
               <button
                 className="bg-danger"
                 type="button"
@@ -441,8 +688,10 @@ export default function AddHonors() {
               >
                 حذف
               </button>
+              
             </div>
           ))}
+          </DivAdjustColorDivs>
           <button
             className="mt-2 bg-success"
             type="button"
@@ -451,7 +700,7 @@ export default function AddHonors() {
             اضافه کردن ویدیو
           </button>
         </BorderInputBox>
-        <button type="submit" className="mt-3 bg-success">
+        <button type="submit" className="mt-3 mb-3 bg-success">
           اضافه کردن محصول
         </button>
         {/* modal  */}
@@ -467,6 +716,6 @@ export default function AddHonors() {
           text={"محصول با موفقیت اضافه شد"}
         />
       </form>
-    </>
+    </div>
   );
 }

@@ -66,7 +66,7 @@ const ProcessTracker = ({ currentStep }) => {
           </div>
         ))}
       </div>
-      <div className="d-block d-lg-none me-2 mb-3 mt-2">
+      <div className="d-block d-lg-none ms-2 me-2 mb-3 mt-2">
         <div className="d-flex flex-row justify-content-between mb-2">
           <p className="VodeoDisSizing">{steps[currentStep-1].label}</p>
           <div>

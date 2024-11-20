@@ -52,7 +52,7 @@ export default function HonorsMainComponent({ toggleShow }) {
 
   // add honors
   const [activekey, setActiveKey] = useState("editUserPage");
-  
+
   // edit honors
   const [editedHonor, setEditedHonor] = useState(null);
 
@@ -77,7 +77,6 @@ export default function HonorsMainComponent({ toggleShow }) {
   const handleCancelEdit = () => {
     setEditedHonor(null);
   };
-
 
   return (
     <section>
@@ -121,10 +120,7 @@ export default function HonorsMainComponent({ toggleShow }) {
               ویرایش محصول
             </div>
             <div>
-              <button
-                className="bg-success"
-                onClick={handleCancelEdit}
-              >
+              <button className="bg-success" onClick={handleCancelEdit}>
                 محصولات
               </button>
             </div>
@@ -205,9 +201,7 @@ export default function HonorsMainComponent({ toggleShow }) {
 
       {activekey === "addUser" && !editedHonor && (
         <>
-          <div>
-            <AddProduct />
-          </div>
+          <AddProduct />
         </>
       )}
       {editedHonor && (
