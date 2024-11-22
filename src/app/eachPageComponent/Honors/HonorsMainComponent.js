@@ -135,7 +135,7 @@ export default function HonorsMainComponent({ toggleShow }) {
             </div>
           </div> */}
           <div
-            className="mt-3 d-flex flex-column gap-3"
+            className="mt-3 d-flex flex-column gap-3 container"
             style={{ cursor: "pointer" }}
           >
             {dataCome.length > 0 ? (

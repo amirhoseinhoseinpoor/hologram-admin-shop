@@ -62,6 +62,15 @@ const FORMCONTROLLABEL = styled(FormControlLabel)`
   }
 `;
 
+const DELETEUPLODEDIMAGE = styled.button`
+  position: absolute;
+  bottom: 0;
+  left: -5%;
+  transform: translate(50%, -50%);
+  border: none;
+  border-radius: 4px;
+`;
+
 const LABELIMAGEUPLOAD = styled.label`
   border: 1px solid #c0c0c0;
   border-radius: 4px;
@@ -309,7 +318,6 @@ export default function EditHonors({
 
   return (
     <div className="mt-3">
-      <h2>ویرایش وبلاگ</h2>
       <form onSubmit={areYouShureFunction} className="p-3">
         <TEXTFIELD
           fullWidth
@@ -332,49 +340,12 @@ export default function EditHonors({
           onChange={handleTypeChange}
           margin="normal"
         />
-        <p className="VodeoDisSizing mb-1 me-1">عکس اصلی مقاله</p>
+        <p className="NormalTextSizing mb-1 me-1">عکس اصلی مقاله</p>
 
         {bannerImage ? (
           <>
-            <input
-              className="d-none"
-              type="file"
-              accept={`${process.env.NEXT_PUBLIC_INPUT_IMAGE_FORMAT}`}
-              id="blogImage"
-              onChange={handleBannerImageUpload}
-            />
-            <LABELIMAGEUPLOAD htmlFor="blogImage">
-              <div className="d-flex flex-column text-center p-1">
-                <div>
-                  <svg
-                    width={21}
-                    height={21}
-                    viewBox="0 0 18 18"
-                    fill="none"
-                    xmlns="http://www.w3.org/2000/svg"
-                  >
-                    <path
-                      d="M2.25 11.25C2.25 13.3713 2.25 14.432 2.90901 15.091C3.56802 15.75 4.62868 15.75 6.75 15.75H11.25C13.3713 15.75 14.432 15.75 15.091 15.091C15.75 14.432 15.75 13.3713 15.75 11.25"
-                      stroke="#404040"
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                    />
-                    <path
-                      d="M9 12V2.25M9 2.25L12 5.53125M9 2.25L6 5.53125"
-                      stroke="#404040"
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                    />
-                  </svg>
-                </div>
-                <p className={`colorTheInputFile discription`}>
-                  بارگذاری فایل .png یا .jpg
-                </p>
-              </div>
-            </LABELIMAGEUPLOAD>
-
             <div
-              className="d-flex flex-column"
+              className="d-flex flex-column position-relative"
               style={{ width: "fit-content" }}
             >
               <BOX
@@ -386,6 +357,46 @@ export default function EditHonors({
                 }
                 alt="UserColorImage"
               />
+              <DELETEUPLODEDIMAGE onClick={() => setBannerImage(null)}>
+                <svg
+                  width={17}
+                  height={17}
+                  viewBox="0 0 12 12"
+                  fill="none"
+                  xmlns="http://www.w3.org/2000/svg"
+                >
+                  <path
+                    d="M10.5 2.98828C8.835 2.82328 7.16 2.73828 5.49 2.73828C4.5 2.73828 3.51 2.78828 2.52 2.88828L1.5 2.98828"
+                    stroke="#FF4F3F"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                  />
+                  <path
+                    d="M4.25 2.485L4.36 1.83C4.44 1.355 4.5 1 5.345 1H6.655C7.5 1 7.565 1.375 7.64 1.835L7.75 2.485"
+                    stroke="#FF4F3F"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                  />
+                  <path
+                    d="M9.4252 4.57031L9.1002 9.60531C9.0452 10.3903 9.0002 11.0003 7.6052 11.0003H4.3952C3.0002 11.0003 2.9552 10.3903 2.9002 9.60531L2.5752 4.57031"
+                    stroke="#FF4F3F"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                  />
+                  <path
+                    d="M5.16504 8.25H6.83004"
+                    stroke="#FF4F3F"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                  />
+                  <path
+                    d="M4.75 6.25H7.25"
+                    stroke="#FF4F3F"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                  />
+                </svg>
+              </DELETEUPLODEDIMAGE>
             </div>
           </>
         ) : (
@@ -429,21 +440,6 @@ export default function EditHonors({
           </>
         )}
 
-        {/* <input
-          type="file"
-          id="bannerImage"
-          onChange={handleBannerImageUpload}
-        /> */}
-        {/* {bannerImage && (
-          <Box sx={{ width: "100px", height: "100px", marginTop: "10px" }}>
-            <CardMedia
-              component="img"
-              src={`${process.env.NEXT_PUBLIC_BACK_END_SERVER}/system/download/${bannerImage}`}
-              sx={{ width: "100%", height: "100%", borderRadius: 3 }}
-            />
-          </Box>
-        )} */}
-
         <TEXTFIELD
           fullWidth
           label="posetives"
@@ -468,47 +464,14 @@ export default function EditHonors({
           margin="normal"
         />
 
-        <label htmlFor="ProductImage">عکس محصول تبلیغاتی</label>
+        <label className="NormalTextSizing" htmlFor="ProductImage">
+          عکس محصول تبلیغاتی
+        </label>
         {productSrc ? (
           <>
-            <input
-              className="d-none"
-              type="file"
-              accept={`${process.env.NEXT_PUBLIC_INPUT_IMAGE_FORMAT}`}
-              id="blogImage"
-              onChange={handleBannerImageUpload}
-            />
-            <LABELIMAGEUPLOAD htmlFor="blogImage">
-              <div className="d-flex flex-column text-center p-1">
-                <div>
-                  <svg
-                    width={21}
-                    height={21}
-                    viewBox="0 0 18 18"
-                    fill="none"
-                    xmlns="http://www.w3.org/2000/svg"
-                  >
-                    <path
-                      d="M2.25 11.25C2.25 13.3713 2.25 14.432 2.90901 15.091C3.56802 15.75 4.62868 15.75 6.75 15.75H11.25C13.3713 15.75 14.432 15.75 15.091 15.091C15.75 14.432 15.75 13.3713 15.75 11.25"
-                      stroke="#404040"
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                    />
-                    <path
-                      d="M9 12V2.25M9 2.25L12 5.53125M9 2.25L6 5.53125"
-                      stroke="#404040"
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                    />
-                  </svg>
-                </div>
-                <p className={`colorTheInputFile discription`}>
-                  بارگذاری فایل .png یا .jpg
-                </p>
-              </div>
-            </LABELIMAGEUPLOAD>
+           
             <div
-              className="d-flex flex-column"
+              className="d-flex flex-column position-relative"
               style={{ width: "fit-content" }}
             >
               <BOX
@@ -520,6 +483,46 @@ export default function EditHonors({
                 }
                 alt="BlogProductImage"
               />
+              <DELETEUPLODEDIMAGE onClick={() => setproductSrc("")}>
+                <svg
+                  width={17}
+                  height={17}
+                  viewBox="0 0 12 12"
+                  fill="none"
+                  xmlns="http://www.w3.org/2000/svg"
+                >
+                  <path
+                    d="M10.5 2.98828C8.835 2.82328 7.16 2.73828 5.49 2.73828C4.5 2.73828 3.51 2.78828 2.52 2.88828L1.5 2.98828"
+                    stroke="#FF4F3F"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                  />
+                  <path
+                    d="M4.25 2.485L4.36 1.83C4.44 1.355 4.5 1 5.345 1H6.655C7.5 1 7.565 1.375 7.64 1.835L7.75 2.485"
+                    stroke="#FF4F3F"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                  />
+                  <path
+                    d="M9.4252 4.57031L9.1002 9.60531C9.0452 10.3903 9.0002 11.0003 7.6052 11.0003H4.3952C3.0002 11.0003 2.9552 10.3903 2.9002 9.60531L2.5752 4.57031"
+                    stroke="#FF4F3F"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                  />
+                  <path
+                    d="M5.16504 8.25H6.83004"
+                    stroke="#FF4F3F"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                  />
+                  <path
+                    d="M4.75 6.25H7.25"
+                    stroke="#FF4F3F"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                  />
+                </svg>
+              </DELETEUPLODEDIMAGE>
             </div>
           </>
         ) : (

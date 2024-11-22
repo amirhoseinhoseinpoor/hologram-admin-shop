@@ -72,15 +72,6 @@ export default function HonorsMainComponent({ toggleShow }) {
     setEditedHonor(null);
   };
 
-  // const handleEditImageChange = (event) => {
-  //   const newImage = event.target.files[0];
-  //   setEditedHonor({
-  //     ...editedHonor,
-  //     src: URL.createObjectURL(newImage),
-  //     newImageFile: newImage,
-  //   });
-  // };
-
   return (
     <section>
       <HeadermakeOrder className="d-flex flex-row mb-3 justify-content-between">
@@ -135,9 +126,8 @@ export default function HonorsMainComponent({ toggleShow }) {
       </HeadermakeOrder>
       {activekey === "editUserPage" && !editedHonor && (
         <>
-          
           <div
-            className="mt-3 d-flex flex-column gap-3"
+            className="mt-3 d-flex flex-column gap-3 container"
             style={{ cursor: "pointer" }}
           >
             {dataCome.length > 0 ? (

@@ -13,6 +13,7 @@ import { productListData } from "@/app/Store/slice";
 import { Card, CardContent, CardMedia, Typography } from "@mui/material";
 import styled from "styled-components";
 
+
 const HeadermakeOrder = styled.div`
   background-color: white;
   padding: 10px;
@@ -130,7 +131,7 @@ export default function HonorsMainComponent({ toggleShow }) {
       {activekey === "editUserPage" && !editedHonor && (
         <>
           <div
-            className="mt-3 d-flex flex-column gap-3"
+            className="mt-3 d-flex flex-column gap-3 container"
             style={{ cursor: "pointer" }}
           >
             {datacome &&
