@@ -9,30 +9,7 @@ import { Box } from "@mui/material";
 
 const DivAdjustColorDivs = styled.div`
   display: grid;
-  grid-template-columns: ${(props) => props.columns || '1fr'};;
-  grid-gap: 20px;
-  width: fit-content;
-  .labelInsteadOfInput {
-    border: 1px solid #c0c0c0;
-    border-radius: 4px;
-    padding: 10px;
-    width: 100%;
-    height: 77%;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-  }
-  .colorTheInputFile {
-    color: #404040;
-  }
-  @media (max-width: 768px) {
-    grid-template-columns: repeat(1, 1fr);
-  }
-`;
-
-const DivAdjustImageAndVideoDivs = styled.div`
-  display: grid;
-  grid-template-columns: repeat(1, 1fr);
+  grid-template-columns: ${(props) => props.columns || "1fr"};
   grid-gap: 20px;
   width: fit-content;
   .labelInsteadOfInput {
@@ -70,12 +47,14 @@ export default function AddHonors() {
   const [name, setName] = useState("");
   const [title, setTitle] = useState("");
   const [subtitle, setSubtitle] = useState("");
+  const [subtitleCompelete, setSubtitleCompelete] = useState("");
   const [colors, setColors] = useState([{ name: "", src: "" }]);
   const [sizes, setSizes] = useState([""]);
   const [imgData, setImgData] = useState([{ src: "", type: "1", poster: "" }]);
   const [media, setMedia] = useState([
     { title: "", description: "", src: "", poster: "" },
   ]);
+  const [ObjectUrlForVideo, setObjectUrlForVideo] = useState("");
 
   // modal state
   const [openModal, setOpenModal] = useState(false);
@@ -86,6 +65,12 @@ export default function AddHonors() {
 
   const handleFileChange = (e, index, setFunction, state) => {
     const file = e.target.files[0];
+    let fileURL;
+    if (file) {
+      fileURL = URL.createObjectURL(file);
+      setObjectUrlForVideo(fileURL);
+    }
+
     const updatedState = state.map((item, i) =>
       i === index ? { ...item, src: file } : item
     );
@@ -248,6 +233,7 @@ export default function AddHonors() {
       const info = {
         title,
         subtitle,
+        subtitleCompelete,
         color: uploadedColors,
         sizes,
         imgData: uploadedImgData, // Use uploaded image data with IDs
@@ -274,8 +260,6 @@ export default function AddHonors() {
   return (
     <div className="container">
       <form onSubmit={areYouShureFunction}>
-        {/* <label htmlFor="bannerImage">Image:</label>
-        <input type="file" id="bannerImage" onChange={handleImageChange} /> */}
         <label htmlFor="name">اسم محصول :</label>
         <input
           type="text"
@@ -298,6 +282,14 @@ export default function AddHonors() {
           id="bannerTags"
           value={subtitle}
           onChange={(e) => setSubtitle(e.target.value)}
+          required
+        />
+        <label htmlFor="DiscriptionCompelete">توضیحات تکمیلی :</label>
+        <textarea
+          type="text"
+          id="DiscriptionCompelete"
+          value={subtitleCompelete}
+          onChange={(e) => setSubtitleCompelete(e.target.value)}
           required
         />
 
@@ -488,13 +480,14 @@ export default function AddHonors() {
                             بارگذاری فایل .png یا .jpg
                           </p>
                           <p className={`colorTheInputFile discription`}>
-                            حداکثر تا 5 مگابایت
+                            یا فیلم mp4
                           </p>
                         </div>
                       </label>
                       <input
                         className="d-none"
                         id="ImageVideoForProduct"
+                        accept={`${process.env.NEXT_PUBLIC_INPUT_IMAGE_AND_VIDEO_FORMAT}`}
                         type="file"
                         onChange={(e) =>
                           handleFileChange(e, index, setImgData, imgData)
@@ -626,71 +619,186 @@ export default function AddHonors() {
 
         <BorderInputBox className="mt-3">
           <label>فیلم ها:</label>
-          <DivAdjustColorDivs style={{width: "100%"}} columns="repeat(1, 1fr)">
-          {media.map((item, index) => (
-            <div className="mt-2" key={index}>
-              <div className="d-flex flex-row align-items-center gap-3 flex-wrap">
-                <input
-                  style={{ width: "45%" }}
-                  type="text"
-                  placeholder="عنوان فیلم"
-                  value={item.title}
-                  onChange={(e) =>
-                    setMedia(
-                      media.map((m, i) =>
-                        i === index ? { ...m, title: e.target.value } : m
+          <DivAdjustColorDivs
+            style={{ width: "100%" }}
+            columns="repeat(1, 1fr)"
+          >
+            {media.map((item, index) => (
+              <div className="mt-2" key={index}>
+                <div className="d-flex flex-row align-items-center gap-3 flex-wrap">
+                  <input
+                    style={{ width: "45%" }}
+                    type="text"
+                    placeholder="عنوان فیلم"
+                    value={item.title}
+                    onChange={(e) =>
+                      setMedia(
+                        media.map((m, i) =>
+                          i === index ? { ...m, title: e.target.value } : m
+                        )
                       )
-                    )
-                  }
-                  required
-                />
-                <input
-                  style={{ width: "45%" }}
-                  type="text"
-                  placeholder="توضیحات"
-                  value={item.description}
-                  onChange={(e) =>
-                    setMedia(
-                      media.map((m, i) =>
-                        i === index ? { ...m, description: e.target.value } : m
+                    }
+                    required
+                  />
+                  <input
+                    style={{ width: "45%" }}
+                    type="text"
+                    placeholder="توضیحات"
+                    value={item.description}
+                    onChange={(e) =>
+                      setMedia(
+                        media.map((m, i) =>
+                          i === index
+                            ? { ...m, description: e.target.value }
+                            : m
+                        )
                       )
-                    )
-                  }
-                  required
-                />
-              </div>
-              <DivAdjustColorDivs className="mt-2 mb-2"  columns="repeat(2, 1fr)">
-              <div className="d-flex flex-column">
-                <span className="NormalTextSizing">فیلم :</span>
-                <input
-                  type="file"
-                  onChange={(e) => handleFileChange(e, index, setMedia, media)}
-                  required
-                />
-              </div>
+                    }
+                    required
+                  />
+                </div>
+                <DivAdjustColorDivs
+                  className="mt-2 mb-2"
+                  columns="repeat(2, 1fr)"
+                >
+                  <div className="d-flex flex-column">
+                    <span className="NormalTextSizing">فیلم :</span>
+                    {item?.src === "" ? (
+                      <>
+                        <label
+                          className="labelInsteadOfInput"
+                          htmlFor="MediaVideo"
+                        >
+                          <div className="d-flex flex-column text-center p-1">
+                            <div>
+                              <svg
+                                width={21}
+                                height={21}
+                                viewBox="0 0 18 18"
+                                fill="none"
+                                xmlns="http://www.w3.org/2000/svg"
+                              >
+                                <path
+                                  d="M2.25 11.25C2.25 13.3713 2.25 14.432 2.90901 15.091C3.56802 15.75 4.62868 15.75 6.75 15.75H11.25C13.3713 15.75 14.432 15.75 15.091 15.091C15.75 14.432 15.75 13.3713 15.75 11.25"
+                                  stroke="#404040"
+                                  strokeLinecap="round"
+                                  strokeLinejoin="round"
+                                />
+                                <path
+                                  d="M9 12V2.25M9 2.25L12 5.53125M9 2.25L6 5.53125"
+                                  stroke="#404040"
+                                  strokeLinecap="round"
+                                  strokeLinejoin="round"
+                                />
+                              </svg>
+                            </div>
 
-              <div className="d-flex flex-column">
-                <span className="NormalTextSizing">پوستر فیلم :</span>
-                <input
-                  accept={`${process.env.NEXT_PUBLIC_INPUT_IMAGE_FORMAT}`}
-                  type="file"
-                  onChange={(e) =>
-                    handleFileChangePoster(e, index, setMedia, media)
-                  }
-                  required
-                />
+                            <p className={`colorTheInputFile discription`}>
+                              فیلم mp4
+                            </p>
+                          </div>
+                        </label>
+                        <input
+                          className="d-none"
+                          id="MediaVideo"
+                          accept={`${process.env.NEXT_PUBLIC_INPUT_VIDEO_FORMAT}`}
+                          type="file"
+                          onChange={(e) =>
+                            handleFileChange(e, index, setMedia, media)
+                          }
+                          required
+                        />
+                      </>
+                    ) : (
+                      <>
+                        <div
+                          className="d-flex flex-column"
+                          style={{ width: "fit-content" }}
+                        >
+                          <BOX
+                            // onClick={() => handleOpen(logo)}
+                            component="video"
+                            src={ObjectUrlForVideo || ""}
+                            controls
+                          />
+                        </div>
+                      </>
+                    )}
+                  </div>
+
+                  <div className="d-flex flex-column">
+                    <span className="NormalTextSizing">پوستر فیلم :</span>
+                    {item?.poster === "" ? (
+                      <>
+                        <label
+                          className="labelInsteadOfInput"
+                          htmlFor="PosterVideoVideo"
+                        >
+                          <div className="d-flex flex-column text-center p-1">
+                            <div>
+                              <svg
+                                width={21}
+                                height={21}
+                                viewBox="0 0 18 18"
+                                fill="none"
+                                xmlns="http://www.w3.org/2000/svg"
+                              >
+                                <path
+                                  d="M2.25 11.25C2.25 13.3713 2.25 14.432 2.90901 15.091C3.56802 15.75 4.62868 15.75 6.75 15.75H11.25C13.3713 15.75 14.432 15.75 15.091 15.091C15.75 14.432 15.75 13.3713 15.75 11.25"
+                                  stroke="#404040"
+                                  strokeLinecap="round"
+                                  strokeLinejoin="round"
+                                />
+                                <path
+                                  d="M9 12V2.25M9 2.25L12 5.53125M9 2.25L6 5.53125"
+                                  stroke="#404040"
+                                  strokeLinecap="round"
+                                  strokeLinejoin="round"
+                                />
+                              </svg>
+                            </div>
+                            <p className={`colorTheInputFile discription`}>
+                              بارگذاری فایل .png یا .jpg
+                            </p>
+                          </div>
+                        </label>
+                        <input
+                          className="d-none"
+                          id="PosterVideoVideo"
+                          accept={`${process.env.NEXT_PUBLIC_INPUT_IMAGE_FORMAT}`}
+                          type="file"
+                          onChange={(e) =>
+                            handleFileChangePoster(e, index, setMedia, media)
+                          }
+                          required
+                        />
+                      </>
+                    ) : (
+                      <>
+                        <div
+                          className="d-flex flex-column"
+                          style={{ width: "fit-content" }}
+                        >
+                          <BOX
+                            // onClick={() => handleOpen(logo)}
+                            component="img"
+                            src={URL.createObjectURL(item?.poster) || ""}
+                            controls
+                          />
+                        </div>
+                      </>
+                    )}
+                  </div>
+                </DivAdjustColorDivs>
+                <button
+                  className="bg-danger"
+                  type="button"
+                  onClick={() => handleRemoveMedia(index)}
+                >
+                  حذف
+                </button>
               </div>
-              </DivAdjustColorDivs>
-              <button
-                className="bg-danger"
-                type="button"
-                onClick={() => handleRemoveMedia(index)}
-              >
-                حذف
-              </button>
-              
-            </div>
-          ))}
+            ))}
           </DivAdjustColorDivs>
           <button
             className="mt-2 bg-success"
