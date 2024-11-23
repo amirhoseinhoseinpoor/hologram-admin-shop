@@ -211,7 +211,6 @@
   background-color: white;
   height: 100%;
   border-radius: 5px;
-  padding-bottom: 17px;
 }
 
 /* Customize scrollbar for WebKit browsers */
@@ -254,6 +253,9 @@
 @media (max-width: 980px) {
   .modalStyleclass {
     width: 500px;
+  }
+  .stepContent {
+    padding: 0;
   }
 }
 

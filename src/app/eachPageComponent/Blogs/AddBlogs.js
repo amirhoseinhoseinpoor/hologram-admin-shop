@@ -1,10 +1,31 @@
 import React, { useState, useEffect } from "react";
 import { Editor } from "@tinymce/tinymce-react";
-import { Checkbox, FormControlLabel, TextField, Button } from "@mui/material";
+import {
+  Checkbox,
+  FormControlLabel,
+  TextField,
+  Button,
+  Box,
+} from "@mui/material";
 import styled from "styled-components";
 import AreYouShureModal from "@/app/BaseComponent/AreYouSureModal";
 import ConfirmModal from "@/app/BaseComponent/ConfirmingModal";
 import ErrorModal from "@/app/BaseComponent/ErrorModal";
+
+const DELETEUPLODEDIMAGE = styled.button`
+  position: absolute;
+  bottom: 0;
+  left: -5%;
+  transform: translate(50%, -50%);
+  border: none;
+  border-radius: 4px;
+`;
+
+const BOX = styled(Box)`
+  max-width: 200px;
+  max-height: 200px;
+  border-radius: 4px;
+`;
 
 const TEXTFIELD = styled(TextField)`
   .MuiInputBase-input {
@@ -13,6 +34,30 @@ const TEXTFIELD = styled(TextField)`
   .css-14s5rfu-MuiFormLabel-root-MuiInputLabel-root {
     transform: translate(50%, 50%);
   }
+  .css-md26zr-MuiInputBase-root-MuiOutlinedInput-root {
+    font-family: unset !important;
+  }
+  .css-1jy569b-MuiFormLabel-root-MuiInputLabel-root {
+    font-family: unset !important;
+  }
+  .css-14s5rfu-MuiFormLabel-root-MuiInputLabel-root {
+    font-family: unset !important;
+  }
+  .css-1jy569b-MuiFormLabel-root-MuiInputLabel-root {
+    left: 3px;
+  }
+`;
+
+const LABELIMAGEUPLOAD = styled.label`
+  border: 1px solid #c0c0c0;
+  border-radius: 4px;
+  padding: 10px;
+  width: 100%;
+  height: 77%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: fit-content;
 `;
 
 const FORMCONTROLLABEL = styled(FormControlLabel)`
@@ -214,7 +259,7 @@ export default function AddHonors() {
       <form onSubmit={areYouShureFunction} className="p-3">
         <TEXTFIELD
           fullWidth
-          label="Title"
+          label="عنوان"
           value={bannerTitle}
           onChange={handleTitleChange}
           margin="normal"
@@ -228,21 +273,114 @@ export default function AddHonors() {
         />
         <TEXTFIELD
           fullWidth
-          label="Type"
+          label="نوع"
           value={blogType}
           onChange={handleTypeChange}
           margin="normal"
         />
-        <label htmlFor="bannerImage">Select Image:</label>
-        <input
-          type="file"
-          id="bannerImage"
-          onChange={handleBannerImageUpload}
-        />
+        <p className="VodeoDisSizing mb-1 me-1">عکس اصلی مقاله</p>
+        {bannerImage ? (
+          <>
+            <div
+              className="d-flex flex-column position-relative"
+              style={{ width: "fit-content" }}
+            >
+              <BOX
+                // onClick={() => handleOpen(logo)}
+                component="img"
+                src={
+                  `${process.env.NEXT_PUBLIC_BACK_END_SERVER}/system/download/${bannerImage}` ||
+                  ""
+                }
+                alt="UserColorImage"
+              />
+
+              <DELETEUPLODEDIMAGE onClick={() => setBannerImage(null)}>
+                <svg
+                  width={17}
+                  height={17}
+                  viewBox="0 0 12 12"
+                  fill="none"
+                  xmlns="http://www.w3.org/2000/svg"
+                >
+                  <path
+                    d="M10.5 2.98828C8.835 2.82328 7.16 2.73828 5.49 2.73828C4.5 2.73828 3.51 2.78828 2.52 2.88828L1.5 2.98828"
+                    stroke="#FF4F3F"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                  />
+                  <path
+                    d="M4.25 2.485L4.36 1.83C4.44 1.355 4.5 1 5.345 1H6.655C7.5 1 7.565 1.375 7.64 1.835L7.75 2.485"
+                    stroke="#FF4F3F"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                  />
+                  <path
+                    d="M9.4252 4.57031L9.1002 9.60531C9.0452 10.3903 9.0002 11.0003 7.6052 11.0003H4.3952C3.0002 11.0003 2.9552 10.3903 2.9002 9.60531L2.5752 4.57031"
+                    stroke="#FF4F3F"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                  />
+                  <path
+                    d="M5.16504 8.25H6.83004"
+                    stroke="#FF4F3F"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                  />
+                  <path
+                    d="M4.75 6.25H7.25"
+                    stroke="#FF4F3F"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                  />
+                </svg>
+              </DELETEUPLODEDIMAGE>
+            </div>
+          </>
+        ) : (
+          <>
+            <LABELIMAGEUPLOAD htmlFor="blogImage">
+              <div className="d-flex flex-column text-center p-1">
+                <div>
+                  <svg
+                    width={21}
+                    height={21}
+                    viewBox="0 0 18 18"
+                    fill="none"
+                    xmlns="http://www.w3.org/2000/svg"
+                  >
+                    <path
+                      d="M2.25 11.25C2.25 13.3713 2.25 14.432 2.90901 15.091C3.56802 15.75 4.62868 15.75 6.75 15.75H11.25C13.3713 15.75 14.432 15.75 15.091 15.091C15.75 14.432 15.75 13.3713 15.75 11.25"
+                      stroke="#404040"
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                    />
+                    <path
+                      d="M9 12V2.25M9 2.25L12 5.53125M9 2.25L6 5.53125"
+                      stroke="#404040"
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                    />
+                  </svg>
+                </div>
+                <p className={`colorTheInputFile discription`}>
+                  بارگذاری فایل .png یا .jpg
+                </p>
+              </div>
+            </LABELIMAGEUPLOAD>
+            <input
+              className="d-none"
+              type="file"
+              accept={`${process.env.NEXT_PUBLIC_INPUT_IMAGE_FORMAT}`}
+              id="blogImage"
+              onChange={handleBannerImageUpload}
+            />
+          </>
+        )}
 
         <TEXTFIELD
           fullWidth
-          label="posetives"
+          label="نکات مثبت"
           value={posetives}
           onChange={handlePosetivesChange}
           margin="normal"
@@ -250,7 +388,7 @@ export default function AddHonors() {
 
         <TEXTFIELD
           fullWidth
-          label="negetive"
+          label="نکات منفی"
           value={negetive}
           onChange={handleNegetivesChange}
           margin="normal"
@@ -258,22 +396,118 @@ export default function AddHonors() {
 
         <TEXTFIELD
           fullWidth
-          label="productTitle"
+          label="تایتل محصول"
           value={productTitle}
           onChange={handleProductTitleChange}
           margin="normal"
         />
 
-        <label htmlFor="ProductImage">Select Image Product:</label>
-        <input
-          type="file"
-          id="ProductImage"
-          onChange={handleProductSrcChange}
-        />
+        <p className="VodeoDisSizing mb-1">عکس محصول تبلیغاتی</p>
+
+        {productSrc ? (
+          <>
+            <div
+              className="d-flex flex-column position-relative"
+              style={{ width: "fit-content" }}
+            >
+              <BOX
+                // onClick={() => handleOpen(logo)}
+                component="img"
+                src={
+                  `${process.env.NEXT_PUBLIC_BACK_END_SERVER}/system/download/${productSrc}` ||
+                  ""
+                }
+                alt="BlogProductImage"
+              />
+
+              <DELETEUPLODEDIMAGE onClick={() => setproductSrc("")}>
+                <svg
+                  width={17}
+                  height={17}
+                  viewBox="0 0 12 12"
+                  fill="none"
+                  xmlns="http://www.w3.org/2000/svg"
+                >
+                  <path
+                    d="M10.5 2.98828C8.835 2.82328 7.16 2.73828 5.49 2.73828C4.5 2.73828 3.51 2.78828 2.52 2.88828L1.5 2.98828"
+                    stroke="#FF4F3F"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                  />
+                  <path
+                    d="M4.25 2.485L4.36 1.83C4.44 1.355 4.5 1 5.345 1H6.655C7.5 1 7.565 1.375 7.64 1.835L7.75 2.485"
+                    stroke="#FF4F3F"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                  />
+                  <path
+                    d="M9.4252 4.57031L9.1002 9.60531C9.0452 10.3903 9.0002 11.0003 7.6052 11.0003H4.3952C3.0002 11.0003 2.9552 10.3903 2.9002 9.60531L2.5752 4.57031"
+                    stroke="#FF4F3F"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                  />
+                  <path
+                    d="M5.16504 8.25H6.83004"
+                    stroke="#FF4F3F"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                  />
+                  <path
+                    d="M4.75 6.25H7.25"
+                    stroke="#FF4F3F"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                  />
+                </svg>
+              </DELETEUPLODEDIMAGE>
+            </div>
+          </>
+        ) : (
+          <>
+            <LABELIMAGEUPLOAD
+              className="VodeoDisSizing mb-1"
+              htmlFor="ProductImage"
+            >
+              <div className="d-flex flex-column text-center p-1">
+                <div>
+                  <svg
+                    width={21}
+                    height={21}
+                    viewBox="0 0 18 18"
+                    fill="none"
+                    xmlns="http://www.w3.org/2000/svg"
+                  >
+                    <path
+                      d="M2.25 11.25C2.25 13.3713 2.25 14.432 2.90901 15.091C3.56802 15.75 4.62868 15.75 6.75 15.75H11.25C13.3713 15.75 14.432 15.75 15.091 15.091C15.75 14.432 15.75 13.3713 15.75 11.25"
+                      stroke="#404040"
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                    />
+                    <path
+                      d="M9 12V2.25M9 2.25L12 5.53125M9 2.25L6 5.53125"
+                      stroke="#404040"
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                    />
+                  </svg>
+                </div>
+                <p className={`colorTheInputFile discription`}>
+                  بارگذاری فایل .png یا .jpg
+                </p>
+              </div>
+            </LABELIMAGEUPLOAD>
+            <input
+              className="d-none"
+              type="file"
+              id="ProductImage"
+              onChange={handleProductSrcChange}
+            />
+          </>
+        )}
 
         <TEXTFIELD
           fullWidth
-          label="productLink"
+          label="لینک محصول"
           value={productLink}
           onChange={handleProductLinkChange}
           margin="normal"
@@ -281,7 +515,7 @@ export default function AddHonors() {
 
         <TEXTFIELD
           fullWidth
-          label="Tags"
+          label="تگ"
           value={bannerTags}
           onChange={handleTagsChange}
           margin="normal"
@@ -347,6 +581,7 @@ export default function AddHonors() {
         >
           تایید
         </Button>
+
         {/* modals */}
         <AreYouShureModal
           open={openModal}

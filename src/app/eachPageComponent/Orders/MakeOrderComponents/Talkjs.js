@@ -241,7 +241,7 @@ const ChatBox = ({
 
   return (
     <>
-      <div className={`${style.stepContent} container`}>
+      <div className={`${style.stepContent}`}>
         <div className={style.mainChatBox}>
           <div
             className={`${style.headerChatBox} d-flex flex-row justify-content-between`}
@@ -474,7 +474,7 @@ const ChatBox = ({
           </div>
         </div>
 
-        <div className="position-relative mt-3">
+        <div className="position-relative mt-3 d-flex">
           {selectedImage ? (
             <>
               <div

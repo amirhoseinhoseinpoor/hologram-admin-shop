@@ -7,14 +7,30 @@ import { Select, MenuItem, FormControl, InputLabel } from "@mui/material";
 import ConfirmingModal from "@/app/BaseComponent/ConfirmingModal";
 import ErrorModal from "@/app/BaseComponent/ErrorModal";
 import styled from "styled-components";
+// import base components
+import NavBarToggleBurgerButton from "@/app/BaseComponent/NavBarToggleBurgerButton";
 
 const HeadermakeOrder = styled.div`
-  background-color: #333;
+  background-color: white;
   padding: 10px;
   color: white;
+  .textHeaderStyle {
+    color: black;
+  }
+
+  @media (max-width: 980px) {
+    background-color: rgb(26, 32, 53) !important;
+    .textHeaderStyle {
+      color: white !important;
+    }
+  }
 `;
 
-export default function OrderMainComponent() {
+const SeeOrderButton = styled.button`
+  background-color: #1572e8;
+`;
+
+export default function OrderMainComponent({ toggleShow }) {
   const dispatch = useDispatch();
 
   const [activekey, setActiveKey] = useState("seeTable");
@@ -98,100 +114,106 @@ export default function OrderMainComponent() {
       {activekey === "seeTable" && (
         <>
           <HeadermakeOrder className="d-flex flex-row mb-3 justify-content-between">
-            <div className="discription me-2">مدیریت سفارشات</div>
+            <div className="d-block d-lg-none">
+              <NavBarToggleBurgerButton func={() => toggleShow("main")} />
+            </div>
+            <div className="NormalTextSizing textHeaderStyle d-flex align-items-center">
+              مدیریت سفارشات
+            </div>
           </HeadermakeOrder>
-          <table className="table table-striped">
-            <thead className="text-center">
-              <tr className="table-head">
-                <th>ردیف</th>
-                <th>نام</th>
-                <th>نام خانوادگی</th>
-                <th>شماره همراه</th>
-                <th>تاریخ</th>
-                <th>عملیات</th>
-                <th>وضعیت</th>
-              </tr>
-            </thead>
-            <tbody className="table-body text-center">
-              {orders?.map((item, index) => (
-                <tr key={index}>
-                  <td style={{ verticalAlign: "middle" }}>{++index}</td>
-                  <td style={{ verticalAlign: "middle" }}>
-                    {usersData[item.createdBy]?.firstName}
-                  </td>
-                  <td style={{ verticalAlign: "middle" }}>
-                    {usersData[item.createdBy]?.lastName}
-                  </td>
-                  <td style={{ verticalAlign: "middle" }}>
-                    {usersData[item.createdBy]?.username}
-                  </td>
-                  <td style={{ verticalAlign: "middle" }}>
-                    {formatPersianDate(item.date)}
-                  </td>
-                  <td style={{ verticalAlign: "middle" }}>
-                    <button
-                      className="bg-success"
-                      onClick={() => {
-                        setActiveKey("seeOrder");
-                        setSeeOrder(item);
-                      }}
-                    >
-                      مشاهده سفارش
-                    </button>
-                  </td>
-                  <td>
-                    {/* Status Select */}
-                    <FormControl
-                      variant="outlined"
-                      size="small"
-                      sx={{ minWidth: 100 }}
-                    >
-                      <InputLabel sx={{ fontFamily: "unset" }}>
-                        وضعیت
-                      </InputLabel>
-                      <Select
-                        sx={{
-                          fontFamily: "unset",
-                          padding: "0px", // Reduce padding for a smaller look
-                        }}
-                        label="Status"
-                        value={selectedStatus[item.code] || item.status || ""}
-                        onChange={(e) => {
-                          const newStatus = e.target.value;
-                          setSelectedStatus((prevStatus) => ({
-                            ...prevStatus,
-                            [item.code]: newStatus, // Update status in state
-                          }));
-                          handleStatusChange(item.code, newStatus); // Call the status change handler
+          <div>
+            <table className="table table-striped">
+              <thead className="text-center">
+                <tr className="table-head">
+                  <th>ردیف</th>
+                  <th>نام</th>
+                  <th>نام خانوادگی</th>
+                  <th>شماره همراه</th>
+                  <th>تاریخ</th>
+                  <th>عملیات</th>
+                  <th>وضعیت</th>
+                </tr>
+              </thead>
+              <tbody className="table-body text-center">
+                {orders?.map((item, index) => (
+                  <tr key={index}>
+                    <td style={{ verticalAlign: "middle" }}>{++index}</td>
+                    <td style={{ verticalAlign: "middle" }}>
+                      {usersData[item.createdBy]?.firstName}
+                    </td>
+                    <td style={{ verticalAlign: "middle" }}>
+                      {usersData[item.createdBy]?.lastName}
+                    </td>
+                    <td style={{ verticalAlign: "middle" }}>
+                      {usersData[item.createdBy]?.username}
+                    </td>
+                    <td style={{ verticalAlign: "middle" }}>
+                      {formatPersianDate(item.date)}
+                    </td>
+                    <td style={{ verticalAlign: "middle" }}>
+                      <SeeOrderButton
+                        onClick={() => {
+                          setActiveKey("seeOrder");
+                          setSeeOrder(item);
                         }}
                       >
-                        {/* Add your status options here */}
-                        <MenuItem sx={{ fontFamily: "unset" }} value="1">
-                          معلق
-                        </MenuItem>
-                        <MenuItem sx={{ fontFamily: "unset" }} value="2">
-                          درحال تولید
-                        </MenuItem>
-                        <MenuItem sx={{ fontFamily: "unset" }} value="3">
-                          درحال ارسال
-                        </MenuItem>
-                        <MenuItem sx={{ fontFamily: "unset" }} value="4">
-                          تحویل داده شده
-                        </MenuItem>
-                        <MenuItem sx={{ fontFamily: "unset" }} value="5">
-                          لغو شده
-                        </MenuItem>
-                      </Select>
-                    </FormControl>
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
+                        مشاهده سفارش
+                      </SeeOrderButton>
+                    </td>
+                    <td>
+                      {/* Status Select */}
+                      <FormControl
+                        variant="outlined"
+                        size="small"
+                        sx={{ minWidth: 100 }}
+                      >
+                        <InputLabel sx={{ fontFamily: "unset" }}>
+                          وضعیت
+                        </InputLabel>
+                        <Select
+                          sx={{
+                            fontFamily: "unset",
+                            padding: "0px", // Reduce padding for a smaller look
+                          }}
+                          label="Status"
+                          value={selectedStatus[item.code] || item.status || ""}
+                          onChange={(e) => {
+                            const newStatus = e.target.value;
+                            setSelectedStatus((prevStatus) => ({
+                              ...prevStatus,
+                              [item.code]: newStatus, // Update status in state
+                            }));
+                            handleStatusChange(item.code, newStatus); // Call the status change handler
+                          }}
+                        >
+                          {/* Add your status options here */}
+                          <MenuItem sx={{ fontFamily: "unset" }} value="1">
+                            معلق
+                          </MenuItem>
+                          <MenuItem sx={{ fontFamily: "unset" }} value="2">
+                            درحال تولید
+                          </MenuItem>
+                          <MenuItem sx={{ fontFamily: "unset" }} value="3">
+                            درحال ارسال
+                          </MenuItem>
+                          <MenuItem sx={{ fontFamily: "unset" }} value="4">
+                            تحویل داده شده
+                          </MenuItem>
+                          <MenuItem sx={{ fontFamily: "unset" }} value="5">
+                            لغو شده
+                          </MenuItem>
+                        </Select>
+                      </FormControl>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
         </>
       )}
       {activekey === "seeOrder" && (
-        <MakeOrder setActiveKey={setActiveKey} seeOrder={seeOrder} />
+        <MakeOrder toggleShow={toggleShow} setActiveKey={setActiveKey} seeOrder={seeOrder} />
       )}
       {/* modals */}
       <ConfirmingModal
