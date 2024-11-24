@@ -7,10 +7,12 @@ import Modal from "@mui/material/Modal";
 import socket from "@/app/utils/socket";
 // imporet modals
 import AreYouShureModal from "@/app/BaseComponent/AreYouSureModal";
+import ConfirmingModal from "@/app/BaseComponent/ConfirmingModal";
 // import redux
 import { useDispatch } from "react-redux";
 import {
   sendNewMessage,
+  chatImageSend,
   uploadFile,
   fetchPrivateImage,
 } from "@/app/Store/thunks";
@@ -48,6 +50,10 @@ const ChatBox = ({
   const [moveForward, setMoveForward] = useState(false);
   const [FinalPaternModal, setFinalPaternModal] = useState(false);
   const [SendingFinalPattern, setSendingFinalPattern] = useState([]);
+  const [openModal2, setOpenModal2] = useState(false);
+  const [FinalData, setFinalData] = useState({ src: "" });
+
+  const closeModal2 = () => setOpenModal2(false);
 
   const dontHavePattern = Object.keys(SendingFinalPattern).length == 0;
 
@@ -56,6 +62,12 @@ const ChatBox = ({
   const handleSendingPattern = () => {
     setFinalPaternModal(true);
   };
+
+  function closeModalOnTimeout() {
+    setTimeout(() => {
+      setOpenModal2(false);
+    }, 3000);
+  }
 
   const closeFinalPaternModal = () => setFinalPaternModal(false);
 
@@ -211,6 +223,10 @@ const ChatBox = ({
     setSelectedImage(null);
   };
 
+  const handleRemoveFinalPattern = (index) => {
+    setSendingFinalPattern(SendingFinalPattern.filter((_, i) => i !== index));
+  };
+
   useEffect(() => {
     const imageUrls = messages
       .filter((msg) => msg.imageUrl)
@@ -239,8 +255,78 @@ const ChatBox = ({
     }
   }, [step]);
 
+  // const hadleChatImageSendFunc = async () => {
+  //   const uploadImage = await Promise.all(
+  //     SendingFinalPattern.map(async (item) => {
+  //       const tag = "chatBoxImage";
+  //       const type = 1; // Adjust based on your backend logic
+  //       const isPublic = false;
+  //       const file = item.file;
+
+  //       const fileIdSrc = await dispatch(
+  //         uploadFile({ file, tag, type, isPublic })
+  //       ).unwrap();
+  //       console.log(fileIdSrc);
+
+  //       setFinalData({ ...FinalData, src: fileIdSrc });
+  //     })
+  //   );
+  //   console.log(FinalData);
+
+  //   console.log(uploadImage);
+
+  //   const responseDispatchImage = await dispatch(
+  //     chatImageSend({
+  //       code,
+  //       chatImage: FinalData,
+  //     })
+  //   ).unwrap();
+
+  //   if (responseDispatchImage?.statusCode == 200) {
+  //     setOpenModal2(true);
+  //     closeModalOnTimeout();
+  //   }
+  // };
+
+  const hadleChatImageSendFunc = async () => {  
+    // Collecting all file IDs into an array  
+    const fileIds = await Promise.all(  
+      SendingFinalPattern.map(async (item) => {  
+        const tag = "chatBoxImage";  
+        const type = 1; // Adjust based on your backend logic  
+        const isPublic = false;  
+        const file = item.file;  
+  
+        const fileIdSrc = await dispatch(  
+          uploadFile({ file, tag, type, isPublic })  
+        ).unwrap();   
+        return fileIdSrc; // Collect the file ID  
+      })  
+    );  
+  
+    // // Update the state with all file IDs at once  
+    // setFinalData(prevFinalData => ({  
+    //   ...prevFinalData,  
+    //   src: [...prevFinalData.src, ...fileIds], // Append new file IDs to the existing src array  
+    // }));  
+  
+    console.log(fileIds); // This will show the correct file IDs  
+  
+    const responseDispatchImage = await dispatch(  
+      chatImageSend({  
+        code,  
+        chatImage: fileIds, // Send the updated file IDs  
+      })  
+    ).unwrap();  
+  
+    if (responseDispatchImage?.statusCode === 200) {  
+      setOpenModal2(true);  
+      closeModalOnTimeout();  
+    }  
+  };  
+
   return (
-    <>
+    <div className="container">
       <div className={`${style.stepContent}`}>
         <div className={style.mainChatBox}>
           <div
@@ -593,61 +679,111 @@ const ChatBox = ({
         >
           <>
             <div className={style.ModalPatternStyle}>
-              {SendingFinalPattern?.map((fileObj, index) => (
-                <>
-                  <div className="d-flex flex-row">
+              <div className={style.sendingFinalPatternImage}>
+                {SendingFinalPattern?.map((fileObj, index) => (
+                  <div key={index} className="position-relative">
                     <Box
                       // onClick={handleOpen}
                       className={`${style.imageChatStyle}  mb-2 mt-2`}
                       component="img"
                       src={fileObj.imageUrl}
-                      style={{ width: "50%", height: "50%" }}
                       alt={`uploaded ${index}`}
                     />
+                    <div
+                      className={style.deleteIconStyle}
+                      onClick={() => handleRemoveFinalPattern(index)}
+                    >
+                      <svg
+                        width={17}
+                        height={17}
+                        viewBox="0 0 12 12"
+                        fill="none"
+                        xmlns="http://www.w3.org/2000/svg"
+                      >
+                        <path
+                          d="M10.5 2.98828C8.835 2.82328 7.16 2.73828 5.49 2.73828C4.5 2.73828 3.51 2.78828 2.52 2.88828L1.5 2.98828"
+                          stroke="#FF4F3F"
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                        />
+                        <path
+                          d="M4.25 2.485L4.36 1.83C4.44 1.355 4.5 1 5.345 1H6.655C7.5 1 7.565 1.375 7.64 1.835L7.75 2.485"
+                          stroke="#FF4F3F"
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                        />
+                        <path
+                          d="M9.4252 4.57031L9.1002 9.60531C9.0452 10.3903 9.0002 11.0003 7.6052 11.0003H4.3952C3.0002 11.0003 2.9552 10.3903 2.9002 9.60531L2.5752 4.57031"
+                          stroke="#FF4F3F"
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                        />
+                        <path
+                          d="M5.16504 8.25H6.83004"
+                          stroke="#FF4F3F"
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                        />
+                        <path
+                          d="M4.75 6.25H7.25"
+                          stroke="#FF4F3F"
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                        />
+                      </svg>
+                    </div>
                   </div>
-                </>
-              ))}
+                ))}
+              </div>
+
               {dontHavePattern && (
                 <p className="discription text-center mt-4 mb-4">
                   هنوز طرحی اضافه نکرده اید
                 </p>
               )}
 
-            
-                <div className="d-flex flex-row justify-content-between mt-3 mb-3">
-                  <div className="me-2">
-                    <label
-                      htmlFor="fileFinalPattern"
-                      className={style.LabelFileUploadPattern}
+              <div className="d-flex flex-row justify-content-between mt-3 mb-3">
+                <div className="me-2">
+                  <label
+                    htmlFor="fileFinalPattern"
+                    className={style.LabelFileUploadPattern}
+                  >
+                    <p
+                      className={`${style.addAnotherPattern} oneBeforeSmallest`}
                     >
-                      <p
-                        className={`${style.addAnotherPattern} oneBeforeSmallest`}
-                      >
-                        اضافه کردن طرح
-                      </p>
-                    </label>
-                    <input
-                      onChange={handleFileUpload}
-                      type="file"
-                      // accept="image/*"
-                      className={`d-none`}
-                      id="fileFinalPattern"
-                    />
-                  </div>
-                  {!dontHavePattern && (
-                    <div className="ms-2">
-                      <button className={style.confirmpatternButtonStyle}>
-                        تایید نهایی
-                      </button>
-                    </div>
-                  )}
+                      اضافه کردن طرح
+                    </p>
+                  </label>
+                  <input
+                    onChange={handleFileUpload}
+                    type="file"
+                    accept={`${process.env.NEXT_PUBLIC_INPUT_IMAGE_FORMAT}`}
+                    className={`d-none`}
+                    id="fileFinalPattern"
+                  />
                 </div>
-              
+                {!dontHavePattern && (
+                  <div className="ms-2">
+                    <button
+                      onClick={hadleChatImageSendFunc}
+                      className={style.confirmpatternButtonStyle}
+                    >
+                      تایید نهایی
+                    </button>
+                  </div>
+                )}
+              </div>
             </div>
           </>
         </Modal>
       )}
-    </>
+      {/* modals  */}
+      <ConfirmingModal
+        open={openModal2}
+        onClose={closeModal2}
+        text={"طرح با موفقیت ثبت شد"}
+      />
+    </div>
   );
 };
 

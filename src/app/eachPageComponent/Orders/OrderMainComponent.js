@@ -220,7 +220,7 @@ export default function OrderMainComponent({ toggleShow }) {
                         >
                           {/* Add your status options here */}
                           <MenuItem sx={{ fontFamily: "unset" }} value="1">
-                            معلق
+                          درحال برسی
                           </MenuItem>
                           <MenuItem sx={{ fontFamily: "unset" }} value="2">
                             درحال تولید
@@ -245,22 +245,8 @@ export default function OrderMainComponent({ toggleShow }) {
 
           <div className="d-lg-none d-block container">
             {orders?.map((item, index) => (
-              <>
-                {/* <thead className="text-center">
-                <tr className="table-head">
-                  <th>ردیف</th>
-                  <th>نام</th>
-                  <th>نام خانوادگی</th>
-                  <th>شماره همراه</th>
-                  <th>تاریخ</th>
-                  <th>عملیات</th>
-                  <th>وضعیت</th>
-                </tr>
-              </thead> */}
-
+              <React.Fragment key={index}>
                 <MAINTABELSTYLE>
-                  {/* <td style={{ verticalAlign: "middle" }}>{++index}</td> */}
-
                   <div className="eachTabelStyle">
                     <p className="NormalTextSizing">نام :</p>
 
@@ -346,7 +332,7 @@ export default function OrderMainComponent({ toggleShow }) {
                         >
                           {/* Add your status options here */}
                           <MenuItem sx={{ fontFamily: "unset" }} value="1">
-                            معلق
+                          درحال برسی
                           </MenuItem>
                           <MenuItem sx={{ fontFamily: "unset" }} value="2">
                             درحال تولید
@@ -365,7 +351,7 @@ export default function OrderMainComponent({ toggleShow }) {
                     </div>
                   </div>
                 </MAINTABELSTYLE>
-              </>
+              </React.Fragment>
             ))}
           </div>
         </>

@@ -16,30 +16,28 @@
   border-radius: 5px;
 }
 
-.confirmImage{
-  background-color: #F7F8FC;
-  border: 1px solid #DDE0E4;
+.confirmImage {
+  background-color: #f7f8fc;
+  border: 1px solid #dde0e4;
   padding: 17px;
   border-radius: 5px;
   margin: 0 13px;
 }
 
-
-
-.confirmFirstButton{
-  background-color: #5695F6;
+.confirmFirstButton {
+  background-color: #5695f6;
   color: white;
   border-radius: 4px;
   border: none;
   padding: 6px 9px;
 }
-.confirmSecondButton{
+.confirmSecondButton {
   background-color: white;
-  color: #5695F6;
+  color: #5695f6;
   border: none;
   border-radius: 4px;
   padding: 5px 9px;
-  border: 1.5px solid #5695F6;
+  border: 1.5px solid #5695f6;
 }
 
 .headerChatBox {
@@ -63,39 +61,44 @@
   gap: 3.5px;
 }
 
-.TimeStyle{
+.TimeStyle {
   color: #737373;
 }
-.editIconStyle{
+.editIconStyle {
   cursor: pointer;
-
 }
 
-.adminDateStyle{
+.adminDateStyle {
   justify-content: end;
 }
 
-.userDateStyle{
+.userDateStyle {
   justify-content: space-between;
 }
 
 .imageChatStyle {
-  width: 230px;
+  width: 100%;
   height: 100%;
-  border-radius: 4px;
+  border-radius: 14px;
+  padding: 10px;
 }
 
-.selectedImageForSend{
+.sendingFinalPatternImage {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+}
+
+.selectedImageForSend {
   width: 20%;
   resize: none;
   border-radius: 4px;
   height: 100%;
 }
 
-.cancelSendingImage{
+.cancelSendingImage {
   padding: 3px 7px;
-  color: #5695F6 !important;
-  border: 1.5px solid #5695F6 !important;
+  color: #5695f6 !important;
+  border: 1.5px solid #5695f6 !important;
   border-radius: 4px;
   // position: absolute;
   // transform: translate(50%, -50%);
@@ -103,8 +106,8 @@
   // top: 70%;
 }
 
-.mainDivSelectedImage{
-  background-color: #E7ECF0;
+.mainDivSelectedImage {
+  background-color: #e7ecf0;
 }
 
 .inputChatBoxStyle {
@@ -125,40 +128,40 @@
   cursor: pointer;
 }
 
-.ModalPatternStyle{
+.ModalPatternStyle {
   position: absolute;
+  max-height: 90vh;
+  max-width: 90vh;
+  overflow: auto;
   top: 50%;
   left: 50%;
-  transform: translate(-50% , -50%);
+  transform: translate(-50%, -50%);
   background-color: white;
   border-radius: 4px;
   width: 50%;
   // height: 50%;
 }
 
-
-.addAnotherPattern{
+.addAnotherPattern {
   border: none;
   border-radius: 4px;
   padding: 3px 10px;
-  background-color: #5695F6;
+  background-color: #5695f6;
   color: white;
 }
 
-.confirmpatternButtonStyle{
+.confirmpatternButtonStyle {
   border: none;
-  background-color: #5695F6;
+  background-color: #5695f6;
   color: white;
   padding: 3px 10px;
   border-radius: 4px;
-
 }
-
 
 .sendMessageChatBox {
   border-radius: 4px;
   border: none;
-  background-color: #5695F6;
+  background-color: #5695f6;
   color: white;
   padding: 4px 7px;
   // position: absolute;
@@ -170,7 +173,7 @@
 .sendMessageChatBox2 {
   border-radius: 4px;
   border: none;
-  background-color: #5695F6;
+  background-color: #5695f6;
   color: white;
   padding: 4px 7px;
   position: absolute;
@@ -183,9 +186,9 @@
   outline: none;
 }
 
-.SeeLastStepButton{
-  border: 1.5px solid #5695F6 !important;
-  color: #5695F6 !important;
+.SeeLastStepButton {
+  border: 1.5px solid #5695f6 !important;
+  color: #5695f6 !important;
   background-color: transparent !important;
   border-radius: 4px;
   padding: 2px 8px;
@@ -198,7 +201,6 @@
   border-radius: 4px;
   padding: 7px 29px;
 }
-
 
 /* New styles for making the chat scrollable */
 .chatContainer {
@@ -249,6 +251,15 @@
   width: 600px;
   border-radius: 10px;
 }
+.deleteIconStyle{
+  position: absolute;
+  bottom: 0;
+  left: 6%;
+  transform: translate(50% , -50%);
+  border: none;
+  border-radius: 4px;
+
+}
 
 @media (max-width: 980px) {
   .modalStyleclass {
@@ -256,6 +267,9 @@
   }
   .stepContent {
     padding: 0;
+  }
+  .sendingFinalPatternImage {
+    grid-template-columns: repeat(1,1fr);
   }
 }
 
