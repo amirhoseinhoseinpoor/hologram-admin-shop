@@ -304,18 +304,10 @@ const ChatBox = ({
       })  
     );  
   
-    // // Update the state with all file IDs at once  
-    // setFinalData(prevFinalData => ({  
-    //   ...prevFinalData,  
-    //   src: [...prevFinalData.src, ...fileIds], // Append new file IDs to the existing src array  
-    // }));  
-  
-    console.log(fileIds); // This will show the correct file IDs  
-  
     const responseDispatchImage = await dispatch(  
       chatImageSend({  
         code,  
-        chatImage: fileIds, // Send the updated file IDs  
+        chatImage: {images: fileIds}, // Send the updated file IDs  
       })  
     ).unwrap();  
   
