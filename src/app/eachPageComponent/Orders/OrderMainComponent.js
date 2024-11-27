@@ -5,6 +5,7 @@ import { useDispatch } from "react-redux";
 import { listorders, whosOrder, updateOrderStatus } from "@/app/Store/thunks";
 import ConfirmingModal from "@/app/BaseComponent/ConfirmingModal";
 import ErrorModal from "@/app/BaseComponent/ErrorModal";
+import SearchIcon from "@mui/icons-material/Search";
 import styled from "styled-components";
 // import base components
 import NavBarToggleBurgerButton from "@/app/BaseComponent/NavBarToggleBurgerButton";
@@ -27,6 +28,22 @@ const HeadermakeOrder = styled.div`
   }
 `;
 
+const SearchInputMainDiv = styled.div`
+  margin-bottom: 10px;
+  width: 50%;
+  .inputSreachStyle {
+    font-size: 15px;
+    width: 100%;
+    padding: 4px;
+  }
+  .SearchIconStyle {
+    position: absolute;
+    transform: translate(50%, -50%);
+    left: 0;
+    top: 50%;
+  }
+`;
+
 const SeeOrderButton = styled.button`
   background-color: ${(props) => props.color || "#1572e8"};
 `;
@@ -39,12 +56,14 @@ export default function OrderMainComponent({ toggleShow }) {
   const [orders, setOrders] = useState(null);
   const [ordersCanceled, setOrdersCanceled] = useState(null);
   const [searchTerm, setSearchTerm] = useState("");
-
   const [filteredOrders, setFilteredOrders] = useState(null);
-
+  const [filteredOrdersUSER, setFilteredOrdersUSER] = useState(null);
   const [usersData, setUsersData] = useState({});
   const [usersDataCanceled, setUsersDataCanceled] = useState({});
   const [selectedStatus, setSelectedStatus] = useState({});
+  const [waitingForAdmin, setWaitingForAdmin] = useState(null);
+  const [WaitingForUser, setWaitingForUser] = useState(null);
+
   // modal state
   const [openModal2, setOpenModal2] = useState(false);
   const [openModal3, setOpenModal3] = useState(false);
@@ -52,8 +71,8 @@ export default function OrderMainComponent({ toggleShow }) {
   const closeModal2 = () => setOpenModal2(false);
   const closeModal3 = () => setOpenModal3(false);
 
-  console.log(usersData);
-  console.log(orders);
+  // console.log(usersData);
+  // console.log(orders);
 
   const normalizeString = (str) => str.replace(/\s+/g, "").toLowerCase();
 
@@ -63,12 +82,13 @@ export default function OrderMainComponent({ toggleShow }) {
 
     // If there's no search term, show all orders
     if (!searchTerm) {
-      setFilteredOrders(orders);
+      setFilteredOrders(waitingForAdmin);
+      setFilteredOrdersUSER(WaitingForUser);
       return;
     }
 
     // Filter orders based on user's firstName and lastName
-    const filtered = orders.filter((order) => {
+    const filtered = waitingForAdmin.filter((order) => {
       const user = usersData[order.createdBy];
       if (!user) return false;
 
@@ -78,11 +98,20 @@ export default function OrderMainComponent({ toggleShow }) {
 
       return normalizedFullName.includes(normalizedSearchTerm);
     });
+    const filteredUSER = WaitingForUser.filter((order) => {
+      const user = usersData[order.createdBy];
+      if (!user) return false;
 
+      const fullName = `${user.firstName || ""} ${user.lastName || ""}`;
+      const normalizedFullName = normalizeString(fullName);
+      const normalizedSearchTerm = normalizeString(searchTerm);
+
+      return normalizedFullName.includes(normalizedSearchTerm);
+    });
     setFilteredOrders(filtered);
-  }, [orders, usersData, searchTerm]);
+    setFilteredOrdersUSER(filteredUSER);
 
-
+  }, [orders, usersData, searchTerm, waitingForAdmin , WaitingForUser]);
 
   const handleCancelOrders = () => {
     const fetchData = async (status) => {
@@ -122,7 +151,6 @@ export default function OrderMainComponent({ toggleShow }) {
       try {
         const ordersData = await dispatch(listorders({ status })).unwrap();
 
-        // Fetch user data for all orders
         const userPromises = ordersData.map(async (item) => {
           const userDataCome = await dispatch(
             whosOrder({ id: item.createdBy })
@@ -141,8 +169,22 @@ export default function OrderMainComponent({ toggleShow }) {
           return acc;
         }, {});
 
-        setUsersData(userDataMap); // Set the user data map
-        setOrders(ordersData); // Set orders
+        setUsersData(userDataMap);
+        setOrders(ordersData);
+
+        // Separate orders with and without request comment
+        const waitingForAdmin = ordersData.filter((order) => {
+          // Check if the requestComment is an empty object
+          return (
+            !order.reqComment || Object.keys(order.reqComment).length === 0
+          );
+        });
+        const withComment = ordersData.filter((order) => {
+          return order.reqComment && Object.keys(order.reqComment).length > 0;
+        });
+
+        setWaitingForAdmin(waitingForAdmin);
+        setWaitingForUser(withComment);
       } catch (error) {
         console.error("Error during dispatch:", error);
       }
@@ -183,19 +225,23 @@ export default function OrderMainComponent({ toggleShow }) {
               مدیریت سفارشات
             </div>
           </HeadermakeOrder>
-
           {/* Add a search input field */}
-          <div className="container mt-4">
+          <SearchInputMainDiv className="me-2 mt-4 position-relative">
             <input
+              className="inputSreachStyle"
               type="text"
-              placeholder="جستجو بر اساس نام و نام خانوادگی"
+              placeholder="جستجو..."
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
             />
-          </div>
+            <SearchIcon className="SearchIconStyle" />
+          </SearchInputMainDiv>
 
-          {orders && (
+          {filteredOrders && filteredOrders.length > 0 && (
             <>
+              <p className="me-2 NormalTextSizing mb-2">
+                سفارشات در انتظار برسی
+              </p>
               <OrderTabel
                 setSeeOrder={setSeeOrder}
                 setActiveKey={setActiveKey}
@@ -203,6 +249,23 @@ export default function OrderMainComponent({ toggleShow }) {
                 setSelectedStatus={setSelectedStatus}
                 handleStatusChange={handleStatusChange}
                 mainArray={filteredOrders}
+                userMainData={usersData}
+              />
+            </>
+          )}
+
+          {filteredOrdersUSER && filteredOrdersUSER.length > 0 && (
+            <>
+              <p className="me-2 NormalTextSizing mb-2">
+                سفارشات در انتظار کاربر
+              </p>
+              <OrderTabel
+                setSeeOrder={setSeeOrder}
+                setActiveKey={setActiveKey}
+                selectedStatus={selectedStatus}
+                setSelectedStatus={setSelectedStatus}
+                handleStatusChange={handleStatusChange}
+                mainArray={filteredOrdersUSER}
                 userMainData={usersData}
               />
             </>
