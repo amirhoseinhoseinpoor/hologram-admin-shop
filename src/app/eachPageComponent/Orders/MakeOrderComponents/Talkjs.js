@@ -51,7 +51,6 @@ const ChatBox = ({
   const [FinalPaternModal, setFinalPaternModal] = useState(false);
   const [SendingFinalPattern, setSendingFinalPattern] = useState([]);
   const [openModal2, setOpenModal2] = useState(false);
-  const [FinalData, setFinalData] = useState({ src: "" });
 
   const closeModal2 = () => setOpenModal2(false);
 
@@ -288,34 +287,34 @@ const ChatBox = ({
   //   }
   // };
 
-  const hadleChatImageSendFunc = async () => {  
-    // Collecting all file IDs into an array  
-    const fileIds = await Promise.all(  
-      SendingFinalPattern.map(async (item) => {  
-        const tag = "chatBoxImage";  
-        const type = 1; // Adjust based on your backend logic  
-        const isPublic = false;  
-        const file = item.file;  
-  
-        const fileIdSrc = await dispatch(  
-          uploadFile({ file, tag, type, isPublic })  
-        ).unwrap();   
-        return fileIdSrc; // Collect the file ID  
-      })  
-    );  
-  
-    const responseDispatchImage = await dispatch(  
-      chatImageSend({  
-        code,  
-        chatImage: {images: fileIds}, // Send the updated file IDs  
-      })  
-    ).unwrap();  
-  
-    if (responseDispatchImage?.statusCode === 200) {  
-      setOpenModal2(true);  
-      closeModalOnTimeout();  
-    }  
-  };  
+  const hadleChatImageSendFunc = async () => {
+    // Collecting all file IDs into an array
+    const fileIds = await Promise.all(
+      SendingFinalPattern.map(async (item) => {
+        const tag = "chatBoxImage";
+        const type = 1; // Adjust based on your backend logic
+        const isPublic = false;
+        const file = item.file;
+
+        const fileIdSrc = await dispatch(
+          uploadFile({ file, tag, type, isPublic })
+        ).unwrap();
+        return fileIdSrc; // Collect the file ID
+      })
+    );
+
+    const responseDispatchImage = await dispatch(
+      chatImageSend({
+        code,
+        chatImage: { images: fileIds }, // Send the updated file IDs
+      })
+    ).unwrap();
+
+    if (responseDispatchImage?.statusCode === 200) {
+      setOpenModal2(true);
+      closeModalOnTimeout();
+    }
+  };
 
   return (
     <div className="container">
@@ -647,19 +646,31 @@ const ChatBox = ({
           )}
         </div>
       </div>
-      <div className="d-flex flex-row gap-2 mt-3 mb-4 container">
-        {/* <button onClick={handleNextStep} className={style.continueButton}>
-          Continue
-        </button> */}
-        <button onClick={handleSendingPattern} className={style.continueButton}>
-          ارسال طرح های نهایی
-        </button>
-        <button
-          className={style.SeeLastStepButton}
-          onClick={handlePreviousStep}
-        >
-          مرحله‌ی قبلی
-        </button>
+      <div className="d-flex flex-row justify-content-between gap-2 mt-3 mb-4 container">
+        <div className="d-flex flex-row gap-2 ">
+          <button
+            onClick={handleSendingPattern}
+            className={style.continueButton}
+          >
+            ارسال طرح های نهایی
+          </button>
+          <button
+            className={style.SeeLastStepButton}
+            onClick={handlePreviousStep}
+          >
+            مرحله‌ی قبلی
+          </button>
+        </div>
+
+        {moveForward && (
+          <button
+            type="button"
+            onClick={handleNextStep}
+            className={`${style.continueButton}`}
+          >
+            رد کردن
+          </button>
+        )}
       </div>
       {/* modals */}
       {FinalPaternModal && (

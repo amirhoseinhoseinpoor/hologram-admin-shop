@@ -3,44 +3,13 @@ import React from "react";
 import MakeOrder from "./MakeOrderComponents/MakeOrder";
 import { useDispatch } from "react-redux";
 import { listorders, whosOrder, updateOrderStatus } from "@/app/Store/thunks";
-import { Select, MenuItem, FormControl, InputLabel } from "@mui/material";
 import ConfirmingModal from "@/app/BaseComponent/ConfirmingModal";
 import ErrorModal from "@/app/BaseComponent/ErrorModal";
 import styled from "styled-components";
 // import base components
 import NavBarToggleBurgerButton from "@/app/BaseComponent/NavBarToggleBurgerButton";
-
-const MAINTABELSTYLE = styled.div`
-  border: 1.5px solid gray;
-  padding: 7px;
-  border-radius: 4px;
-  margin-bottom: 10px;
-
-  .eachTabelStyle {
-    display: grid;
-    grid-template-columns: repeat(2, 1fr);
-    grid-gap: 10px;
-    border-bottom: 1px solid #ccc;
-    text-align: center;
-    p {
-      background-color: #f1f1f1;
-      padding: 12px 0px;
-      border-radius: 4px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-    }
-  }
-  .SecondValueTabel {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-
-    .MuiInputBase-inputSizeSmall {
-      padding: 4px !important;
-    }
-  }
-`;
+// import component
+import OrderTabel from "./OrderTabel";
 
 const HeadermakeOrder = styled.div`
   background-color: white;
@@ -59,7 +28,7 @@ const HeadermakeOrder = styled.div`
 `;
 
 const SeeOrderButton = styled.button`
-  background-color: #1572e8;
+  background-color: ${(props) => props.color || "#1572e8"};
 `;
 
 export default function OrderMainComponent({ toggleShow }) {
@@ -68,7 +37,13 @@ export default function OrderMainComponent({ toggleShow }) {
   const [activekey, setActiveKey] = useState("seeTable");
   const [seeOrder, setSeeOrder] = useState(null);
   const [orders, setOrders] = useState(null);
-  const [usersData, setUsersData] = useState({}); // To store user data
+  const [ordersCanceled, setOrdersCanceled] = useState(null);
+  const [searchTerm, setSearchTerm] = useState("");
+
+  const [filteredOrders, setFilteredOrders] = useState(null);
+
+  const [usersData, setUsersData] = useState({});
+  const [usersDataCanceled, setUsersDataCanceled] = useState({});
   const [selectedStatus, setSelectedStatus] = useState({});
   // modal state
   const [openModal2, setOpenModal2] = useState(false);
@@ -77,20 +52,75 @@ export default function OrderMainComponent({ toggleShow }) {
   const closeModal2 = () => setOpenModal2(false);
   const closeModal3 = () => setOpenModal3(false);
 
-  const formatPersianDate = (isoDate) => {
-    const date = new Date(isoDate);
-    const persianFormatter = new Intl.DateTimeFormat("fa-IR-u-ca-persian", {
-      year: "numeric",
-      month: "numeric",
-      day: "numeric",
+  console.log(usersData);
+  console.log(orders);
+
+  const normalizeString = (str) => str.replace(/\s+/g, "").toLowerCase();
+
+  // Add useEffect to handle filtering whenever orders, usersData, or searchTerm changes
+  useEffect(() => {
+    if (!orders || !usersData) return;
+
+    // If there's no search term, show all orders
+    if (!searchTerm) {
+      setFilteredOrders(orders);
+      return;
+    }
+
+    // Filter orders based on user's firstName and lastName
+    const filtered = orders.filter((order) => {
+      const user = usersData[order.createdBy];
+      if (!user) return false;
+
+      const fullName = `${user.firstName || ""} ${user.lastName || ""}`;
+      const normalizedFullName = normalizeString(fullName);
+      const normalizedSearchTerm = normalizeString(searchTerm);
+
+      return normalizedFullName.includes(normalizedSearchTerm);
     });
-    return persianFormatter.format(date);
+
+    setFilteredOrders(filtered);
+  }, [orders, usersData, searchTerm]);
+
+
+
+  const handleCancelOrders = () => {
+    const fetchData = async (status) => {
+      try {
+        const ordersData = await dispatch(listorders({ status })).unwrap();
+
+        // Fetch user data for all orders
+        const userPromises = ordersData.map(async (item) => {
+          const userDataCome = await dispatch(
+            whosOrder({ id: item.createdBy })
+          ).unwrap();
+
+          // Return the user data
+          return { id: item.createdBy, userData: userDataCome[0] }; // Access the first item of the userData array
+        });
+
+        // Wait for all user data to be fetched
+        const userDataArray = await Promise.all(userPromises);
+
+        // Create a mapping of userId to userData
+        const userDataMap = userDataArray.reduce((acc, user) => {
+          acc[user.id] = user.userData; // Store the first element directly instead of the array
+          return acc;
+        }, {});
+
+        setUsersDataCanceled(userDataMap); // Set the user data map
+        setOrdersCanceled(ordersData); // Set orders
+      } catch (error) {
+        console.error("Error during dispatch:", error);
+      }
+    };
+    fetchData(5);
   };
 
   useEffect(() => {
-    const fetchData = async () => {
+    const fetchData = async (status) => {
       try {
-        const ordersData = await dispatch(listorders()).unwrap();
+        const ordersData = await dispatch(listorders({ status })).unwrap();
 
         // Fetch user data for all orders
         const userPromises = ordersData.map(async (item) => {
@@ -118,7 +148,7 @@ export default function OrderMainComponent({ toggleShow }) {
       }
     };
 
-    fetchData();
+    fetchData(1);
   }, [dispatch]);
 
   function closeModalOnTimeout() {
@@ -153,207 +183,54 @@ export default function OrderMainComponent({ toggleShow }) {
               مدیریت سفارشات
             </div>
           </HeadermakeOrder>
-          <div className="d-lg-block d-none">
-            <table className="table table-striped">
-              <thead className="text-center">
-                <tr className="table-head">
-                  <th>ردیف</th>
-                  <th>نام</th>
-                  <th>نام خانوادگی</th>
-                  <th>شماره همراه</th>
-                  <th>تاریخ</th>
-                  <th>عملیات</th>
-                  <th>وضعیت</th>
-                </tr>
-              </thead>
-              <tbody className="table-body text-center">
-                {orders?.map((item, index) => (
-                  <tr key={index}>
-                    <td style={{ verticalAlign: "middle" }}>{++index}</td>
-                    <td style={{ verticalAlign: "middle" }}>
-                      {usersData[item.createdBy]?.firstName}
-                    </td>
-                    <td style={{ verticalAlign: "middle" }}>
-                      {usersData[item.createdBy]?.lastName}
-                    </td>
-                    <td style={{ verticalAlign: "middle" }}>
-                      {usersData[item.createdBy]?.username}
-                    </td>
-                    <td style={{ verticalAlign: "middle" }}>
-                      {formatPersianDate(item.date)}
-                    </td>
-                    <td style={{ verticalAlign: "middle" }}>
-                      <SeeOrderButton
-                        onClick={() => {
-                          setActiveKey("seeOrder");
-                          setSeeOrder(item);
-                        }}
-                      >
-                        مشاهده سفارش
-                      </SeeOrderButton>
-                    </td>
-                    <td>
-                      {/* Status Select */}
-                      <FormControl
-                        variant="outlined"
-                        size="small"
-                        sx={{ minWidth: 100 }}
-                      >
-                        <InputLabel sx={{ fontFamily: "unset" }}>
-                          وضعیت
-                        </InputLabel>
-                        <Select
-                          sx={{
-                            fontFamily: "unset",
-                            padding: "0px", // Reduce padding for a smaller look
-                          }}
-                          label="Status"
-                          value={selectedStatus[item.code] || item.status || ""}
-                          onChange={(e) => {
-                            const newStatus = e.target.value;
-                            setSelectedStatus((prevStatus) => ({
-                              ...prevStatus,
-                              [item.code]: newStatus, // Update status in state
-                            }));
-                            handleStatusChange(item.code, newStatus); // Call the status change handler
-                          }}
-                        >
-                          {/* Add your status options here */}
-                          <MenuItem sx={{ fontFamily: "unset" }} value="1">
-                          درحال برسی
-                          </MenuItem>
-                          <MenuItem sx={{ fontFamily: "unset" }} value="2">
-                            درحال تولید
-                          </MenuItem>
-                          <MenuItem sx={{ fontFamily: "unset" }} value="3">
-                            درحال ارسال
-                          </MenuItem>
-                          <MenuItem sx={{ fontFamily: "unset" }} value="4">
-                            تحویل داده شده
-                          </MenuItem>
-                          <MenuItem sx={{ fontFamily: "unset" }} value="5">
-                            لغو شده
-                          </MenuItem>
-                        </Select>
-                      </FormControl>
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
+
+          {/* Add a search input field */}
+          <div className="container mt-4">
+            <input
+              type="text"
+              placeholder="جستجو بر اساس نام و نام خانوادگی"
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+            />
           </div>
 
-          <div className="d-lg-none d-block container">
-            {orders?.map((item, index) => (
-              <React.Fragment key={index}>
-                <MAINTABELSTYLE>
-                  <div className="eachTabelStyle">
-                    <p className="NormalTextSizing">نام :</p>
+          {orders && (
+            <>
+              <OrderTabel
+                setSeeOrder={setSeeOrder}
+                setActiveKey={setActiveKey}
+                selectedStatus={selectedStatus}
+                setSelectedStatus={setSelectedStatus}
+                handleStatusChange={handleStatusChange}
+                mainArray={filteredOrders}
+                userMainData={usersData}
+              />
+            </>
+          )}
 
-                    <div className="SecondValueTabel">
-                      {usersData[item.createdBy]?.firstName}
-                    </div>
-                  </div>
-
-                  <div className="eachTabelStyle">
-                    <p className="NormalTextSizing">نام خانوادگی :</p>
-                    <div
-                      className="SecondValueTabel"
-                      style={{ verticalAlign: "middle" }}
-                    >
-                      {usersData[item.createdBy]?.lastName}
-                    </div>
-                  </div>
-                  <div className="eachTabelStyle">
-                    <p className="NormalTextSizing">شماره همراه :</p>
-
-                    <div
-                      className="SecondValueTabel"
-                      style={{ verticalAlign: "middle" }}
-                    >
-                      {usersData[item.createdBy]?.username}
-                    </div>
-                  </div>
-
-                  <div className="eachTabelStyle">
-                    <p className="NormalTextSizing">تاریخ :</p>
-                    <div
-                      className="SecondValueTabel"
-                      style={{ verticalAlign: "middle" }}
-                    >
-                      {formatPersianDate(item.date)}
-                    </div>
-                  </div>
-
-                  <div className="eachTabelStyle">
-                    <p className="NormalTextSizing">عملیات :</p>
-                    <div
-                      className="SecondValueTabel"
-                      style={{ verticalAlign: "middle" }}
-                    >
-                      <SeeOrderButton
-                        onClick={() => {
-                          setActiveKey("seeOrder");
-                          setSeeOrder(item);
-                        }}
-                      >
-                        مشاهده سفارش
-                      </SeeOrderButton>
-                    </div>
-                  </div>
-
-                  <div className="eachTabelStyle">
-                    <p className="NormalTextSizing">وضعیت :</p>
-                    <div className="SecondValueTabel">
-                      {/* Status Select */}
-                      <FormControl
-                        variant="outlined"
-                        size="small"
-                        sx={{ minWidth: 100 }}
-                      >
-                        <InputLabel sx={{ fontFamily: "unset" }}>
-                          وضعیت
-                        </InputLabel>
-                        <Select
-                          sx={{
-                            fontFamily: "unset",
-                            padding: "0px", // Reduce padding for a smaller look
-                          }}
-                          label="Status"
-                          value={selectedStatus[item.code] || item.status || ""}
-                          onChange={(e) => {
-                            const newStatus = e.target.value;
-                            setSelectedStatus((prevStatus) => ({
-                              ...prevStatus,
-                              [item.code]: newStatus, // Update status in state
-                            }));
-                            handleStatusChange(item.code, newStatus); // Call the status change handler
-                          }}
-                        >
-                          {/* Add your status options here */}
-                          <MenuItem sx={{ fontFamily: "unset" }} value="1">
-                          درحال برسی
-                          </MenuItem>
-                          <MenuItem sx={{ fontFamily: "unset" }} value="2">
-                            درحال تولید
-                          </MenuItem>
-                          <MenuItem sx={{ fontFamily: "unset" }} value="3">
-                            درحال ارسال
-                          </MenuItem>
-                          <MenuItem sx={{ fontFamily: "unset" }} value="4">
-                            تحویل داده شده
-                          </MenuItem>
-                          <MenuItem sx={{ fontFamily: "unset" }} value="5">
-                            لغو شده
-                          </MenuItem>
-                        </Select>
-                      </FormControl>
-                    </div>
-                  </div>
-                </MAINTABELSTYLE>
-              </React.Fragment>
-            ))}
+          <div className="container mt-4 mb-4">
+            <SeeOrderButton
+              color="#6861ce"
+              onClick={handleCancelOrders}
+              type="button"
+            >
+              دیدن سفارشات لغو شده
+            </SeeOrderButton>
           </div>
+          {/* orders canceled */}
+          {ordersCanceled && (
+            <>
+              <OrderTabel
+                setSeeOrder={setSeeOrder}
+                setActiveKey={setActiveKey}
+                selectedStatus={selectedStatus}
+                setSelectedStatus={setSelectedStatus}
+                handleStatusChange={handleStatusChange}
+                mainArray={filteredOrders}
+                userMainData={usersDataCanceled}
+              />
+            </>
+          )}
         </>
       )}
       {activekey === "seeOrder" && (
