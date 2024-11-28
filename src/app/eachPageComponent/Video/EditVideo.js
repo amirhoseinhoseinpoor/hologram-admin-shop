@@ -10,6 +10,40 @@ import ConfirmModal from "@/app/BaseComponent/ConfirmingModal";
 import ErrorModal from "@/app/BaseComponent/ErrorModal";
 import AreYouShureModal from "@/app/BaseComponent/AreYouSureModal";
 
+const LABELIMAGEUPLOAD = styled.label`
+  border: 1px solid #c0c0c0;
+  border-radius: 4px;
+  padding: 10px;
+  width: 100%;
+  height: 77%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: fit-content;
+`;
+
+const BUTTONSSTYLE = styled.div`
+  .cancelButtonStyle {
+    color: #48abf7;
+    background-color: rgba(72, 171, 247, 0.1);
+  }
+
+  .deleteButtonStyle {
+    color: #ff4f3f !important;
+    background-color: transparent;
+  }
+  .confirmButtonStyle {
+    color: white;
+    background-color: #1572e8;
+  }
+`;
+
+const BOX = styled(Box)`
+  max-width: 200px;
+  max-height: 200px;
+  border-radius: 4px;
+`;
+
 const BorderInputBox = styled.div`
   border: 2px solid #28a745;
   padding: 5px;
@@ -168,8 +202,7 @@ export default function EditHonors({
   };
 
   return (
-    <div className="mt-3">
-      <h2>ادیت ویدیو</h2>
+    <div className="mt-3 container">
       <form onSubmit={areYouShureFunction}>
         <BorderInputBox className="mt-3">
           <label>فیلم ها:</label>
@@ -179,7 +212,7 @@ export default function EditHonors({
                 <input
                   style={{ width: "40%" }}
                   type="text"
-                  placeholder="Title"
+                  placeholder="عنوان"
                   value={item.title} // Use item.title instead of media.title
                   onChange={(e) =>
                     setMedia(
@@ -194,7 +227,7 @@ export default function EditHonors({
                 <input
                   style={{ width: "40%" }}
                   type="text"
-                  placeholder="Description"
+                  placeholder="توضیحات"
                   value={item.description} // Use item.description instead of media.description
                   onChange={(e) =>
                     setMedia(
@@ -208,8 +241,77 @@ export default function EditHonors({
               </div>
 
               <div className="d-flex flex-column">
-                <span>فیلم :</span>
-                <div className="d-flex flex-row flex-wrap align-items-center gap-2">
+                <span className="NormalTextSizing">فیلم :</span>
+                {item?.src === "" ? (
+                  <>
+                    <LABELIMAGEUPLOAD htmlFor="MediaVideo">
+                      <div className="d-flex flex-column text-center p-1">
+                        <div>
+                          <svg
+                            width={21}
+                            height={21}
+                            viewBox="0 0 18 18"
+                            fill="none"
+                            xmlns="http://www.w3.org/2000/svg"
+                          >
+                            <path
+                              d="M2.25 11.25C2.25 13.3713 2.25 14.432 2.90901 15.091C3.56802 15.75 4.62868 15.75 6.75 15.75H11.25C13.3713 15.75 14.432 15.75 15.091 15.091C15.75 14.432 15.75 13.3713 15.75 11.25"
+                              stroke="#404040"
+                              strokeLinecap="round"
+                              strokeLinejoin="round"
+                            />
+                            <path
+                              d="M9 12V2.25M9 2.25L12 5.53125M9 2.25L6 5.53125"
+                              stroke="#404040"
+                              strokeLinecap="round"
+                              strokeLinejoin="round"
+                            />
+                          </svg>
+                        </div>
+
+                        <p className={`colorTheInputFile discription`}>
+                          فیلم mp4
+                        </p>
+                      </div>
+                    </LABELIMAGEUPLOAD>
+                    <input
+                      className="d-none"
+                      id="MediaVideo"
+                      accept={`${process.env.NEXT_PUBLIC_INPUT_VIDEO_FORMAT}`}
+                      type="file"
+                      onChange={(e) =>
+                        handleFileChange(e, index, setMedia, media)
+                      }
+                      required
+                    />
+                  </>
+                ) : (
+                  <>
+                    <div
+                      className="d-flex flex-column"
+                      style={{ width: "fit-content" }}
+                    >
+                      {objectUrls[index] && (
+                        <BOX
+                          // onClick={() => handleOpen(logo)}
+                          component="video"
+                          src={objectUrls[index]}
+                          controls
+                        />
+                      )}
+                      {item.src && !objectUrls[index] && (
+                        <BOX
+                          // onClick={() => handleOpen(logo)}
+                          component="video"
+                          src={`${process.env.NEXT_PUBLIC_BACK_END_SERVER}/system/download/${item.src}`}
+                          controls
+                        />
+                      )}
+                    </div>
+                  </>
+                )}
+
+                {/* <div className="d-flex flex-row flex-wrap align-items-center gap-2">
                   <input
                     type="file"
                     onChange={(e) =>
@@ -241,12 +343,83 @@ export default function EditHonors({
                       controls
                     />
                   )}
-                </div>
+                </div> */}
               </div>
 
               <div className="d-flex flex-column">
-                <span>پوستر فیلم :</span>
-                <div className="d-flex flex-row flex-wrap align-items-center gap-2">
+                <span className="mt-2 NormalTextSizing">پوستر فیلم :</span>
+                {item.poster ? (
+                  <>
+                    <div
+                      className="d-flex flex-column"
+                      style={{ width: "fit-content" }}
+                    >
+                      {posterObjectUrls[index] && (
+                        <BOX
+                          // onClick={() => handleOpen(logo)}
+                          component="img"
+                          src={posterObjectUrls[index] || ""}
+                          alt="BlogProductImage"
+                        />
+                      )}
+                      {item.poster && !posterObjectUrls[index] && (
+                        <Box
+                          component="img"
+                          src={`${process.env.NEXT_PUBLIC_BACK_END_SERVER}/system/download/${item.poster}`}
+                          sx={{
+                            width: "140px",
+                            maxHeight: "100%",
+                            borderRadius: "2px",
+                          }}
+                        />
+                      )}
+                    </div>
+                  </>
+                ) : (
+                  <>
+                    <LABELIMAGEUPLOAD
+                      className="VodeoDisSizing mb-1"
+                      htmlFor="ProductImage"
+                    >
+                      <div className="d-flex flex-column text-center p-1">
+                        <div>
+                          <svg
+                            width={21}
+                            height={21}
+                            viewBox="0 0 18 18"
+                            fill="none"
+                            xmlns="http://www.w3.org/2000/svg"
+                          >
+                            <path
+                              d="M2.25 11.25C2.25 13.3713 2.25 14.432 2.90901 15.091C3.56802 15.75 4.62868 15.75 6.75 15.75H11.25C13.3713 15.75 14.432 15.75 15.091 15.091C15.75 14.432 15.75 13.3713 15.75 11.25"
+                              stroke="#404040"
+                              strokeLinecap="round"
+                              strokeLinejoin="round"
+                            />
+                            <path
+                              d="M9 12V2.25M9 2.25L12 5.53125M9 2.25L6 5.53125"
+                              stroke="#404040"
+                              strokeLinecap="round"
+                              strokeLinejoin="round"
+                            />
+                          </svg>
+                        </div>
+                        <p className={`colorTheInputFile discription`}>
+                          بارگذاری فایل .png یا .jpg
+                        </p>
+                      </div>
+                    </LABELIMAGEUPLOAD>
+                    <input
+                      className="d-none"
+                      type="file"
+                      id="ProductImage"
+                      onChange={(e) =>
+                        handleFileChangePoster(e, index, setMedia, media)
+                      }
+                    />
+                  </>
+                )}
+                {/* <div className="d-flex flex-row flex-wrap align-items-center gap-2">
                   <input
                     type="file"
                     onChange={(e) =>
@@ -276,7 +449,7 @@ export default function EditHonors({
                       }}
                     />
                   )}
-                </div>
+                </div> */}
               </div>
 
               <button
@@ -296,19 +469,26 @@ export default function EditHonors({
             اضافه کردن ویدیو
           </button>
         </BorderInputBox>
-        <button type="submit" className="mt-3 bg-success">
-          ویرایش محصول
-        </button>
-        <button
-          onClick={areYouShureFunction2}
-          className="bg-danger mt-2 mb-2"
-          type="button"
-        >
-          حذف محصول
-        </button>
-        <button className="bg-warning" onClick={handleCancelEdit}>
-          انصراف
-        </button>
+        <BUTTONSSTYLE className="d-flex flex-row justify-content-between">
+          <div className="d-flex flex-row mt-3 mb-3 gap-3">
+            <button type="submit" className="confirmButtonStyle">
+              ویرایش ویدیو
+            </button>
+            <button className="cancelButtonStyle" onClick={handleCancelEdit}>
+              انصراف
+            </button>
+          </div>
+          <div>
+            <button
+              className="mt-2 mb-2 deleteButtonStyle"
+              type="button"
+              onClick={areYouShureFunction2}
+            >
+              حذف ویدیو
+            </button>
+          </div>
+        </BUTTONSSTYLE>
+
         {/* modal  */}
         <AreYouShureModal
           open={openModal}

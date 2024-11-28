@@ -1,19 +1,47 @@
 import content from "/public/json/tabelContent.json";
 import React from "react";
-
+// import base component
+import NavBarToggleBurgerButton from "@/app/BaseComponent/NavBarToggleBurgerButton";
 // import components
-
 import DefineUserBtn from "../DefineUser/AddUserBtn";
 import EditUserBtnfunction from "./EditUserBtn";
-export default function DefineUser() {
+import styled from "styled-components";
+
+const HeadermakeOrder = styled.div`
+  background-color: white;
+  padding: 10px;
+  color: white;
+  .textHeaderStyle {
+    color: black;
+  }
+
+  @media (max-width: 980px) {
+    background-color: rgb(26, 32, 53) !important;
+    .textHeaderStyle {
+      color: white !important;
+    }
+  }
+`;
+
+export default function DefineUser({ toggleShow }) {
   return (
     <section>
-      <div className="d-flex flex-row mb-3 justify-content-between">
+      <HeadermakeOrder className="d-flex flex-row mb-3 justify-content-between">
+        <div className="d-block d-lg-none">
+          <NavBarToggleBurgerButton func={() => toggleShow("main")} />
+        </div>
+        <div className="NormalTextSizing textHeaderStyle d-flex align-items-center">
+          مدیریت کاربر
+        </div>
+        <DefineUserBtn />
+      </HeadermakeOrder>
+
+      {/* <div className="d-flex flex-row mb-3 justify-content-between">
         <div>مدیریت کاربر</div>
         <div>
           <DefineUserBtn />
         </div>
-      </div>
+      </div> */}
       <table className="table table-striped">
         <thead>
           <tr className="table-head">

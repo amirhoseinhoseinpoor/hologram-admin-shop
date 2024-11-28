@@ -4,15 +4,31 @@ import React, { useState, useEffect } from "react";
 
 import AddExhibition from "./AddExhibition";
 import EditExhibition from "./EditExhibition";
-
 import { Card, CardContent, CardMedia, Typography } from "@mui/material";
-import honorsData from "/public/json/ExhibitionTest.json";
 import styled from "styled-components";
+// import base component
+import NavBarToggleBurgerButton from "@/app/BaseComponent/NavBarToggleBurgerButton";
 
 //redux import
 import { useDispatch } from "react-redux";
 import { exhibitionList } from "@/app/Store/thunks";
 import { formatPersianDate } from "@/app/utils/persionDateUtils";
+
+const HeadermakeOrder = styled.div`
+  background-color: white;
+  padding: 10px;
+  color: white;
+  .textHeaderStyle {
+    color: black;
+  }
+
+  @media (max-width: 980px) {
+    background-color: rgb(26, 32, 53) !important;
+    .textHeaderStyle {
+      color: white !important;
+    }
+  }
+`;
 
 const CARD = styled(Card)`
   background-color: #dfdcdc !important;
@@ -32,7 +48,7 @@ const TYPOGRAPHY = styled(Typography)`
   font-size: 17px !important;
 `;
 
-export default function HonorsMainComponent() {
+export default function HonorsMainComponent({ toggleShow }) {
   const dispatch = useDispatch();
 
   const [activekey, setActiveKey] = useState("editUserPage");
@@ -58,23 +74,57 @@ export default function HonorsMainComponent() {
 
   return (
     <section>
-      {activekey === "editUserPage" && !editedHonor && (
-        <>
-          <div className="d-flex flex-row justify-content-between mb-2">
-            <div>
-              <h2 className="m-0"> ویرایش نمایشگاه</h2>
+      <HeadermakeOrder className="d-flex flex-row mb-3 justify-content-between">
+        <div className="d-block d-lg-none">
+          <NavBarToggleBurgerButton func={() => toggleShow("main")} />
+        </div>
+        {activekey === "editUserPage" && !editedHonor && (
+          <>
+            <div className="NormalTextSizing textHeaderStyle d-flex align-items-center">
+              ویرایش نمایشگاه
             </div>
             <div>
               <button
-                style={{ backgroundColor: "green" }}
+                className="bg-success"
                 onClick={() => setActiveKey("addUser")}
               >
                 افزودن نمایشگاه
               </button>
             </div>
-          </div>
+          </>
+        )}
+        {activekey === "addUser" && !editedHonor && (
+          <>
+            <div className="NormalTextSizing textHeaderStyle d-flex align-items-center">
+              افزودن نمایشگاه
+            </div>
+            <div>
+              <button
+                className="bg-success"
+                onClick={() => setActiveKey("editUserPage")}
+              >
+                ویرایش نمایشگاه
+              </button>
+            </div>
+          </>
+        )}
+        {editedHonor && (
+          <>
+            <div className="NormalTextSizing textHeaderStyle d-flex align-items-center">
+              ویرایش نمایشگاه
+            </div>
+            <div>
+              <button className="bg-success" onClick={handleCancelEdit}>
+              نمایشگاه
+              </button>
+            </div>
+          </>
+        )}
+      </HeadermakeOrder>
+      {activekey === "editUserPage" && !editedHonor && (
+        <>
           <div
-            className="mt-3 d-flex flex-column gap-3"
+            className="mt-3 d-flex flex-column gap-3 container"
             style={{ cursor: "pointer" }}
           >
             {dataCome.length > 0 ? (
@@ -116,17 +166,6 @@ export default function HonorsMainComponent() {
 
       {activekey === "addUser" && !editedHonor && (
         <>
-          <div className="d-flex flex-row justify-content-between mb-2">
-            <div>
-              <h2 className="m-0"> افزودن نمایشگاه</h2>
-            </div>
-            <div>
-              <button className="bg-success" onClick={() => setActiveKey("editUserPage")}>
-                ویرایش نمایشگاه
-              </button>
-            </div>
-          </div>
-
           <div>
             <AddExhibition />
           </div>

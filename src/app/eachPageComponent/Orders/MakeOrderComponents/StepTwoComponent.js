@@ -47,6 +47,7 @@ export default function StepTwoComponent({
   // const [isButtonDisabled, setIsButtonDisabled] = useState(false);
   const [open, setOpen] = useState(false);
   const [moveForward, setMoveForward] = useState(false);
+  
 
   const handleOpen = () => setOpen(true);
   const handleClose = () => setOpen(false);
@@ -148,7 +149,6 @@ export default function StepTwoComponent({
 
   const handleSubmit = async () => {
     const increseingStep = await dispatch(increaseStep({ code, step: 3 }));
-
     if (increseingStep.payload.message == "Success") {
       setStep(3);
     }
@@ -159,7 +159,7 @@ export default function StepTwoComponent({
       <div className={`${style.resizeNewresponsive} d-flex flex-row gap-3`}>
         <div className={`${style.fixNewSizes} d-flex flex-column`}>
           {!hasData ? (
-            <>
+            <div className="container">
               <Alert
                 style={{ fontFamily: "unset", gap: "8px" }}
                 severity="warning"
@@ -172,7 +172,7 @@ export default function StepTwoComponent({
               >
                 مشاهده مراحل قبلی
               </button>
-            </>
+            </div>
           ) : (
             <>
               <div className={style.stepContent}>
@@ -285,6 +285,7 @@ export default function StepTwoComponent({
                               className={style.displayNoneTheInput}
                               id="logoUpload"
                               type="file"
+                              accept={`${process.env.NEXT_PUBLIC_INPUT_IMAGE_FORMAT}`}
                               onChange={handleLogoChange}
                               disabled={disabelInputStep2}
                             />

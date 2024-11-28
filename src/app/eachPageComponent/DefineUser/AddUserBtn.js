@@ -8,8 +8,6 @@ import { useDispatch , useSelector } from "react-redux";
 import { addUser } from "@/app/Store/thunks";
 import { getuser } from "@/app/Store/thunks";
 
-
-
 const AddUserModal = styled(Modal)`
   .modal-dialog {
     max-width: 500px;
@@ -45,21 +43,13 @@ const AddUserModal = styled(Modal)`
   }
 `;
 const AddUserBtnstyle = styled(Button)`
-  background-color: #4caf50; /* Green */
   border: none;
   color: white;
-  padding: 8px 16px;
+  padding: 5px;
   text-align: center;
-  text-decoration: none;
-  display: inline-block;
-  font-size: 16px;
-  margin: 4px 2px;
   cursor: pointer;
   border-radius: 4px;
 
-  &:hover {
-    background-color: #3e8e41;
-  }
 `;
 
 export default function AddUserBtn() {
@@ -113,8 +103,8 @@ export default function AddUserBtn() {
   console.log(dataCome);
   
   return (
-    <section className="mb-3">
-      <AddUserBtnstyle variant="primary" onClick={handleAddModalShow}>
+    <section>
+      <AddUserBtnstyle className="NormalTextSizing bg-success" variant="primary" onClick={handleAddModalShow}>
         اضافه کردن کاربر جدید
       </AddUserBtnstyle>
       <AddUserModal show={showAddModal} onHide={handleAddModalClose}>

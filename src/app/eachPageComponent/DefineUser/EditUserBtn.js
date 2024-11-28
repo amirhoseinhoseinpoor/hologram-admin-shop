@@ -41,21 +41,15 @@ const EditUserModal = styled(Modal)`
 `;
 
 const EditUserBtn = styled.button`
-  background-color: #4CAF50; /* Green */
   border: none;
   color: white;
-  padding: 8px 16px;
+  padding: 5px;
   text-align: center;
   text-decoration: none;
   display: inline-block;
-  font-size: 16px;
   margin: 4px 2px;
   cursor: pointer;
   border-radius: 4px;
-
-  &:hover {
-    background-color: #3e8e41;
-  }
 `;
 
 
@@ -88,7 +82,7 @@ function EditUserBtnfunction({ userId, onSubmit }) {
   
     return (
       <>
-        <EditUserBtn onClick={handleEditModalShow}>ویرایش</EditUserBtn>
+        <EditUserBtn className="bg-success NormalTextSizing" onClick={handleEditModalShow}>ویرایش</EditUserBtn>
         <EditUserModal show={showEditModal} onHide={handleEditModalClose}>
           <Modal.Header closeButton>
             <Modal.Title>ویرایش کاربر</Modal.Title>

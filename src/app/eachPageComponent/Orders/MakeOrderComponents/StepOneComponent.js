@@ -604,6 +604,7 @@ export default function SteponeComponent({
                   id="paymentImage"
                   type="file"
                   name="paymentImage"
+                  accept={`${process.env.NEXT_PUBLIC_INPUT_IMAGE_FORMAT}`}
                   onChange={handleLogoChange}
                 />
               </>

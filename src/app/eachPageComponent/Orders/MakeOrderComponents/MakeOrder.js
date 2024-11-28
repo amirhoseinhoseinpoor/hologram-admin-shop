@@ -5,6 +5,25 @@ import React, { useEffect, useState } from "react";
 import style from "../../../Styles/MakeOrderStyle/MakeOrder.module.scss";
 import ProcessTracker from "../ProcessTracker";
 import PusherChat from "./Talkjs";
+import styled from "styled-components";
+// import base component
+import NavBarToggleBurgerButton from "@/app/BaseComponent/NavBarToggleBurgerButton";
+
+const HeadermakeOrder = styled.div`
+  background-color: white;
+  padding: 10px;
+  color: white;
+  .textHeaderStyle {
+    color: black;
+  }
+
+  @media (max-width: 980px) {
+    background-color: rgb(26, 32, 53) !important;
+    .textHeaderStyle {
+      color: white !important;
+    }
+  }
+`;
 
 const SteponeComponent = dynamic(() => import("./StepOneComponent"));
 
@@ -23,12 +42,11 @@ const StepSixComponent = dynamic(() => import("./StepSixComponent"), {
 
 const StepSeven = dynamic(() => import("./StepSevenComponent"));
 
-export default function MakeOrder({seeOrder , setActiveKey}) {
-  
+export default function MakeOrder({ seeOrder, setActiveKey , toggleShow }) {
   const [step, setStep] = useState(1);
 
   useEffect(() => {
-    setStep(seeOrder.step)    
+    setStep(seeOrder.step);
   }, [seeOrder]);
   console.log(seeOrder);
 
@@ -114,9 +132,30 @@ export default function MakeOrder({seeOrder , setActiveKey}) {
   };
   return (
     <section>
-      <div className={`${style.makeorderHeader} mb-4 d-flex justify-content-end`}> 
-        <p onClick={() => setActiveKey("seeTable")} className={`discription ${style.seeOrderButtonStyle}`}>بازگشت به سفارشات</p>
-      </div>
+      {/* <div
+        className={`${style.makeorderHeader} mb-4 d-flex justify-content-end`}
+      >
+        <p
+          onClick={() => setActiveKey("seeTable")}
+          className={`discription ${style.seeOrderButtonStyle}`}
+        >
+          بازگشت به سفارشات
+        </p>
+      </div> */}
+      <HeadermakeOrder className="d-flex flex-row mb-3 justify-content-between">
+        <div className="d-block d-lg-none">
+          <NavBarToggleBurgerButton func={() => toggleShow("main")} />
+        </div>
+        <div className="NormalTextSizing textHeaderStyle d-flex align-items-center">
+          مدیریت سفارشات
+        </div>
+        <p
+          onClick={() => setActiveKey("seeTable")}
+          className={`discription ${style.seeOrderButtonStyle}`}
+        >
+          بازگشت به سفارشات
+        </p>
+      </HeadermakeOrder>
       <ProcessTracker currentStep={step} />
       {renderStepContent()}
     </section>

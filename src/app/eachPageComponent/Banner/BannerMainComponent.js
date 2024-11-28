@@ -5,12 +5,30 @@ import React, { useState, useEffect } from "react";
 import AddBanner from "./AddBanner";
 import EditBanner from "./EditBanner";
 //redux import
-import { useSelector, useDispatch } from "react-redux";
+import { useDispatch } from "react-redux";
 import { bannerList } from "@/app/Store/thunks";
 
 import { Card, CardContent, CardMedia, Typography } from "@mui/material";
 import styled from "styled-components";
+// improt base component
+import NavBarToggleBurgerButton from "@/app/BaseComponent/NavBarToggleBurgerButton";
 import { formatPersianDate } from "@/app/utils/persionDateUtils";
+
+const HeadermakeOrder = styled.div`
+  background-color: white;
+  padding: 10px;
+  color: white;
+  .textHeaderStyle {
+    color: black;
+  }
+
+  @media (max-width: 980px) {
+    background-color: rgb(26, 32, 53) !important;
+    .textHeaderStyle {
+      color: white !important;
+    }
+  }
+`;
 
 const CARD = styled(Card)`
   background-color: #dfdcdc !important;
@@ -30,7 +48,7 @@ const TYPOGRAPHY = styled(Typography)`
   font-size: 17px !important;
 `;
 
-export default function HonorsMainComponent() {
+export default function HonorsMainComponent({ toggleShow }) {
   const dispatch = useDispatch();
 
   const [activekey, setActiveKey] = useState("editUserPage");
@@ -54,34 +72,62 @@ export default function HonorsMainComponent() {
     setEditedHonor(null);
   };
 
-  // const handleEditImageChange = (event) => {
-  //   const newImage = event.target.files[0];
-  //   setEditedHonor({
-  //     ...editedHonor,
-  //     src: URL.createObjectURL(newImage),
-  //     newImageFile: newImage,
-  //   });
-  // };
-
   return (
     <section>
-      {activekey === "editUserPage" && !editedHonor && (
-        <>
-          <div className="d-flex flex-row justify-content-between mb-2">
-            <div>
-              <h2 className="m-0">ویرایش بنر ها</h2>
+      <HeadermakeOrder className="d-flex flex-row mb-3 justify-content-between">
+        <div className="d-block d-lg-none">
+          <NavBarToggleBurgerButton func={() => toggleShow("main")} />
+        </div>
+        {activekey === "editUserPage" && !editedHonor && (
+          <>
+            <div className="NormalTextSizing textHeaderStyle d-flex align-items-center">
+              ویرایش بنر
             </div>
             <div>
               <button
-                style={{ backgroundColor: "green" }}
+                className="bg-success"
                 onClick={() => setActiveKey("addUser")}
               >
                 افزودن بنر
               </button>
             </div>
-          </div>
+          </>
+        )}
+        {activekey === "addUser" && !editedHonor && (
+          <>
+            <div className="NormalTextSizing textHeaderStyle d-flex align-items-center">
+              افزودن بنر
+            </div>
+            <div>
+              <button
+                className="bg-success"
+                onClick={() => setActiveKey("editUserPage")}
+              >
+                ویرایش بنر
+              </button>
+            </div>
+          </>
+        )}
+        {editedHonor && (
+          <>
+            <div className="NormalTextSizing textHeaderStyle d-flex align-items-center">
+              ویرایش بنر
+            </div>
+            <div>
+              <button
+                className="bg-success"
+                onClick={handleCancelEdit}
+              >
+                بنر ها
+              </button>
+            </div>
+          </>
+        )}
+      </HeadermakeOrder>
+      {activekey === "editUserPage" && !editedHonor && (
+        <>
           <div
-            className="mt-3 d-flex flex-column gap-3"
+            className="mt-3 d-flex flex-column gap-3 container"
             style={{ cursor: "pointer" }}
           >
             {dataCome.length > 0 ? (
@@ -117,51 +163,12 @@ export default function HonorsMainComponent() {
             ) : (
               <TYPOGRAPHY variant="body2">No data available</TYPOGRAPHY>
             )}
-
-            {/* {honorsData.map((honor, index) => (
-              <React.Fragment key={index}>
-                <CARD
-                  className="d-flex flex-row"
-                  onClick={() => {
-                    setEditedHonor(honor);
-                    setContent(honor.content); // Set content when editing
-                  }}
-                >
-                  <CardMedia
-                    component="img"
-                    src={honor.src}
-                    sx={{
-                      width: "120px",
-                      maxHeight: "100%",
-                      borderRadius: "2px",
-                    }}
-                  />
-                  <CardContent className="d-flex flex-column justify-content-around">
-                    <Typography className="titleHonors">
-                      {honor.title}
-                    </Typography>
-                    <Typography className="dateHonors">{honor.date}</Typography>
-                  </CardContent>
-                </CARD>
-              </React.Fragment>
-            ))} */}
           </div>
         </>
       )}
 
       {activekey === "addUser" && !editedHonor && (
         <>
-          <div className="d-flex flex-row justify-content-between mb-2">
-            <div>
-              <h2 className="m-0"> افزودن افتخارات</h2>
-            </div>
-            <div>
-              <button className="bg-success" onClick={() => setActiveKey("editUserPage")}>
-                ویرایش افتخارات
-              </button>
-            </div>
-          </div>
-
           <div>
             <AddBanner />
           </div>

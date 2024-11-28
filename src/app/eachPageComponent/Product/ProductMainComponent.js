@@ -4,12 +4,31 @@ import React, { useState, useEffect } from "react";
 
 import AddProduct from "./AddProduct";
 import EditProduct from "./EditProduct";
+// import base component
+import NavBarToggleBurgerButton from "@/app/BaseComponent/NavBarToggleBurgerButton";
 //redux import
 import { useSelector, useDispatch } from "react-redux";
 import { list } from "../../Store/thunks.js";
 import { productListData } from "@/app/Store/slice";
 import { Card, CardContent, CardMedia, Typography } from "@mui/material";
 import styled from "styled-components";
+
+
+const HeadermakeOrder = styled.div`
+  background-color: white;
+  padding: 10px;
+  color: white;
+  .textHeaderStyle {
+    color: black;
+  }
+
+  @media (max-width: 980px) {
+    background-color: rgb(26, 32, 53) !important;
+    .textHeaderStyle {
+      color: white !important;
+    }
+  }
+`;
 
 const CARD = styled(Card)`
   background-color: #dfdcdc !important;
@@ -29,11 +48,12 @@ const TYPOGRAPHY = styled(Typography)`
   font-size: 17px !important;
 `;
 
-export default function HonorsMainComponent() {
+export default function HonorsMainComponent({ toggleShow }) {
   const dispatch = useDispatch();
 
   // add honors
   const [activekey, setActiveKey] = useState("editUserPage");
+
   // edit honors
   const [editedHonor, setEditedHonor] = useState(null);
 
@@ -59,34 +79,59 @@ export default function HonorsMainComponent() {
     setEditedHonor(null);
   };
 
-  // const handleEditImageChange = (event) => {
-  //   const newImage = event.target.files[0];
-  //   setEditedHonor({
-  //     ...editedHonor,
-  //     src: URL.createObjectURL(newImage),
-  //     newImageFile: newImage,
-  //   });
-  // };
-
   return (
     <section>
-      {activekey === "editUserPage" && !editedHonor && (
-        <>
-          <div className="d-flex flex-row justify-content-between mb-2">
-            <div>
-              <h2 className="m-0">ویرایش محصولات</h2>
+      <HeadermakeOrder className="d-flex flex-row mb-3 justify-content-between">
+        <div className="d-block d-lg-none">
+          <NavBarToggleBurgerButton func={() => toggleShow("main")} />
+        </div>
+        {activekey === "editUserPage" && !editedHonor && (
+          <>
+            <div className="NormalTextSizing textHeaderStyle d-flex align-items-center">
+              ویرایش محصولات
             </div>
             <div>
               <button
-                style={{ backgroundColor: "green" }}
+                className="bg-success"
                 onClick={() => setActiveKey("addUser")}
               >
                 افزودن محصول
               </button>
             </div>
-          </div>
+          </>
+        )}
+        {activekey === "addUser" && !editedHonor && (
+          <>
+            <div className="NormalTextSizing textHeaderStyle d-flex align-items-center">
+              افزودن محصول
+            </div>
+            <div>
+              <button
+                className="bg-success"
+                onClick={() => setActiveKey("editUserPage")}
+              >
+                ویرایش محصولات
+              </button>
+            </div>
+          </>
+        )}
+        {editedHonor && (
+          <>
+            <div className="NormalTextSizing textHeaderStyle d-flex align-items-center">
+              ویرایش محصول
+            </div>
+            <div>
+              <button className="bg-success" onClick={handleCancelEdit}>
+                محصولات
+              </button>
+            </div>
+          </>
+        )}
+      </HeadermakeOrder>
+      {activekey === "editUserPage" && !editedHonor && (
+        <>
           <div
-            className="mt-3 d-flex flex-column gap-3"
+            className="mt-3 d-flex flex-column gap-3 container"
             style={{ cursor: "pointer" }}
           >
             {datacome &&
@@ -157,23 +202,7 @@ export default function HonorsMainComponent() {
 
       {activekey === "addUser" && !editedHonor && (
         <>
-          <div className="d-flex flex-row justify-content-between mb-2">
-            <div>
-              <h2 className="m-0"> افزودن محصول</h2>
-            </div>
-            <div>
-              <button
-                className="bg-success"
-                onClick={() => setActiveKey("editUserPage")}
-              >
-                ویرایش محصولات
-              </button>
-            </div>
-          </div>
-
-          <div>
-            <AddProduct />
-          </div>
+          <AddProduct />
         </>
       )}
       {editedHonor && (

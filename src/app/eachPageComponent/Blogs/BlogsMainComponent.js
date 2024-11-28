@@ -7,10 +7,27 @@ import EditBlogs from "./EditBlogs";
 import { Card, CardContent, CardMedia, Typography } from "@mui/material";
 import styled from "styled-components";
 import { formatPersianDate } from "@/app/utils/persionDateUtils";
-
+// import baseComponents
+import NavBarToggleBurgerButton from "@/app/BaseComponent/NavBarToggleBurgerButton";
 //redux import
 import { useDispatch } from "react-redux";
 import { blogsList } from "@/app/Store/thunks";
+
+const HeadermakeOrder = styled.div`
+  background-color: white;
+  padding: 10px;
+  color: white;
+  .textHeaderStyle {
+    color: black;
+  }
+
+  @media (max-width: 980px) {
+    background-color: rgb(26, 32, 53) !important;
+    .textHeaderStyle {
+      color: white !important;
+    }
+  }
+`;
 
 const CARD = styled(Card)`
   background-color: #dfdcdc !important;
@@ -30,7 +47,7 @@ const TYPOGRAPHY = styled(Typography)`
   font-size: 17px !important;
 `;
 
-export default function HonorsMainComponent() {
+export default function HonorsMainComponent({ toggleShow }) {
   const dispatch = useDispatch();
 
   const [activekey, setActiveKey] = useState("editUserPage");
@@ -57,23 +74,58 @@ export default function HonorsMainComponent() {
 
   return (
     <section>
-      {activekey === "editUserPage" && !editedHonor && (
-        <>
-          <div className="d-flex flex-row justify-content-between mb-2">
-            <div>
-              <h2 className="m-0 "> ویرایش مقالات</h2>
+      <HeadermakeOrder className="d-flex flex-row mb-3 justify-content-between">
+        <div className="d-block d-lg-none">
+          <NavBarToggleBurgerButton func={() => toggleShow("main")} />
+        </div>
+        {activekey === "editUserPage" && !editedHonor && (
+          <>
+            <div className="NormalTextSizing textHeaderStyle d-flex align-items-center">
+              ویرایش مقالات
             </div>
             <div>
               <button
-                style={{ backgroundColor: "green" }}
+                className="bg-success"
                 onClick={() => setActiveKey("addUser")}
               >
-                افزودن افتخارات
+                افزودن مقالات
               </button>
             </div>
-          </div>
+          </>
+        )}
+        {activekey === "addUser" && !editedHonor && (
+          <>
+            <div className="NormalTextSizing textHeaderStyle d-flex align-items-center">
+              افزودن مقالات
+            </div>
+            <div>
+              <button
+                className="bg-success"
+                onClick={() => setActiveKey("editUserPage")}
+              >
+                ویرایش مقالات
+              </button>
+            </div>
+          </>
+        )}
+        {editedHonor && (
+          <>
+            <div className="NormalTextSizing textHeaderStyle d-flex align-items-center">
+              ویرایش مقالات
+            </div>
+            <div>
+              <button className="bg-success" onClick={handleCancelEdit}>
+                مقالات
+              </button>
+            </div>
+          </>
+        )}
+      </HeadermakeOrder>
+
+      {activekey === "editUserPage" && !editedHonor && (
+        <>
           <div
-            className="mt-3 d-flex flex-column gap-3"
+            className="mt-3 d-flex flex-column gap-3 container"
             style={{ cursor: "pointer" }}
           >
             {dataCome.length > 0 ? (
@@ -114,20 +166,6 @@ export default function HonorsMainComponent() {
 
       {activekey === "addUser" && !editedHonor && (
         <>
-          <div className="d-flex flex-row justify-content-between mb-2">
-            <div>
-              <h2 className="m-0"> افزودن مقالات</h2>
-            </div>
-            <div>
-              <button
-                className="bg-success"
-                onClick={() => setActiveKey("editUserPage")}
-              >
-                ویرایش مقالات
-              </button>
-            </div>
-          </div>
-
           <div>
             <AddBlogs />
           </div>
