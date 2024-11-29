@@ -85,8 +85,6 @@ export default function SteponeComponent({
     paymentImage: "",
   });
 
-  console.log(information);
-
   useEffect(() => {
     if (data) {
       setFormData((prevFormData) => ({
@@ -199,10 +197,7 @@ export default function SteponeComponent({
           ...information,
           paymentImage: reqComment?.paymentImage,
         };
-      }
-
-      console.log(updatedInformation);
-      
+      }      
 
       // Send updatedInformation with the second API call
       const uploadDocumentUser = await dispatch(

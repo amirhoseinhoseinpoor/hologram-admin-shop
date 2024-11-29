@@ -58,6 +58,7 @@ export default function OrderMainComponent({ toggleShow }) {
   const [searchTerm, setSearchTerm] = useState("");
   const [filteredOrders, setFilteredOrders] = useState(null);
   const [filteredOrdersUSER, setFilteredOrdersUSER] = useState(null);
+  const [filteredOrdersCanceled, setFilteredOrdersCanceled] = useState(null);
   const [usersData, setUsersData] = useState({});
   const [usersDataCanceled, setUsersDataCanceled] = useState({});
   const [selectedStatus, setSelectedStatus] = useState({});
@@ -71,9 +72,6 @@ export default function OrderMainComponent({ toggleShow }) {
   const closeModal2 = () => setOpenModal2(false);
   const closeModal3 = () => setOpenModal3(false);
 
-  // console.log(usersData);
-  // console.log(orders);
-
   const normalizeString = (str) => str.replace(/\s+/g, "").toLowerCase();
 
   // Add useEffect to handle filtering whenever orders, usersData, or searchTerm changes
@@ -84,6 +82,7 @@ export default function OrderMainComponent({ toggleShow }) {
     if (!searchTerm) {
       setFilteredOrders(waitingForAdmin);
       setFilteredOrdersUSER(WaitingForUser);
+      setFilteredOrdersCanceled(ordersCanceled);
       return;
     }
 
@@ -98,7 +97,19 @@ export default function OrderMainComponent({ toggleShow }) {
 
       return normalizedFullName.includes(normalizedSearchTerm);
     });
+
     const filteredUSER = WaitingForUser.filter((order) => {
+      const user = usersData[order.createdBy];
+      if (!user) return false;
+
+      const fullName = `${user.firstName || ""} ${user.lastName || ""}`;
+      const normalizedFullName = normalizeString(fullName);
+      const normalizedSearchTerm = normalizeString(searchTerm);
+
+      return normalizedFullName.includes(normalizedSearchTerm);
+    });
+
+    const filteredCanceled = ordersCanceled?.filter((order) => {
       const user = usersData[order.createdBy];
       if (!user) return false;
 
@@ -110,8 +121,9 @@ export default function OrderMainComponent({ toggleShow }) {
     });
     setFilteredOrders(filtered);
     setFilteredOrdersUSER(filteredUSER);
+    setFilteredOrdersCanceled(filteredCanceled);
 
-  }, [orders, usersData, searchTerm, waitingForAdmin , WaitingForUser]);
+  }, [orders, usersData, searchTerm, waitingForAdmin , WaitingForUser , ordersCanceled]);
 
   const handleCancelOrders = () => {
     const fetchData = async (status) => {
@@ -281,7 +293,7 @@ export default function OrderMainComponent({ toggleShow }) {
             </SeeOrderButton>
           </div>
           {/* orders canceled */}
-          {ordersCanceled && (
+          {filteredOrdersCanceled && filteredOrdersCanceled.length > 0 && (
             <>
               <OrderTabel
                 setSeeOrder={setSeeOrder}
@@ -289,7 +301,7 @@ export default function OrderMainComponent({ toggleShow }) {
                 selectedStatus={selectedStatus}
                 setSelectedStatus={setSelectedStatus}
                 handleStatusChange={handleStatusChange}
-                mainArray={filteredOrders}
+                mainArray={filteredOrdersCanceled}
                 userMainData={usersDataCanceled}
               />
             </>
