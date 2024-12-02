@@ -7,7 +7,7 @@ export const login = createAsyncThunk(
     const { username, password } = credentials;
     try {
       const response = await axios.post(
-        `${process.env.NEXT_PUBLIC_BACK_END_SERVER}/auth/login`,
+        `${process.env.NEXT_PUBLIC_BACK_END_SERVER}/auth/adminLogin`,
         {
           username,
           password,
@@ -1113,6 +1113,38 @@ export const requestAdminCommnet = createAsyncThunk(
         `${process.env.NEXT_PUBLIC_BACK_END_SERVER}/order/request/${code}/comment`,
         {
           reqComment,
+        },
+        {
+          headers: {
+            Authorization: token ? `Bearer ${token}` : "",
+          },
+        }
+      );
+      const data = response.data;
+      return data;
+    } catch (error) {
+      if (error.response && error.response.status === 400) {
+        return thunkAPI.rejectWithValue("ارور سمت من");
+      } else {
+        return thunkAPI.rejectWithValue(
+          "مشکلی به وجود امده لطفا بعدا تلاش کنید"
+        );
+      }
+    }
+  }
+);
+
+export const paymentStepData = createAsyncThunk(
+  "order/paymentStepData",
+  async ({ code, payment }, thunkAPI) => {
+    const state = thunkAPI.getState();
+    const token = state.auth.token;
+
+    try {
+      const response = await axios.patch(
+        `${process.env.NEXT_PUBLIC_BACK_END_SERVER}/order/payment/${code}`,
+        {
+          payment,
         },
         {
           headers: {
