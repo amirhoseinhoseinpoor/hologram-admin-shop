@@ -4,7 +4,9 @@ import { Modal, Button } from "react-bootstrap";
 import styled from "styled-components";
 // import redux
 import { useDispatch } from "react-redux";
-import { editUser } from "@/app/Store/thunks";
+import { editUser, deleteUser } from "@/app/Store/thunks";
+// import base component
+import AreYouShureModal from "@/app/BaseComponent/AreYouSureModal";;
 
 const EditUserModal = styled(Modal)`
   .modal-dialog {
@@ -53,21 +55,59 @@ const EditUserBtn = styled.button`
   border-radius: 4px;
 `;
 
-function EditUserBtnfunction({ data , setDataUpdated }) {
+const DeleteButtonStyle = styled.button`
+  border: none;
+  padding: 3px 5px !important;
+  background-color: unset !important;
+  border-radius: 4px;
+  color: red !important;
+
+  @media (max-width: 768px) {
+    padding: 3px 3px !important;
+  }
+`;
+
+function EditUserBtnfunction({ data, setDataUpdated, setConfirmModal }) {
   const dispatch = useDispatch();
   const [showEditModal, setShowEditModal] = useState(false);
   const [userData, setUserData] = useState({});
   const [factorType, setFactorType] = useState("");
+  const [whereLogin, setWhereLogin] = useState("");
+  const [rolesChange, setrolesChange] = useState("");
+  const [deleteCode, setDeleteCode] = useState("");
 
+  // modals state
+  const [openModal, setOpenModal] = useState(false);
+  const closeModal = () => setOpenModal(false);
 
-  const handleImageTypeChange = (event) => {
+  const handleDomainChange = (event) => {
+    setWhereLogin(event.target.value);
+  };
+
+  const handleRoleChange = (event) => {
+    setrolesChange(event.target.value);
+  };
+
+  const handleActiveStateChange = (event) => {
     setFactorType(event.target.value);
   };
 
   useEffect(() => {
     setUserData(data || {});
     setFactorType(data.active);
+    setWhereLogin(data.domain);
+    setrolesChange(data.userRoles[0]?.role?.name || 3);
   }, [data, showEditModal]);
+
+  useEffect(() => {
+    if (rolesChange == "admin") {
+      setrolesChange(2);
+    } else if (rolesChange == "master") {
+      setrolesChange(1);
+    } else if (rolesChange == "customer") {
+      setrolesChange(3);
+    }
+  }, [rolesChange]);
 
   const handleEditModalClose = () => {
     setShowEditModal(false);
@@ -80,6 +120,24 @@ function EditUserBtnfunction({ data , setDataUpdated }) {
     setUserData((prevData) => ({ ...prevData, [name]: value }));
   };
 
+  const areYouShureFunction = (e, { code }) => {
+    e.preventDefault();
+    setDeleteCode(code);
+    setOpenModal(true);
+  };
+
+  const handleDeleteUser = async () => {
+    const deleteUserApiCall = await dispatch(
+      deleteUser({ code: deleteCode })
+    ).unwrap();
+
+    setOpenModal(false);
+    setDataUpdated(true);
+    if (deleteUserApiCall.statusCode == 200) {
+      setConfirmModal(true);
+    }
+  };
+
   const handleEditSubmit = async (event) => {
     event.preventDefault();
 
@@ -88,8 +146,10 @@ function EditUserBtnfunction({ data , setDataUpdated }) {
         code: userData?.code,
         firstName: userData.firstName,
         lastName: userData.lastName,
-        active: factorType,
         username: userData.username,
+        active: factorType,
+        domain: whereLogin,
+        roleIds: [rolesChange],
       })
     ).unwrap();
 
@@ -165,7 +225,7 @@ function EditUserBtnfunction({ data , setDataUpdated }) {
                 id="factorType"
                 value={factorType}
                 name="active"
-                onChange={handleImageTypeChange}
+                onChange={handleActiveStateChange}
                 className="form-select mb-2"
                 style={{ boxShadow: "unset" }}
               >
@@ -173,12 +233,62 @@ function EditUserBtnfunction({ data , setDataUpdated }) {
                 <option value="false">غیرفعال</option>
               </select>
             </div>
-            <Button variant="primary" type="submit">
-              ذخیره
-            </Button>
+            <div className="form-group">
+              <label className="mb-1 me-1" htmlFor="whereLogin">
+                نوع دسترسی
+              </label>
+              <select
+                id="whereLogin"
+                value={whereLogin}
+                name="whereLogin"
+                onChange={handleDomainChange}
+                className="form-select mb-2"
+                style={{ boxShadow: "unset" }}
+              >
+                <option value="1">سایت</option>
+                <option value="2">ادمین و سایت</option>
+              </select>
+            </div>
+            <div className="form-group">
+              <label className="mb-1 me-1" htmlFor="rolesChange">
+                دسترسی
+              </label>
+              <select
+                id="rolesChange"
+                value={rolesChange}
+                name="rolesChange"
+                onChange={handleRoleChange}
+                className="form-select mb-2"
+                style={{ boxShadow: "unset" }}
+              >
+                <option value="1">مدیر</option>
+                <option value="2">ادمین</option>
+                <option value="3">مشتری</option>
+              </select>
+            </div>
+            <div className="d-flex flex-row justify-content-between">
+              <Button variant="primary" type="submit">
+                ذخیره
+              </Button>
+              <DeleteButtonStyle
+                type="button"
+                onClick={(e) =>
+                  areYouShureFunction(e, { code: userData?.code })
+                }
+              >
+                حذف اکانت
+              </DeleteButtonStyle>
+            </div>
           </form>
         </Modal.Body>
       </EditUserModal>
+      {/* modals */}
+      <AreYouShureModal
+        open={openModal}
+        onClose={closeModal}
+        text={"ایا از حذف کاربر مطمئن هستید"}
+        func={handleDeleteUser}
+      />
     </>
   );
 }

@@ -1,12 +1,11 @@
 "use client";
-import content from "/public/json/tabelContent.json";
 import React, { useEffect, useState } from "react";
 // import redux
-import { useDispatch, useSelector } from "react-redux";
+import { useDispatch } from "react-redux";
 import { getuser } from "@/app/Store/thunks";
-
 // import base component
 import NavBarToggleBurgerButton from "@/app/BaseComponent/NavBarToggleBurgerButton";
+import ConfirmingModal from "@/app/BaseComponent/ConfirmingModal";
 // import components
 import DefineUserBtn from "../DefineUser/AddUserBtn";
 import EditUserBtnfunction from "./EditUserBtn";
@@ -32,7 +31,24 @@ export default function DefineUser({ toggleShow }) {
   const dispatch = useDispatch();
 
   const [dataCome, setDataCome] = useState([]);
-  const [dataUpdated, setDataUpdated] = useState(false); 
+  const [dataUpdated, setDataUpdated] = useState(false);
+  const [confirmModal, setConfirmModal] = useState(false);
+
+  const [openModal2, setOpenModal2] = useState(false);
+  const closeModal2 = () => setOpenModal2(false);
+
+  function closeModalOnTimeout() {
+    setTimeout(() => {
+      setOpenModal2(false);
+    }, 2000);
+  }
+
+  useEffect(() => {
+    if (confirmModal == true) {
+      setOpenModal2(true);
+      closeModalOnTimeout();
+    }
+  }, [confirmModal]);
 
   useEffect(() => {
     const fetchData = async () => {
@@ -42,7 +58,6 @@ export default function DefineUser({ toggleShow }) {
     };
     fetchData();
   }, [dispatch, dataUpdated]);
-
 
   return (
     <section>
@@ -56,12 +71,6 @@ export default function DefineUser({ toggleShow }) {
         <DefineUserBtn />
       </HeadermakeOrder>
 
-      {/* <div className="d-flex flex-row mb-3 justify-content-between">
-        <div>مدیریت کاربر</div>
-        <div>
-          <DefineUserBtn />
-        </div>
-      </div> */}
       <table className="table table-striped">
         <thead>
           <tr className="table-head text-center">
@@ -70,6 +79,8 @@ export default function DefineUser({ toggleShow }) {
             <th>نام خانوادگی</th>
             <th>شماره همراه</th>
             <th>وضعیت</th>
+            <th>نوع دسترسی</th>
+            <th>دسترسی</th>
             <th>عملیات</th>
           </tr>
         </thead>
@@ -88,14 +99,44 @@ export default function DefineUser({ toggleShow }) {
                     <p className="NormalTextSizing">غیرفعال</p>
                   )}
                 </td>
+
                 <td>
-                  <EditUserBtnfunction setDataUpdated={setDataUpdated} data={dataCome[--index]}/>
+                  {item.domain == 1 && <p className="NormalTextSizing">سایت</p>}
+                  {item.domain == 2 && (
+                    <p className="NormalTextSizing">سایت و ادمین</p>
+                  )}
+                </td>
+                <td>
+                  {item.userRoles[0]?.role?.name == "admin" && (
+                    <p className="NormalTextSizing">ادمین</p>
+                  )}
+                  {item.userRoles[0]?.role?.name == "master" && (
+                    <p className="NormalTextSizing">مدیر</p>
+                  )}
+                  {item.userRoles[0]?.role?.name == "customer" && (
+                    <p className="NormalTextSizing">مشتری</p>
+                  )}
+                </td>
+                <td>
+                  <div className="d-flex flex-row justify-content-center">
+                    <EditUserBtnfunction
+                      setDataUpdated={setDataUpdated}
+                      data={dataCome[--index]}
+                      setConfirmModal={setConfirmModal}
+                    />
+                  </div>
                 </td>
               </tr>
             </React.Fragment>
           ))}
         </tbody>
       </table>
+      {/* modals */}
+      <ConfirmingModal
+        open={openModal2}
+        onClose={closeModal2}
+        text={"کاربر با موفقیت حذف شد"}
+      />
     </section>
   );
 }

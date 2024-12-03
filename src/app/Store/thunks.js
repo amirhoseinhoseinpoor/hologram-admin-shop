@@ -100,7 +100,9 @@ export const getuser = createAsyncThunk(
 
 export const editUser = createAsyncThunk(
   "userManagment/editUser",
-  async ({ code, firstName, lastName, username, active  }, thunkAPI) => {
+  async ({ code, firstName, lastName, username, active , domain , roleIds  }, thunkAPI) => {
+    
+    console.log(roleIds);
     
     const state = thunkAPI.getState();
     const token = state.auth.token;
@@ -113,7 +115,39 @@ export const editUser = createAsyncThunk(
           lastName,
           username,
           active,
+          domain,
+          roleIds,
         },
+        {
+          headers: {
+            Authorization: token ? `Bearer ${token}` : "",
+          },
+        }
+      );
+      const data = response.data;
+      return data;
+    } catch (error) {
+      if (error.response && error.response.status === 400) {
+        return thunkAPI.rejectWithValue("error");
+      } else {
+        return thunkAPI.rejectWithValue(
+          "مشکلی به وجود امده لطفا بعدا تلاش کنید"
+        );
+      }
+    }
+  }
+);
+
+export const deleteUser = createAsyncThunk(
+  "userManagment/deleteUser",
+  async ({ code }, thunkAPI) => {
+    
+    const state = thunkAPI.getState();
+    const token = state.auth.token;
+
+    try {
+      const response = await axios.delete(
+        `${process.env.NEXT_PUBLIC_BACK_END_SERVER}/users/${code}`,
         {
           headers: {
             Authorization: token ? `Bearer ${token}` : "",
@@ -354,7 +388,6 @@ export const homePageVideo = createAsyncThunk(
         `${process.env.NEXT_PUBLIC_BACK_END_SERVER}/video/list`
       );
 
-      console.log(response.data);
       return response.data;
     } catch (error) {
       if (error.response && error.response.status === 400) {
