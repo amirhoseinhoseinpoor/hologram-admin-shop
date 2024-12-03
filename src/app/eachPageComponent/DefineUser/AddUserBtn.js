@@ -100,7 +100,6 @@ export default function AddUserBtn() {
     }
   };
 
-  console.log(dataCome);
   
   return (
     <section>
