@@ -1,12 +1,11 @@
 "use client";
-import React, { useState , useEffect } from "react";
+import React, { useState, useEffect } from "react";
 import { Modal, Button } from "react-bootstrap";
 import styled from "styled-components";
 
 // import redux
-import { useDispatch , useSelector } from "react-redux";
-import { addUser } from "@/app/Store/thunks";
-import { getuser } from "@/app/Store/thunks";
+import { useDispatch } from "react-redux";
+import { addUser, getuser } from "@/app/Store/thunks";
 
 const AddUserModal = styled(Modal)`
   .modal-dialog {
@@ -37,9 +36,9 @@ const AddUserModal = styled(Modal)`
     border-radius: 4px;
     padding: 8px 12px;
   }
-  .form-control:focus{
-     box-shadow: none; 
-     border: 1px solid black;   
+  .form-control:focus {
+    box-shadow: none;
+    border: 1px solid black;
   }
 `;
 const AddUserBtnstyle = styled(Button)`
@@ -49,10 +48,13 @@ const AddUserBtnstyle = styled(Button)`
   text-align: center;
   cursor: pointer;
   border-radius: 4px;
-
 `;
 
-export default function AddUserBtn() {
+export default function AddUserBtn({
+  setDataUpdated,
+  setConfirmModal,
+  setErrorModal,
+}) {
   const dispatch = useDispatch();
 
   const [newUserData, setNewUserData] = useState({
@@ -60,17 +62,16 @@ export default function AddUserBtn() {
     lastName: "",
     username: "",
     password: "",
-    gender: "u",
     domain: "",
-    roleIdsC: "",
+    roleId: "",
   });
   const [showAddModal, setShowAddModal] = useState(false);
 
-  const [dataCome , setDataCome] = useState([]);
+  // const [dataCome , setDataCome] = useState([]);
 
   const handleInputChange = (event) => {
     const { name, value } = event.target;
-   
+
     setNewUserData((prevUserData) => ({
       ...prevUserData,
       [name]: value,
@@ -80,30 +81,40 @@ export default function AddUserBtn() {
   const handleAddModalClose = () => setShowAddModal(false);
   const handleAddModalShow = () => setShowAddModal(true);
 
-  useEffect(() => {
-    const fetchData = async () => {
-      const dataComeAPI = await dispatch(getuser()).unwrap();
-      setDataCome(dataComeAPI);
-    }
-    fetchData();
-   
-  }, [dispatch]);
+  // useEffect(() => {
+  //   const fetchData = async () => {
+  //     const dataComeAPI = await dispatch(getuser()).unwrap();
+  //     setDataCome(dataComeAPI);
+  //   }
+  //   fetchData();
+
+  // }, [dispatch]);
 
   const handleAddUser = async (event) => {
     event.preventDefault();
     try {
-      await dispatch(addUser(newUserData))
-      console.log(newUserData);
+      const gettingResponseAPI = await dispatch(addUser(newUserData)).unwrap();
+
+      if (gettingResponseAPI) {
+        setDataUpdated(true);
+        setConfirmModal(true);
+      } else {
+        setErrorModal(true);
+      }
+
       handleAddModalClose();
     } catch (error) {
       console.error("Error adding user:", error);
     }
   };
 
-  
   return (
     <section>
-      <AddUserBtnstyle className="NormalTextSizing bg-success" variant="primary" onClick={handleAddModalShow}>
+      <AddUserBtnstyle
+        className="NormalTextSizing bg-success"
+        variant="primary"
+        onClick={handleAddModalShow}
+      >
         اضافه کردن کاربر جدید
       </AddUserBtnstyle>
       <AddUserModal show={showAddModal} onHide={handleAddModalClose}>
@@ -114,20 +125,25 @@ export default function AddUserBtn() {
           <form>
             {/* Input fields for new user data (replace with appropriate labels) */}
             <div className="form-group">
-                <label className="mb-1 me-1" htmlFor="firstName">نام</label>
+              <label className="mb-1 me-1" htmlFor="firstName">
+                نام
+              </label>
               <input
                 type="text"
-                id="firstName" 
+                id="firstName"
                 name="firstName"
                 placeholder="نام"
                 className="form-control"
                 value={newUserData.firstName}
                 onChange={handleInputChange}
+                required
               />
             </div>
 
             <div className="form-group">
-              <label className="mb-1 me-1" htmlFor="lastName">نام خانوادگی</label>
+              <label className="mb-1 me-1" htmlFor="lastName">
+                نام خانوادگی
+              </label>
               <input
                 type="text"
                 id="lastName"
@@ -136,6 +152,7 @@ export default function AddUserBtn() {
                 className="form-control"
                 value={newUserData.lastName}
                 onChange={handleInputChange}
+                required
               />
             </div>
             {/* <div className="form-group">
@@ -152,7 +169,9 @@ export default function AddUserBtn() {
             </div> */}
 
             <div className="form-group">
-            <label className="mb-1 me-1" htmlFor="username">شماره همراه</label>
+              <label className="mb-1 me-1" htmlFor="username">
+                شماره همراه
+              </label>
               <input
                 type="number"
                 id="username"
@@ -161,11 +180,14 @@ export default function AddUserBtn() {
                 className="form-control"
                 value={newUserData.cardId}
                 onChange={handleInputChange}
+                required
               />
             </div>
 
             <div className="form-group">
-            <label className="mb-1 me-1" htmlFor="password">رمز</label>
+              <label className="mb-1 me-1" htmlFor="password">
+                رمز
+              </label>
               <input
                 type="password"
                 id="password"
@@ -174,10 +196,11 @@ export default function AddUserBtn() {
                 className="form-control"
                 value={newUserData.password}
                 onChange={handleInputChange}
+                required
               />
             </div>
 
-            <div className="form-group">  
+            {/* <div className="form-group">  
               <label className="mb-1 me-1" htmlFor="gender">جنسیت</label>  
               <select  
                 id="gender"  
@@ -190,38 +213,48 @@ export default function AddUserBtn() {
                 <option value="m">مرد</option>  
                 <option value="f">زن</option>  
               </select>  
-            </div> 
-            
-            <div className="form-group">  
-              <label className="mb-1 me-1" htmlFor="domain">امکان دسترسی</label>  
-              <select  
-                id="domain"  
-                name="domain"  
-                className="form-control"  
-                value={newUserData.domain}  
-                onChange={handleInputChange}  
-              >  
-                <option value="" disabled>انتخاب کنید</option>  
-                <option value="2">ویرایشگر</option>  
-                <option value="1">بیننده</option>  
-              </select>  
+            </div>  */}
+
+            <div className="form-group">
+              <label className="mb-1 me-1" htmlFor="domain">
+                امکان دسترسی
+              </label>
+              <select
+                id="domain"
+                name="domain"
+                className="form-control"
+                value={newUserData.domain}
+                onChange={handleInputChange}
+                required
+              >
+                <option value="" disabled>
+                  انتخاب کنید
+                </option>
+                <option value="2">سایت و ادمین</option>
+                <option value="1">سایت</option>
+              </select>
             </div>
 
-            <div className="form-group">  
-              <label className="mb-1 me-1" htmlFor="roleIdsC">نوع کاربر</label>  
-              <select  
-                id="roleIdsC"  
-                name="roleIdsC"  
-                className="form-control"  
-                value={newUserData.roleIdsC}  
-                onChange={handleInputChange}  
-              >  
-                <option value="" disabled>انتخاب کنید</option>  
-                <option value="3">مدیر</option>  
-                <option value="2">ادمین</option>  
-                <option value="1">مشتری</option>  
-              </select>  
-            </div>   
+            <div className="form-group">
+              <label className="mb-1 me-1" htmlFor="roleId">
+                نوع کاربر
+              </label>
+              <select
+                id="roleId"
+                name="roleId"
+                className="form-control"
+                value={newUserData.roleId}
+                onChange={handleInputChange}
+                required
+              >
+                <option value="" disabled>
+                  انتخاب کنید
+                </option>
+                <option value="1">مدیر</option>
+                <option value="2">ادمین</option>
+                <option value="3">مشتری</option>
+              </select>
+            </div>
           </form>
         </Modal.Body>
         <Modal.Footer>

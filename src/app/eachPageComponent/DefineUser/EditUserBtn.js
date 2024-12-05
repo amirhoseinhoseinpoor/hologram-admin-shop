@@ -94,9 +94,9 @@ function EditUserBtnfunction({ data, setDataUpdated, setConfirmModal }) {
 
   useEffect(() => {
     setUserData(data || {});
-    setFactorType(data.active);
-    setWhereLogin(data.domain);
-    setrolesChange(data.userRoles[0]?.role?.name || 3);
+    setFactorType(data?.active);
+    setWhereLogin(data?.domain);
+    setrolesChange(data?.userRoles[0]?.role?.name || 3);
   }, [data, showEditModal]);
 
   useEffect(() => {

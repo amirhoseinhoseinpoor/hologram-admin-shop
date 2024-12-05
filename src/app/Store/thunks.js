@@ -1,6 +1,7 @@
 import { createAsyncThunk } from "@reduxjs/toolkit";
 import axios from "axios";
 
+// auterezation
 export const login = createAsyncThunk(
   "auth/login",
   async (credentials, thunkAPI) => {
@@ -27,38 +28,39 @@ export const login = createAsyncThunk(
     }
   }
 );
-// user managment
+
 export const addUser = createAsyncThunk(
   "userManagment/addUser",
   async (credentials, thunkAPI) => {
-    const {
-      firstName,
-      lastName,
-      username,
-      password,
-      gender,
-      domain,
-      roleIdsC,
-    } = credentials;
+    const { firstName, lastName, username, password, domain, roleId } =
+      credentials;
+
+    const state = thunkAPI.getState();
+    const token = state.auth.token;
+
     try {
       const response = await axios.post(
-        `${process.env.NEXT_PUBLIC_BACK_END_SERVER}/auth/register`,
+        `${process.env.NEXT_PUBLIC_BACK_END_SERVER}/auth/createUserByAdmin`,
         {
           firstName,
           lastName,
           username,
-          gender,
           password,
           domain,
-          roleIds: [parseInt(roleIdsC)],
+          roleIds: [parseInt(roleId)],
+        },
+        {
+          headers: {
+            Authorization: token ? `Bearer ${token}` : "",
+          },
         }
       );
-      const token = response.data.token;
-
-      return token;
+      const signUpSattus = response.data.message;
+      console.log(signUpSattus);
+      return signUpSattus;
     } catch (error) {
       if (error.response && error.response.status === 400) {
-        return thunkAPI.rejectWithValue("شماره همراه یا پسورد اشتباه است");
+        return thunkAPI.rejectWithValue("شما قبلا ثبت نام کرده اید");
       } else {
         return thunkAPI.rejectWithValue(
           "مشکلی به وجود امده لطفا بعدا تلاش کنید"
@@ -67,6 +69,8 @@ export const addUser = createAsyncThunk(
     }
   }
 );
+
+// user managment
 
 export const getuser = createAsyncThunk(
   "userManagment/getuser",
@@ -100,10 +104,12 @@ export const getuser = createAsyncThunk(
 
 export const editUser = createAsyncThunk(
   "userManagment/editUser",
-  async ({ code, firstName, lastName, username, active , domain , roleIds  }, thunkAPI) => {
-    
+  async (
+    { code, firstName, lastName, username, active, domain, roleIds },
+    thunkAPI
+  ) => {
     console.log(roleIds);
-    
+
     const state = thunkAPI.getState();
     const token = state.auth.token;
 
@@ -141,7 +147,6 @@ export const editUser = createAsyncThunk(
 export const deleteUser = createAsyncThunk(
   "userManagment/deleteUser",
   async ({ code }, thunkAPI) => {
-    
     const state = thunkAPI.getState();
     const token = state.auth.token;
 
