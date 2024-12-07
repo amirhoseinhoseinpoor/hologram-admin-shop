@@ -100,6 +100,7 @@ export default function MakeOrder({ seeOrder, setActiveKey , toggleShow }) {
           <PusherChat
             data={seeOrder.request}
             chatData={seeOrder.chat}
+            chatFinalImage={seeOrder.chatImage}
             code={seeOrder.code}
             step={seeOrder.step}
             handleNextStep={handleNextStep}

@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect, useRef } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import style from "/src/app/Styles/MakeOrderStyle/Talkjs.module.scss";
 import { Box } from "@mui/material";
 import Modal from "@mui/material/Modal";
@@ -35,6 +35,7 @@ const ChatBox = ({
   code,
   step,
   data,
+  chatFinalImage,
 }) => {
   const dispatch = useDispatch();
 
@@ -51,12 +52,12 @@ const ChatBox = ({
   const [FinalPaternModal, setFinalPaternModal] = useState(false);
   const [SendingFinalPattern, setSendingFinalPattern] = useState([]);
   const [openModal2, setOpenModal2] = useState(false);
+  const [patternImageUrls, setPatternImageUrls] = useState({});
 
+  console.log(chatFinalImage);
   const closeModal2 = () => setOpenModal2(false);
 
   const dontHavePattern = Object.keys(SendingFinalPattern).length == 0;
-
-  console.log(SendingFinalPattern);
 
   const handleSendingPattern = () => {
     setFinalPaternModal(true);
@@ -84,6 +85,40 @@ const ChatBox = ({
     setMessageToDeleteIndex(index);
     setOpenModal(true);
   };
+
+  useEffect(() => {
+    const fetchImages = async () => {
+      if (chatFinalImage?.images && Array.isArray(chatFinalImage.images)) {
+        try {
+          // Store only image IDs in SendingFinalPattern
+          setSendingFinalPattern(chatFinalImage.images || []);
+
+          // Fetch image URLs and update patternImageUrls
+          const imageUrls = await Promise.all(
+            chatFinalImage.images.map(async (filename) => {
+              const imageData = await dispatch(
+                fetchPrivateImage({ filename })
+              ).unwrap();
+              return { filename, url: imageData }; // Assuming imageData is the URL
+            })
+          );
+
+          // Update patternImageUrls with fetched URLs
+          setPatternImageUrls((prevUrls) => {
+            const newUrls = { ...prevUrls };
+            imageUrls.forEach(({ filename, url }) => {
+              newUrls[filename] = url;
+            });
+            return newUrls;
+          });
+        } catch (error) {
+          console.error("Error fetching final images:", error);
+        }
+      }
+    };
+
+    fetchImages();
+  }, [dispatch, chatFinalImage]);
 
   const handleFileUpload = (event) => {
     const files = Array.from(event.target.files);
@@ -211,10 +246,12 @@ const ChatBox = ({
 
   const handleSelectImage = (event) => {
     const file = event.target.files[0];
-    setImage(file);
-    const imageUrl = URL.createObjectURL(file);
-    setSelectedImage(imageUrl);
-    console.log(image);
+    if (file) {
+      setImage(file);
+      const imageUrl = URL.createObjectURL(file);
+      setSelectedImage(imageUrl);
+      console.log(file);
+    }
   };
 
   const handleCancelSending = () => {
@@ -254,65 +291,55 @@ const ChatBox = ({
     }
   }, [step]);
 
-  // const hadleChatImageSendFunc = async () => {
-  //   const uploadImage = await Promise.all(
-  //     SendingFinalPattern.map(async (item) => {
-  //       const tag = "chatBoxImage";
-  //       const type = 1; // Adjust based on your backend logic
-  //       const isPublic = false;
-  //       const file = item.file;
+  const handleChatImageSendFunc = async () => {
+    try {
+      // Collect all image IDs (existing and new)
+      const fileIds = await Promise.all(
+        SendingFinalPattern.map(async (item) => {
+          if (typeof item === "object" && item.file) {
+            // New image upload
+            const tag = "chatBoxImage";
+            const type = 1;
+            const isPublic = false;
+            const file = item.file;
 
-  //       const fileIdSrc = await dispatch(
-  //         uploadFile({ file, tag, type, isPublic })
-  //       ).unwrap();
-  //       console.log(fileIdSrc);
+            // Upload the new image and get its new ID
+            const fileIdSrc = await dispatch(
+              uploadFile({ file, tag, type, isPublic })
+            ).unwrap();
+            return fileIdSrc; // New image ID
+          } else if (typeof item === "string") {
+            // Existing image ID, include as-is
+            return item;
+          } else {
+            // Unexpected item type, skip or handle accordingly
+            console.warn("Unexpected item in SendingFinalPattern:", item);
+            return null;
+          }
+        })
+      );
 
-  //       setFinalData({ ...FinalData, src: fileIdSrc });
-  //     })
-  //   );
-  //   console.log(FinalData);
+      // Filter out any nulls (unexpected items)
+      const validFileIds = fileIds.filter((id) => id !== null);
 
-  //   console.log(uploadImage);
+      // Send all image IDs to the API
+      const responseDispatchImage = await dispatch(
+        chatImageSend({
+          code,
+          chatImage: { images: validFileIds },
+        })
+      ).unwrap();
 
-  //   const responseDispatchImage = await dispatch(
-  //     chatImageSend({
-  //       code,
-  //       chatImage: FinalData,
-  //     })
-  //   ).unwrap();
-
-  //   if (responseDispatchImage?.statusCode == 200) {
-  //     setOpenModal2(true);
-  //     closeModalOnTimeout();
-  //   }
-  // };
-
-  const hadleChatImageSendFunc = async () => {
-    // Collecting all file IDs into an array
-    const fileIds = await Promise.all(
-      SendingFinalPattern.map(async (item) => {
-        const tag = "chatBoxImage";
-        const type = 1; // Adjust based on your backend logic
-        const isPublic = false;
-        const file = item.file;
-
-        const fileIdSrc = await dispatch(
-          uploadFile({ file, tag, type, isPublic })
-        ).unwrap();
-        return fileIdSrc; // Collect the file ID
-      })
-    );
-
-    const responseDispatchImage = await dispatch(
-      chatImageSend({
-        code,
-        chatImage: { images: fileIds }, // Send the updated file IDs
-      })
-    ).unwrap();
-
-    if (responseDispatchImage?.statusCode === 200) {
-      setOpenModal2(true);
-      closeModalOnTimeout();
+      if (responseDispatchImage?.statusCode === 200) {
+        setOpenModal2(true);
+        closeModalOnTimeout();
+      } else {
+        console.error("Failed to send images:", responseDispatchImage);
+        // Optionally handle unsuccessful response
+      }
+    } catch (error) {
+      console.error("Error sending chat images:", error);
+      // Optionally handle error (e.g., show notification to user)
     }
   };
 
@@ -401,7 +428,7 @@ const ChatBox = ({
 
                             <svg
                               style={{ cursor: "pointer" }}
-                              onClick={() => handleDeleteMessage(index)}
+                              onClick={() => areYouShureFunction(index)}
                               width={18}
                               height={17}
                               viewBox="0 0 25 24"
@@ -493,7 +520,7 @@ const ChatBox = ({
                                 <div className="d-flex flex-row">
                                   <svg
                                     style={{ cursor: "pointer" }}
-                                    onClick={() => handleDeleteMessage(index)}
+                                    onClick={() => areYouShureFunction(index)}
                                     width={18}
                                     height={17}
                                     viewBox="0 0 25 24"
@@ -555,7 +582,7 @@ const ChatBox = ({
           {selectedImage ? (
             <>
               <div
-                className={`${style.mainDivSelectedImage} d-flex flex-row align-items-center justify-content-between`}
+                className={`${style.mainDivSelectedImage} d-flex flex-row align-items-center justify-content-between w-100`}
               >
                 <Box
                   component="img"
@@ -683,60 +710,118 @@ const ChatBox = ({
           <>
             <div className={style.ModalPatternStyle}>
               <div className={style.sendingFinalPatternImage}>
-                {SendingFinalPattern?.map((fileObj, index) => (
-                  <div key={index} className="position-relative">
-                    <Box
-                      // onClick={handleOpen}
-                      className={`${style.imageChatStyle}  mb-2 mt-2`}
-                      component="img"
-                      src={fileObj.imageUrl}
-                      alt={`uploaded ${index}`}
-                    />
-                    <div
-                      className={style.deleteIconStyle}
-                      onClick={() => handleRemoveFinalPattern(index)}
-                    >
-                      <svg
-                        width={17}
-                        height={17}
-                        viewBox="0 0 12 12"
-                        fill="none"
-                        xmlns="http://www.w3.org/2000/svg"
-                      >
-                        <path
-                          d="M10.5 2.98828C8.835 2.82328 7.16 2.73828 5.49 2.73828C4.5 2.73828 3.51 2.78828 2.52 2.88828L1.5 2.98828"
-                          stroke="#FF4F3F"
-                          strokeLinecap="round"
-                          strokeLinejoin="round"
-                        />
-                        <path
-                          d="M4.25 2.485L4.36 1.83C4.44 1.355 4.5 1 5.345 1H6.655C7.5 1 7.565 1.375 7.64 1.835L7.75 2.485"
-                          stroke="#FF4F3F"
-                          strokeLinecap="round"
-                          strokeLinejoin="round"
-                        />
-                        <path
-                          d="M9.4252 4.57031L9.1002 9.60531C9.0452 10.3903 9.0002 11.0003 7.6052 11.0003H4.3952C3.0002 11.0003 2.9552 10.3903 2.9002 9.60531L2.5752 4.57031"
-                          stroke="#FF4F3F"
-                          strokeLinecap="round"
-                          strokeLinejoin="round"
-                        />
-                        <path
-                          d="M5.16504 8.25H6.83004"
-                          stroke="#FF4F3F"
-                          strokeLinecap="round"
-                          strokeLinejoin="round"
-                        />
-                        <path
-                          d="M4.75 6.25H7.25"
-                          stroke="#FF4F3F"
-                          strokeLinecap="round"
-                          strokeLinejoin="round"
-                        />
-                      </svg>
-                    </div>
-                  </div>
-                ))}
+                {Array.isArray(SendingFinalPattern) &&
+                  SendingFinalPattern?.map((fileObj, index) => (
+                    <React.Fragment key={index}>
+                      {typeof fileObj === "string" ? (
+                        <div className="position-relative">
+                          <Box
+                            // onClick={handleOpen}
+                            className={`${style.imageChatStyle}  mb-2 mt-2`}
+                            component="img"
+                            src={patternImageUrls[fileObj]}
+                            alt={`uploaded ${index}`}
+                          />
+                          <div
+                            className={style.deleteIconStyle}
+                            onClick={() => handleRemoveFinalPattern(index)}
+                          >
+                            <svg
+                              width={17}
+                              height={17}
+                              viewBox="0 0 12 12"
+                              fill="none"
+                              xmlns="http://www.w3.org/2000/svg"
+                            >
+                              <path
+                                d="M10.5 2.98828C8.835 2.82328 7.16 2.73828 5.49 2.73828C4.5 2.73828 3.51 2.78828 2.52 2.88828L1.5 2.98828"
+                                stroke="#FF4F3F"
+                                strokeLinecap="round"
+                                strokeLinejoin="round"
+                              />
+                              <path
+                                d="M4.25 2.485L4.36 1.83C4.44 1.355 4.5 1 5.345 1H6.655C7.5 1 7.565 1.375 7.64 1.835L7.75 2.485"
+                                stroke="#FF4F3F"
+                                strokeLinecap="round"
+                                strokeLinejoin="round"
+                              />
+                              <path
+                                d="M9.4252 4.57031L9.1002 9.60531C9.0452 10.3903 9.0002 11.0003 7.6052 11.0003H4.3952C3.0002 11.0003 2.9552 10.3903 2.9002 9.60531L2.5752 4.57031"
+                                stroke="#FF4F3F"
+                                strokeLinecap="round"
+                                strokeLinejoin="round"
+                              />
+                              <path
+                                d="M5.16504 8.25H6.83004"
+                                stroke="#FF4F3F"
+                                strokeLinecap="round"
+                                strokeLinejoin="round"
+                              />
+                              <path
+                                d="M4.75 6.25H7.25"
+                                stroke="#FF4F3F"
+                                strokeLinecap="round"
+                                strokeLinejoin="round"
+                              />
+                            </svg>
+                          </div>
+                        </div>
+                      ) : (
+                        <div className="position-relative">
+                          <Box
+                            // onClick={handleOpen}
+                            className={`${style.imageChatStyle}  mb-2 mt-2`}
+                            component="img"
+                            src={fileObj.imageUrl}
+                            alt={`uploaded ${index}`}
+                          />
+                          <div
+                            className={style.deleteIconStyle}
+                            onClick={() => handleRemoveFinalPattern(index)}
+                          >
+                            <svg
+                              width={17}
+                              height={17}
+                              viewBox="0 0 12 12"
+                              fill="none"
+                              xmlns="http://www.w3.org/2000/svg"
+                            >
+                              <path
+                                d="M10.5 2.98828C8.835 2.82328 7.16 2.73828 5.49 2.73828C4.5 2.73828 3.51 2.78828 2.52 2.88828L1.5 2.98828"
+                                stroke="#FF4F3F"
+                                strokeLinecap="round"
+                                strokeLinejoin="round"
+                              />
+                              <path
+                                d="M4.25 2.485L4.36 1.83C4.44 1.355 4.5 1 5.345 1H6.655C7.5 1 7.565 1.375 7.64 1.835L7.75 2.485"
+                                stroke="#FF4F3F"
+                                strokeLinecap="round"
+                                strokeLinejoin="round"
+                              />
+                              <path
+                                d="M9.4252 4.57031L9.1002 9.60531C9.0452 10.3903 9.0002 11.0003 7.6052 11.0003H4.3952C3.0002 11.0003 2.9552 10.3903 2.9002 9.60531L2.5752 4.57031"
+                                stroke="#FF4F3F"
+                                strokeLinecap="round"
+                                strokeLinejoin="round"
+                              />
+                              <path
+                                d="M5.16504 8.25H6.83004"
+                                stroke="#FF4F3F"
+                                strokeLinecap="round"
+                                strokeLinejoin="round"
+                              />
+                              <path
+                                d="M4.75 6.25H7.25"
+                                stroke="#FF4F3F"
+                                strokeLinecap="round"
+                                strokeLinejoin="round"
+                              />
+                            </svg>
+                          </div>
+                        </div>
+                      )}
+                    </React.Fragment>
+                  ))}
               </div>
 
               {dontHavePattern && (
@@ -768,7 +853,7 @@ const ChatBox = ({
                 {!dontHavePattern && (
                   <div className="ms-2">
                     <button
-                      onClick={hadleChatImageSendFunc}
+                      onClick={handleChatImageSendFunc}
                       className={style.confirmpatternButtonStyle}
                     >
                       تایید نهایی
@@ -780,11 +865,19 @@ const ChatBox = ({
           </>
         </Modal>
       )}
+
       {/* modals  */}
       <ConfirmingModal
         open={openModal2}
         onClose={closeModal2}
         text={"طرح با موفقیت ثبت شد"}
+      />
+      {/* modals */}
+      <AreYouShureModal
+        open={openModal}
+        onClose={closeModal}
+        text={"ایا از حذف پیام مطمئن هستید ؟"}
+        func={() => handleDeleteMessage(messageToDeleteIndex)}
       />
     </div>
   );

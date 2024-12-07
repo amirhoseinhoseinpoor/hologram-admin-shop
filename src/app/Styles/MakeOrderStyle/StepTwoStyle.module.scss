@@ -7,6 +7,11 @@
   color: #f3802c;
 }
 
+.disabledButtonLoading {  
+  background-color: #868686 !important;   
+  cursor: not-allowed !important;  
+}  
+
 .resetfontLabel {
   font-family: unset;
   color: var.$social-media-color;
