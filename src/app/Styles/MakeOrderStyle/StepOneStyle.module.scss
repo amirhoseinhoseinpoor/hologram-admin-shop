@@ -7,6 +7,14 @@
 .textAreaDocument{
   max-height: 300px;
 }
+.widthFactorsImage{
+  width: 50%;
+}
+
+.disabledButtonLoading {  
+  background-color: #868686 !important;   
+  cursor: not-allowed !important;  
+}  
 
 .stepContent {
   background-color: white;
@@ -206,7 +214,7 @@
   color: white;
   background-color: #5695f6;
   border-radius: 4px;
-  padding: 7px 29px !important;
+  padding: 9px 35px !important;
 }
 
 
@@ -240,8 +248,9 @@
   display: none;
 }
 .LogoReplaceStyle {
-  max-width: 300px;
-  max-height: 300px;
+  // max-width: 300px;
+  width: 100%;
+  // max-height: 300px;
   border-radius: 4px;
 }
 .deleteButton {
@@ -294,5 +303,24 @@
   .resizingWebInResponsive {
     width: 100% !important;
     margin-bottom: 10px;
+  }
+  .responsiveBottomMainDiv{
+    flex-direction: column !important;
+  }
+  .LogoReplaceStyle {
+    max-width: unset;
+    width: 100%;
+  }
+  .SecondSectionStyle{
+    width: 100%;
+  }
+  .fixReponsiveFactor{
+    flex-direction: column !important;
+  }
+  .widthFactorsImage{
+    width: 100%;
+  }
+  .continueButton {
+    padding: 6px 30px !important;
   }
 }

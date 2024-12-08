@@ -1,13 +1,14 @@
 import { createAsyncThunk } from "@reduxjs/toolkit";
 import axios from "axios";
 
+// auterezation
 export const login = createAsyncThunk(
   "auth/login",
   async (credentials, thunkAPI) => {
     const { username, password } = credentials;
     try {
       const response = await axios.post(
-        `${process.env.NEXT_PUBLIC_BACK_END_SERVER}/auth/login`,
+        `${process.env.NEXT_PUBLIC_BACK_END_SERVER}/auth/adminLogin`,
         {
           username,
           password,
@@ -27,38 +28,39 @@ export const login = createAsyncThunk(
     }
   }
 );
-// user managment
+
 export const addUser = createAsyncThunk(
   "userManagment/addUser",
   async (credentials, thunkAPI) => {
-    const {
-      firstName,
-      lastName,
-      username,
-      password,
-      gender,
-      domain,
-      roleIdsC,
-    } = credentials;
+    const { firstName, lastName, username, password, domain, roleId } =
+      credentials;
+
+    const state = thunkAPI.getState();
+    const token = state.auth.token;
+
     try {
       const response = await axios.post(
-        `${process.env.NEXT_PUBLIC_BACK_END_SERVER}/auth/register`,
+        `${process.env.NEXT_PUBLIC_BACK_END_SERVER}/auth/createUserByAdmin`,
         {
           firstName,
           lastName,
           username,
-          gender,
           password,
           domain,
-          roleIds: [parseInt(roleIdsC)],
+          roleIds: [parseInt(roleId)],
+        },
+        {
+          headers: {
+            Authorization: token ? `Bearer ${token}` : "",
+          },
         }
       );
-      const token = response.data.token;
-
-      return token;
+      const signUpSattus = response.data.message;
+      console.log(signUpSattus);
+      return signUpSattus;
     } catch (error) {
       if (error.response && error.response.status === 400) {
-        return thunkAPI.rejectWithValue("شماره همراه یا پسورد اشتباه است");
+        return thunkAPI.rejectWithValue("شما قبلا ثبت نام کرده اید");
       } else {
         return thunkAPI.rejectWithValue(
           "مشکلی به وجود امده لطفا بعدا تلاش کنید"
@@ -67,6 +69,8 @@ export const addUser = createAsyncThunk(
     }
   }
 );
+
+// user managment
 
 export const getuser = createAsyncThunk(
   "userManagment/getuser",
@@ -75,13 +79,83 @@ export const getuser = createAsyncThunk(
     const token = state.auth.token;
 
     try {
-      const response = await axios.post(
-        `${process.env.NEXT_PUBLIC_BACK_END_SERVER}/users`,
-        {},
+      const response = await axios.get(
+        `${process.env.NEXT_PUBLIC_BACK_END_SERVER}/users/allUser`,
         {
           headers: {
             Authorization: token ? `Bearer ${token}` : "",
             "Content-Type": "multipart/form-data",
+          },
+        }
+      );
+      const data = response.data;
+      return data;
+    } catch (error) {
+      if (error.response && error.response.status === 400) {
+        return thunkAPI.rejectWithValue("error");
+      } else {
+        return thunkAPI.rejectWithValue(
+          "مشکلی به وجود امده لطفا بعدا تلاش کنید"
+        );
+      }
+    }
+  }
+);
+
+export const editUser = createAsyncThunk(
+  "userManagment/editUser",
+  async (
+    { code, firstName, lastName, username, active, domain, roleIds },
+    thunkAPI
+  ) => {
+    console.log(roleIds);
+
+    const state = thunkAPI.getState();
+    const token = state.auth.token;
+
+    try {
+      const response = await axios.patch(
+        `${process.env.NEXT_PUBLIC_BACK_END_SERVER}/users/${code}`,
+        {
+          firstName,
+          lastName,
+          username,
+          active,
+          domain,
+          roleIds,
+        },
+        {
+          headers: {
+            Authorization: token ? `Bearer ${token}` : "",
+          },
+        }
+      );
+      const data = response.data;
+      return data;
+    } catch (error) {
+      if (error.response && error.response.status === 400) {
+        return thunkAPI.rejectWithValue("error");
+      } else {
+        return thunkAPI.rejectWithValue(
+          "مشکلی به وجود امده لطفا بعدا تلاش کنید"
+        );
+      }
+    }
+  }
+);
+
+export const deleteUser = createAsyncThunk(
+  "userManagment/deleteUser",
+  async ({ code }, thunkAPI) => {
+    const state = thunkAPI.getState();
+    const token = state.auth.token;
+
+    try {
+      const response = await axios.delete(
+        `${process.env.NEXT_PUBLIC_BACK_END_SERVER}/users/${code}`,
+        {
+          headers: {
+            Authorization: token ? `Bearer ${token}` : "",
           },
         }
       );
@@ -319,7 +393,6 @@ export const homePageVideo = createAsyncThunk(
         `${process.env.NEXT_PUBLIC_BACK_END_SERVER}/video/list`
       );
 
-      console.log(response.data);
       return response.data;
     } catch (error) {
       if (error.response && error.response.status === 400) {
@@ -1113,6 +1186,38 @@ export const requestAdminCommnet = createAsyncThunk(
         `${process.env.NEXT_PUBLIC_BACK_END_SERVER}/order/request/${code}/comment`,
         {
           reqComment,
+        },
+        {
+          headers: {
+            Authorization: token ? `Bearer ${token}` : "",
+          },
+        }
+      );
+      const data = response.data;
+      return data;
+    } catch (error) {
+      if (error.response && error.response.status === 400) {
+        return thunkAPI.rejectWithValue("ارور سمت من");
+      } else {
+        return thunkAPI.rejectWithValue(
+          "مشکلی به وجود امده لطفا بعدا تلاش کنید"
+        );
+      }
+    }
+  }
+);
+
+export const paymentStepData = createAsyncThunk(
+  "order/paymentStepData",
+  async ({ code, payment }, thunkAPI) => {
+    const state = thunkAPI.getState();
+    const token = state.auth.token;
+
+    try {
+      const response = await axios.patch(
+        `${process.env.NEXT_PUBLIC_BACK_END_SERVER}/order/payment/${code}`,
+        {
+          payment,
         },
         {
           headers: {

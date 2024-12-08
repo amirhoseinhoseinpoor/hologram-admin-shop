@@ -5,6 +5,10 @@ import React, { useState, useEffect } from "react";
 import { useDispatch } from "react-redux";
 import { fetchPrivateImage } from "@/app/Store/thunks";
 import { increaseStep } from "@/app/Store/thunks";
+// import base component
+import ZoomModal from "@/app/BaseComponent/ZoomModal";
+import LoadingCss from "@/app/BaseComponent/LoadingCss";
+import ErrorModal from "@/app/BaseComponent/ErrorModal";
 
 import Radio from "@mui/material/Radio";
 import RadioGroup from "@mui/material/RadioGroup";
@@ -12,19 +16,7 @@ import FormControlLabel from "@mui/material/FormControlLabel";
 import FormControl from "@mui/material/FormControl";
 import FormLabel from "@mui/material/FormLabel";
 import { Box } from "@mui/material";
-import Modal from "@mui/material/Modal";
 import Alert from "@mui/material/Alert";
-
-const ModalStyle = {
-  position: "absolute",
-  top: "50%",
-  left: "50%",
-  transform: "translate(-50%, -50%)",
-  bgcolor: "background.paper",
-  border: "1.5px solid #000",
-  boxShadow: 24,
-  p: 0,
-};
 
 import style from "../../../Styles/MakeOrderStyle/StepTwoStyle.module.scss";
 
@@ -45,12 +37,24 @@ export default function StepTwoComponent({
   const [uploadedFiles, setUploadedFiles] = useState([]);
   const [logo, setLogo] = useState(null);
   // const [isButtonDisabled, setIsButtonDisabled] = useState(false);
-  const [open, setOpen] = useState(false);
   const [moveForward, setMoveForward] = useState(false);
-  
 
-  const handleOpen = () => setOpen(true);
-  const handleClose = () => setOpen(false);
+  const [selectedImage, setSelectedImage] = useState(null);
+  const [isZoomModalOpen, setIsZoomModalOpen] = useState(false);
+  const [loading, setLoading] = useState(false);
+
+  const [openModal3, setOpenModal3] = useState(false);
+  const closeModal3 = () => setOpenModal3(false);
+
+  const handleCloseZoomModal = () => {
+    setIsZoomModalOpen(false);
+    setSelectedImage(null);
+  };
+
+  const handleImageClick = (imageSrc) => {
+    setSelectedImage(imageSrc);
+    setIsZoomModalOpen(true);
+  };
 
   // Fetch logo on component mount
   useEffect(() => {
@@ -148,9 +152,17 @@ export default function StepTwoComponent({
   };
 
   const handleSubmit = async () => {
-    const increseingStep = await dispatch(increaseStep({ code, step: 3 }));
-    if (increseingStep.payload.message == "Success") {
-      setStep(3);
+    setLoading(true);
+    try {
+
+      const increseingStep = await dispatch(increaseStep({ code, step: 3 }));
+      if (increseingStep.payload.message == "Success") {
+        setStep(3);
+      }
+      setLoading(false);
+
+    } catch (error) {
+      setLoading(false);
     }
   };
 
@@ -364,7 +376,7 @@ export default function StepTwoComponent({
                         >
                           <div className="position-relative">
                             <Box
-                              onClick={handleOpen}
+                              onClick={() => handleImageClick(fileObj.file)}
                               component="img"
                               src={fileObj.file}
                               alt={`uploaded ${index}`}
@@ -414,21 +426,6 @@ export default function StepTwoComponent({
                               </svg>
                             </button>
                           </div>
-                          {/* modal */}
-                          <Modal
-                            open={open}
-                            onClose={handleClose}
-                            aria-labelledby="modal-modal-title"
-                            aria-describedby="modal-modal-description"
-                          >
-                            <Box
-                              component="img"
-                              src={fileObj.file}
-                              alt={`uploaded ${index}`}
-                              className={style.modalStyleclass}
-                              sx={ModalStyle}
-                            ></Box>
-                          </Modal>
 
                           <input
                             type="text"
@@ -448,9 +445,11 @@ export default function StepTwoComponent({
                   <div className="d-flex flex-row gap-2  mt-3">
                     <button
                       onClick={handleDisabelInput}
-                      className={`${style.continueButton}`}
+                      disabled={loading}
+                      className={`${style.continueButton}  ${loading ? style.disabledButtonLoading : ''}`}
                     >
-                      تایید مدارک
+                      {loading ? <LoadingCss /> : <>تایید مدارک</>}
+                      
                     </button>
                     <button
                       className={style.SeeLastStepButton}
@@ -474,6 +473,14 @@ export default function StepTwoComponent({
           )}
         </div>
       </div>
+      {selectedImage && (
+        <ZoomModal
+          open={isZoomModalOpen}
+          onClose={handleCloseZoomModal}
+          src={selectedImage}
+          alt={`zoomModalImage`}
+        />
+      )}
     </>
   );
 }

@@ -1,9 +1,10 @@
 import React, { useState, useEffect } from "react";
 import style from "../../../Styles/MakeOrderStyle/StepOneStyle.module.scss";
 import { Box } from "@mui/system";
-// import modals
+// import basecomponent
 import ZoomModal from "@/app/BaseComponent/ZoomModal";
 import ErrorModal from "@/app/BaseComponent/ErrorModal";
+import LoadingCss from "@/app/BaseComponent/LoadingCss";
 // import redux
 import { useDispatch } from "react-redux";
 import {
@@ -11,6 +12,7 @@ import {
   requestAdminCommnet,
   increaseStep,
   fetchPrivateImage,
+  paymentStepData,
 } from "@/app/Store/thunks";
 
 export default function SteponeComponent({
@@ -20,6 +22,7 @@ export default function SteponeComponent({
   setStep,
   handleNextStep,
   reqComment,
+  payment,
   setDisabelInput,
   disabelInput,
 }) {
@@ -31,13 +34,17 @@ export default function SteponeComponent({
   const [zoomModal, setZoomModal] = useState(false);
 
   const handleCloseZoomModal = () => setZoomModal(false);
+  
 
   // const [inputFields, setInputFields] = useState([{ title: "", price: "" }]);
   // const [disablenextStep, setDisableNextStep] = useState(true);
   const [statusTraking, setStatusTraking] = useState(false);
   const [moveForward, setMoveForward] = useState(false);
-
+  const [factorType, setFactorType] = useState("");
   const [logo, setLogo] = useState(null);
+  const [finalFactor, setFinalFactor] = useState(null);
+  const [bothFactor, setBothFactor] = useState(null);
+  const [loading, setLoading] = useState(false);
 
   const [formData, setFormData] = useState({
     feature: "",
@@ -71,18 +78,27 @@ export default function SteponeComponent({
       } else {
         setLogo(null);
       }
+      if (payment?.finalPayment) {
+        const returnFactor = await dispatch(
+          fetchPrivateImage({ filename: payment?.finalPayment })
+        ).unwrap();
+        setFinalFactor({ imageUrl: returnFactor || null });
+        setBothFactor({ imageUrl: returnFactor || null });
+      } else {
+        setFinalFactor(null);
+      }
     };
     gettingImageFactor();
-  }, [reqComment, dispatch]);
+  }, [reqComment, dispatch, payment]);
 
   // modal state
   const [openModal3, setOpenModal3] = useState(false);
-  // Close modal
   const closeModal3 = () => setOpenModal3(false);
 
   const [information, setInformation] = useState({
     docInfo: "",
     paymentImage: "",
+    finalPayment: "",
   });
 
   useEffect(() => {
@@ -110,9 +126,12 @@ export default function SteponeComponent({
 
   const handleDisabelInput = () => {
     // setDisabelInput(true);
-
     handleSubmit();
     // handleNextStep();
+  };
+
+  const handleImageTypeChange = (event) => {
+    setFactorType(event.target.value);
   };
 
   const handleSizeChange = (size) => {
@@ -154,8 +173,33 @@ export default function SteponeComponent({
     setInformation({ ...information, paymentImage: file });
   };
 
+  const handleFinalFactorChange = (event) => {
+    const file = event.target.files[0];
+    const imageUrl = URL.createObjectURL(file);
+    setFinalFactor({
+      imageUrl,
+    });
+    setInformation({ ...information, finalPayment: file });
+  };
+
+  const handleBothFactorChange = (event) => {
+    const file = event.target.files[0];
+    const imageUrl = URL.createObjectURL(file);
+    setBothFactor({
+      imageUrl,
+    });
+    setInformation({ ...information, paymentImage: file, finalPayment: file });
+  };
+
   const handleDeleteLogo = () => {
     setLogo(null);
+  };
+
+  const handleDeleteFinalFactor = () => {
+    setFinalFactor(null);
+  };
+  const handleDeleteBothFactor = () => {
+    setBothFactor(null);
   };
 
   // const checkAllFieldsFilled = () => {
@@ -172,11 +216,14 @@ export default function SteponeComponent({
   // };
 
   const handleSubmit = async () => {
-    const updatedData = { request: { ...formData } };
+    // const updatedData = { request: { ...formData } };
 
     try {
-      let uploadFactor ;
-      let updatedInformation ;
+      setLoading(true);
+      let uploadFactor;
+      let updatedInformation;
+      let uploadFinalFactor;
+      let updatedFinalFactor;
 
       if (information?.paymentImage) {
         uploadFactor = await dispatch(
@@ -189,22 +236,47 @@ export default function SteponeComponent({
         ).unwrap();
 
         updatedInformation = {
-          ...information,
           paymentImage: uploadFactor,
+          docInfo: information.docInfo,
         };
       } else {
         updatedInformation = {
-          ...information,
           paymentImage: reqComment?.paymentImage,
+          docInfo: information.docInfo,
         };
-      }      
+      }
+      if (information?.finalPayment) {
+        uploadFinalFactor = await dispatch(
+          uploadFile({
+            file: information?.finalPayment,
+            tag: "finalFactor",
+            type: 1,
+            isPublic: false,
+          })
+        ).unwrap();
+
+        updatedFinalFactor = {
+          finalPayment: uploadFinalFactor,
+        };
+      } else {
+        updatedFinalFactor = {
+          finalPayment: payment?.finalPayment,
+        };
+      }
 
       // Send updatedInformation with the second API call
       const uploadDocumentUser = await dispatch(
         requestAdminCommnet({ code, reqComment: updatedInformation })
       );
 
-      if (uploadDocumentUser.payload.message == "Success") {
+      const uploadPaymentLastStep = await dispatch(
+        paymentStepData({ code, payment: updatedFinalFactor })
+      );
+
+      if (
+        uploadDocumentUser.payload.message == "Success" &&
+        uploadPaymentLastStep.payload.message == "Success"
+      ) {
         const increaseStepOrder = await dispatch(
           increaseStep({ code, step: 2 })
         );
@@ -214,11 +286,14 @@ export default function SteponeComponent({
         }
       }
 
-      // Optionally, you can update the state if needed later
-      setInformation(updatedInformation);
+      setLoading(false);
+
+      // // Optionally, you can update the state if needed later
+      // setInformation(updatedInformation);
     } catch (error) {
       console.error("Error uploading file:", error);
       setOpenModal3(true);
+      setLoading(false);
     }
   };
 
@@ -374,7 +449,6 @@ export default function SteponeComponent({
               onClick={
                 disabelInput ? undefined : () => handleShapeChange("مربع")
               }
-              // onClick={() => setSelectedShape("مربع")}
             >
               مربع
             </div>
@@ -497,17 +571,51 @@ export default function SteponeComponent({
 
       <hr />
 
-      <div className="d-flex flex-row justify-content-between">
-        <div className={`d-flex flex-column`}>
-          <div className="d-flex flex-row gap-2 align-items-center">
-            <span className="NormalTextSizing">پیش فاکتور</span>
-            <span className={style.StarFixReq}>*</span>
-          </div>
-          <div className="mt-2">
+      <div
+        className={`${style.responsiveBottomMainDiv} d-flex flex-row justify-content-between`}
+      >
+        <div>
+          <p className="NormalTextSizing mb-1 me-1">نوع فاکتور</p>
+          <select
+            id="factorType"
+            value={factorType}
+            onChange={handleImageTypeChange}
+            className="form-select mb-2"
+            style={{ boxShadow: "unset" }}
+          >
+            <option value="">انتخاب کنید</option>
+            <option value="firstOption">پیش فاکتور و فاکتور نهایی</option>
+            <option value="secondOption">یک فاکتور برای جفتش</option>
+          </select>
+        </div>
+
+        <div className={`d-flex flex-column mb-1 ${style.SecondSectionStyle}`}>
+          <label htmlFor="docInfo" className="mb-1 NormalTextSizing">
+            مدارک مورد نیاز برای اپلود
+          </label>
+          <textarea
+            className={`${style.formInputNumber} ${style.textAreaDocument} form-control discription`}
+            cols="40"
+            value={information.docInfo}
+            rows="2"
+            id="docInfo"
+            name="docInfo"
+            onChange={handleInfomationChange}
+          ></textarea>
+        </div>
+      </div>
+      {factorType === "firstOption" && (
+        <div className={`${style.fixReponsiveFactor} d-flex flex-row gap-2`}>
+          <div className={style.widthFactorsImage}>
+            <div className="d-flex flex-row mb-2 gap-2 align-items-center">
+              <span className="NormalTextSizing">پیش فاکتور</span>
+              <span className={style.StarFixReq}>*</span>
+            </div>
+
             {logo ? (
-              <div className={`${style.onlyFitContentWidth} position-relative`}>
+              <div className={`d-flex position-relative`}>
                 <Box
-                  onClick={() => setZoomModal(true)}
+                  onClick={() => setZoomModal(logo.imageUrl)}
                   component="img"
                   src={logo.imageUrl}
                   alt="UserLogo"
@@ -559,77 +667,287 @@ export default function SteponeComponent({
               </div>
             ) : (
               <>
-                <label
-                  className={style.labelInsteadOfInput}
-                  htmlFor="paymentImage"
-                >
-                  <div className="d-flex flex-column text-center p-1">
-                    <div>
-                      <svg
-                        width={21}
-                        height={21}
-                        viewBox="0 0 18 18"
-                        fill="none"
-                        xmlns="http://www.w3.org/2000/svg"
-                      >
-                        <path
-                          d="M2.25 11.25C2.25 13.3713 2.25 14.432 2.90901 15.091C3.56802 15.75 4.62868 15.75 6.75 15.75H11.25C13.3713 15.75 14.432 15.75 15.091 15.091C15.75 14.432 15.75 13.3713 15.75 11.25"
-                          stroke="#404040"
-                          strokeLinecap="round"
-                          strokeLinejoin="round"
-                        />
-                        <path
-                          d="M9 12V2.25M9 2.25L12 5.53125M9 2.25L6 5.53125"
-                          stroke="#404040"
-                          strokeLinecap="round"
-                          strokeLinejoin="round"
-                        />
-                      </svg>
+                <div>
+                  <label
+                    className={style.labelInsteadOfInput}
+                    htmlFor="paymentImage"
+                  >
+                    <div className="d-flex flex-column text-center p-1">
+                      <div>
+                        <svg
+                          width={21}
+                          height={21}
+                          viewBox="0 0 18 18"
+                          fill="none"
+                          xmlns="http://www.w3.org/2000/svg"
+                        >
+                          <path
+                            d="M2.25 11.25C2.25 13.3713 2.25 14.432 2.90901 15.091C3.56802 15.75 4.62868 15.75 6.75 15.75H11.25C13.3713 15.75 14.432 15.75 15.091 15.091C15.75 14.432 15.75 13.3713 15.75 11.25"
+                            stroke="#404040"
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                          />
+                          <path
+                            d="M9 12V2.25M9 2.25L12 5.53125M9 2.25L6 5.53125"
+                            stroke="#404040"
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                          />
+                        </svg>
+                      </div>
+                      <p className={`${style.colorTheInputFile} discription`}>
+                        بارگذاری فایل .png یا .jpg
+                      </p>
+                      <p className={`${style.colorTheInputFile} discription`}>
+                        حداکثر تا 5 مگابایت
+                      </p>
                     </div>
-                    <p className={`${style.colorTheInputFile} discription`}>
-                      بارگذاری فایل .png یا .jpg
-                    </p>
-                    <p className={`${style.colorTheInputFile} discription`}>
-                      حداکثر تا 5 مگابایت
-                    </p>
-                  </div>
-                </label>
-                <input
-                  className={style.displayNoneTheInput}
-                  id="paymentImage"
-                  type="file"
-                  name="paymentImage"
-                  accept={`${process.env.NEXT_PUBLIC_INPUT_IMAGE_FORMAT}`}
-                  onChange={handleLogoChange}
-                />
+                  </label>
+                  <input
+                    className={style.displayNoneTheInput}
+                    id="paymentImage"
+                    type="file"
+                    name="paymentImage"
+                    accept={`${process.env.NEXT_PUBLIC_INPUT_IMAGE_FORMAT}`}
+                    onChange={handleLogoChange}
+                  />
+                </div>
+              </>
+            )}
+          </div>
+
+          <div className={style.widthFactorsImage}>
+            <div className="d-flex flex-row gap-2 mb-2 align-items-center">
+              <span className="NormalTextSizing">فاکتور نهایی</span>
+              <span className={style.StarFixReq}>*</span>
+            </div>
+            {finalFactor ? (
+              <>
+                <div className={`d-flex position-relative`}>
+                  <Box
+                    onClick={() => setZoomModal(finalFactor.imageUrl)}
+                    component="img"
+                    src={finalFactor.imageUrl}
+                    alt="UserLogo"
+                    className={style.LogoReplaceStyle}
+                  />
+                  <button
+                    onClick={handleDeleteFinalFactor}
+                    className={style.deleteButton}
+                  >
+                    <svg
+                      width={17}
+                      height={17}
+                      viewBox="0 0 12 12"
+                      fill="none"
+                      xmlns="http://www.w3.org/2000/svg"
+                    >
+                      <path
+                        d="M10.5 2.98828C8.835 2.82328 7.16 2.73828 5.49 2.73828C4.5 2.73828 3.51 2.78828 2.52 2.88828L1.5 2.98828"
+                        stroke="#FF4F3F"
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                      />
+                      <path
+                        d="M4.25 2.485L4.36 1.83C4.44 1.355 4.5 1 5.345 1H6.655C7.5 1 7.565 1.375 7.64 1.835L7.75 2.485"
+                        stroke="#FF4F3F"
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                      />
+                      <path
+                        d="M9.4252 4.57031L9.1002 9.60531C9.0452 10.3903 9.0002 11.0003 7.6052 11.0003H4.3952C3.0002 11.0003 2.9552 10.3903 2.9002 9.60531L2.5752 4.57031"
+                        stroke="#FF4F3F"
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                      />
+                      <path
+                        d="M5.16504 8.25H6.83004"
+                        stroke="#FF4F3F"
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                      />
+                      <path
+                        d="M4.75 6.25H7.25"
+                        stroke="#FF4F3F"
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                      />
+                    </svg>
+                  </button>
+                </div>
+              </>
+            ) : (
+              <>
+                {/* second input */}
+                <div>
+                  <label
+                    className={style.labelInsteadOfInput}
+                    htmlFor="paymentImageFFactor"
+                  >
+                    <div className="d-flex flex-column text-center p-1">
+                      <div>
+                        <svg
+                          width={21}
+                          height={21}
+                          viewBox="0 0 18 18"
+                          fill="none"
+                          xmlns="http://www.w3.org/2000/svg"
+                        >
+                          <path
+                            d="M2.25 11.25C2.25 13.3713 2.25 14.432 2.90901 15.091C3.56802 15.75 4.62868 15.75 6.75 15.75H11.25C13.3713 15.75 14.432 15.75 15.091 15.091C15.75 14.432 15.75 13.3713 15.75 11.25"
+                            stroke="#404040"
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                          />
+                          <path
+                            d="M9 12V2.25M9 2.25L12 5.53125M9 2.25L6 5.53125"
+                            stroke="#404040"
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                          />
+                        </svg>
+                      </div>
+                      <p className={`${style.colorTheInputFile} discription`}>
+                        بارگذاری فایل .png یا .jpg
+                      </p>
+                      <p className={`${style.colorTheInputFile} discription`}>
+                        حداکثر تا 5 مگابایت
+                      </p>
+                    </div>
+                  </label>
+                  <input
+                    className={style.displayNoneTheInput}
+                    id="paymentImageFFactor"
+                    type="file"
+                    name="finalPayment"
+                    accept={`${process.env.NEXT_PUBLIC_INPUT_IMAGE_FORMAT}`}
+                    onChange={handleFinalFactorChange}
+                  />
+                </div>
               </>
             )}
           </div>
         </div>
+      )}
 
-        <div className={`d-flex flex-column ${style.SecondSectionStyle}`}>
-          <label htmlFor="docInfo" className="mb-1">
-            مدارک مورد نیاز برای اپلود
-          </label>
-          <textarea
-            className={`${style.formInputNumber} ${style.textAreaDocument} form-control discription`}
-            cols="40"
-            value={information.docInfo}
-            rows="2"
-            id="docInfo"
-            name="docInfo"
-            onChange={handleInfomationChange}
-          ></textarea>
+      {factorType === "secondOption" && (
+        <div className={style.widthFactorsImage}>
+          <div className="d-flex flex-row gap-2 align-items-center">
+            <span className="NormalTextSizing">پیش فاکتور و فاکتور نهایی</span>
+            <span className={style.StarFixReq}>*</span>
+          </div>
+          {bothFactor ? (
+            <>
+              <div className={`d-flex position-relative`}>
+                <Box
+                  onClick={() => setZoomModal(bothFactor.imageUrl)}
+                  component="img"
+                  src={bothFactor.imageUrl}
+                  alt="UserLogo"
+                  className={style.LogoReplaceStyle}
+                />
+                <button
+                  onClick={handleDeleteBothFactor}
+                  className={style.deleteButton}
+                >
+                  <svg
+                    width={17}
+                    height={17}
+                    viewBox="0 0 12 12"
+                    fill="none"
+                    xmlns="http://www.w3.org/2000/svg"
+                  >
+                    <path
+                      d="M10.5 2.98828C8.835 2.82328 7.16 2.73828 5.49 2.73828C4.5 2.73828 3.51 2.78828 2.52 2.88828L1.5 2.98828"
+                      stroke="#FF4F3F"
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                    />
+                    <path
+                      d="M4.25 2.485L4.36 1.83C4.44 1.355 4.5 1 5.345 1H6.655C7.5 1 7.565 1.375 7.64 1.835L7.75 2.485"
+                      stroke="#FF4F3F"
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                    />
+                    <path
+                      d="M9.4252 4.57031L9.1002 9.60531C9.0452 10.3903 9.0002 11.0003 7.6052 11.0003H4.3952C3.0002 11.0003 2.9552 10.3903 2.9002 9.60531L2.5752 4.57031"
+                      stroke="#FF4F3F"
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                    />
+                    <path
+                      d="M5.16504 8.25H6.83004"
+                      stroke="#FF4F3F"
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                    />
+                    <path
+                      d="M4.75 6.25H7.25"
+                      stroke="#FF4F3F"
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                    />
+                  </svg>
+                </button>
+              </div>
+            </>
+          ) : (
+            <div>
+              <label
+                className={style.labelInsteadOfInput}
+                htmlFor="paymentImageSecondOption"
+              >
+                <div className="d-flex flex-column text-center p-1">
+                  <div>
+                    <svg
+                      width={21}
+                      height={21}
+                      viewBox="0 0 18 18"
+                      fill="none"
+                      xmlns="http://www.w3.org/2000/svg"
+                    >
+                      <path
+                        d="M2.25 11.25C2.25 13.3713 2.25 14.432 2.90901 15.091C3.56802 15.75 4.62868 15.75 6.75 15.75H11.25C13.3713 15.75 14.432 15.75 15.091 15.091C15.75 14.432 15.75 13.3713 15.75 11.25"
+                        stroke="#404040"
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                      />
+                      <path
+                        d="M9 12V2.25M9 2.25L12 5.53125M9 2.25L6 5.53125"
+                        stroke="#404040"
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                      />
+                    </svg>
+                  </div>
+                  <p className={`${style.colorTheInputFile} discription`}>
+                    بارگذاری فایل .png یا .jpg
+                  </p>
+                  <p className={`${style.colorTheInputFile} discription`}>
+                    حداکثر تا 5 مگابایت
+                  </p>
+                </div>
+              </label>
+              <input
+                className={style.displayNoneTheInput}
+                id="paymentImageSecondOption"
+                type="file"
+                name="paymentImage"
+                accept={`${process.env.NEXT_PUBLIC_INPUT_IMAGE_FORMAT}`}
+                onChange={handleBothFactorChange}
+              />
+            </div>
+          )}
         </div>
-      </div>
+      )}
       <div className="d-flex flex-row gap-3 align-items-center">
         <button
           type="button"
           onClick={handleDisabelInput}
-          // disabled={disablenextStep}
-          className={`${style.continueButton} mt-3 mb-2`}
+          disabled={loading}
+          className={`${style.continueButton} mt-3 mb-2 ${loading ? style.disabledButtonLoading : ''}`}
         >
-          تایید
+          {loading ? <LoadingCss /> : <>تایید</>}
         </button>
         {moveForward && (
           <button
@@ -648,14 +966,12 @@ export default function SteponeComponent({
         onClose={closeModal3}
         text={"مشکلی به وجود آمده است، لطفا بعدا تلاش کنید."}
       />
-      {logo && (
-        <ZoomModal
-          open={zoomModal}
-          onClose={handleCloseZoomModal}
-          src={logo.imageUrl}
-          alt={`uploaded image`}
-        />
-      )}
+      <ZoomModal
+        open={zoomModal}
+        onClose={handleCloseZoomModal}
+        src={zoomModal}
+        alt={`uploaded image`}
+      />
     </>
   );
 }

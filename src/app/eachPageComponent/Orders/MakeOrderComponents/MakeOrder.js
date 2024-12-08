@@ -48,7 +48,6 @@ export default function MakeOrder({ seeOrder, setActiveKey , toggleShow }) {
   useEffect(() => {
     setStep(seeOrder.step);
   }, [seeOrder]);
-  console.log(seeOrder);
 
   const [disabelInput, setDisabelInput] = useState(false);
   const [disabelInputStep2, setDisabelInputStep2] = useState(false);
@@ -72,6 +71,7 @@ export default function MakeOrder({ seeOrder, setActiveKey , toggleShow }) {
           <div className={style.stepContent}>
             <SteponeComponent
               reqComment={seeOrder.reqComment}
+              payment={seeOrder.payment}
               step={seeOrder.step}
               data={seeOrder.request}
               code={seeOrder.code}
@@ -100,6 +100,7 @@ export default function MakeOrder({ seeOrder, setActiveKey , toggleShow }) {
           <PusherChat
             data={seeOrder.request}
             chatData={seeOrder.chat}
+            chatFinalImage={seeOrder.chatImage}
             code={seeOrder.code}
             step={seeOrder.step}
             handleNextStep={handleNextStep}
