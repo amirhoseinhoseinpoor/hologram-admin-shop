@@ -80,11 +80,10 @@ export const getuser = createAsyncThunk(
 
     try {
       const response = await axios.get(
-        `${process.env.NEXT_PUBLIC_BACK_END_SERVER}/users/allUser`,
+        `${process.env.NEXT_PUBLIC_BACK_END_SERVER}/users/allUser?domain=2`,
         {
           headers: {
             Authorization: token ? `Bearer ${token}` : "",
-            "Content-Type": "multipart/form-data",
           },
         }
       );

@@ -25,10 +25,12 @@ export default function Login() {
   const [loadinStatus, setLodaingStatus] = useState(false);
   const [captchaValue, setCaptchaValue] = useState(null);
   const [isCaptchaRequired, setIsCaptchaRequired] = useState(false);
-  const [saveEachRequest, setSaveEachRequest] = useState(0);
+  const [failedAttempts, setFailedAttempts] = useState(0);
 
   const hasError = Boolean(errorMessage);
 
+  // ReCAPTCHA Ref
+  const recaptchaRef = useRef(null);
   // focuse the number filed
   const numberRef = useRef(null);
   // input ref for moving to the next
@@ -44,17 +46,22 @@ export default function Login() {
   }, [username]);
 
   useEffect(() => {
-    if (username.length == 11 && password.length >= 4) {
-      setIsButtonDisabled(false);
-      if (!isCaptchaRequired && captchaValue) {
+    if (username.length === 11 && password.length >= 4) {
+      if (isCaptchaRequired) {
+        setIsButtonDisabled(!captchaValue);
+      } else {
         setIsButtonDisabled(false);
-      } else if (!captchaValue && isCaptchaRequired) {
-        setIsButtonDisabled(true);
       }
     } else {
       setIsButtonDisabled(true);
     }
   }, [username, password, captchaValue, isCaptchaRequired]);
+
+  useEffect(() => {
+    if (failedAttempts >= 3) {
+      setIsCaptchaRequired(true);
+    }
+  }, [failedAttempts]);
 
   // Send OTP to the user's phone
 
@@ -80,11 +87,13 @@ export default function Login() {
       } else {
         const resultAction = await dispatch(login(credentials));
         if (login.rejected.match(resultAction)) {
-          setErrorMessage(resultAction.payload);
-          setSaveEachRequest((prevRequest) => prevRequest + 1);
-          // Check if CAPTCHA is required after failed login attempts
-          if (resultAction.error.message == "Rejected" && saveEachRequest > 1) {
-            setIsCaptchaRequired(true);
+          setErrorMessage(resultAction.payload || "ورود ناموفق");
+          setFailedAttempts((prevRequest) => prevRequest + 1);
+          if (isCaptchaRequired) {
+            setCaptchaValue(null);
+            if (recaptchaRef.current) {
+              recaptchaRef.current.reset(); // Reset ReCAPTCHA widget
+            }
           }
           setLodaingStatus(false);
         }
@@ -173,47 +182,12 @@ export default function Login() {
     // }
   };
 
-  function NavigateLastPage() {
-    const lastPage = sessionStorage.getItem("lastPage") || "/";
-    router.push(lastPage);
-  }
+
 
   return (
     <section className={`${style.sectionLoginStyle}  d-flex w-100`}>
       <div className={`${style.outerLoginPage} container pt-3 pb-3`}>
         <div className={`${style.LoginMainDiv} position-relative`}>
-          <div onClick={NavigateLastPage} className={style.closeIconImg}>
-            <svg
-              width={24}
-              height={25}
-              viewBox="0 0 24 25"
-              fill="none"
-              xmlns="http://www.w3.org/2000/svg"
-            >
-              <path
-                d="M12 22.4756C17.5 22.4756 22 17.9756 22 12.4756C22 6.97559 17.5 2.47559 12 2.47559C6.5 2.47559 2 6.97559 2 12.4756C2 17.9756 6.5 22.4756 12 22.4756Z"
-                stroke="#333333"
-                strokeWidth="1.5"
-                strokeLinecap="round"
-                strokeLinejoin="round"
-              />
-              <path
-                d="M9.16992 15.3055L14.8299 9.64551"
-                stroke="#333333"
-                strokeWidth="1.5"
-                strokeLinecap="round"
-                strokeLinejoin="round"
-              />
-              <path
-                d="M14.8299 15.3055L9.16992 9.64551"
-                stroke="#333333"
-                strokeWidth="1.5"
-                strokeLinecap="round"
-                strokeLinejoin="round"
-              />
-            </svg>
-          </div>
-
           {!isOtpSent ? (
             <form
               onSubmit={handleLogin}
@@ -292,9 +266,12 @@ export default function Login() {
               {isCaptchaRequired && (
                 <div className="mb-4">
                   <ReCAPTCHA
+                    
+                    ref={recaptchaRef}
                     className={style.captchaContainer}
                     sitekey="6Ld_oI4qAAAAAK1UKDgdrplzpiAbffOBTiarZ37i" // Replace with your site key
                     onChange={(value) => setCaptchaValue(value)}
+                    onExpired={() => setCaptchaValue(null)}
                   />
                 </div>
               )}

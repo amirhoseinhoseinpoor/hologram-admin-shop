@@ -91,6 +91,9 @@ export default function DefineUser({ toggleShow }) {
   const [searchTerm, setSearchTerm] = useState("");
   const [filteredUsers, setFilteredUsers] = useState(null);
 
+  console.log(dataCome);
+  
+
   const [openModal2, setOpenModal2] = useState(false);
   const closeModal2 = () => setOpenModal2(false);
 
