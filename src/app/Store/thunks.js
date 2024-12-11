@@ -74,13 +74,13 @@ export const addUser = createAsyncThunk(
 
 export const getuser = createAsyncThunk(
   "userManagment/getuser",
-  async (_, thunkAPI) => {
+  async ({ domain }, thunkAPI) => {
     const state = thunkAPI.getState();
     const token = state.auth.token;
 
     try {
       const response = await axios.get(
-        `${process.env.NEXT_PUBLIC_BACK_END_SERVER}/users/allUser?domain=2`,
+        `${process.env.NEXT_PUBLIC_BACK_END_SERVER}/users/allUser?domain=${domain}`,
         {
           headers: {
             Authorization: token ? `Bearer ${token}` : "",

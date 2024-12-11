@@ -31,6 +31,14 @@ const HonorsMainComponent = lazy(() =>
   import("../eachPageComponent/Honors/HonorsMainComponent.js")
 );
 
+const DoshbordMainComponent = dynamic(
+  () => import("../eachPageComponent/Doshbord/DoshbordMainComponent.js"),
+  {
+    ssr: false,
+    loading: () => <p>Loading...</p>,
+  }
+);
+
 const OrderMainComponent = dynamic(
   () => import("../eachPageComponent/Orders/OrderMainComponent.js"),
   {
@@ -324,7 +332,9 @@ const AdminPanel = () => {
         </div>
 
         {activeTab === "Doshbord" && (
-          <div className={style.tabContent}>Tab content for Settings</div>
+          <div className={style.tabContent}>
+            <DoshbordMainComponent toggleShow={toggleShow}/>
+          </div>
         )}
         {activeTab === "Orders" && (
           <div className={style.tabContent}>
