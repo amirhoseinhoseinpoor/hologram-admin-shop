@@ -19,8 +19,8 @@ const ActiveUsersCard = () => {
         width: '250px',
       }}
     >
-      <Typography variant="h6" gutterBottom>
-        Active Users
+      <Typography className="VodeoDisSizing" style={{fontFamily : "unset"}} variant="h6" gutterBottom>
+        کاربر های فعال
       </Typography>
       {error ? (
         <Typography variant="body1" color="error">

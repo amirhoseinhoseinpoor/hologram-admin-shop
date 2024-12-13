@@ -2,6 +2,7 @@ import React from "react";
 import ActiveUsersCard from "./ActiveUsersCard";
 import { Box, Typography } from "@mui/material";
 // import base component
+import MonthlyVisitsChart from "./MonthlyVisitsChart";
 import NavBarToggleBurgerButton from "@/app/BaseComponent/NavBarToggleBurgerButton";
 import styled from "styled-components";
 
@@ -24,26 +25,18 @@ const HeadermakeOrder = styled.div`
 export default function DoshbordMainComponent({ toggleShow }) {
   return (
     <>
-      <HeadermakeOrder className="d-flex flex-row mb-3 justify-content-between">
+     <HeadermakeOrder className="d-flex flex-row mb-3 justify-content-between">
         <div className="d-block d-lg-none">
           <NavBarToggleBurgerButton func={() => toggleShow("main")} />
         </div>
+        <div className="NormalTextSizing textHeaderStyle d-flex align-items-center">
+          داشبورد
+        </div>
       </HeadermakeOrder>
       <Box sx={{ p: 4 }}>
-        <Typography variant="h4" gutterBottom>
-          Admin Dashboard
-        </Typography>
-        <Box
-          sx={{
-            display: "flex",
-            justifyContent: "center",
-            alignItems: "center",
-            mt: 4,
-          }}
-        >
-          <ActiveUsersCard />
-        </Box>
-        {/* Add more components or metrics as needed */}
+       <ActiveUsersCard />
+       <MonthlyVisitsChart />
+       
       </Box>
     </>
   );
