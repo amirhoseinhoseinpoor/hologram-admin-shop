@@ -1,6 +1,7 @@
 import React from "react";
 import ActiveUsersCard from "./ActiveUsersCard";
-import { Box, Typography } from "@mui/material";
+import ProductCountCard from "./ProductCountCard";
+import { Box } from "@mui/material";
 // import base component
 import MonthlyVisitsChart from "./MonthlyVisitsChart";
 import NavBarToggleBurgerButton from "@/app/BaseComponent/NavBarToggleBurgerButton";
@@ -25,7 +26,7 @@ const HeadermakeOrder = styled.div`
 export default function DoshbordMainComponent({ toggleShow }) {
   return (
     <>
-     <HeadermakeOrder className="d-flex flex-row mb-3 justify-content-between">
+      <HeadermakeOrder className="d-flex flex-row mb-3 justify-content-between">
         <div className="d-block d-lg-none">
           <NavBarToggleBurgerButton func={() => toggleShow("main")} />
         </div>
@@ -34,9 +35,12 @@ export default function DoshbordMainComponent({ toggleShow }) {
         </div>
       </HeadermakeOrder>
       <Box sx={{ p: 4 }}>
-       <ActiveUsersCard />
-       <MonthlyVisitsChart />
-       
+        <div className="d-flex flex-row gap-2 mb-3">
+          <ActiveUsersCard />
+          <ProductCountCard />
+        </div>
+
+        <MonthlyVisitsChart />
       </Box>
     </>
   );
