@@ -199,14 +199,14 @@ const AdminPanel = () => {
               </>
             }
           ></Tab>
-          <Tab
+          {/* <Tab
             eventKey="setting"
             title={
               <>
                 <SettingsIcon /> تنظیمات
               </>
             }
-          ></Tab>
+          ></Tab> */}
         </Tabs>
       </aside>
 
@@ -318,14 +318,14 @@ const AdminPanel = () => {
                     </>
                   }
                 ></Tab>
-                <Tab
+                {/* <Tab
                   eventKey="setting"
                   title={
                     <>
                       <SettingsIcon /> تنظیمات
                     </>
                   }
-                ></Tab>
+                ></Tab> */}
               </Tabs>
             </Nav>
           </Navbar.Offcanvas>
@@ -385,9 +385,9 @@ const AdminPanel = () => {
             </Suspense>
           </div>
         )}
-        {activeTab === "setting" && (
+        {/* {activeTab === "setting" && (
           <div className={style.tabContent}>Tab content for Settings</div>
-        )}
+        )} */}
       </div>
     </section>
   );

@@ -15,6 +15,13 @@ import {
   Tooltip,
   Legend,
 } from 'chart.js';
+import styled from 'styled-components';
+
+const ChartContainer = styled.div`
+  position: relative;
+  width: 100%;
+  height: 400px; /* می‌توانید این مقدار را به نیاز خود تنظیم کنید */
+`;
 
 // ثبت کامپوننت‌های مورد نیاز Chart.js
 ChartJS.register(CategoryScale, LinearScale, BarElement, Title, Tooltip, Legend);
@@ -103,6 +110,7 @@ const MonthlyVisitsChart = () => {
 
   const options = {
     responsive: true,
+    maintainAspectRatio: false,
     plugins: {
       legend: {
         position: 'top',
@@ -163,9 +171,9 @@ const MonthlyVisitsChart = () => {
   if (error) return <p>خطا در بارگذاری داده‌ها. لطفاً دوباره تلاش کنید.</p>;
 
   return (
-    <div>
+    <ChartContainer>
       <Bar data={chartData} options={options} />
-    </div>
+    </ChartContainer>
   );
 };
 

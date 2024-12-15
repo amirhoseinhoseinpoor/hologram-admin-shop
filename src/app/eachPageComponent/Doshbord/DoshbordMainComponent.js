@@ -1,6 +1,8 @@
 import React from "react";
-import ActiveUsersCard from "./ActiveUsersCard";
-import ProductCountCard from "./ProductCountCard";
+import ActiveUsersCard from "./Cards/ActiveUsersCard";
+import ProductCountCard from "./Cards/ProductCountCard";
+import AllOrderCard from "./Cards/AllOrderCard";
+import ActiveOrdersCard from "./Cards/ActiveOrdersCard";
 import { Box } from "@mui/material";
 // import base component
 import MonthlyVisitsChart from "./MonthlyVisitsChart";
@@ -23,6 +25,17 @@ const HeadermakeOrder = styled.div`
   }
 `;
 
+const CardResponssive = styled.div`
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  grid-gap: 15px;
+  width: fit-content;
+
+  @media (max-width: 980px) {
+    grid-template-columns: repeat(2, 1fr);
+  }
+`;
+
 export default function DoshbordMainComponent({ toggleShow }) {
   return (
     <>
@@ -34,11 +47,13 @@ export default function DoshbordMainComponent({ toggleShow }) {
           داشبورد
         </div>
       </HeadermakeOrder>
-      <Box sx={{ p: 4 }}>
-        <div className="d-flex flex-row gap-2 mb-3">
+      <Box sx={{ p: 2 }}>
+        <CardResponssive className="mb-3">
           <ActiveUsersCard />
           <ProductCountCard />
-        </div>
+          <AllOrderCard />
+          <ActiveOrdersCard/>
+        </CardResponssive>
 
         <MonthlyVisitsChart />
       </Box>

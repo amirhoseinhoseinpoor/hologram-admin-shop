@@ -3,6 +3,29 @@ import { Box, Typography, CircularProgress } from "@mui/material";
 // imoport redux
 import { useDispatch } from "react-redux";
 import { countProduct } from "@/app/Store/thunks";
+import styled from "styled-components";
+
+const TypographyStyle = styled(Typography)`
+  font-size: 16px;
+  font-weight: 600;
+  @media (max-width: 980px) {
+    font-size: 15px;
+  }
+  @media (max-width: 768px) {
+    font-size: 14px;
+  }
+`;
+
+const TypographyStyleNumber = styled(Typography)`
+  font-size: 35px;
+  font-weight: 700;
+  @media (max-width: 980px) {
+    font-size: 30px;
+  }
+  @media (max-width: 768px) {
+    font-size: 25px;
+  }
+`;
 
 export default function ProductCountCard() {
   const dispatch = useDispatch();
@@ -21,29 +44,29 @@ export default function ProductCountCard() {
   return (
     <Box
       sx={{
-        p: 3,
+        p: 2,
         border: "1px solid #ddd",
         borderRadius: "10px",
         textAlign: "center",
         boxShadow: "2px 2px 12px rgba(0,0,0,0.1)",
         backgroundColor: "#fff",
-        width: "250px",
+        width: "100%",
       }}
     >
-      <Typography
+      <TypographyStyle
         className="VodeoDisSizing"
         style={{ fontFamily: "unset" }}
         variant="h6"
         gutterBottom
       >
         تعداد محصولات
-      </Typography>
+      </TypographyStyle>
       {!productCount ? (
         <CircularProgress />
       ) : (
-        <Typography variant="h3" color="primary">
+        <TypographyStyleNumber variant="h4" color="primary">
           {productCount}
-        </Typography>
+        </TypographyStyleNumber>
       )}
     </Box>
   );
