@@ -85,11 +85,14 @@ export default function DefineUser({ toggleShow }) {
   const dispatch = useDispatch();
 
   const [dataCome, setDataCome] = useState([]);
+  const [dataComeUser, setDataComeUser] = useState([]);
   const [dataUpdated, setDataUpdated] = useState(false);
   const [confirmModal, setConfirmModal] = useState(false);
   const [errorModal, setErrorModal] = useState(false);
   const [searchTerm, setSearchTerm] = useState("");
   const [filteredUsers, setFilteredUsers] = useState(null);
+  const [filteredSiteUser, setFilteredSiteUser] = useState(null);
+
 
   const [openModal2, setOpenModal2] = useState(false);
   const closeModal2 = () => setOpenModal2(false);
@@ -121,18 +124,25 @@ export default function DefineUser({ toggleShow }) {
 
   useEffect(() => {
     const fetchData = async () => {
-      const dataComeAPI = await dispatch(getuser()).unwrap();
+      const dataComeAPI = await dispatch(getuser({ domain: 2 })).unwrap();
       setDataCome(dataComeAPI);
       setDataUpdated(false);
     };
     fetchData();
   }, [dispatch, dataUpdated]);
 
+  const handleSiteUser = async () => {
+    const dataComeApi = await dispatch(getuser({ domain: 1 })).unwrap();
+    setDataComeUser(dataComeApi);
+    setDataUpdated(false);
+  };
+
   useEffect(() => {
     if (!dataCome) return;
 
     if (!searchTerm) {
       setFilteredUsers(dataCome);
+      setFilteredSiteUser(dataComeUser);
       return;
     }
 
@@ -149,8 +159,22 @@ export default function DefineUser({ toggleShow }) {
       return normalizedFullName.includes(normalizedSearchTerm);
     });
 
+    const filteredSiteUser = dataComeUser.filter((user) => {
+      if (!user) return false;
+
+      const fullName = `${user.firstName || ""} ${user.lastName || ""} ${
+        user.username || ""
+      }`;
+      const normalizedFullName = normalizeString(fullName);
+      const normalizedSearchTerm = normalizeString(searchTerm);
+
+      return normalizedFullName.includes(normalizedSearchTerm);
+    });
+
     setFilteredUsers(filtered);
-  }, [searchTerm, dataCome]);
+    setFilteredSiteUser(filteredSiteUser);
+
+  }, [searchTerm, dataCome, dataComeUser]);
 
   return (
     <section>
@@ -161,7 +185,11 @@ export default function DefineUser({ toggleShow }) {
         <div className="NormalTextSizing textHeaderStyle d-flex align-items-center">
           مدیریت کاربر
         </div>
-        <AddUserBtn setDataUpdated={setDataUpdated}  setConfirmModal={setConfirmModal} setErrorModal={setErrorModal}/>
+        <AddUserBtn
+          setDataUpdated={setDataUpdated}
+          setConfirmModal={setConfirmModal}
+          setErrorModal={setErrorModal}
+        />
       </HeadermakeOrder>
       {/* Add a search input field */}
       <SearchInputMainDiv className="me-2 mt-4 position-relative">
@@ -175,56 +203,174 @@ export default function DefineUser({ toggleShow }) {
         <SearchIcon className="SearchIconStyle" />
       </SearchInputMainDiv>
 
-      <div className="d-none d-lg-block">
-        <table className="table table-striped">
-          <thead>
-            <tr className="table-head text-center">
-              <th>ردیف</th>
-              <th>نام</th>
-              <th>نام خانوادگی</th>
-              <th>شماره همراه</th>
-              <th>وضعیت</th>
-              <th>نوع دسترسی</th>
-              <th>دسترسی</th>
-              <th>عملیات</th>
-            </tr>
-          </thead>
-          <tbody className="table-body text-center">
+      {dataCome.length > 0 && (
+        <>
+          <div className="d-none d-lg-block">
+            <table className="table table-striped">
+              <thead>
+                <tr className="table-head text-center">
+                  <th>ردیف</th>
+                  <th>نام</th>
+                  <th>نام خانوادگی</th>
+                  <th>شماره همراه</th>
+                  <th>وضعیت</th>
+                  <th>نوع دسترسی</th>
+                  <th>دسترسی</th>
+                  <th>عملیات</th>
+                </tr>
+              </thead>
+              <tbody className="table-body text-center">
+                {filteredUsers?.map((item, index) => (
+                  <React.Fragment key={index}>
+                    <tr>
+                      <td>{++index}</td>
+                      <td>{item.firstName}</td>
+                      <td>{item.lastName}</td>
+                      <td>{item.username}</td>
+                      <td>
+                        {item.active == true ? (
+                          <p className="NormalTextSizing">فعال</p>
+                        ) : (
+                          <p className="NormalTextSizing">غیرفعال</p>
+                        )}
+                      </td>
+
+                      <td>
+                        {item.domain == 1 && (
+                          <p className="NormalTextSizing">سایت</p>
+                        )}
+                        {item.domain == 2 && (
+                          <p className="NormalTextSizing">سایت و ادمین</p>
+                        )}
+                      </td>
+                      <td>
+                        {item.userRoles[0]?.role?.name == "admin" && (
+                          <p className="NormalTextSizing">ادمین</p>
+                        )}
+                        {item.userRoles[0]?.role?.name == "master" && (
+                          <p className="NormalTextSizing">مدیر</p>
+                        )}
+                        {item.userRoles[0]?.role?.name == "customer" && (
+                          <p className="NormalTextSizing">مشتری</p>
+                        )}
+                      </td>
+                      <td>
+                        <div className="d-flex flex-row justify-content-center">
+                          <EditUserBtnfunction
+                            setDataUpdated={setDataUpdated}
+                            data={dataCome[--index]}
+                            setConfirmModal={setConfirmModal}
+                          />
+                        </div>
+                      </td>
+                    </tr>
+                  </React.Fragment>
+                ))}
+              </tbody>
+            </table>
+          </div>
+
+          <div className="d-block d-lg-none container">
             {filteredUsers?.map((item, index) => (
               <React.Fragment key={index}>
-                <tr>
-                  <td>{++index}</td>
-                  <td>{item.firstName}</td>
-                  <td>{item.lastName}</td>
-                  <td>{item.username}</td>
-                  <td>
-                    {item.active == true ? (
-                      <p className="NormalTextSizing">فعال</p>
-                    ) : (
-                      <p className="NormalTextSizing">غیرفعال</p>
-                    )}
-                  </td>
+                <MAINTABELSTYLE>
+                  <div className="eachTabelStyle">
+                    <p className="NormalTextSizing">نام :</p>
 
-                  <td>
+                    <div className="SecondValueTabel NormalTextSizing">
+                      {item.firstName}
+                    </div>
+                  </div>
+
+                  <div className="eachTabelStyle">
+                    <p className="NormalTextSizing">نام خانوادگی :</p>
+                    <div
+                      className="SecondValueTabel NormalTextSizing"
+                      style={{ verticalAlign: "middle" }}
+                    >
+                      {item.lastName}
+                    </div>
+                  </div>
+                  <div className="eachTabelStyle">
+                    <p className="NormalTextSizing">شماره همراه :</p>
+
+                    <div
+                      className="SecondValueTabel NormalTextSizing"
+                      style={{ verticalAlign: "middle" }}
+                    >
+                      {item.username}
+                    </div>
+                  </div>
+
+                  <div className="eachTabelStyle">
+                    <p className="NormalTextSizing">وضعیت :</p>
+                    {item.active == true ? (
+                      <p
+                        style={{ backgroundColor: "unset" }}
+                        className="NormalTextSizing"
+                      >
+                        فعال
+                      </p>
+                    ) : (
+                      <p
+                        style={{ backgroundColor: "unset" }}
+                        className="NormalTextSizing"
+                      >
+                        غیرفعال
+                      </p>
+                    )}
+                  </div>
+
+                  <div className="eachTabelStyle">
+                    <p className="NormalTextSizing">نوع دسترسی :</p>
                     {item.domain == 1 && (
-                      <p className="NormalTextSizing">سایت</p>
+                      <p
+                        style={{ backgroundColor: "unset" }}
+                        className="NormalTextSizing"
+                      >
+                        سایت
+                      </p>
                     )}
                     {item.domain == 2 && (
-                      <p className="NormalTextSizing">سایت و ادمین</p>
+                      <p
+                        style={{ backgroundColor: "unset" }}
+                        className="NormalTextSizing"
+                      >
+                        سایت و ادمین
+                      </p>
                     )}
-                  </td>
-                  <td>
+                  </div>
+
+                  <div className="eachTabelStyle">
+                    <p className="NormalTextSizing">دسترسی :</p>
                     {item.userRoles[0]?.role?.name == "admin" && (
-                      <p className="NormalTextSizing">ادمین</p>
+                      <p
+                        style={{ backgroundColor: "unset" }}
+                        className="NormalTextSizing"
+                      >
+                        ادمین
+                      </p>
                     )}
                     {item.userRoles[0]?.role?.name == "master" && (
-                      <p className="NormalTextSizing">مدیر</p>
+                      <p
+                        style={{ backgroundColor: "unset" }}
+                        className="NormalTextSizing"
+                      >
+                        مدیر
+                      </p>
                     )}
                     {item.userRoles[0]?.role?.name == "customer" && (
-                      <p className="NormalTextSizing">مشتری</p>
+                      <p
+                        style={{ backgroundColor: "unset" }}
+                        className="NormalTextSizing"
+                      >
+                        مشتری
+                      </p>
                     )}
-                  </td>
-                  <td>
+                  </div>
+
+                  <div className="eachTabelStyle">
+                    <p className="NormalTextSizing">عملیات :</p>
                     <div className="d-flex flex-row justify-content-center">
                       <EditUserBtnfunction
                         setDataUpdated={setDataUpdated}
@@ -232,88 +378,202 @@ export default function DefineUser({ toggleShow }) {
                         setConfirmModal={setConfirmModal}
                       />
                     </div>
-                  </td>
-                </tr>
+                  </div>
+                </MAINTABELSTYLE>
               </React.Fragment>
             ))}
-          </tbody>
-        </table>
+          </div>
+        </>
+      )}
+
+      <div className="container mt-4 mb-4">
+        <SeeOrderButton color="#6861ce" onClick={handleSiteUser} type="button">
+          دیدن کاربر های سایت
+        </SeeOrderButton>
       </div>
 
-      <div className="d-block d-lg-none container">
-        {filteredUsers?.map((item, index) => (
-          <React.Fragment key={index}>
-            <MAINTABELSTYLE>
-              <div className="eachTabelStyle">
-                <p className="NormalTextSizing">نام :</p>
+      {dataComeUser.length > 0 && (
+        <>
+          <div className="d-none d-lg-block">
+            <table className="table table-striped">
+              <thead>
+                <tr className="table-head text-center">
+                  <th>ردیف</th>
+                  <th>نام</th>
+                  <th>نام خانوادگی</th>
+                  <th>شماره همراه</th>
+                  <th>وضعیت</th>
+                  <th>نوع دسترسی</th>
+                  <th>دسترسی</th>
+                  <th>عملیات</th>
+                </tr>
+              </thead>
+              <tbody className="table-body text-center">
+                {filteredSiteUser?.map((item, index) => (
+                  <React.Fragment key={index}>
+                    <tr>
+                      <td>{++index}</td>
+                      <td>{item.firstName}</td>
+                      <td>{item.lastName}</td>
+                      <td>{item.username}</td>
+                      <td>
+                        {item.active == true ? (
+                          <p className="NormalTextSizing">فعال</p>
+                        ) : (
+                          <p className="NormalTextSizing">غیرفعال</p>
+                        )}
+                      </td>
 
-                <div className="SecondValueTabel NormalTextSizing">{item.firstName}</div>
-              </div>
+                      <td>
+                        {item.domain == 1 && (
+                          <p className="NormalTextSizing">سایت</p>
+                        )}
+                        {item.domain == 2 && (
+                          <p className="NormalTextSizing">سایت و ادمین</p>
+                        )}
+                      </td>
+                      <td>
+                        {item.userRoles[0]?.role?.name == "admin" && (
+                          <p className="NormalTextSizing">ادمین</p>
+                        )}
+                        {item.userRoles[0]?.role?.name == "master" && (
+                          <p className="NormalTextSizing">مدیر</p>
+                        )}
+                        {item.userRoles[0]?.role?.name == "customer" && (
+                          <p className="NormalTextSizing">مشتری</p>
+                        )}
+                      </td>
+                      <td>
+                        <div className="d-flex flex-row justify-content-center">
+                          <EditUserBtnfunction
+                            setDataUpdated={setDataUpdated}
+                            data={dataCome[--index]}
+                            setConfirmModal={setConfirmModal}
+                          />
+                        </div>
+                      </td>
+                    </tr>
+                  </React.Fragment>
+                ))}
+              </tbody>
+            </table>
+          </div>
 
-              <div className="eachTabelStyle">
-                <p className="NormalTextSizing">نام خانوادگی :</p>
-                <div
-                  className="SecondValueTabel NormalTextSizing"
-                  style={{ verticalAlign: "middle" }}
-                >
-                  {item.lastName}
-                </div>
-              </div>
-              <div className="eachTabelStyle">
-                <p className="NormalTextSizing">شماره همراه :</p>
+          <div className="d-block d-lg-none container">
+            {filteredSiteUser?.map((item, index) => (
+              <React.Fragment key={index}>
+                <MAINTABELSTYLE>
+                  <div className="eachTabelStyle">
+                    <p className="NormalTextSizing">نام :</p>
 
-                <div
-                  className="SecondValueTabel NormalTextSizing"
-                  style={{ verticalAlign: "middle" }}
-                >
-                  {item.username}
-                </div>
-              </div>
+                    <div className="SecondValueTabel NormalTextSizing">
+                      {item.firstName}
+                    </div>
+                  </div>
 
-              <div className="eachTabelStyle">
-                <p className="NormalTextSizing">وضعیت :</p>
-                {item.active == true ? (
-                  <p style={{backgroundColor: "unset"}} className="NormalTextSizing">فعال</p>
-                ) : (
-                  <p style={{backgroundColor: "unset"}} className="NormalTextSizing">غیرفعال</p>
-                )}
-              </div>
+                  <div className="eachTabelStyle">
+                    <p className="NormalTextSizing">نام خانوادگی :</p>
+                    <div
+                      className="SecondValueTabel NormalTextSizing"
+                      style={{ verticalAlign: "middle" }}
+                    >
+                      {item.lastName}
+                    </div>
+                  </div>
+                  <div className="eachTabelStyle">
+                    <p className="NormalTextSizing">شماره همراه :</p>
 
-              <div className="eachTabelStyle">
-                <p className="NormalTextSizing">نوع دسترسی :</p>
-                {item.domain == 1 && <p style={{backgroundColor: "unset"}} className="NormalTextSizing">سایت</p>}
-                {item.domain == 2 && (
-                  <p style={{backgroundColor: "unset"}} className="NormalTextSizing">سایت و ادمین</p>
-                )}
-              </div>
+                    <div
+                      className="SecondValueTabel NormalTextSizing"
+                      style={{ verticalAlign: "middle" }}
+                    >
+                      {item.username}
+                    </div>
+                  </div>
 
-              <div className="eachTabelStyle">
-                <p  className="NormalTextSizing">دسترسی :</p>
-                {item.userRoles[0]?.role?.name == "admin" && (
-                  <p style={{backgroundColor: "unset"}} className="NormalTextSizing">ادمین</p>
-                )}
-                {item.userRoles[0]?.role?.name == "master" && (
-                  <p style={{backgroundColor: "unset"}} className="NormalTextSizing">مدیر</p>
-                )}
-                {item.userRoles[0]?.role?.name == "customer" && (
-                  <p style={{backgroundColor: "unset"}} className="NormalTextSizing">مشتری</p>
-                )}
-              </div>
+                  <div className="eachTabelStyle">
+                    <p className="NormalTextSizing">وضعیت :</p>
+                    {item.active == true ? (
+                      <p
+                        style={{ backgroundColor: "unset" }}
+                        className="NormalTextSizing"
+                      >
+                        فعال
+                      </p>
+                    ) : (
+                      <p
+                        style={{ backgroundColor: "unset" }}
+                        className="NormalTextSizing"
+                      >
+                        غیرفعال
+                      </p>
+                    )}
+                  </div>
 
-              <div className="eachTabelStyle">
-                <p className="NormalTextSizing">عملیات :</p>
-                <div className="d-flex flex-row justify-content-center">
-                  <EditUserBtnfunction
-                    setDataUpdated={setDataUpdated}
-                    data={dataCome[--index]}
-                    setConfirmModal={setConfirmModal}
-                  />
-                </div>
-              </div>
-            </MAINTABELSTYLE>
-          </React.Fragment>
-        ))}
-      </div>
+                  <div className="eachTabelStyle">
+                    <p className="NormalTextSizing">نوع دسترسی :</p>
+                    {item.domain == 1 && (
+                      <p
+                        style={{ backgroundColor: "unset" }}
+                        className="NormalTextSizing"
+                      >
+                        سایت
+                      </p>
+                    )}
+                    {item.domain == 2 && (
+                      <p
+                        style={{ backgroundColor: "unset" }}
+                        className="NormalTextSizing"
+                      >
+                        سایت و ادمین
+                      </p>
+                    )}
+                  </div>
+
+                  <div className="eachTabelStyle">
+                    <p className="NormalTextSizing">دسترسی :</p>
+                    {item.userRoles[0]?.role?.name == "admin" && (
+                      <p
+                        style={{ backgroundColor: "unset" }}
+                        className="NormalTextSizing"
+                      >
+                        ادمین
+                      </p>
+                    )}
+                    {item.userRoles[0]?.role?.name == "master" && (
+                      <p
+                        style={{ backgroundColor: "unset" }}
+                        className="NormalTextSizing"
+                      >
+                        مدیر
+                      </p>
+                    )}
+                    {item.userRoles[0]?.role?.name == "customer" && (
+                      <p
+                        style={{ backgroundColor: "unset" }}
+                        className="NormalTextSizing"
+                      >
+                        مشتری
+                      </p>
+                    )}
+                  </div>
+
+                  <div className="eachTabelStyle">
+                    <p className="NormalTextSizing">عملیات :</p>
+                    <div className="d-flex flex-row justify-content-center">
+                      <EditUserBtnfunction
+                        setDataUpdated={setDataUpdated}
+                        data={dataCome[--index]}
+                        setConfirmModal={setConfirmModal}
+                      />
+                    </div>
+                  </div>
+                </MAINTABELSTYLE>
+              </React.Fragment>
+            ))}
+          </div>
+        </>
+      )}
 
       {/* modals */}
       <ConfirmingModal
@@ -322,9 +582,9 @@ export default function DefineUser({ toggleShow }) {
         text={"عملیات با موفقیت انجام شد"}
       />
       <ErrorModal
-       open={openModal3}
-       onClose={closeModal3}
-       text={"خطا در انجام عملیات"}
+        open={openModal3}
+        onClose={closeModal3}
+        text={"خطا در انجام عملیات"}
       />
     </section>
   );

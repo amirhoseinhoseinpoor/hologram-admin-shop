@@ -74,17 +74,16 @@ export const addUser = createAsyncThunk(
 
 export const getuser = createAsyncThunk(
   "userManagment/getuser",
-  async (_, thunkAPI) => {
+  async ({ domain }, thunkAPI) => {
     const state = thunkAPI.getState();
     const token = state.auth.token;
 
     try {
       const response = await axios.get(
-        `${process.env.NEXT_PUBLIC_BACK_END_SERVER}/users/allUser`,
+        `${process.env.NEXT_PUBLIC_BACK_END_SERVER}/users/allUser?domain=${domain}`,
         {
           headers: {
             Authorization: token ? `Bearer ${token}` : "",
-            "Content-Type": "multipart/form-data",
           },
         }
       );
@@ -305,6 +304,30 @@ export const productEdit = createAsyncThunk(
     }
   }
 );
+
+export const countProduct = createAsyncThunk(
+  "product/countProduct",
+  async (_,thunkAPI) => {
+    try {
+      const response = await axios.get(
+        `${process.env.NEXT_PUBLIC_BACK_END_SERVER}/product/count`
+      );
+      const data = response.data;
+
+      return data;
+    } catch (error) {
+      if (error.response && error.response.status === 400) {
+        return thunkAPI.rejectWithValue("ارور سمت من");
+      } else {
+        return thunkAPI.rejectWithValue(
+          "مشکلی به وجود امده لطفا بعدا تلاش کنید"
+        );
+      }
+    }
+  }
+);
+
+
 
 export const list = createAsyncThunk("product/list", async (thunkAPI) => {
   try {
@@ -1022,6 +1045,40 @@ export const blogsDeleted = createAsyncThunk(
 // end blog
 
 // start order
+
+export const Countorders = createAsyncThunk(
+  "order/Countorders",
+  async ({ status }, thunkAPI) => {
+    const state = thunkAPI.getState();
+    const token = state.auth.token;
+
+    try {
+      let url = `${process.env.NEXT_PUBLIC_BACK_END_SERVER}/order/count`;
+
+      // If status is provided, append it to the URL
+      if (status !== undefined) {
+        url += `?status=${status}`;
+      }
+
+      const response = await axios.get(url, {
+        headers: {
+          Authorization: token ? `Bearer ${token}` : "",
+        },
+      });
+
+      const data = response.data;
+      return data;
+    } catch (error) {
+      if (error.response && error.response.status === 400) {
+        return thunkAPI.rejectWithValue("ارور سمت من");
+      } else {
+        return thunkAPI.rejectWithValue(
+          "مشکلی به وجود امده لطفا بعدا تلاش کنید"
+        );
+      }
+    }
+  }
+);
 
 export const sendNewMessage = createAsyncThunk(
   "order/sendNewMessage",

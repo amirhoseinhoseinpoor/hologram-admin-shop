@@ -1,14 +1,11 @@
+// src/components/ChatBox.js
+
 "use client";
 
 import React, { useState, useEffect, useRef } from "react";
 import style from "/src/app/Styles/MakeOrderStyle/Talkjs.module.scss";
 import { Box } from "@mui/material";
 import Modal from "@mui/material/Modal";
-import socket from "@/app/utils/socket";
-// imporet modals
-import AreYouShureModal from "@/app/BaseComponent/AreYouSureModal";
-import ConfirmingModal from "@/app/BaseComponent/ConfirmingModal";
-// import redux
 import { useDispatch } from "react-redux";
 import {
   sendNewMessage,
@@ -16,6 +13,9 @@ import {
   uploadFile,
   fetchPrivateImage,
 } from "@/app/Store/thunks";
+import AreYouShureModal from "@/app/BaseComponent/AreYouSureModal";
+import ConfirmingModal from "@/app/BaseComponent/ConfirmingModal";
+import socket from "@/app/utils/socket";
 
 const ModalStyle = {
   position: "absolute",
@@ -54,10 +54,9 @@ const ChatBox = ({
   const [openModal2, setOpenModal2] = useState(false);
   const [patternImageUrls, setPatternImageUrls] = useState({});
 
-  console.log(chatFinalImage);
   const closeModal2 = () => setOpenModal2(false);
 
-  const dontHavePattern = Object.keys(SendingFinalPattern).length == 0;
+  const dontHavePattern = SendingFinalPattern.length === 0;
 
   const handleSendingPattern = () => {
     setFinalPaternModal(true);
@@ -86,69 +85,32 @@ const ChatBox = ({
     setOpenModal(true);
   };
 
+  // Initialize chat socket
   useEffect(() => {
-    const fetchImages = async () => {
-      if (chatFinalImage?.images && Array.isArray(chatFinalImage.images)) {
-        try {
-          // Store only image IDs in SendingFinalPattern
-          setSendingFinalPattern(chatFinalImage.images || []);
+    if (!socket) {
+      console.error('Socket not initialized.');
+      return;
+    }
 
-          // Fetch image URLs and update patternImageUrls
-          const imageUrls = await Promise.all(
-            chatFinalImage.images.map(async (filename) => {
-              const imageData = await dispatch(
-                fetchPrivateImage({ filename })
-              ).unwrap();
-              return { filename, url: imageData }; // Assuming imageData is the URL
-            })
-          );
-
-          // Update patternImageUrls with fetched URLs
-          setPatternImageUrls((prevUrls) => {
-            const newUrls = { ...prevUrls };
-            imageUrls.forEach(({ filename, url }) => {
-              newUrls[filename] = url;
-            });
-            return newUrls;
-          });
-        } catch (error) {
-          console.error("Error fetching final images:", error);
-        }
-      }
-    };
-
-    fetchImages();
-  }, [dispatch, chatFinalImage]);
-
-  const handleFileUpload = (event) => {
-    const files = Array.from(event.target.files);
-    const validImageTypes = ["image/png", "image/jpeg"];
-
-    const newFiles = files
-      .filter((file) => validImageTypes.includes(file.type)) // Only accept PNG and JPG
-      .map((file) => ({
-        imageUrl: URL.createObjectURL(file),
-        file: file,
-      }));
-
-    setSendingFinalPattern((prevFiles) => [...prevFiles, ...newFiles]);
-  };
-
-  // Initialize socket connection
-  useEffect(() => {
+    // Set initial messages
     setMessages(Array.isArray(chatData) ? chatData : []);
 
     // Listen for chat updates
-    socket.on("chatUpdate", (data) => {
+    socket.on("message", (data) => {
       if (data.code === code) {
         setMessages(Array.isArray(data.chat) ? data.chat : []);
       }
     });
 
+    // Handle connection errors
+    socket.on("connect_error", (err) => {
+      console.error("Chat Socket Connection Error:", err.message);
+    });
+
     // Clean up the listener on unmount
-    // return () => {
-    //   socket.disconnect();
-    // };
+    return () => {
+      socket.off("message");
+    };
   }, [code, chatData]);
 
   const handleEditMessage = (index) => {
@@ -208,7 +170,7 @@ const ChatBox = ({
             uploadFile({ file: image, tag, type, isPublic })
           ).unwrap();
 
-          newMessageObject.imageUrl = response;
+          newMessageObject.imageUrl = response.filename; // Use filename with extension
         } catch (error) {
           console.error("Image upload failed:", error);
           return;
@@ -250,7 +212,6 @@ const ChatBox = ({
       setImage(file);
       const imageUrl = URL.createObjectURL(file);
       setSelectedImage(imageUrl);
-      console.log(file);
     }
   };
 
@@ -261,6 +222,54 @@ const ChatBox = ({
 
   const handleRemoveFinalPattern = (index) => {
     setSendingFinalPattern(SendingFinalPattern.filter((_, i) => i !== index));
+  };
+
+  useEffect(() => {
+    const fetchImages = async () => {
+      if (chatFinalImage?.images && Array.isArray(chatFinalImage.images)) {
+        try {
+          // Store only image IDs in SendingFinalPattern
+          setSendingFinalPattern(chatFinalImage.images || []);
+
+          // Fetch image URLs and update patternImageUrls
+          const imageUrls = await Promise.all(
+            chatFinalImage.images.map(async (filename) => {
+              const imageData = await dispatch(
+                fetchPrivateImage({ filename })
+              ).unwrap();
+              return { filename, url: imageData }; // Assuming imageData is the URL
+            })
+          );
+
+          // Update patternImageUrls with fetched URLs
+          setPatternImageUrls((prevUrls) => {
+            const newUrls = { ...prevUrls };
+            imageUrls.forEach(({ filename, url }) => {
+              newUrls[filename] = url;
+            });
+            return newUrls;
+          });
+        } catch (error) {
+          console.error("Error fetching final images:", error);
+        }
+      }
+    };
+
+    fetchImages();
+  }, [dispatch, chatFinalImage]);
+
+  const handleFileUpload = (event) => {
+    const files = Array.from(event.target.files);
+    const validImageTypes = ["image/png", "image/jpeg"];
+
+    const newFiles = files
+      .filter((file) => validImageTypes.includes(file.type)) // Only accept PNG and JPG
+      .map((file) => ({
+        imageUrl: URL.createObjectURL(file),
+        file: file,
+      }));
+
+    setSendingFinalPattern((prevFiles) => [...prevFiles, ...newFiles]);
   };
 
   useEffect(() => {
@@ -307,7 +316,7 @@ const ChatBox = ({
             const fileIdSrc = await dispatch(
               uploadFile({ file, tag, type, isPublic })
             ).unwrap();
-            return fileIdSrc; // New image ID
+            return fileIdSrc.filename; // Return filename with extension
           } else if (typeof item === "string") {
             // Existing image ID, include as-is
             return item;
@@ -360,7 +369,7 @@ const ChatBox = ({
 
           {/* Scrollable chat area */}
           <div className={`${style.chatContainer} container`} ref={chatBoxRef}>
-            {messages.length == 0 && (
+            {messages.length === 0 && (
               <p
                 style={{ marginTop: "60px", marginBottom: "60px" }}
                 className="discription text-center"
@@ -389,7 +398,7 @@ const ChatBox = ({
                         <p className={`${style.TimeStyle} smallest`}>
                           {msg.date}
                         </p>
-                        {msg.isAdmin == true && (
+                        {msg.isAdmin === true && (
                           <div className="d-flex flex-row">
                             <svg
                               style={{ cursor: "pointer" }}
@@ -481,8 +490,7 @@ const ChatBox = ({
                     <>
                       {imageCache[msg.imageUrl] ? (
                         <>
-                          {/* modal */}
-
+                          {/* Image Modal */}
                           <Modal
                             open={open}
                             onClose={handleClose}
@@ -491,7 +499,7 @@ const ChatBox = ({
                           >
                             <Box
                               component="img"
-                              src={imageCache[msg.imageUrl]}
+                              src={`${process.env.NEXT_PUBLIC_BACK_END_SERVER}${msg.imageUrl}`}
                               alt="uploaded"
                               className={style.modalStyleclass}
                               sx={ModalStyle}
@@ -503,7 +511,7 @@ const ChatBox = ({
                               onClick={handleOpen}
                               className={`${style.imageChatStyle}`}
                               component="img"
-                              src={imageCache[msg.imageUrl]}
+                              src={`${process.env.NEXT_PUBLIC_BACK_END_SERVER}${msg.imageUrl}`}
                               alt="uploaded"
                             />
                             <div
@@ -516,7 +524,7 @@ const ChatBox = ({
                               <p className={`${style.TimeStyle} smallest`}>
                                 {msg.date}
                               </p>
-                              {msg.isAdmin == true && (
+                              {msg.isAdmin === true && (
                                 <div className="d-flex flex-row">
                                   <svg
                                     style={{ cursor: "pointer" }}
@@ -615,7 +623,7 @@ const ChatBox = ({
                 placeholder="پیام خود را بنویسید"
                 className={`${style.inputChatBoxStyle} discription`}
               />
-              {message.length == 0 && (
+              {message.length === 0 && (
                 <>
                   <label
                     htmlFor="fileInputChatBox"
@@ -711,15 +719,14 @@ const ChatBox = ({
             <div className={style.ModalPatternStyle}>
               <div className={style.sendingFinalPatternImage}>
                 {Array.isArray(SendingFinalPattern) &&
-                  SendingFinalPattern?.map((fileObj, index) => (
+                  SendingFinalPattern.map((fileObj, index) => (
                     <React.Fragment key={index}>
                       {typeof fileObj === "string" ? (
                         <div className="position-relative">
                           <Box
-                            // onClick={handleOpen}
                             className={`${style.imageChatStyle}  mb-2 mt-2`}
                             component="img"
-                            src={patternImageUrls[fileObj]}
+                            src={`${process.env.NEXT_PUBLIC_BACK_END_SERVER}${fileObj}`}
                             alt={`uploaded ${index}`}
                           />
                           <div
@@ -769,10 +776,9 @@ const ChatBox = ({
                       ) : (
                         <div className="position-relative">
                           <Box
-                            // onClick={handleOpen}
                             className={`${style.imageChatStyle}  mb-2 mt-2`}
                             component="img"
-                            src={fileObj.imageUrl}
+                            src={`${process.env.NEXT_PUBLIC_BACK_END_SERVER}${fileObj.imageUrl}`}
                             alt={`uploaded ${index}`}
                           />
                           <div
@@ -845,7 +851,7 @@ const ChatBox = ({
                   <input
                     onChange={handleFileUpload}
                     type="file"
-                    accept={`${process.env.NEXT_PUBLIC_INPUT_IMAGE_FORMAT}`}
+                    accept="image/png,image/jpeg,image/jpg"
                     className={`d-none`}
                     id="fileFinalPattern"
                   />
@@ -866,7 +872,7 @@ const ChatBox = ({
         </Modal>
       )}
 
-      {/* modals  */}
+      {/* modals */}
       <ConfirmingModal
         open={openModal2}
         onClose={closeModal2}
