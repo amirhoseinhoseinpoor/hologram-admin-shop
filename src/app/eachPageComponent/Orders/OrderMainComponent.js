@@ -3,12 +3,13 @@ import React from "react";
 import MakeOrder from "./MakeOrderComponents/MakeOrder";
 import { useDispatch } from "react-redux";
 import { listorders, whosOrder, updateOrderStatus } from "@/app/Store/thunks";
-import ConfirmingModal from "@/app/BaseComponent/ConfirmingModal";
-import ErrorModal from "@/app/BaseComponent/ErrorModal";
 import SearchIcon from "@mui/icons-material/Search";
 import styled from "styled-components";
 // import base components
 import NavBarToggleBurgerButton from "@/app/BaseComponent/NavBarToggleBurgerButton";
+import LoadingCss from "@/app/BaseComponent/LoadingCss";
+import ConfirmingModal from "@/app/BaseComponent/ConfirmingModal";
+import ErrorModal from "@/app/BaseComponent/ErrorModal";
 // import component
 import OrderTabel from "./OrderTabel";
 
@@ -64,6 +65,7 @@ export default function OrderMainComponent({ toggleShow }) {
   const [selectedStatus, setSelectedStatus] = useState({});
   const [waitingForAdmin, setWaitingForAdmin] = useState(null);
   const [WaitingForUser, setWaitingForUser] = useState(null);
+  const [trackLoadingProduct, setTrackLoadingProduct] = useState(false);
 
   // modal state
   const [openModal2, setOpenModal2] = useState(false);
@@ -122,37 +124,51 @@ export default function OrderMainComponent({ toggleShow }) {
     setFilteredOrders(filtered);
     setFilteredOrdersUSER(filteredUSER);
     setFilteredOrdersCanceled(filteredCanceled);
-
-  }, [orders, usersData, searchTerm, waitingForAdmin , WaitingForUser , ordersCanceled]);
+  }, [
+    orders,
+    usersData,
+    searchTerm,
+    waitingForAdmin,
+    WaitingForUser,
+    ordersCanceled,
+  ]);
 
   const handleCancelOrders = () => {
     const fetchData = async (status) => {
-      try {
-        const ordersData = await dispatch(listorders({ status })).unwrap();
+      if (ordersCanceled) {
+        setUsersDataCanceled({});
+        setOrdersCanceled(null);
+      } else {
+        try {
+          setTrackLoadingProduct(true);
+          const ordersData = await dispatch(listorders({ status })).unwrap();
 
-        // Fetch user data for all orders
-        const userPromises = ordersData.map(async (item) => {
-          const userDataCome = await dispatch(
-            whosOrder({ id: item.createdBy })
-          ).unwrap();
+          // Fetch user data for all orders
+          const userPromises = ordersData.map(async (item) => {
+            const userDataCome = await dispatch(
+              whosOrder({ id: item.createdBy })
+            ).unwrap();
 
-          // Return the user data
-          return { id: item.createdBy, userData: userDataCome[0] }; // Access the first item of the userData array
-        });
+            return { id: item.createdBy, userData: userDataCome[0] }; // Access the first item of the userData array
+          });
 
-        // Wait for all user data to be fetched
-        const userDataArray = await Promise.all(userPromises);
+          // Wait for all user data to be fetched
+          const userDataArray = await Promise.all(userPromises);
 
-        // Create a mapping of userId to userData
-        const userDataMap = userDataArray.reduce((acc, user) => {
-          acc[user.id] = user.userData; // Store the first element directly instead of the array
-          return acc;
-        }, {});
+          // Create a mapping of userId to userData
+          const userDataMap = userDataArray.reduce((acc, user) => {
+            acc[user.id] = user.userData; // Store the first element directly instead of the array
+            return acc;
+          }, {});
 
-        setUsersDataCanceled(userDataMap); // Set the user data map
-        setOrdersCanceled(ordersData); // Set orders
-      } catch (error) {
-        console.error("Error during dispatch:", error);
+          setUsersDataCanceled(userDataMap); // Set the user data map
+          setOrdersCanceled(ordersData); // Set orders
+          setTrackLoadingProduct(false);
+        } catch (error) {
+          console.error("Error during dispatch:", error);
+          setOpenModal3(true);
+          setTrackLoadingProduct(false);
+        }
       }
     };
     fetchData(5);
@@ -198,6 +214,7 @@ export default function OrderMainComponent({ toggleShow }) {
         setWaitingForAdmin(waitingForAdmin);
         setWaitingForUser(withComment);
       } catch (error) {
+        setOpenModal3(true);
         console.error("Error during dispatch:", error);
       }
     };
@@ -288,8 +305,13 @@ export default function OrderMainComponent({ toggleShow }) {
               color="#6861ce"
               onClick={handleCancelOrders}
               type="button"
+              style={{
+                width: "180px",
+                display: "flex",
+                justifyContent: "center",
+              }}
             >
-              دیدن سفارشات لغو شده
+              {trackLoadingProduct ? <LoadingCss /> : ordersCanceled  ? `پنهان کردن سفارشات لغو شده` : `دیدن سفارشات لغو شده`}
             </SeeOrderButton>
           </div>
           {/* orders canceled */}
@@ -324,7 +346,7 @@ export default function OrderMainComponent({ toggleShow }) {
       <ErrorModal
         open={openModal3}
         onClose={closeModal3}
-        text={"خطا در تغییر وضعیت "}
+        text={"خطا در انجام عملیات "}
       />
     </section>
   );

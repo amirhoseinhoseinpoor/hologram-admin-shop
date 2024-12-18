@@ -33,8 +33,10 @@ const MAINTABELSTYLE = styled.div`
     justify-content: center;
     align-items: center;
 
-    .MuiInputBase-inputSizeSmall {
-      padding: 4px !important;
+    @media (min-width: 980px) {
+      .MuiInputBase-inputSizeSmall {
+        padding: 4px !important;
+      }
     }
   }
 `;
