@@ -14,7 +14,7 @@ import { useDispatch } from "react-redux";
 import { blogsList } from "@/app/Store/thunks";
 
 const HeadermakeOrder = styled.div`
-  background-color: white;
+  /* background-color: white; */
   padding: 10px;
   color: white;
   .textHeaderStyle {
@@ -22,9 +22,9 @@ const HeadermakeOrder = styled.div`
   }
 
   @media (max-width: 980px) {
-    background-color: rgb(26, 32, 53) !important;
+    /* background-color: rgb(26, 32, 53) !important; */
     .textHeaderStyle {
-      color: white !important;
+      /* color: white !important; */
     }
   }
 `;
@@ -40,6 +40,10 @@ const CARD = styled(Card)`
       font-weight: 500;
     }
   }
+`;
+
+const ButtonColor = styled.button`
+ background-image : linear-gradient(195deg, #42424a 0%, #191919 100%);
 `;
 
 const TYPOGRAPHY = styled(Typography)`
@@ -84,12 +88,12 @@ export default function HonorsMainComponent({ toggleShow }) {
               ویرایش مقالات
             </div>
             <div>
-              <button
-                className="bg-success"
+              <ButtonColor
+                
                 onClick={() => setActiveKey("addUser")}
               >
                 افزودن مقالات
-              </button>
+              </ButtonColor>
             </div>
           </>
         )}
@@ -99,12 +103,12 @@ export default function HonorsMainComponent({ toggleShow }) {
               افزودن مقالات
             </div>
             <div>
-              <button
-                className="bg-success"
+              <ButtonColor
+                
                 onClick={() => setActiveKey("editUserPage")}
               >
                 ویرایش مقالات
-              </button>
+              </ButtonColor>
             </div>
           </>
         )}
@@ -114,9 +118,9 @@ export default function HonorsMainComponent({ toggleShow }) {
               ویرایش مقالات
             </div>
             <div>
-              <button className="bg-success" onClick={handleCancelEdit}>
+              <ButtonColor  onClick={handleCancelEdit}>
                 مقالات
-              </button>
+              </ButtonColor>
             </div>
           </>
         )}

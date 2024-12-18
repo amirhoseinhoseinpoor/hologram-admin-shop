@@ -48,6 +48,7 @@ const AddUserBtnstyle = styled(Button)`
   text-align: center;
   cursor: pointer;
   border-radius: 4px;
+  background-image : linear-gradient(195deg, #42424a 0%, #191919 100%);
 `;
 
 export default function AddUserBtn({
@@ -111,7 +112,7 @@ export default function AddUserBtn({
   return (
     <section>
       <AddUserBtnstyle
-        className="NormalTextSizing bg-success"
+        className="NormalTextSizing"
         variant="primary"
         onClick={handleAddModalShow}
       >

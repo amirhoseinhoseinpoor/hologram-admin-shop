@@ -4,17 +4,22 @@
   display: flex;
   height: fit-content;
   min-height: 100%;
+  background-color: var.$mainBackgroundColor;
+  gap: 10px;
 }
 
 .offcanvasheader :global {
   button {
     margin: 0 !important;
   }
+  .offcanvas-title{
+    color: var.$sidebarColorActive;
+  }
 }
 
 
 .navbaritemheader{
-  background-color: rgb(26,32,53);
+  background-color: white;
   width: 250px !important;
   overflow-y: auto;
   scrollbar-width: none;
@@ -27,32 +32,41 @@
 
 .sidebar {
   width: 19%;
-  background-color: rgb(26,32,53);
+  background-color: white;
   color: #fff;
-  box-shadow: 2px 0 5px rgba(0, 0, 0, 0.1);
-  display: flex;
+  box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+  align-items: center;
   flex-direction: column;
+  border-radius: 0.5rem;
 }
 
 .sidebarMain {
   display: flex;
   flex-direction: column;
-  width: 100%;
+  gap: 7px;
+  width: 95%;
+  justify-content: center;
   border-bottom: none;
 }
 .sidebarMain :global {
+  .nav-item{
+    border-radius: 10px !important;
+    .css-i4bv87-MuiSvgIcon-root{
+      opacity: 0.7;
+    }
+  }
   .nav-link {
-    color: #8d8f97;
+    color: var.$sidebarColorActive;
     text-align: start;
     width: 100%;
     border: none;
-    padding: 10px 27px 10px 10px;
+    padding: 7px 27px 7px 7px;
   }
   .nav-link.active {
-    background-color: #161b2c;
+    background-image: var.$sideBarMainBackground;
     color: white;
     border: none;
-    border-radius: 0;
+    border-radius: 10px;
   }
 }
 
@@ -65,7 +79,7 @@
 
 .content {
   flex: 1;
-  background-color: #f4f7fd;
+  background-color: var.$mainBackgroundColor;
   overflow-y: auto;
 }
 

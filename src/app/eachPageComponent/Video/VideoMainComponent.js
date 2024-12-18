@@ -13,7 +13,7 @@ import styled from "styled-components";
 import NavBarToggleBurgerButton from "@/app/BaseComponent/NavBarToggleBurgerButton";
 
 const HeadermakeOrder = styled.div`
-  background-color: white;
+  /* background-color: white; */
   padding: 10px;
   color: white;
   .textHeaderStyle {
@@ -21,9 +21,9 @@ const HeadermakeOrder = styled.div`
   }
 
   @media (max-width: 980px) {
-    background-color: rgb(26, 32, 53) !important;
+    /* background-color: rgb(26, 32, 53) !important; */
     .textHeaderStyle {
-      color: white !important;
+      /* color: white !important; */
     }
   }
 `;
@@ -39,6 +39,10 @@ const CARD = styled(Card)`
       font-weight: 500;
     }
   }
+`;
+
+const ButtonColor = styled.button`
+ background-image : linear-gradient(195deg, #42424a 0%, #191919 100%);
 `;
 
 const TYPOGRAPHY = styled(Typography)`
@@ -88,12 +92,12 @@ export default function HonorsMainComponent({ toggleShow }) {
               ویرایش ویدیو
             </div>
             <div>
-              <button
-                className="bg-success"
+              <ButtonColor
+                
                 onClick={() => setActiveKey("addUser")}
               >
                 افزودن ویدیو
-              </button>
+              </ButtonColor>
             </div>
           </>
         )}
@@ -103,12 +107,12 @@ export default function HonorsMainComponent({ toggleShow }) {
               افزودن ویدیو
             </div>
             <div>
-              <button
-                className="bg-success"
+              <ButtonColor
+                
                 onClick={() => setActiveKey("editUserPage")}
               >
                 ویرایش ویدیو
-              </button>
+              </ButtonColor>
             </div>
           </>
         )}
@@ -118,9 +122,9 @@ export default function HonorsMainComponent({ toggleShow }) {
               ویرایش ویدیو
             </div>
             <div>
-              <button className="bg-success" onClick={handleCancelEdit}>
+              <ButtonColor  onClick={handleCancelEdit}>
                 ویدیو
-              </button>
+              </ButtonColor>
             </div>
           </>
         )}

@@ -5,6 +5,7 @@ import AddHonors from "./AddHonors";
 import EditHonors from "./EditHoors";
 // import base component
 import NavBarToggleBurgerButton from "@/app/BaseComponent/NavBarToggleBurgerButton";
+import ProfileComponent from "@/app/BaseComponent/ProfileComponent";
 //redux import
 import { useDispatch } from "react-redux";
 import { honorsList } from "../../Store/thunks.js";
@@ -13,7 +14,8 @@ import { formatPersianDate } from "@/app/utils/persionDateUtils";
 import styled from "styled-components";
 
 const HeadermakeOrder = styled.div`
-  background-color: white;
+  /* background-color: white; */
+  border-radius: 5px;
   padding: 10px;
   color: white;
   .textHeaderStyle {
@@ -21,12 +23,16 @@ const HeadermakeOrder = styled.div`
   }
 
   @media (max-width: 980px) {
-    background-color: rgb(26, 32, 53) !important;
+    background-color: white !important;
     .textHeaderStyle {
-      color: white !important;
     }
   }
 `;
+
+const ButtonColor = styled.button`
+ background-image : linear-gradient(195deg, #42424a 0%, #191919 100%);
+`;
+
 
 const CARD = styled(Card)`
   background-color: #dfdcdc !important;
@@ -70,11 +76,12 @@ export default function HonorsMainComponent({ toggleShow }) {
     setEditedHonor(null);
   };
 
+
   return (
     <section>
       <HeadermakeOrder className="d-flex flex-row mb-3 justify-content-between">
         <div className="d-block d-lg-none">
-          <NavBarToggleBurgerButton func={() => toggleShow("main")} />
+          <NavBarToggleBurgerButton  func={() => toggleShow("main")} />
         </div>
         {activekey === "editUserPage" && !editedHonor && (
           <>
@@ -82,12 +89,11 @@ export default function HonorsMainComponent({ toggleShow }) {
               ویرایش افتخارات
             </div>
             <div>
-              <button
-                className="bg-success"
+              <ButtonColor
                 onClick={() => setActiveKey("addUser")}
               >
                 افزودن افتخارات
-              </button>
+              </ButtonColor>
             </div>
           </>
         )}
@@ -97,12 +103,11 @@ export default function HonorsMainComponent({ toggleShow }) {
               افزودن افتخارات
             </div>
             <div>
-              <button
-                className="bg-success"
+              <ButtonColor
                 onClick={() => setActiveKey("editUserPage")}
               >
                 ویرایش افتخارات
-              </button>
+              </ButtonColor>
             </div>
           </>
         )}
@@ -112,28 +117,15 @@ export default function HonorsMainComponent({ toggleShow }) {
               ویرایش افتخارات
             </div>
             <div>
-              <button className="bg-success" onClick={handleCancelEdit}>
+              <ButtonColor  onClick={handleCancelEdit}>
                 افتخارات
-              </button>
+              </ButtonColor>
             </div>
           </>
         )}
       </HeadermakeOrder>
       {activekey === "editUserPage" && !editedHonor && (
         <>
-          {/* <div className="d-flex flex-row justify-content-between mb-2">
-            <div>
-              <h2 className="m-0"> ویرایش افتخارات</h2>
-            </div>
-            <div>
-              <button
-                style={{ backgroundColor: "green" }}
-                onClick={() => setActiveKey("addUser")}
-              >
-                افزودن افتخارات
-              </button>
-            </div>
-          </div> */}
           <div
             className="mt-3 d-flex flex-column gap-3 container"
             style={{ cursor: "pointer" }}
@@ -177,20 +169,6 @@ export default function HonorsMainComponent({ toggleShow }) {
 
       {activekey === "addUser" && !editedHonor && (
         <>
-          {/* <div className="d-flex flex-row justify-content-between mb-2">
-            <div>
-              <h2 className="m-0"> افزودن افتخارات</h2>
-            </div>
-            <div>
-              <button
-                className="bg-success"
-                onClick={() => setActiveKey("editUserPage")}
-              >
-                ویرایش افتخارات
-              </button>
-            </div>
-          </div> */}
-
           <div>
             <AddHonors />
           </div>

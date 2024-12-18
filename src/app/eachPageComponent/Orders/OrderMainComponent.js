@@ -14,7 +14,7 @@ import ErrorModal from "@/app/BaseComponent/ErrorModal";
 import OrderTabel from "./OrderTabel";
 
 const HeadermakeOrder = styled.div`
-  background-color: white;
+  /* background-color: white; */
   padding: 10px;
   color: white;
   .textHeaderStyle {
@@ -22,9 +22,9 @@ const HeadermakeOrder = styled.div`
   }
 
   @media (max-width: 980px) {
-    background-color: rgb(26, 32, 53) !important;
+    /* background-color: rgb(26, 32, 53) !important; */
     .textHeaderStyle {
-      color: white !important;
+      /* color: white !important; */
     }
   }
 `;

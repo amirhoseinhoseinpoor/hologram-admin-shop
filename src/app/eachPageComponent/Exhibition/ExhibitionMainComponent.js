@@ -15,7 +15,7 @@ import { exhibitionList } from "@/app/Store/thunks";
 import { formatPersianDate } from "@/app/utils/persionDateUtils";
 
 const HeadermakeOrder = styled.div`
-  background-color: white;
+  /* background-color: white; */
   padding: 10px;
   color: white;
   .textHeaderStyle {
@@ -23,9 +23,9 @@ const HeadermakeOrder = styled.div`
   }
 
   @media (max-width: 980px) {
-    background-color: rgb(26, 32, 53) !important;
+    /* background-color: rgb(26, 32, 53) !important; */
     .textHeaderStyle {
-      color: white !important;
+      /* color: white !important; */
     }
   }
 `;
@@ -42,6 +42,10 @@ const CARD = styled(Card)`
     }
   }
 `;
+const ButtonColor = styled.button`
+ background-image : linear-gradient(195deg, #42424a 0%, #191919 100%);
+`;
+
 
 const TYPOGRAPHY = styled(Typography)`
   font-family: unset !important;
@@ -84,12 +88,12 @@ export default function HonorsMainComponent({ toggleShow }) {
               ویرایش نمایشگاه
             </div>
             <div>
-              <button
-                className="bg-success"
+              <ButtonColor
+              
                 onClick={() => setActiveKey("addUser")}
               >
                 افزودن نمایشگاه
-              </button>
+              </ButtonColor>
             </div>
           </>
         )}
@@ -99,12 +103,12 @@ export default function HonorsMainComponent({ toggleShow }) {
               افزودن نمایشگاه
             </div>
             <div>
-              <button
-                className="bg-success"
+              <ButtonColor
+                
                 onClick={() => setActiveKey("editUserPage")}
               >
                 ویرایش نمایشگاه
-              </button>
+              </ButtonColor>
             </div>
           </>
         )}
@@ -114,9 +118,9 @@ export default function HonorsMainComponent({ toggleShow }) {
               ویرایش نمایشگاه
             </div>
             <div>
-              <button className="bg-success" onClick={handleCancelEdit}>
+              <ButtonColor onClick={handleCancelEdit}>
               نمایشگاه
-              </button>
+              </ButtonColor>
             </div>
           </>
         )}
