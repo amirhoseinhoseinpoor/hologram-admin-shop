@@ -53,6 +53,7 @@ const EditUserBtn = styled.button`
   margin: 4px 2px;
   cursor: pointer;
   border-radius: 4px;
+  background-image: linear-gradient(195deg, #66bb6a 0%, #43a047 100%);
 `;
 
 const DeleteButtonStyle = styled.button`
@@ -161,7 +162,7 @@ function EditUserBtnfunction({ data, setDataUpdated, setConfirmModal }) {
   return (
     <>
       <EditUserBtn
-        className="bg-success NormalTextSizing"
+        className="NormalTextSizing"
         onClick={handleEditModalShow}
       >
         ویرایش

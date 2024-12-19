@@ -14,6 +14,24 @@ import ErrorModal from "@/app/BaseComponent/ErrorModal";
 // import component
 import OrderTabel from "./OrderTabel";
 
+const FixTablePlace = styled.div`
+  @media (min-width: 980px) {
+    position: relative;
+    margin-top: 60px;
+    p {
+      position: absolute;
+      transform: translate(-50%, 50%);
+      left: 50%;
+      width: 94%;
+      top: -55px;
+      border-radius: 10px;
+      padding: 18px 12px;
+      background-image: linear-gradient(195deg, #42424a 0%, #191919 100%);
+      color: white;
+    }
+  }
+`;
+
 const HeadermakeOrder = styled.div`
   /* background-color: white; */
   padding: 10px;
@@ -254,7 +272,7 @@ export default function OrderMainComponent({ toggleShow }) {
             <div className="NormalTextSizing textHeaderStyle d-flex align-items-center">
               مدیریت سفارشات
             </div>
-             <ProfileComponent colorGet={"#191919"} />
+            <ProfileComponent colorGet={"#191919"} />
           </HeadermakeOrder>
           {/* Add a search input field */}
           <SearchInputMainDiv className="me-2 mt-4 position-relative">
@@ -269,7 +287,7 @@ export default function OrderMainComponent({ toggleShow }) {
           </SearchInputMainDiv>
 
           {filteredOrders && filteredOrders.length > 0 && (
-            <>
+            <FixTablePlace className="container">
               <p className="me-2 NormalTextSizing mb-2">
                 سفارشات در انتظار برسی
               </p>
@@ -282,11 +300,11 @@ export default function OrderMainComponent({ toggleShow }) {
                 mainArray={filteredOrders}
                 userMainData={usersData}
               />
-            </>
+            </FixTablePlace>
           )}
 
           {filteredOrdersUSER && filteredOrdersUSER.length > 0 && (
-            <>
+            <FixTablePlace className="container">
               <p className="me-2 NormalTextSizing mb-2">
                 سفارشات در انتظار کاربر
               </p>
@@ -299,7 +317,7 @@ export default function OrderMainComponent({ toggleShow }) {
                 mainArray={filteredOrdersUSER}
                 userMainData={usersData}
               />
-            </>
+            </FixTablePlace>
           )}
 
           <div className="container mt-4 mb-4">
@@ -313,12 +331,20 @@ export default function OrderMainComponent({ toggleShow }) {
                 justifyContent: "center",
               }}
             >
-              {trackLoadingProduct ? <LoadingCss /> : ordersCanceled  ? `پنهان کردن سفارشات لغو شده` : `دیدن سفارشات لغو شده`}
+              {trackLoadingProduct ? (
+                <LoadingCss />
+              ) : ordersCanceled ? (
+                `پنهان کردن سفارشات لغو شده`
+              ) : (
+                `دیدن سفارشات لغو شده`
+              )}
             </SeeOrderButton>
           </div>
+          
           {/* orders canceled */}
           {filteredOrdersCanceled && filteredOrdersCanceled.length > 0 && (
-            <>
+            <FixTablePlace className="container">
+              <p className="me-2 NormalTextSizing mb-2">سفارشات لغو شده</p>
               <OrderTabel
                 setSeeOrder={setSeeOrder}
                 setActiveKey={setActiveKey}
@@ -328,7 +354,7 @@ export default function OrderMainComponent({ toggleShow }) {
                 mainArray={filteredOrdersCanceled}
                 userMainData={usersDataCanceled}
               />
-            </>
+            </FixTablePlace>
           )}
         </>
       )}

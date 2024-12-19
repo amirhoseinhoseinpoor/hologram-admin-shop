@@ -8,6 +8,7 @@ import NavBarToggleBurgerButton from "@/app/BaseComponent/NavBarToggleBurgerButt
 import ConfirmingModal from "@/app/BaseComponent/ConfirmingModal";
 import ErrorModal from "@/app/BaseComponent/ErrorModal";
 import ProfileComponent from "@/app/BaseComponent/ProfileComponent";
+import LoadingCss from "@/app/BaseComponent/LoadingCss";
 // import components
 import AddUserBtn from "../DefineUser/AddUserBtn";
 import EditUserBtnfunction from "./EditUserBtn";
@@ -82,6 +83,41 @@ const SeeOrderButton = styled.button`
   background-color: ${(props) => props.color || "#1572e8"};
 `;
 
+const FixTablePlace = styled.div`
+  @media (min-width: 980px) {
+    position: relative;
+    margin-top: 60px;
+    .pTagForStyle {
+      position: absolute;
+      transform: translate(-50%, 50%);
+      left: 50%;
+      width: 94%;
+      top: -55px;
+      border-radius: 10px;
+      padding: 18px 12px;
+      background-image: linear-gradient(195deg, #42424a 0%, #191919 100%);
+      color: white;
+    }
+
+    .tabelStyle {
+      @media (min-width: 980px) {
+        border-collapse: separate;
+        border-radius: 12px;
+        overflow: hidden;
+        width: 100%;
+        th,
+        td {
+          padding: 10px;
+          text-align: center;
+        }
+        th {
+          padding-top: 55px;
+        }
+      }
+    }
+  }
+`;
+
 export default function DefineUser({ toggleShow }) {
   const dispatch = useDispatch();
 
@@ -93,6 +129,7 @@ export default function DefineUser({ toggleShow }) {
   const [searchTerm, setSearchTerm] = useState("");
   const [filteredUsers, setFilteredUsers] = useState(null);
   const [filteredSiteUser, setFilteredSiteUser] = useState(null);
+  const [trackLoadingProduct, setTrackLoadingProduct] = useState(false);
 
   const [openModal2, setOpenModal2] = useState(false);
   const closeModal2 = () => setOpenModal2(false);
@@ -132,9 +169,21 @@ export default function DefineUser({ toggleShow }) {
   }, [dispatch, dataUpdated]);
 
   const handleSiteUser = async () => {
-    const dataComeApi = await dispatch(getuser({ domain: 1 })).unwrap();
-    setDataComeUser(dataComeApi);
-    setDataUpdated(false);
+    if (dataComeUser?.length > 0) {
+      setDataComeUser([]);
+    } else {
+      try {
+        setTrackLoadingProduct(true);
+        const dataComeApi = await dispatch(getuser({ domain: 1 })).unwrap();
+        setDataComeUser(dataComeApi);
+        setDataUpdated(false);
+
+        setTrackLoadingProduct(false);
+      } catch (error) {
+        console.error("Error during dispatch:", error);
+        setTrackLoadingProduct(false);
+      }
+    }
   };
 
   useEffect(() => {
@@ -207,8 +256,11 @@ export default function DefineUser({ toggleShow }) {
 
       {dataCome.length > 0 && (
         <>
-          <div className="d-none d-lg-block">
-            <table className="table table-striped">
+          <FixTablePlace className="d-none d-lg-block container">
+            <p className="me-2 NormalTextSizing mb-2 pTagForStyle">
+              کاربر های ادمین
+            </p>
+            <table className="table table-striped tabelStyle">
               <thead>
                 <tr className="table-head text-center">
                   <th>ردیف</th>
@@ -270,7 +322,7 @@ export default function DefineUser({ toggleShow }) {
                 ))}
               </tbody>
             </table>
-          </div>
+          </FixTablePlace>
 
           <div className="d-block d-lg-none container">
             {filteredUsers?.map((item, index) => (
@@ -389,15 +441,33 @@ export default function DefineUser({ toggleShow }) {
       )}
 
       <div className="container mt-4 mb-4">
-        <SeeOrderButton color="#6861ce" onClick={handleSiteUser} type="button">
-          دیدن کاربر های سایت
+        <SeeOrderButton
+          color="#6861ce"
+          onClick={handleSiteUser}
+          type="button"
+          style={{
+            width: "170px",
+            display: "flex",
+            justifyContent: "center",
+          }}
+        >
+          {trackLoadingProduct ? (
+            <LoadingCss />
+          ) : dataComeUser?.length ? (
+            `پنهان کردن کاربر های سایت`
+          ) : (
+            `دیدن کاربر های سایت`
+          )}
         </SeeOrderButton>
       </div>
 
       {dataComeUser.length > 0 && (
         <>
-          <div className="d-none d-lg-block">
-            <table className="table table-striped">
+          <FixTablePlace className="d-none d-lg-block container">
+            <p className="me-2 NormalTextSizing mb-2 pTagForStyle">
+              کاربر های سایت
+            </p>
+            <table className="table table-striped tabelStyle">
               <thead>
                 <tr className="table-head text-center">
                   <th>ردیف</th>
@@ -459,7 +529,7 @@ export default function DefineUser({ toggleShow }) {
                 ))}
               </tbody>
             </table>
-          </div>
+          </FixTablePlace>
 
           <div className="d-block d-lg-none container">
             {filteredSiteUser?.map((item, index) => (
