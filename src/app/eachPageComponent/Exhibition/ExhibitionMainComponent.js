@@ -7,6 +7,7 @@ import EditExhibition from "./EditExhibition";
 import { Card, CardContent, CardMedia, Typography } from "@mui/material";
 import styled from "styled-components";
 // import base component
+import ProfileComponent from "@/app/BaseComponent/ProfileComponent";
 import NavBarToggleBurgerButton from "@/app/BaseComponent/NavBarToggleBurgerButton";
 
 //redux import
@@ -43,9 +44,8 @@ const CARD = styled(Card)`
   }
 `;
 const ButtonColor = styled.button`
- background-image : linear-gradient(195deg, #42424a 0%, #191919 100%);
+  background-image: linear-gradient(195deg, #42424a 0%, #191919 100%);
 `;
-
 
 const TYPOGRAPHY = styled(Typography)`
   font-family: unset !important;
@@ -87,28 +87,12 @@ export default function HonorsMainComponent({ toggleShow }) {
             <div className="NormalTextSizing textHeaderStyle d-flex align-items-center">
               ویرایش نمایشگاه
             </div>
-            <div>
-              <ButtonColor
-              
-                onClick={() => setActiveKey("addUser")}
-              >
-                افزودن نمایشگاه
-              </ButtonColor>
-            </div>
           </>
         )}
         {activekey === "addUser" && !editedHonor && (
           <>
             <div className="NormalTextSizing textHeaderStyle d-flex align-items-center">
               افزودن نمایشگاه
-            </div>
-            <div>
-              <ButtonColor
-                
-                onClick={() => setActiveKey("editUserPage")}
-              >
-                ویرایش نمایشگاه
-              </ButtonColor>
             </div>
           </>
         )}
@@ -117,14 +101,40 @@ export default function HonorsMainComponent({ toggleShow }) {
             <div className="NormalTextSizing textHeaderStyle d-flex align-items-center">
               ویرایش نمایشگاه
             </div>
+          </>
+        )}
+        <ProfileComponent colorGet={"#191919"} />
+      </HeadermakeOrder>
+      {/* tabs */}
+      <div className="d-flex justify-content-end ms-3">
+        {activekey === "editUserPage" && !editedHonor && (
+          <>
             <div>
-              <ButtonColor onClick={handleCancelEdit}>
-              نمایشگاه
+              <ButtonColor onClick={() => setActiveKey("addUser")}>
+                افزودن نمایشگاه
               </ButtonColor>
             </div>
           </>
         )}
-      </HeadermakeOrder>
+        {activekey === "addUser" && !editedHonor && (
+          <>
+            <div>
+              <ButtonColor onClick={() => setActiveKey("editUserPage")}>
+                ویرایش نمایشگاه
+              </ButtonColor>
+            </div>
+          </>
+        )}
+        {editedHonor && (
+          <>
+            <div>
+              <ButtonColor onClick={handleCancelEdit}>نمایشگاه</ButtonColor>
+            </div>
+          </>
+        )}
+      </div>
+
+      {/* content */}
       {activekey === "editUserPage" && !editedHonor && (
         <>
           <div

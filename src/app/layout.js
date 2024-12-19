@@ -1,13 +1,11 @@
-import localFont from 'next/font/local';
+import localFont from "next/font/local";
 
-import 'bootstrap/dist/css/bootstrap.min.css';
+import "bootstrap/dist/css/bootstrap.min.css";
 import "./Styles/reset.css";
 import "./Styles/globals.scss";
-import StoreProvider from './Store/storeProvider';
+import StoreProvider from "./Store/storeProvider";
 
-const myFont = localFont({ src: './Fonts/IRANSansXVF.ttf' })
-
-
+const myFont = localFont({ src: "./Fonts/IRANSansXVF.ttf" });
 
 export const metadata = {
   title: "آذر هولوگرام",
@@ -19,9 +17,7 @@ export default function RootLayout({ children }) {
   return (
     <html lang="en" dir="rtl">
       <body className={`${myFont.className}`}>
-        <StoreProvider>
-           {children}
-        </StoreProvider>
+        <StoreProvider>{children}</StoreProvider>
       </body>
     </html>
   );

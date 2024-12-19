@@ -16,7 +16,25 @@ export const login = createAsyncThunk(
       );
       const token = response.data.token;
 
-      return token;
+      const response2 = await axios.post(
+        `${process.env.NEXT_PUBLIC_BACK_END_SERVER}/users`,
+        { username },
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+
+      return {
+        token,
+        firstName: response2.data[0].firstName,
+        lastName: response2.data[0].lastName,
+        phoneNumber: response2.data[0].username,
+        code: response2.data[0].code,
+        email: response2.data[0].email,
+        gender: response2.data[0].gender,
+      };
     } catch (error) {
       if (error.response && error.response.status === 400) {
         return thunkAPI.rejectWithValue("شماره همراه یا پسورد اشتباه است");
@@ -36,7 +54,7 @@ export const addUser = createAsyncThunk(
       credentials;
 
     const state = thunkAPI.getState();
-    const token = state.auth.token;
+    const token = state.auth.token.token;
 
     try {
       const response = await axios.post(
@@ -76,7 +94,7 @@ export const getuser = createAsyncThunk(
   "userManagment/getuser",
   async ({ domain }, thunkAPI) => {
     const state = thunkAPI.getState();
-    const token = state.auth.token;
+    const token = state.auth.token.token;
 
     try {
       const response = await axios.get(
@@ -110,7 +128,7 @@ export const editUser = createAsyncThunk(
     console.log(roleIds);
 
     const state = thunkAPI.getState();
-    const token = state.auth.token;
+    const token = state.auth.token.token;
 
     try {
       const response = await axios.patch(
@@ -147,7 +165,7 @@ export const deleteUser = createAsyncThunk(
   "userManagment/deleteUser",
   async ({ code }, thunkAPI) => {
     const state = thunkAPI.getState();
-    const token = state.auth.token;
+    const token = state.auth.token.token;
 
     try {
       const response = await axios.delete(
@@ -178,7 +196,7 @@ export const uploadFile = createAsyncThunk(
   "product/uploadFile ",
   async ({ file, tag, type, isPublic }, thunkAPI) => {
     const state = thunkAPI.getState();
-    const token = state.auth.token;
+    const token = state.auth.token.token;
 
     try {
       // Create a FormData object
@@ -216,7 +234,7 @@ export const fetchPrivateImage = createAsyncThunk(
   "image/fetchPrivateImage",
   async ({ filename }, thunkAPI) => {
     const state = thunkAPI.getState();
-    const token = state.auth.token;
+    const token = state.auth.token.token;
 
     try {
       const response = await axios.post(
@@ -249,7 +267,7 @@ export const productpot = createAsyncThunk(
   "product/productpot",
   async (productData, thunkAPI) => {
     const state = thunkAPI.getState();
-    const token = state.auth.token;
+    const token = state.auth.token.token;
     try {
       const response = await axios.post(
         `${process.env.NEXT_PUBLIC_BACK_END_SERVER}/product`,
@@ -279,7 +297,7 @@ export const productEdit = createAsyncThunk(
   "product/productEdit",
   async ({ productData, code }, thunkAPI) => {
     const state = thunkAPI.getState();
-    const token = state.auth.token;
+    const token = state.auth.token.token;
     try {
       const response = await axios.patch(
         `${process.env.NEXT_PUBLIC_BACK_END_SERVER}/product/${code}`,
@@ -307,7 +325,7 @@ export const productEdit = createAsyncThunk(
 
 export const countProduct = createAsyncThunk(
   "product/countProduct",
-  async (_,thunkAPI) => {
+  async (_, thunkAPI) => {
     try {
       const response = await axios.get(
         `${process.env.NEXT_PUBLIC_BACK_END_SERVER}/product/count`
@@ -326,8 +344,6 @@ export const countProduct = createAsyncThunk(
     }
   }
 );
-
-
 
 export const list = createAsyncThunk("product/list", async (thunkAPI) => {
   try {
@@ -350,7 +366,7 @@ export const deleted = createAsyncThunk(
   "product/deleted",
   async ({ code, name }, thunkAPI) => {
     const state = thunkAPI.getState();
-    const token = state.auth.token;
+    const token = state.auth.token.token;
 
     try {
       const response2 = await axios.get(
@@ -433,7 +449,7 @@ export const videopot = createAsyncThunk(
   "homePage/videopot",
   async (productData, thunkAPI) => {
     const state = thunkAPI.getState();
-    const token = state.auth.token;
+    const token = state.auth.token.token;
     try {
       const response = await axios.post(
         `${process.env.NEXT_PUBLIC_BACK_END_SERVER}/video`,
@@ -463,7 +479,7 @@ export const videoEdit = createAsyncThunk(
   "homePage/videoEdit",
   async ({ media, code }, thunkAPI) => {
     const state = thunkAPI.getState();
-    const token = state.auth.token;
+    const token = state.auth.token.token;
     try {
       const response = await axios.patch(
         `${process.env.NEXT_PUBLIC_BACK_END_SERVER}/video/${code}`,
@@ -493,7 +509,7 @@ export const HomePageVideoDeleted = createAsyncThunk(
   "homePage/HomePageVideoDeleted",
   async ({ code }, thunkAPI) => {
     const state = thunkAPI.getState();
-    const token = state.auth.token;
+    const token = state.auth.token.token;
 
     try {
       const response = await axios.delete(
@@ -551,7 +567,7 @@ export const honorspot = createAsyncThunk(
   "homePage/honorspot",
   async (formData, thunkAPI) => {
     const state = thunkAPI.getState();
-    const token = state.auth.token;
+    const token = state.auth.token.token;
     try {
       const response = await axios.post(
         `${process.env.NEXT_PUBLIC_BACK_END_SERVER}/honors`,
@@ -581,7 +597,7 @@ export const honorsEdit = createAsyncThunk(
   "homePage/honorsEdit",
   async ({ honor, code }, thunkAPI) => {
     const state = thunkAPI.getState();
-    const token = state.auth.token;
+    const token = state.auth.token.token;
     try {
       const response = await axios.patch(
         `${process.env.NEXT_PUBLIC_BACK_END_SERVER}/honors/${code}`,
@@ -611,7 +627,7 @@ export const honorsDeleted = createAsyncThunk(
   "homePage/honorsDeleted",
   async ({ code }, thunkAPI) => {
     const state = thunkAPI.getState();
-    const token = state.auth.token;
+    const token = state.auth.token.token;
 
     try {
       const response = await axios.delete(
@@ -666,7 +682,7 @@ export const exhibitionpot = createAsyncThunk(
   "exhibition/exhibitionpot",
   async (formData, thunkAPI) => {
     const state = thunkAPI.getState();
-    const token = state.auth.token;
+    const token = state.auth.token.token;
     try {
       const response = await axios.post(
         `${process.env.NEXT_PUBLIC_BACK_END_SERVER}/exhibition`,
@@ -696,7 +712,7 @@ export const exhibitionEdit = createAsyncThunk(
   "exhibition/exhibitionEdit",
   async ({ exhibition, code }, thunkAPI) => {
     const state = thunkAPI.getState();
-    const token = state.auth.token;
+    const token = state.auth.token.token;
     try {
       const response = await axios.patch(
         `${process.env.NEXT_PUBLIC_BACK_END_SERVER}/exhibition/${code}`,
@@ -726,7 +742,7 @@ export const exhibitionDeleted = createAsyncThunk(
   "exhibition/exhibitionDeleted",
   async ({ code }, thunkAPI) => {
     const state = thunkAPI.getState();
-    const token = state.auth.token;
+    const token = state.auth.token.token;
 
     try {
       const response = await axios.delete(
@@ -783,7 +799,7 @@ export const bannerpot = createAsyncThunk(
   "banner/bannerpot",
   async (formData, thunkAPI) => {
     const state = thunkAPI.getState();
-    const token = state.auth.token;
+    const token = state.auth.token.token;
     try {
       const response = await axios.post(
         `${process.env.NEXT_PUBLIC_BACK_END_SERVER}/banner`,
@@ -813,7 +829,7 @@ export const bannerEdit = createAsyncThunk(
   "banner/bannerEdit",
   async ({ banner, code }, thunkAPI) => {
     const state = thunkAPI.getState();
-    const token = state.auth.token;
+    const token = state.auth.token.token;
     try {
       const response = await axios.patch(
         `${process.env.NEXT_PUBLIC_BACK_END_SERVER}/banner/${code}`,
@@ -843,7 +859,7 @@ export const bannerDeleted = createAsyncThunk(
   "banner/bannerDeleted",
   async ({ code }, thunkAPI) => {
     const state = thunkAPI.getState();
-    const token = state.auth.token;
+    const token = state.auth.token.token;
 
     try {
       const response = await axios.delete(
@@ -900,7 +916,7 @@ export const headerEdit = createAsyncThunk(
   "header/headerEdit",
   async ({ header }, thunkAPI) => {
     const state = thunkAPI.getState();
-    const token = state.auth.token;
+    const token = state.auth.token.token;
     try {
       const response = await axios.patch(
         `${process.env.NEXT_PUBLIC_BACK_END_SERVER}/header`,
@@ -956,7 +972,7 @@ export const blogspot = createAsyncThunk(
   "blog/blogspot",
   async (formData, thunkAPI) => {
     const state = thunkAPI.getState();
-    const token = state.auth.token;
+    const token = state.auth.token.token;
     try {
       const response = await axios.post(
         `${process.env.NEXT_PUBLIC_BACK_END_SERVER}/blogs`,
@@ -986,7 +1002,7 @@ export const blogsEdit = createAsyncThunk(
   "blog/blogsEdit",
   async ({ content, code }, thunkAPI) => {
     const state = thunkAPI.getState();
-    const token = state.auth.token;
+    const token = state.auth.token.token;
     try {
       const response = await axios.patch(
         `${process.env.NEXT_PUBLIC_BACK_END_SERVER}/blogs/${code}`,
@@ -1017,7 +1033,7 @@ export const blogsDeleted = createAsyncThunk(
   "blog/blogsDeleted",
   async ({ code }, thunkAPI) => {
     const state = thunkAPI.getState();
-    const token = state.auth.token;
+    const token = state.auth.token.token;
 
     try {
       const response = await axios.delete(
@@ -1050,7 +1066,7 @@ export const Countorders = createAsyncThunk(
   "order/Countorders",
   async ({ status }, thunkAPI) => {
     const state = thunkAPI.getState();
-    const token = state.auth.token;
+    const token = state.auth.token.token;
 
     try {
       let url = `${process.env.NEXT_PUBLIC_BACK_END_SERVER}/order/count`;
@@ -1084,7 +1100,7 @@ export const sendNewMessage = createAsyncThunk(
   "order/sendNewMessage",
   async ({ code, newMessageSend }, thunkAPI) => {
     const state = thunkAPI.getState();
-    const token = state.auth.token;
+    const token = state.auth.token.token;
 
     try {
       const response = await axios.patch(
@@ -1115,7 +1131,7 @@ export const listorders = createAsyncThunk(
   "order/list",
   async ({ status }, thunkAPI) => {
     const state = thunkAPI.getState();
-    const token = state.auth.token;
+    const token = state.auth.token.token;
 
     try {
       const response = await axios.get(
@@ -1144,7 +1160,7 @@ export const whosOrder = createAsyncThunk(
   "order/whosOrder",
   async ({ id }, thunkAPI) => {
     const state = thunkAPI.getState();
-    const token = state.auth.token;
+    const token = state.auth.token.token;
 
     try {
       const response = await axios.post(
@@ -1174,7 +1190,7 @@ export const updateOrderStatus = createAsyncThunk(
   "order/updateOrderStatus",
   async ({ code, status }, thunkAPI) => {
     const state = thunkAPI.getState();
-    const token = state.auth.token;
+    const token = state.auth.token.token;
 
     try {
       const response = await axios.patch(
@@ -1204,7 +1220,7 @@ export const chatImageSend = createAsyncThunk(
   "order/chatImageSend",
   async ({ code, chatImage }, thunkAPI) => {
     const state = thunkAPI.getState();
-    const token = state.auth.token;
+    const token = state.auth.token.token;
 
     try {
       const response = await axios.patch(
@@ -1236,7 +1252,7 @@ export const requestAdminCommnet = createAsyncThunk(
   "order/requestAdminCommnet",
   async ({ code, reqComment }, thunkAPI) => {
     const state = thunkAPI.getState();
-    const token = state.auth.token;
+    const token = state.auth.token.token;
 
     try {
       const response = await axios.patch(
@@ -1268,7 +1284,7 @@ export const paymentStepData = createAsyncThunk(
   "order/paymentStepData",
   async ({ code, payment }, thunkAPI) => {
     const state = thunkAPI.getState();
-    const token = state.auth.token;
+    const token = state.auth.token.token;
 
     try {
       const response = await axios.patch(
@@ -1300,7 +1316,7 @@ export const increaseStep = createAsyncThunk(
   "order/increaseStep",
   async ({ code, step }, thunkAPI) => {
     const state = thunkAPI.getState();
-    const token = state.auth.token;
+    const token = state.auth.token.token;
     try {
       const response = await axios.patch(
         `${process.env.NEXT_PUBLIC_BACK_END_SERVER}/order/step/${code}/${step}`,
@@ -1386,7 +1402,7 @@ export const increaseStep = createAsyncThunk(
 //   "banner/addBanner",
 //   async ({ bannerImage }, thunkAPI) => {
 //     const state = thunkAPI.getState();
-//     const token = state.auth.token;
+//     const token = state.auth.token.token;
 
 //     try {
 //       // Create a FormData object

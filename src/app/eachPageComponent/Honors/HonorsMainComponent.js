@@ -30,9 +30,8 @@ const HeadermakeOrder = styled.div`
 `;
 
 const ButtonColor = styled.button`
- background-image : linear-gradient(195deg, #42424a 0%, #191919 100%);
+  background-image: linear-gradient(195deg, #42424a 0%, #191919 100%);
 `;
-
 
 const CARD = styled(Card)`
   background-color: #dfdcdc !important;
@@ -76,24 +75,16 @@ export default function HonorsMainComponent({ toggleShow }) {
     setEditedHonor(null);
   };
 
-
   return (
     <section>
       <HeadermakeOrder className="d-flex flex-row mb-3 justify-content-between">
         <div className="d-block d-lg-none">
-          <NavBarToggleBurgerButton  func={() => toggleShow("main")} />
+          <NavBarToggleBurgerButton func={() => toggleShow("main")} />
         </div>
         {activekey === "editUserPage" && !editedHonor && (
           <>
             <div className="NormalTextSizing textHeaderStyle d-flex align-items-center">
               ویرایش افتخارات
-            </div>
-            <div>
-              <ButtonColor
-                onClick={() => setActiveKey("addUser")}
-              >
-                افزودن افتخارات
-              </ButtonColor>
             </div>
           </>
         )}
@@ -102,13 +93,6 @@ export default function HonorsMainComponent({ toggleShow }) {
             <div className="NormalTextSizing textHeaderStyle d-flex align-items-center">
               افزودن افتخارات
             </div>
-            <div>
-              <ButtonColor
-                onClick={() => setActiveKey("editUserPage")}
-              >
-                ویرایش افتخارات
-              </ButtonColor>
-            </div>
           </>
         )}
         {editedHonor && (
@@ -116,14 +100,40 @@ export default function HonorsMainComponent({ toggleShow }) {
             <div className="NormalTextSizing textHeaderStyle d-flex align-items-center">
               ویرایش افتخارات
             </div>
+          </>
+        )}
+        <ProfileComponent colorGet={"#191919"} />
+      </HeadermakeOrder>
+      {/* tabs */}
+      <div className="d-flex justify-content-end ms-3">
+        {activekey === "editUserPage" && !editedHonor && (
+          <>
             <div>
-              <ButtonColor  onClick={handleCancelEdit}>
-                افتخارات
+              <ButtonColor onClick={() => setActiveKey("addUser")}>
+                افزودن افتخارات
               </ButtonColor>
             </div>
           </>
         )}
-      </HeadermakeOrder>
+        {activekey === "addUser" && !editedHonor && (
+          <>
+            <div>
+              <ButtonColor onClick={() => setActiveKey("editUserPage")}>
+                ویرایش افتخارات
+              </ButtonColor>
+            </div>
+          </>
+        )}
+        {editedHonor && (
+          <>
+            <div>
+              <ButtonColor onClick={handleCancelEdit}>افتخارات</ButtonColor>
+            </div>
+          </>
+        )}
+      </div>
+
+      {/* content */}
       {activekey === "editUserPage" && !editedHonor && (
         <>
           <div

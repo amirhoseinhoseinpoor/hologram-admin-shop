@@ -11,6 +11,7 @@ import { bannerList } from "@/app/Store/thunks";
 import { Card, CardContent, CardMedia, Typography } from "@mui/material";
 import styled from "styled-components";
 // improt base component
+import ProfileComponent from "@/app/BaseComponent/ProfileComponent";
 import NavBarToggleBurgerButton from "@/app/BaseComponent/NavBarToggleBurgerButton";
 import { formatPersianDate } from "@/app/utils/persionDateUtils";
 
@@ -44,7 +45,7 @@ const CARD = styled(Card)`
 `;
 
 const ButtonColor = styled.button`
- background-image : linear-gradient(195deg, #42424a 0%, #191919 100%);
+  background-image: linear-gradient(195deg, #42424a 0%, #191919 100%);
 `;
 
 const TYPOGRAPHY = styled(Typography)`
@@ -87,28 +88,12 @@ export default function HonorsMainComponent({ toggleShow }) {
             <div className="NormalTextSizing textHeaderStyle d-flex align-items-center">
               ویرایش بنر
             </div>
-            <div>
-              <ButtonColor
-                
-                onClick={() => setActiveKey("addUser")}
-              >
-                افزودن بنر
-              </ButtonColor>
-            </div>
           </>
         )}
         {activekey === "addUser" && !editedHonor && (
           <>
             <div className="NormalTextSizing textHeaderStyle d-flex align-items-center">
               افزودن بنر
-            </div>
-            <div>
-              <ButtonColor
-                
-                onClick={() => setActiveKey("editUserPage")}
-              >
-                ویرایش بنر
-              </ButtonColor>
             </div>
           </>
         )}
@@ -117,17 +102,39 @@ export default function HonorsMainComponent({ toggleShow }) {
             <div className="NormalTextSizing textHeaderStyle d-flex align-items-center">
               ویرایش بنر
             </div>
+          </>
+        )}
+        <ProfileComponent colorGet={"#191919"} />
+      </HeadermakeOrder>
+      {/* tabs */}
+      <div className="d-flex justify-content-end ms-3">
+        {activekey === "editUserPage" && !editedHonor && (
+          <>
             <div>
-              <ButtonColor
-                
-                onClick={handleCancelEdit}
-              >
-                بنر ها
+              <ButtonColor onClick={() => setActiveKey("addUser")}>
+                افزودن بنر
               </ButtonColor>
             </div>
           </>
         )}
-      </HeadermakeOrder>
+        {activekey === "addUser" && !editedHonor && (
+          <>
+            <div>
+              <ButtonColor onClick={() => setActiveKey("editUserPage")}>
+                ویرایش بنر
+              </ButtonColor>
+            </div>
+          </>
+        )}
+        {editedHonor && (
+          <>
+            <div>
+              <ButtonColor onClick={handleCancelEdit}>بنر ها</ButtonColor>
+            </div>
+          </>
+        )}
+      </div>
+      {/* content */}
       {activekey === "editUserPage" && !editedHonor && (
         <>
           <div

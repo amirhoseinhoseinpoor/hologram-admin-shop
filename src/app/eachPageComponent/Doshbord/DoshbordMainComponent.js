@@ -5,6 +5,7 @@ import AllOrderCard from "./Cards/AllOrderCard";
 import ActiveOrdersCard from "./Cards/ActiveOrdersCard";
 import { Box } from "@mui/material";
 // import base component
+import ProfileComponent from "@/app/BaseComponent/ProfileComponent";
 import MonthlyVisitsChart from "./MonthlyVisitsChart";
 import NavBarToggleBurgerButton from "@/app/BaseComponent/NavBarToggleBurgerButton";
 import styled from "styled-components";
@@ -46,13 +47,14 @@ export default function DoshbordMainComponent({ toggleShow }) {
         <div className="NormalTextSizing textHeaderStyle d-flex align-items-center">
           داشبورد
         </div>
+        <ProfileComponent colorGet={"#191919"} />
       </HeadermakeOrder>
       <Box sx={{ p: 2 }}>
         <CardResponssive className="mb-3">
           <ActiveUsersCard />
           <ProductCountCard />
           <AllOrderCard />
-          <ActiveOrdersCard/>
+          <ActiveOrdersCard />
         </CardResponssive>
 
         <MonthlyVisitsChart />

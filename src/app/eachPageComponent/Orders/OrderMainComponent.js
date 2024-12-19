@@ -6,6 +6,7 @@ import { listorders, whosOrder, updateOrderStatus } from "@/app/Store/thunks";
 import SearchIcon from "@mui/icons-material/Search";
 import styled from "styled-components";
 // import base components
+import ProfileComponent from "@/app/BaseComponent/ProfileComponent";
 import NavBarToggleBurgerButton from "@/app/BaseComponent/NavBarToggleBurgerButton";
 import LoadingCss from "@/app/BaseComponent/LoadingCss";
 import ConfirmingModal from "@/app/BaseComponent/ConfirmingModal";
@@ -253,6 +254,7 @@ export default function OrderMainComponent({ toggleShow }) {
             <div className="NormalTextSizing textHeaderStyle d-flex align-items-center">
               مدیریت سفارشات
             </div>
+             <ProfileComponent colorGet={"#191919"} />
           </HeadermakeOrder>
           {/* Add a search input field */}
           <SearchInputMainDiv className="me-2 mt-4 position-relative">

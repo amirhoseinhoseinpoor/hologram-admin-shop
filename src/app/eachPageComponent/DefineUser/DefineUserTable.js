@@ -7,6 +7,7 @@ import { getuser } from "@/app/Store/thunks";
 import NavBarToggleBurgerButton from "@/app/BaseComponent/NavBarToggleBurgerButton";
 import ConfirmingModal from "@/app/BaseComponent/ConfirmingModal";
 import ErrorModal from "@/app/BaseComponent/ErrorModal";
+import ProfileComponent from "@/app/BaseComponent/ProfileComponent";
 // import components
 import AddUserBtn from "../DefineUser/AddUserBtn";
 import EditUserBtnfunction from "./EditUserBtn";
@@ -29,9 +30,8 @@ const HeadermakeOrder = styled.div`
   }
 `;
 
-
 const SearchInputMainDiv = styled.div`
-  margin-bottom: 10px;
+  /* margin-bottom: 10px; */
   width: 50%;
   .inputSreachStyle {
     font-size: 15px;
@@ -93,7 +93,6 @@ export default function DefineUser({ toggleShow }) {
   const [searchTerm, setSearchTerm] = useState("");
   const [filteredUsers, setFilteredUsers] = useState(null);
   const [filteredSiteUser, setFilteredSiteUser] = useState(null);
-
 
   const [openModal2, setOpenModal2] = useState(false);
   const closeModal2 = () => setOpenModal2(false);
@@ -174,7 +173,6 @@ export default function DefineUser({ toggleShow }) {
 
     setFilteredUsers(filtered);
     setFilteredSiteUser(filteredSiteUser);
-
   }, [searchTerm, dataCome, dataComeUser]);
 
   return (
@@ -186,23 +184,26 @@ export default function DefineUser({ toggleShow }) {
         <div className="NormalTextSizing textHeaderStyle d-flex align-items-center">
           مدیریت کاربر
         </div>
+        <ProfileComponent colorGet={"#191919"} />
+      </HeadermakeOrder>
+      {/* Add a search input field */}
+      <div className="d-flex flex-row align-items-center mt-4 gap-3 mb-4">
+        <SearchInputMainDiv className="me-2  position-relative">
+          <input
+            className="inputSreachStyle"
+            type="text"
+            placeholder="جستجو..."
+            value={searchTerm}
+            onChange={(e) => setSearchTerm(e.target.value)}
+          />
+          <SearchIcon className="SearchIconStyle" />
+        </SearchInputMainDiv>
         <AddUserBtn
           setDataUpdated={setDataUpdated}
           setConfirmModal={setConfirmModal}
           setErrorModal={setErrorModal}
         />
-      </HeadermakeOrder>
-      {/* Add a search input field */}
-      <SearchInputMainDiv className="me-2 mt-4 position-relative">
-        <input
-          className="inputSreachStyle"
-          type="text"
-          placeholder="جستجو..."
-          value={searchTerm}
-          onChange={(e) => setSearchTerm(e.target.value)}
-        />
-        <SearchIcon className="SearchIconStyle" />
-      </SearchInputMainDiv>
+      </div>
 
       {dataCome.length > 0 && (
         <>

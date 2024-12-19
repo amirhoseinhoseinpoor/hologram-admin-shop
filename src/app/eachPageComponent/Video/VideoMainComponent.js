@@ -10,6 +10,7 @@ import { homePageVideo } from "../../Store/thunks.js";
 import { Card, CardContent, CardMedia, Typography } from "@mui/material";
 import styled from "styled-components";
 // improt base component
+import ProfileComponent from "@/app/BaseComponent/ProfileComponent";
 import NavBarToggleBurgerButton from "@/app/BaseComponent/NavBarToggleBurgerButton";
 
 const HeadermakeOrder = styled.div`
@@ -42,7 +43,7 @@ const CARD = styled(Card)`
 `;
 
 const ButtonColor = styled.button`
- background-image : linear-gradient(195deg, #42424a 0%, #191919 100%);
+  background-image: linear-gradient(195deg, #42424a 0%, #191919 100%);
 `;
 
 const TYPOGRAPHY = styled(Typography)`
@@ -91,28 +92,12 @@ export default function HonorsMainComponent({ toggleShow }) {
             <div className="NormalTextSizing textHeaderStyle d-flex align-items-center">
               ویرایش ویدیو
             </div>
-            <div>
-              <ButtonColor
-                
-                onClick={() => setActiveKey("addUser")}
-              >
-                افزودن ویدیو
-              </ButtonColor>
-            </div>
           </>
         )}
         {activekey === "addUser" && !editedHonor && (
           <>
             <div className="NormalTextSizing textHeaderStyle d-flex align-items-center">
               افزودن ویدیو
-            </div>
-            <div>
-              <ButtonColor
-                
-                onClick={() => setActiveKey("editUserPage")}
-              >
-                ویرایش ویدیو
-              </ButtonColor>
             </div>
           </>
         )}
@@ -121,14 +106,41 @@ export default function HonorsMainComponent({ toggleShow }) {
             <div className="NormalTextSizing textHeaderStyle d-flex align-items-center">
               ویرایش ویدیو
             </div>
+          </>
+        )}
+        <ProfileComponent colorGet={"#191919"} />
+      </HeadermakeOrder>
+      {/* tabs */}
+
+      <div className="d-flex justify-content-end ms-3">
+        {activekey === "editUserPage" && !editedHonor && (
+          <>
             <div>
-              <ButtonColor  onClick={handleCancelEdit}>
-                ویدیو
+              <ButtonColor onClick={() => setActiveKey("addUser")}>
+                افزودن ویدیو
               </ButtonColor>
             </div>
           </>
         )}
-      </HeadermakeOrder>
+        {activekey === "addUser" && !editedHonor && (
+          <>
+            <div>
+              <ButtonColor onClick={() => setActiveKey("editUserPage")}>
+                ویرایش ویدیو
+              </ButtonColor>
+            </div>
+          </>
+        )}
+        {editedHonor && (
+          <>
+            <div>
+              <ButtonColor onClick={handleCancelEdit}>ویدیو</ButtonColor>
+            </div>
+          </>
+        )}
+      </div>
+
+      {/* content */}
       {activekey === "editUserPage" && !editedHonor && (
         <>
           <div

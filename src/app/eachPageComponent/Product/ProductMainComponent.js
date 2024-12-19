@@ -5,6 +5,7 @@ import React, { useState, useEffect } from "react";
 import AddProduct from "./AddProduct";
 import EditProduct from "./EditProduct";
 // import base component
+import ProfileComponent from "@/app/BaseComponent/ProfileComponent";
 import NavBarToggleBurgerButton from "@/app/BaseComponent/NavBarToggleBurgerButton";
 //redux import
 import { useSelector, useDispatch } from "react-redux";
@@ -12,7 +13,6 @@ import { list } from "../../Store/thunks.js";
 import { productListData } from "@/app/Store/slice";
 import { Card, CardContent, CardMedia, Typography } from "@mui/material";
 import styled from "styled-components";
-
 
 const HeadermakeOrder = styled.div`
   /* background-color: white; */
@@ -44,7 +44,7 @@ const CARD = styled(Card)`
 `;
 
 const ButtonColor = styled.button`
- background-image : linear-gradient(195deg, #42424a 0%, #191919 100%);
+  background-image: linear-gradient(195deg, #42424a 0%, #191919 100%);
 `;
 
 const TYPOGRAPHY = styled(Typography)`
@@ -89,16 +89,37 @@ export default function HonorsMainComponent({ toggleShow }) {
         <div className="d-block d-lg-none">
           <NavBarToggleBurgerButton func={() => toggleShow("main")} />
         </div>
+        <div>
+          {activekey === "editUserPage" && !editedHonor && (
+            <>
+              <div className="NormalTextSizing textHeaderStyle d-flex align-items-center">
+                ویرایش محصولات
+              </div>
+            </>
+          )}
+          {activekey === "addUser" && !editedHonor && (
+            <>
+              <div className="NormalTextSizing textHeaderStyle d-flex align-items-center">
+                افزودن محصول
+              </div>
+            </>
+          )}
+          {editedHonor && (
+            <>
+              <div className="NormalTextSizing textHeaderStyle d-flex align-items-center">
+                ویرایش محصول
+              </div>
+            </>
+          )}
+        </div>
+        <ProfileComponent colorGet={"#191919"} />
+      </HeadermakeOrder>
+
+      <div className="d-flex  justify-content-end ms-3">
         {activekey === "editUserPage" && !editedHonor && (
           <>
-            <div className="NormalTextSizing textHeaderStyle d-flex align-items-center">
-              ویرایش محصولات
-            </div>
             <div>
-              <ButtonColor
-                
-                onClick={() => setActiveKey("addUser")}
-              >
+              <ButtonColor onClick={() => setActiveKey("addUser")}>
                 افزودن محصول
               </ButtonColor>
             </div>
@@ -106,14 +127,8 @@ export default function HonorsMainComponent({ toggleShow }) {
         )}
         {activekey === "addUser" && !editedHonor && (
           <>
-            <div className="NormalTextSizing textHeaderStyle d-flex align-items-center">
-              افزودن محصول
-            </div>
             <div>
-              <ButtonColor
-                
-                onClick={() => setActiveKey("editUserPage")}
-              >
+              <ButtonColor onClick={() => setActiveKey("editUserPage")}>
                 ویرایش محصولات
               </ButtonColor>
             </div>
@@ -121,17 +136,13 @@ export default function HonorsMainComponent({ toggleShow }) {
         )}
         {editedHonor && (
           <>
-            <div className="NormalTextSizing textHeaderStyle d-flex align-items-center">
-              ویرایش محصول
-            </div>
             <div>
-              <ButtonColor  onClick={handleCancelEdit}>
-                محصولات
-              </ButtonColor>
+              <ButtonColor onClick={handleCancelEdit}>محصولات</ButtonColor>
             </div>
           </>
         )}
-      </HeadermakeOrder>
+      </div>
+
       {activekey === "editUserPage" && !editedHonor && (
         <>
           <div
