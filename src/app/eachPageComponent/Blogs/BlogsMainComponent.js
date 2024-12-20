@@ -31,15 +31,32 @@ const HeadermakeOrder = styled.div`
 `;
 
 const CARD = styled(Card)`
-  background-color: #dfdcdc !important;
+  background-color: white !important;
   color: black !important;
   border: 1px solid #ddd;
-  box-shadow: unset;
+  box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+  display: flex;
+  flex-direction : column;
   .MuiCardContent-root {
     .titleHonors {
       font-size: 20px;
       font-weight: 500;
     }
+  }
+  .css-46bh2p-MuiCardContent-root:last-child{
+    padding-bottom : 10px;
+  }
+`;
+
+const GridbaseDiv = styled.div`
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  grid-gap: 20px;
+  @media (max-width : 980px) {
+    grid-template-columns: repeat(3 , 1fr);
+  }
+  @media (max-width : 768px) {
+    grid-template-columns: repeat(2 , 1fr);
   }
 `;
 
@@ -139,15 +156,15 @@ export default function HonorsMainComponent({ toggleShow }) {
       {/* content */}
       {activekey === "editUserPage" && !editedHonor && (
         <>
-          <div
-            className="mt-3 d-flex flex-column gap-3 container"
+          <GridbaseDiv
+            className="mt-3 container"
             style={{ cursor: "pointer" }}
           >
             {dataCome.length > 0 ? (
               dataCome.map((honor, index) => (
                 <React.Fragment key={index}>
                   <CARD
-                    className="d-flex flex-row"
+                   
                     onClick={() => {
                       setEditedHonor(honor);
                     }}
@@ -156,7 +173,7 @@ export default function HonorsMainComponent({ toggleShow }) {
                       component="img"
                       src={`${process.env.NEXT_PUBLIC_BACK_END_SERVER}/system/download/${honor.content.imageSrc}`}
                       sx={{
-                        width: "150px",
+                        width: "100%",
                         maxHeight: "100%",
                         borderRadius: "2px",
                       }}
@@ -175,7 +192,7 @@ export default function HonorsMainComponent({ toggleShow }) {
             ) : (
               <TYPOGRAPHY variant="body2">No data available</TYPOGRAPHY>
             )}
-          </div>
+          </GridbaseDiv>
         </>
       )}
 

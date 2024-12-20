@@ -70,11 +70,12 @@ const InputField = styled.input`
 
 const Button = styled.button`
   padding: 10px 20px;
-  background-color: ${(props) => {
-    if (props.$danger) return "#dc3545"; // Red for remove buttons
-    if (props.$secondary) return "#007bff"; // Blue for secondary actions
-    return "#28a745"; // Green for add actions
+  background-image: ${(props) => {
+    if (props.$secondary)
+      return "linear-gradient(195deg, #42424a 0%, #191919 100%)";
+    return "#28a745";
   }};
+
   color: #fff;
   border: none;
   border-radius: 5px;
@@ -87,18 +88,10 @@ const Button = styled.button`
   }
 `;
 
-// MUI Modal style
-// const modalStyle = {
-//   position: "absolute",
-//   top: "50%",
-//   left: "50%",
-//   transform: "translate(-50%, -50%)",
-//   width: 400,
-//   bgcolor: "background.paper",
-//   boxShadow: 24,
-//   p: 4,
-//   borderRadius: 2,
-// };
+const RemoveButtonStyle = styled.button`
+  color: #e53935 !important;
+  background-color: transparent !important;
+`;
 
 const HeaderListWrapper = styled.ul`
   list-style-type: none;
@@ -114,9 +107,9 @@ const HeaderItem = styled.li`
 `;
 
 const SubItemList = styled.ul`
-  margin-left: 20px;
+  margin-right: 15px;
   margin-top: 10px;
-  padding-left: 20px;
+  padding-right: 20px;
 `;
 
 const SubItem = styled.li`
@@ -185,8 +178,22 @@ export default function HeaderMainComponent({ toggleShow }) {
           return (
             <SubItem key={subIndex}>
               <div className="d-flex flex-row align-items-center">
-                <StrongText>{subItem.title}</StrongText>
+                <div className="d-flex flex-row align-items-center gap-1">
+                  <StrongText>{subItem.title}</StrongText>
+                  <Button
+                    type="button"
+                    className="me-1"
+                    $secondary
+                    onClick={() =>
+                      selectSubItemForSubItem(headerIndex, newPath)
+                    }
+                  >
+                    اضافه کردن ساب ایتم به {subItem.title}
+                  </Button>
+                </div>
+
                 <Button
+                  type="button"
                   style={{ background: "unset" }}
                   onClick={() => openRemoveModal(newPath, false)}
                 >
@@ -199,13 +206,6 @@ export default function HeaderMainComponent({ toggleShow }) {
                 renderSubItems(subItem.subItems, headerIndex, newPath)}
 
               {/* Button to add sub-items recursively */}
-              <Button
-                className="me-1"
-                $secondary
-                onClick={() => selectSubItemForSubItem(headerIndex, newPath)}
-              >
-                اضافه کردن ساب ایتم به {subItem.title}
-              </Button>
             </SubItem>
           );
         })}
@@ -326,7 +326,7 @@ export default function HeaderMainComponent({ toggleShow }) {
         <div className="NormalTextSizing textHeaderStyle d-flex align-items-center">
           ساخت هدر
         </div>
-         <ProfileComponent colorGet={"#191919"} />
+        <ProfileComponent colorGet={"#191919"} />
       </HeadermakeOrder>
       <Container>
         {/* Input for new header item */}
@@ -349,8 +349,9 @@ export default function HeaderMainComponent({ toggleShow }) {
           </div>
 
           <Button
+            type="button"
             className="me-2 buttonMainHeaderCreate"
-            style={{ backgroundColor: "#007bff" }}
+            $secondary
             onClick={addItem}
           >
             اضافه کردن هدر اصلی
@@ -363,25 +364,27 @@ export default function HeaderMainComponent({ toggleShow }) {
             <HeaderListWrapper>
               {headerData.map((item, index) => (
                 <HeaderItem key={index}>
-                  <StrongText>{item.title}</StrongText>
+                  <div className="d-flex flex-row align-items-center gap-1">
+                    <StrongText>{item.title}</StrongText>
+                    <Button
+                      type="button"
+                      className="me-1"
+                      $secondary
+                      onClick={() => selectHeaderForSubItem(index)}
+                    >
+                      اضافه کردن ساب ایتم به {item.title}
+                    </Button>
+                    <RemoveButtonStyle
+                      onClick={() => openRemoveModal([index], true)}
+                    >
+                      حذف هدر اصلی
+                    </RemoveButtonStyle>
+                  </div>
 
                   {/* Render sub-items */}
                   {renderSubItems(item.subItems, index, [])}
 
                   {/* Button to add sub-items */}
-                  <Button
-                    className="me-1"
-                    $secondary
-                    onClick={() => selectHeaderForSubItem(index)}
-                  >
-                    اضافه کردن ساب ایتم به {item.title}
-                  </Button>
-                  <Button
-                    $danger
-                    onClick={() => openRemoveModal([index], true)}
-                  >
-                    حذف هدر اصلی
-                  </Button>
                 </HeaderItem>
               ))}
             </HeaderListWrapper>
@@ -407,14 +410,23 @@ export default function HeaderMainComponent({ toggleShow }) {
               value={newSubItem.link}
               onChange={handleSubInputChange}
             />
-            <Button className="me-1" $secondary onClick={addSubItem}>
+            <Button
+              type="button"
+              className="me-1"
+              $secondary
+              onClick={addSubItem}
+            >
               اضافه کردن ساب ایتم
             </Button>
           </div>
         )}
 
         {/* Submit Button */}
-        <Button onClick={submitHeaderData} style={{ marginTop: "20px" }}>
+        <Button
+          type="button"
+          onClick={submitHeaderData}
+          style={{ marginTop: "20px" }}
+        >
           تایید هدر
         </Button>
 
