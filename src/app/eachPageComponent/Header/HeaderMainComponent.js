@@ -6,6 +6,7 @@ import { HeaderList, headerEdit } from "@/app/Store/thunks";
 import styled from "styled-components";
 import DeleteIcon from "@mui/icons-material/Delete";
 //import base components
+import ProfileComponent from "@/app/BaseComponent/ProfileComponent";
 import NavBarToggleBurgerButton from "@/app/BaseComponent/NavBarToggleBurgerButton";
 // improt modals
 import ConfirmModal from "@/app/BaseComponent/ConfirmingModal";
@@ -44,7 +45,7 @@ const Container = styled.div`
 `;
 
 const HeadermakeOrder = styled.div`
-  background-color: white;
+  /* background-color: white; */
   padding: 10px;
   color: white;
   .textHeaderStyle {
@@ -52,9 +53,9 @@ const HeadermakeOrder = styled.div`
   }
 
   @media (max-width: 980px) {
-    background-color: rgb(26, 32, 53) !important;
+    /* background-color: rgb(26, 32, 53) !important; */
     .textHeaderStyle {
-      color: white !important;
+      /* color: white !important; */
     }
   }
 `;
@@ -325,6 +326,7 @@ export default function HeaderMainComponent({ toggleShow }) {
         <div className="NormalTextSizing textHeaderStyle d-flex align-items-center">
           ساخت هدر
         </div>
+         <ProfileComponent colorGet={"#191919"} />
       </HeadermakeOrder>
       <Container>
         {/* Input for new header item */}

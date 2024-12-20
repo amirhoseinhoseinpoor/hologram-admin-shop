@@ -14,6 +14,13 @@ import {
 
 const authinitialState = {
   token: null,
+  firstName: null,
+  lastName: null,
+  phoneNumber: null,
+  code: null,
+  email: null,
+  gender: null,
+  signUpSattus: null,
   loading: false,
   error: null,
 };
@@ -21,7 +28,20 @@ const authinitialState = {
 const authSlice = createSlice({
   name: "auth",
   initialState: authinitialState,
-  reducers: {},
+  reducers: {
+    setUserData: (state, action) => {
+      state.firstName = action.payload.firstName;
+      state.lastName = action.payload.lastName;
+      state.email = action.payload.email;
+      state.gender = action.payload.gender;
+    },
+    resetToken: (state) => {
+      state.token = null;
+      state.firstName = null;
+      state.lastName = null;
+      state.phoneNumber = null;
+    },
+  },
   extraReducers: (builder) => {
     builder
       .addCase(login.pending, (state) => {
@@ -31,6 +51,12 @@ const authSlice = createSlice({
       .addCase(login.fulfilled, (state, action) => {
         state.loading = false;
         state.token = action.payload;
+        state.firstName = action.payload.firstName;
+        state.lastName = action.payload.lastName;
+        state.phoneNumber = action.payload.phoneNumber;
+        state.code = action.payload.code;
+        state.gender = action.payload.gender;
+        state.email = action.payload.email;
       })
       .addCase(login.rejected, (state, action) => {
         state.loading = false;
@@ -53,6 +79,15 @@ const authSlice = createSlice({
 
 export const authSliceV = authSlice.reducer;
 export const token = (state) => state.auth.token;
+export const firstName = (state) => state.auth.firstName;
+export const lastName = (state) => state.auth.lastName;
+export const phoneNumber = (state) => state.auth.phoneNumber;
+export const code = (state) => state.auth.code;
+export const email = (state) => state.auth.email;
+export const gender = (state) => state.auth.gender;
+export const { resetToken } = authSlice.actions;
+export const { setUserData } = authSlice.actions;
+export const signUpSattus = (state) => state.auth.signUpSattus;
 export const loading = (state) => state.auth.loading;
 export const error = (state) => state.auth.error;
 

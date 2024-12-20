@@ -112,12 +112,12 @@ const AdminPanel = () => {
 
   return (
     <section className={` ${style.adminPanel}`}>
-      <aside className={`${style.sidebar} d-lg-block d-none`}>
+      <aside className={`${style.sidebar} d-lg-flex d-none me-2 my-2`}>
         <Tabs
           activeKey={activeTab}
           onSelect={(k) => setActiveTab(k)}
           id="admin-tabs1"
-          className={`${style.sidebarMain} NormalTextSizing`}
+          className={`${style.sidebarMain} discription mt-3`}
         >
           <Tab
             eventKey="Doshbord"
@@ -131,7 +131,7 @@ const AdminPanel = () => {
             eventKey="Orders"
             title={
               <>
-                <ListAltIcon /> سفارشات
+                <ListAltIcon/> سفارشات
               </>
             }
           ></Tab>
@@ -227,8 +227,8 @@ const AdminPanel = () => {
               className={`${style.offcanvasheader} ${style.nextoffcanvas}`}
               closeButton={false}
             >
-              <Offcanvas.Title style={{color: "white"}}>لوگو</Offcanvas.Title>
-              <CustomCloseButton onClick={() => handleClose("main")} />
+              <Offcanvas.Title>لوگو</Offcanvas.Title>
+              <CustomCloseButton color={'#262626'} onClick={() => handleClose("main")} />
             </Offcanvas.Header>
 
             <Nav className="align-items-center gap-3">

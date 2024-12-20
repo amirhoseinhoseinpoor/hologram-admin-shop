@@ -3,17 +3,37 @@ import React from "react";
 import MakeOrder from "./MakeOrderComponents/MakeOrder";
 import { useDispatch } from "react-redux";
 import { listorders, whosOrder, updateOrderStatus } from "@/app/Store/thunks";
-import ConfirmingModal from "@/app/BaseComponent/ConfirmingModal";
-import ErrorModal from "@/app/BaseComponent/ErrorModal";
 import SearchIcon from "@mui/icons-material/Search";
 import styled from "styled-components";
 // import base components
+import ProfileComponent from "@/app/BaseComponent/ProfileComponent";
 import NavBarToggleBurgerButton from "@/app/BaseComponent/NavBarToggleBurgerButton";
+import LoadingCss from "@/app/BaseComponent/LoadingCss";
+import ConfirmingModal from "@/app/BaseComponent/ConfirmingModal";
+import ErrorModal from "@/app/BaseComponent/ErrorModal";
 // import component
 import OrderTabel from "./OrderTabel";
 
+const FixTablePlace = styled.div`
+  @media (min-width: 980px) {
+    position: relative;
+    margin-top: 60px;
+    p {
+      position: absolute;
+      transform: translate(-50%, 50%);
+      left: 50%;
+      width: 94%;
+      top: -55px;
+      border-radius: 10px;
+      padding: 18px 12px;
+      background-image: linear-gradient(195deg, #42424a 0%, #191919 100%);
+      color: white;
+    }
+  }
+`;
+
 const HeadermakeOrder = styled.div`
-  background-color: white;
+  /* background-color: white; */
   padding: 10px;
   color: white;
   .textHeaderStyle {
@@ -21,9 +41,9 @@ const HeadermakeOrder = styled.div`
   }
 
   @media (max-width: 980px) {
-    background-color: rgb(26, 32, 53) !important;
+    /* background-color: rgb(26, 32, 53) !important; */
     .textHeaderStyle {
-      color: white !important;
+      /* color: white !important; */
     }
   }
 `;
@@ -64,6 +84,7 @@ export default function OrderMainComponent({ toggleShow }) {
   const [selectedStatus, setSelectedStatus] = useState({});
   const [waitingForAdmin, setWaitingForAdmin] = useState(null);
   const [WaitingForUser, setWaitingForUser] = useState(null);
+  const [trackLoadingProduct, setTrackLoadingProduct] = useState(false);
 
   // modal state
   const [openModal2, setOpenModal2] = useState(false);
@@ -122,37 +143,51 @@ export default function OrderMainComponent({ toggleShow }) {
     setFilteredOrders(filtered);
     setFilteredOrdersUSER(filteredUSER);
     setFilteredOrdersCanceled(filteredCanceled);
-
-  }, [orders, usersData, searchTerm, waitingForAdmin , WaitingForUser , ordersCanceled]);
+  }, [
+    orders,
+    usersData,
+    searchTerm,
+    waitingForAdmin,
+    WaitingForUser,
+    ordersCanceled,
+  ]);
 
   const handleCancelOrders = () => {
     const fetchData = async (status) => {
-      try {
-        const ordersData = await dispatch(listorders({ status })).unwrap();
+      if (ordersCanceled) {
+        setUsersDataCanceled({});
+        setOrdersCanceled(null);
+      } else {
+        try {
+          setTrackLoadingProduct(true);
+          const ordersData = await dispatch(listorders({ status })).unwrap();
 
-        // Fetch user data for all orders
-        const userPromises = ordersData.map(async (item) => {
-          const userDataCome = await dispatch(
-            whosOrder({ id: item.createdBy })
-          ).unwrap();
+          // Fetch user data for all orders
+          const userPromises = ordersData.map(async (item) => {
+            const userDataCome = await dispatch(
+              whosOrder({ id: item.createdBy })
+            ).unwrap();
 
-          // Return the user data
-          return { id: item.createdBy, userData: userDataCome[0] }; // Access the first item of the userData array
-        });
+            return { id: item.createdBy, userData: userDataCome[0] }; // Access the first item of the userData array
+          });
 
-        // Wait for all user data to be fetched
-        const userDataArray = await Promise.all(userPromises);
+          // Wait for all user data to be fetched
+          const userDataArray = await Promise.all(userPromises);
 
-        // Create a mapping of userId to userData
-        const userDataMap = userDataArray.reduce((acc, user) => {
-          acc[user.id] = user.userData; // Store the first element directly instead of the array
-          return acc;
-        }, {});
+          // Create a mapping of userId to userData
+          const userDataMap = userDataArray.reduce((acc, user) => {
+            acc[user.id] = user.userData; // Store the first element directly instead of the array
+            return acc;
+          }, {});
 
-        setUsersDataCanceled(userDataMap); // Set the user data map
-        setOrdersCanceled(ordersData); // Set orders
-      } catch (error) {
-        console.error("Error during dispatch:", error);
+          setUsersDataCanceled(userDataMap); // Set the user data map
+          setOrdersCanceled(ordersData); // Set orders
+          setTrackLoadingProduct(false);
+        } catch (error) {
+          console.error("Error during dispatch:", error);
+          setOpenModal3(true);
+          setTrackLoadingProduct(false);
+        }
       }
     };
     fetchData(5);
@@ -198,6 +233,7 @@ export default function OrderMainComponent({ toggleShow }) {
         setWaitingForAdmin(waitingForAdmin);
         setWaitingForUser(withComment);
       } catch (error) {
+        setOpenModal3(true);
         console.error("Error during dispatch:", error);
       }
     };
@@ -236,6 +272,7 @@ export default function OrderMainComponent({ toggleShow }) {
             <div className="NormalTextSizing textHeaderStyle d-flex align-items-center">
               مدیریت سفارشات
             </div>
+            <ProfileComponent colorGet={"#191919"} />
           </HeadermakeOrder>
           {/* Add a search input field */}
           <SearchInputMainDiv className="me-2 mt-4 position-relative">
@@ -250,7 +287,7 @@ export default function OrderMainComponent({ toggleShow }) {
           </SearchInputMainDiv>
 
           {filteredOrders && filteredOrders.length > 0 && (
-            <>
+            <FixTablePlace className="container">
               <p className="me-2 NormalTextSizing mb-2">
                 سفارشات در انتظار برسی
               </p>
@@ -263,11 +300,11 @@ export default function OrderMainComponent({ toggleShow }) {
                 mainArray={filteredOrders}
                 userMainData={usersData}
               />
-            </>
+            </FixTablePlace>
           )}
 
           {filteredOrdersUSER && filteredOrdersUSER.length > 0 && (
-            <>
+            <FixTablePlace className="container">
               <p className="me-2 NormalTextSizing mb-2">
                 سفارشات در انتظار کاربر
               </p>
@@ -280,7 +317,7 @@ export default function OrderMainComponent({ toggleShow }) {
                 mainArray={filteredOrdersUSER}
                 userMainData={usersData}
               />
-            </>
+            </FixTablePlace>
           )}
 
           <div className="container mt-4 mb-4">
@@ -288,13 +325,26 @@ export default function OrderMainComponent({ toggleShow }) {
               color="#6861ce"
               onClick={handleCancelOrders}
               type="button"
+              style={{
+                width: "180px",
+                display: "flex",
+                justifyContent: "center",
+              }}
             >
-              دیدن سفارشات لغو شده
+              {trackLoadingProduct ? (
+                <LoadingCss />
+              ) : ordersCanceled ? (
+                `پنهان کردن سفارشات لغو شده`
+              ) : (
+                `دیدن سفارشات لغو شده`
+              )}
             </SeeOrderButton>
           </div>
+          
           {/* orders canceled */}
           {filteredOrdersCanceled && filteredOrdersCanceled.length > 0 && (
-            <>
+            <FixTablePlace className="container">
+              <p className="me-2 NormalTextSizing mb-2">سفارشات لغو شده</p>
               <OrderTabel
                 setSeeOrder={setSeeOrder}
                 setActiveKey={setActiveKey}
@@ -304,7 +354,7 @@ export default function OrderMainComponent({ toggleShow }) {
                 mainArray={filteredOrdersCanceled}
                 userMainData={usersDataCanceled}
               />
-            </>
+            </FixTablePlace>
           )}
         </>
       )}
@@ -324,7 +374,7 @@ export default function OrderMainComponent({ toggleShow }) {
       <ErrorModal
         open={openModal3}
         onClose={closeModal3}
-        text={"خطا در تغییر وضعیت "}
+        text={"خطا در انجام عملیات "}
       />
     </section>
   );

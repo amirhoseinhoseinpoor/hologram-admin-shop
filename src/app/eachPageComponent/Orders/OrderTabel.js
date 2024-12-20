@@ -1,10 +1,32 @@
-import React from "react";
+import React, { useState } from "react";
 import { Select, MenuItem, FormControl, InputLabel } from "@mui/material";
 import styled from "styled-components";
 import { formatPersianDate } from "@/app/utils/persionDateUtils";
+import { Modal, Box } from "@mui/material";
+// import icons
+import MoreHorizIcon from "@mui/icons-material/MoreHoriz";
 
 const SeeOrderButton = styled.button`
   background-color: ${(props) => props.color || "#1572e8"};
+  background-image: linear-gradient(195deg, #66bb6a 0%, #43a047 100%);
+`;
+
+const StyledTable = styled.table`
+  @media (min-width: 980px) {
+    border-collapse: separate;
+    border-radius: 12px;
+    overflow: hidden;
+    width: 100%;
+
+    th,
+    td {
+      padding: 10px;
+      text-align: center;
+    }
+    th {
+      padding-top: 55px;
+    }
+  }
 `;
 
 const MAINTABELSTYLE = styled.div`
@@ -33,11 +55,25 @@ const MAINTABELSTYLE = styled.div`
     justify-content: center;
     align-items: center;
 
-    .MuiInputBase-inputSizeSmall {
-      padding: 4px !important;
+    @media (min-width: 980px) {
+      .MuiInputBase-inputSizeSmall {
+        padding: 4px !important;
+      }
     }
   }
 `;
+
+const modalStyle = {
+  position: "absolute",
+  top: "50%",
+  left: "50%",
+  transform: "translate(-50%, -50%)",
+  width: 400,
+  bgcolor: "background.paper",
+  boxShadow: 24,
+  p: 4,
+  borderRadius: 2,
+};
 
 export default function OrderTabelDesctop({
   setSeeOrder,
@@ -48,10 +84,20 @@ export default function OrderTabelDesctop({
   setSelectedStatus,
   selectedStatus,
 }) {
+  const [openModals, setOpenModals] = useState({});
+
+  const handleCloseModal = (itemCode) => {
+    setOpenModals((prev) => ({ ...prev, [itemCode]: false }));
+  };
+
+  const handleOpenModal = (itemCode) => {
+    setOpenModals((prev) => ({ ...prev, [itemCode]: true }));
+  };
+
   return (
     <>
       <div className="d-lg-block d-none">
-        <table className="table table-striped">
+        <StyledTable className="table table-striped">
           <thead className="text-center">
             <tr className="table-head">
               <th>ردیف</th>
@@ -59,8 +105,8 @@ export default function OrderTabelDesctop({
               <th>نام خانوادگی</th>
               <th>شماره همراه</th>
               <th>تاریخ</th>
+              <th>سفارش</th>
               <th>عملیات</th>
-              <th>وضعیت</th>
             </tr>
           </thead>
           <tbody className="table-body text-center">
@@ -90,52 +136,67 @@ export default function OrderTabelDesctop({
                   </SeeOrderButton>
                 </td>
                 <td>
-                  {/* Status Select */}
-                  <FormControl
-                    variant="outlined"
-                    size="small"
-                    sx={{ minWidth: 100 }}
+                  <Modal
+                    open={openModals[item.code] || false}
+                    onClose={() => handleCloseModal(item.code)}
+                    aria-labelledby="modal-modal-title"
+                    aria-describedby="modal-modal-description"
                   >
-                    <InputLabel sx={{ fontFamily: "unset" }}>وضعیت</InputLabel>
-                    <Select
-                      sx={{
-                        fontFamily: "unset",
-                        padding: "0px", // Reduce padding for a smaller look
-                      }}
-                      label="Status"
-                      value={selectedStatus[item.code] || item.status || ""}
-                      onChange={(e) => {
-                        const newStatus = e.target.value;
-                        setSelectedStatus((prevStatus) => ({
-                          ...prevStatus,
-                          [item.code]: newStatus, // Update status in state
-                        }));
-                        handleStatusChange(item.code, newStatus); // Call the status change handler
-                      }}
-                    >
-                      {/* Add your status options here */}
-                      <MenuItem sx={{ fontFamily: "unset" }} value="1">
-                        درحال برسی
-                      </MenuItem>
-                      <MenuItem sx={{ fontFamily: "unset" }} value="2">
-                        درحال تولید
-                      </MenuItem>
-                      <MenuItem sx={{ fontFamily: "unset" }} value="3">
-                        درحال ارسال
-                      </MenuItem>
-                      <MenuItem sx={{ fontFamily: "unset" }} value="4">
-                        تحویل داده شده
-                      </MenuItem>
-                      <MenuItem sx={{ fontFamily: "unset" }} value="5">
-                        لغو شده
-                      </MenuItem>
-                    </Select>
-                  </FormControl>
+                    <Box sx={modalStyle}>
+                      <p className="mb-3 NormalTextSizing">وضعیت سفارش :</p>
+                      <FormControl
+                        variant="outlined"
+                        size="small"
+                        sx={{ minWidth: 100 }}
+                      >
+                        <InputLabel sx={{ fontFamily: "unset" }}>
+                          وضعیت
+                        </InputLabel>
+                        <Select
+                          sx={{
+                            fontFamily: "unset",
+                            padding: "0px",
+                          }}
+                          label="Status"
+                          value={selectedStatus[item.code] || item.status || ""}
+                          onChange={(e) => {
+                            const newStatus = e.target.value;
+                            setSelectedStatus((prevStatus) => ({
+                              ...prevStatus,
+                              [item.code]: newStatus, // Update status in state
+                            }));
+                            handleStatusChange(item.code, newStatus);
+                          }}
+                        >
+                          {/* Add your status options here */}
+                          <MenuItem sx={{ fontFamily: "unset" }} value="1">
+                            درحال برسی
+                          </MenuItem>
+                          <MenuItem sx={{ fontFamily: "unset" }} value="2">
+                            درحال تولید
+                          </MenuItem>
+                          <MenuItem sx={{ fontFamily: "unset" }} value="3">
+                            درحال ارسال
+                          </MenuItem>
+                          <MenuItem sx={{ fontFamily: "unset" }} value="4">
+                            تحویل داده شده
+                          </MenuItem>
+                          <MenuItem sx={{ fontFamily: "unset" }} value="5">
+                            لغو شده
+                          </MenuItem>
+                        </Select>
+                      </FormControl>
+                    </Box>
+                  </Modal>
+
+                  <div onClick={() => handleOpenModal(item.code)}>
+                    <MoreHorizIcon style={{ cursor: "pointer" }} />
+                  </div>
                 </td>
               </tr>
             ))}
           </tbody>
-        </table>
+        </StyledTable>
       </div>
       {/* responsive */}
       <div className="d-lg-none d-block container">
@@ -181,7 +242,7 @@ export default function OrderTabelDesctop({
               </div>
 
               <div className="eachTabelStyle">
-                <p className="NormalTextSizing">عملیات :</p>
+                <p className="NormalTextSizing">سفارش :</p>
                 <div
                   className="SecondValueTabel"
                   style={{ verticalAlign: "middle" }}
@@ -198,49 +259,66 @@ export default function OrderTabelDesctop({
               </div>
 
               <div className="eachTabelStyle">
-                <p className="NormalTextSizing">وضعیت :</p>
+                <p className="NormalTextSizing">عملیات :</p>
                 <div className="SecondValueTabel">
                   {/* Status Select */}
-                  <FormControl
-                    variant="outlined"
-                    size="small"
-                    sx={{ minWidth: 100 }}
+                  
+
+                  <Modal
+                    open={openModals[item.code] || false}
+                    onClose={() => handleCloseModal(item.code)}
+                    aria-labelledby="modal-modal-title"
+                    aria-describedby="modal-modal-description"
                   >
-                    <InputLabel sx={{ fontFamily: "unset" }}>وضعیت</InputLabel>
-                    <Select
-                      sx={{
-                        fontFamily: "unset",
-                        padding: "0px", // Reduce padding for a smaller look
-                      }}
-                      label="Status"
-                      value={selectedStatus[item.code] || item.status || ""}
-                      onChange={(e) => {
-                        const newStatus = e.target.value;
-                        setSelectedStatus((prevStatus) => ({
-                          ...prevStatus,
-                          [item.code]: newStatus, // Update status in state
-                        }));
-                        handleStatusChange(item.code, newStatus); // Call the status change handler
-                      }}
-                    >
-                      {/* Add your status options here */}
-                      <MenuItem sx={{ fontFamily: "unset" }} value="1">
-                        درحال برسی
-                      </MenuItem>
-                      <MenuItem sx={{ fontFamily: "unset" }} value="2">
-                        درحال تولید
-                      </MenuItem>
-                      <MenuItem sx={{ fontFamily: "unset" }} value="3">
-                        درحال ارسال
-                      </MenuItem>
-                      <MenuItem sx={{ fontFamily: "unset" }} value="4">
-                        تحویل داده شده
-                      </MenuItem>
-                      <MenuItem sx={{ fontFamily: "unset" }} value="5">
-                        لغو شده
-                      </MenuItem>
-                    </Select>
-                  </FormControl>
+                    <Box sx={modalStyle}>
+                      <p className="mb-3 NormalTextSizing">وضعیت سفارش :</p>
+                      <FormControl
+                        variant="outlined"
+                        size="small"
+                        sx={{ minWidth: 100 }}
+                      >
+                        <InputLabel sx={{ fontFamily: "unset" }}>
+                          وضعیت
+                        </InputLabel>
+                        <Select
+                          sx={{
+                            fontFamily: "unset",
+                            padding: "0px",
+                          }}
+                          label="Status"
+                          value={selectedStatus[item.code] || item.status || ""}
+                          onChange={(e) => {
+                            const newStatus = e.target.value;
+                            setSelectedStatus((prevStatus) => ({
+                              ...prevStatus,
+                              [item.code]: newStatus, // Update status in state
+                            }));
+                            handleStatusChange(item.code, newStatus);
+                          }}
+                        >
+                          <MenuItem sx={{ fontFamily: "unset" }} value="1">
+                            درحال برسی
+                          </MenuItem>
+                          <MenuItem sx={{ fontFamily: "unset" }} value="2">
+                            درحال تولید
+                          </MenuItem>
+                          <MenuItem sx={{ fontFamily: "unset" }} value="3">
+                            درحال ارسال
+                          </MenuItem>
+                          <MenuItem sx={{ fontFamily: "unset" }} value="4">
+                            تحویل داده شده
+                          </MenuItem>
+                          <MenuItem sx={{ fontFamily: "unset" }} value="5">
+                            لغو شده
+                          </MenuItem>
+                        </Select>
+                      </FormControl>
+                    </Box>
+                  </Modal>
+
+                  <div onClick={() => handleOpenModal(item.code)}>
+                    <MoreHorizIcon style={{ cursor: "pointer" }} />
+                  </div>
                 </div>
               </div>
             </MAINTABELSTYLE>
