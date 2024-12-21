@@ -59,7 +59,7 @@ const GridbaseDiv = styled.div`
   }
 `;
 const ButtonColor = styled.button`
-  background-image: linear-gradient(195deg, #42424a 0%, #191919 100%);
+  background-image: linear-gradient(195deg, #66BB6A 0%, #43A047 100%);
 `;
 
 const TYPOGRAPHY = styled(Typography)`

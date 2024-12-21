@@ -1,4 +1,5 @@
 "use client";
+
 import React, { useEffect, useState } from "react";
 // import redux
 import { useDispatch } from "react-redux";
@@ -8,7 +9,7 @@ import NavBarToggleBurgerButton from "@/app/BaseComponent/NavBarToggleBurgerButt
 import ConfirmingModal from "@/app/BaseComponent/ConfirmingModal";
 import ErrorModal from "@/app/BaseComponent/ErrorModal";
 import ProfileComponent from "@/app/BaseComponent/ProfileComponent";
-import LoadingCss from "@/app/BaseComponent/LoadingCss";
+import { Skeleton } from "@mui/material";
 // import components
 import AddUserBtn from "../DefineUser/AddUserBtn";
 import EditUserBtnfunction from "./EditUserBtn";
@@ -16,7 +17,6 @@ import SearchIcon from "@mui/icons-material/Search";
 import styled from "styled-components";
 
 const HeadermakeOrder = styled.div`
-  /* background-color: white; */
   padding: 10px;
   color: white;
   .textHeaderStyle {
@@ -24,16 +24,25 @@ const HeadermakeOrder = styled.div`
   }
 
   @media (max-width: 980px) {
-    /* background-color: rgb(26, 32, 53) !important; */
     .textHeaderStyle {
-      /* color: white !important; */
     }
   }
 `;
 
+const ResponsiveDiv = styled.div`
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  gap: 10px;
+
+  @media (max-width: 768px) {
+    flex-direction: column;
+  }
+`;
+
 const SearchInputMainDiv = styled.div`
-  /* margin-bottom: 10px; */
   width: 50%;
+  position: relative;
   .inputSreachStyle {
     font-size: 15px;
     width: 100%;
@@ -44,6 +53,8 @@ const SearchInputMainDiv = styled.div`
     transform: translate(50%, -50%);
     left: 0;
     top: 50%;
+    pointer-events: none;
+    color: gray;
   }
 `;
 
@@ -72,10 +83,6 @@ const MAINTABELSTYLE = styled.div`
     display: flex;
     justify-content: center;
     align-items: center;
-
-    .MuiInputBase-inputSizeSmall {
-      padding: 4px !important;
-    }
   }
 `;
 
@@ -98,131 +105,94 @@ const FixTablePlace = styled.div`
       background-image: linear-gradient(195deg, #42424a 0%, #191919 100%);
       color: white;
     }
-
     .tabelStyle {
-      @media (min-width: 980px) {
-        border-collapse: separate;
-        border-radius: 12px;
-        overflow: hidden;
-        width: 100%;
-        th,
-        td {
-          padding: 10px;
-          text-align: center;
-        }
-        th {
-          padding-top: 55px;
-        }
+      border-collapse: separate;
+      border-radius: 12px;
+      overflow: hidden;
+      width: 100%;
+      th,
+      td {
+        padding: 10px;
+        text-align: center;
+      }
+      th {
+        padding-top: 55px;
       }
     }
   }
 `;
 
+const SelectFilter = styled.select`
+  padding: 6px 10px;
+  font-size: 15px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  cursor: pointer;
+`;
+
 export default function DefineUser({ toggleShow }) {
   const dispatch = useDispatch();
 
-  const [dataCome, setDataCome] = useState([]);
-  const [dataComeUser, setDataComeUser] = useState([]);
+  // list of users (fetched based on domain)
+  const [users, setUsers] = useState([]);
+  // for re-fetch when user add/edit
   const [dataUpdated, setDataUpdated] = useState(false);
-  const [confirmModal, setConfirmModal] = useState(false);
-  const [errorModal, setErrorModal] = useState(false);
+
+  // filter states
   const [searchTerm, setSearchTerm] = useState("");
   const [filteredUsers, setFilteredUsers] = useState(null);
-  const [filteredSiteUser, setFilteredSiteUser] = useState(null);
-  const [trackLoadingProduct, setTrackLoadingProduct] = useState(false);
 
+  // domain filter states (default 2 => ادمین)
+  const [selectedDomain, setSelectedDomain] = useState("2");
+
+  // loading
+  const [trackLoading, setTrackLoading] = useState(false);
+
+  // modals
   const [openModal2, setOpenModal2] = useState(false);
   const closeModal2 = () => setOpenModal2(false);
 
   const [openModal3, setOpenModal3] = useState(false);
   const closeModal3 = () => setOpenModal3(false);
 
-  function closeModalOnTimeout() {
-    setTimeout(() => {
-      setOpenModal2(false);
-    }, 2000);
-  }
-
-  useEffect(() => {
-    if (confirmModal == true) {
-      setOpenModal2(true);
-      closeModalOnTimeout();
-    }
-  }, [confirmModal]);
-
-  useEffect(() => {
-    if (errorModal == true) {
-      setOpenModal2(true);
-      closeModalOnTimeout();
-    }
-  }, [errorModal]);
-
+  // helper for trim & lowerCase
   const normalizeString = (str) => str.replace(/\s+/g, "").toLowerCase();
 
+  // fetch data whenever domain or dataUpdated changes
   useEffect(() => {
-    const fetchData = async () => {
-      const dataComeAPI = await dispatch(getuser({ domain: 2 })).unwrap();
-      setDataCome(dataComeAPI);
-      setDataUpdated(false);
-    };
-    fetchData();
-  }, [dispatch, dataUpdated]);
-
-  const handleSiteUser = async () => {
-    if (dataComeUser?.length > 0) {
-      setDataComeUser([]);
-    } else {
+    const fetchUsers = async () => {
       try {
-        setTrackLoadingProduct(true);
-        const dataComeApi = await dispatch(getuser({ domain: 1 })).unwrap();
-        setDataComeUser(dataComeApi);
+        setTrackLoading(true);
+        const dataResponse = await dispatch(
+          getuser({ domain: selectedDomain })
+        ).unwrap();
+        setUsers(dataResponse);
         setDataUpdated(false);
-
-        setTrackLoadingProduct(false);
       } catch (error) {
-        console.error("Error during dispatch:", error);
-        setTrackLoadingProduct(false);
+        console.error("Error fetching users:", error);
+        setOpenModal3(true);
+      } finally {
+        setTrackLoading(false);
       }
-    }
-  };
+    };
+    fetchUsers();
+  }, [dispatch, selectedDomain, dataUpdated]);
 
+  // handle search filter
   useEffect(() => {
-    if (!dataCome) return;
-
     if (!searchTerm) {
-      setFilteredUsers(dataCome);
-      setFilteredSiteUser(dataComeUser);
+      setFilteredUsers(users);
       return;
     }
-
-    // Filter Users based on user's firstName and lastName and phone
-    const filtered = dataCome.filter((user) => {
-      if (!user) return false;
-
+    const normalizedSearchTerm = normalizeString(searchTerm);
+    const filtered = users.filter((user) => {
       const fullName = `${user.firstName || ""} ${user.lastName || ""} ${
         user.username || ""
       }`;
-      const normalizedFullName = normalizeString(fullName);
-      const normalizedSearchTerm = normalizeString(searchTerm);
-
-      return normalizedFullName.includes(normalizedSearchTerm);
+      return normalizeString(fullName).includes(normalizedSearchTerm);
     });
-
-    const filteredSiteUser = dataComeUser.filter((user) => {
-      if (!user) return false;
-
-      const fullName = `${user.firstName || ""} ${user.lastName || ""} ${
-        user.username || ""
-      }`;
-      const normalizedFullName = normalizeString(fullName);
-      const normalizedSearchTerm = normalizeString(searchTerm);
-
-      return normalizedFullName.includes(normalizedSearchTerm);
-    });
-
     setFilteredUsers(filtered);
-    setFilteredSiteUser(filteredSiteUser);
-  }, [searchTerm, dataCome, dataComeUser]);
+  }, [searchTerm, users]);
 
   return (
     <section>
@@ -235,9 +205,10 @@ export default function DefineUser({ toggleShow }) {
         </div>
         <ProfileComponent colorGet={"#191919"} />
       </HeadermakeOrder>
-      {/* Add a search input field */}
-      <div className="d-flex flex-row align-items-center mt-4 gap-3 mb-4">
-        <SearchInputMainDiv className="me-2  position-relative">
+
+      {/* Filter Container */}
+      <div className="container mt-4 mb-4 d-flex flex-row gap-3 align-items-center">
+        <SearchInputMainDiv>
           <input
             className="inputSreachStyle"
             type="text"
@@ -247,403 +218,156 @@ export default function DefineUser({ toggleShow }) {
           />
           <SearchIcon className="SearchIconStyle" />
         </SearchInputMainDiv>
+
+        {/* domain filter */}
+        <SelectFilter
+          value={selectedDomain}
+          onChange={(e) => setSelectedDomain(e.target.value)}
+        >
+          <option value="2">کاربرهای ادمین</option>
+          <option value="1">کاربرهای سایت</option>
+        </SelectFilter>
+      </div>
+      {/* add user */}
+      <div className="d-flex justify-content-end  mb-3 container">
         <AddUserBtn
           setDataUpdated={setDataUpdated}
-          setConfirmModal={setConfirmModal}
-          setErrorModal={setErrorModal}
+          setConfirmModal={() => setOpenModal2(true)}
+          setErrorModal={() => setOpenModal3(true)}
         />
       </div>
 
-      {dataCome.length > 0 && (
+      {/* loading spinner */}
+      {trackLoading ? (
+        <div className="container d-flex justify-content-center align-items-center">
+          <Skeleton
+            animation="wave"
+            variant="rounded"
+            className="w-100"
+            height={250}
+          />
+        </div>
+      ) : (
         <>
-          <FixTablePlace className="d-none d-lg-block container">
-            <p className="me-2 NormalTextSizing mb-2 pTagForStyle">
-              کاربر های ادمین
-            </p>
-            <table className="table table-striped tabelStyle">
-              <thead>
-                <tr className="table-head text-center">
-                  <th>ردیف</th>
-                  <th>نام</th>
-                  <th>نام خانوادگی</th>
-                  <th>شماره همراه</th>
-                  <th>وضعیت</th>
-                  <th>نوع دسترسی</th>
-                  <th>دسترسی</th>
-                  <th>عملیات</th>
-                </tr>
-              </thead>
-              <tbody className="table-body text-center">
-                {filteredUsers?.map((item, index) => (
-                  <React.Fragment key={index}>
+          {filteredUsers && filteredUsers.length > 0 && !trackLoading && (
+            <>
+              {/* desktop table */}
+              <FixTablePlace className="d-none d-lg-block container">
+                <p className="me-2 NormalTextSizing mb-2 pTagForStyle">
+                  {selectedDomain === "2"
+                    ? "کاربر های ادمین"
+                    : "کاربر های سایت"}
+                </p>
+                <table className="table table-striped tabelStyle">
+                  <thead>
                     <tr>
-                      <td>{++index}</td>
-                      <td>{item.firstName}</td>
-                      <td>{item.lastName}</td>
-                      <td>{item.username}</td>
-                      <td>
-                        {item.active == true ? (
-                          <p className="NormalTextSizing">فعال</p>
-                        ) : (
-                          <p className="NormalTextSizing">غیرفعال</p>
-                        )}
-                      </td>
-
-                      <td>
-                        {item.domain == 1 && (
-                          <p className="NormalTextSizing">سایت</p>
-                        )}
-                        {item.domain == 2 && (
-                          <p className="NormalTextSizing">سایت و ادمین</p>
-                        )}
-                      </td>
-                      <td>
-                        {item.userRoles[0]?.role?.name == "admin" && (
-                          <p className="NormalTextSizing">ادمین</p>
-                        )}
-                        {item.userRoles[0]?.role?.name == "master" && (
-                          <p className="NormalTextSizing">مدیر</p>
-                        )}
-                        {item.userRoles[0]?.role?.name == "customer" && (
-                          <p className="NormalTextSizing">مشتری</p>
-                        )}
-                      </td>
-                      <td>
-                        <div className="d-flex flex-row justify-content-center">
-                          <EditUserBtnfunction
-                            setDataUpdated={setDataUpdated}
-                            data={dataCome[--index]}
-                            setConfirmModal={setConfirmModal}
-                          />
-                        </div>
-                      </td>
+                      <th>ردیف</th>
+                      <th>نام</th>
+                      <th>نام خانوادگی</th>
+                      <th>شماره همراه</th>
+                      <th>وضعیت</th>
+                      <th>نوع دسترسی</th>
+                      <th>دسترسی</th>
+                      <th>عملیات</th>
                     </tr>
-                  </React.Fragment>
+                  </thead>
+                  <tbody>
+                    {filteredUsers.map((item, index) => (
+                      <tr key={index}>
+                        <td>{++index}</td>
+                        <td>{item.firstName}</td>
+                        <td>{item.lastName}</td>
+                        <td>{item.username}</td>
+                        <td>{item.active ? "فعال" : "غیرفعال"}</td>
+                        <td>{item.domain === 1 ? "سایت" : "سایت و ادمین"}</td>
+                        <td>
+                          {item.userRoles[0]?.role?.name === "admin" && "ادمین"}
+                          {item.userRoles[0]?.role?.name === "master" && "مدیر"}
+                          {item.userRoles[0]?.role?.name === "customer" &&
+                            "مشتری"}
+                        </td>
+                        <td>
+                          <div className="d-flex flex-row justify-content-center">
+                            <EditUserBtnfunction
+                              setDataUpdated={setDataUpdated}
+                              data={item}
+                              setConfirmModal={() => setOpenModal2(true)}
+                            />
+                          </div>
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </FixTablePlace>
+
+              {/* mobile view */}
+              <div className="d-block d-lg-none container">
+                {filteredUsers.map((item, idx) => (
+                  <MAINTABELSTYLE key={idx}>
+                    <div className="eachTabelStyle">
+                      <p className="NormalTextSizing">نام :</p>
+                      <div className="SecondValueTabel NormalTextSizing">
+                        {item.firstName}
+                      </div>
+                    </div>
+                    <div className="eachTabelStyle">
+                      <p className="NormalTextSizing">نام خانوادگی :</p>
+                      <div className="SecondValueTabel NormalTextSizing">
+                        {item.lastName}
+                      </div>
+                    </div>
+                    <div className="eachTabelStyle">
+                      <p className="NormalTextSizing">شماره همراه :</p>
+                      <div className="SecondValueTabel NormalTextSizing">
+                        {item.username}
+                      </div>
+                    </div>
+                    <div className="eachTabelStyle">
+                      <p className="NormalTextSizing">وضعیت :</p>
+                      <div className="SecondValueTabel NormalTextSizing">
+                        {item.active ? "فعال" : "غیرفعال"}
+                      </div>
+                    </div>
+                    <div className="eachTabelStyle">
+                      <p className="NormalTextSizing">نوع دسترسی :</p>
+                      <div className="SecondValueTabel NormalTextSizing">
+                        {item.domain === 1 ? "سایت" : "سایت و ادمین"}
+                      </div>
+                    </div>
+                    <div className="eachTabelStyle">
+                      <p className="NormalTextSizing">دسترسی :</p>
+                      <div className="SecondValueTabel NormalTextSizing">
+                        {item.userRoles[0]?.role?.name === "admin" && "ادمین"}
+                        {item.userRoles[0]?.role?.name === "master" && "مدیر"}
+                        {item.userRoles[0]?.role?.name === "customer" &&
+                          "مشتری"}
+                      </div>
+                    </div>
+                    <div className="eachTabelStyle">
+                      <p className="NormalTextSizing">عملیات :</p>
+                      <div className="SecondValueTabel NormalTextSizing">
+                        <EditUserBtnfunction
+                          setDataUpdated={setDataUpdated}
+                          data={item}
+                          setConfirmModal={() => setOpenModal2(true)}
+                        />
+                      </div>
+                    </div>
+                  </MAINTABELSTYLE>
                 ))}
-              </tbody>
-            </table>
-          </FixTablePlace>
-
-          <div className="d-block d-lg-none container">
-            {filteredUsers?.map((item, index) => (
-              <React.Fragment key={index}>
-                <MAINTABELSTYLE>
-                  <div className="eachTabelStyle">
-                    <p className="NormalTextSizing">نام :</p>
-
-                    <div className="SecondValueTabel NormalTextSizing">
-                      {item.firstName}
-                    </div>
-                  </div>
-
-                  <div className="eachTabelStyle">
-                    <p className="NormalTextSizing">نام خانوادگی :</p>
-                    <div
-                      className="SecondValueTabel NormalTextSizing"
-                      style={{ verticalAlign: "middle" }}
-                    >
-                      {item.lastName}
-                    </div>
-                  </div>
-                  <div className="eachTabelStyle">
-                    <p className="NormalTextSizing">شماره همراه :</p>
-
-                    <div
-                      className="SecondValueTabel NormalTextSizing"
-                      style={{ verticalAlign: "middle" }}
-                    >
-                      {item.username}
-                    </div>
-                  </div>
-
-                  <div className="eachTabelStyle">
-                    <p className="NormalTextSizing">وضعیت :</p>
-                    {item.active == true ? (
-                      <p
-                        style={{ backgroundColor: "unset" }}
-                        className="NormalTextSizing"
-                      >
-                        فعال
-                      </p>
-                    ) : (
-                      <p
-                        style={{ backgroundColor: "unset" }}
-                        className="NormalTextSizing"
-                      >
-                        غیرفعال
-                      </p>
-                    )}
-                  </div>
-
-                  <div className="eachTabelStyle">
-                    <p className="NormalTextSizing">نوع دسترسی :</p>
-                    {item.domain == 1 && (
-                      <p
-                        style={{ backgroundColor: "unset" }}
-                        className="NormalTextSizing"
-                      >
-                        سایت
-                      </p>
-                    )}
-                    {item.domain == 2 && (
-                      <p
-                        style={{ backgroundColor: "unset" }}
-                        className="NormalTextSizing"
-                      >
-                        سایت و ادمین
-                      </p>
-                    )}
-                  </div>
-
-                  <div className="eachTabelStyle">
-                    <p className="NormalTextSizing">دسترسی :</p>
-                    {item.userRoles[0]?.role?.name == "admin" && (
-                      <p
-                        style={{ backgroundColor: "unset" }}
-                        className="NormalTextSizing"
-                      >
-                        ادمین
-                      </p>
-                    )}
-                    {item.userRoles[0]?.role?.name == "master" && (
-                      <p
-                        style={{ backgroundColor: "unset" }}
-                        className="NormalTextSizing"
-                      >
-                        مدیر
-                      </p>
-                    )}
-                    {item.userRoles[0]?.role?.name == "customer" && (
-                      <p
-                        style={{ backgroundColor: "unset" }}
-                        className="NormalTextSizing"
-                      >
-                        مشتری
-                      </p>
-                    )}
-                  </div>
-
-                  <div className="eachTabelStyle">
-                    <p className="NormalTextSizing">عملیات :</p>
-                    <div className="d-flex flex-row justify-content-center">
-                      <EditUserBtnfunction
-                        setDataUpdated={setDataUpdated}
-                        data={dataCome[--index]}
-                        setConfirmModal={setConfirmModal}
-                      />
-                    </div>
-                  </div>
-                </MAINTABELSTYLE>
-              </React.Fragment>
-            ))}
-          </div>
-        </>
-      )}
-
-      <div className="container mt-4 mb-4">
-        <SeeOrderButton
-          color="#6861ce"
-          onClick={handleSiteUser}
-          type="button"
-          style={{
-            width: "170px",
-            display: "flex",
-            justifyContent: "center",
-          }}
-        >
-          {trackLoadingProduct ? (
-            <LoadingCss />
-          ) : dataComeUser?.length ? (
-            `پنهان کردن کاربر های سایت`
-          ) : (
-            `دیدن کاربر های سایت`
+              </div>
+            </>
           )}
-        </SeeOrderButton>
-      </div>
 
-      {dataComeUser.length > 0 && (
-        <>
-          <FixTablePlace className="d-none d-lg-block container">
-            <p className="me-2 NormalTextSizing mb-2 pTagForStyle">
-              کاربر های سایت
-            </p>
-            <table className="table table-striped tabelStyle">
-              <thead>
-                <tr className="table-head text-center">
-                  <th>ردیف</th>
-                  <th>نام</th>
-                  <th>نام خانوادگی</th>
-                  <th>شماره همراه</th>
-                  <th>وضعیت</th>
-                  <th>نوع دسترسی</th>
-                  <th>دسترسی</th>
-                  <th>عملیات</th>
-                </tr>
-              </thead>
-              <tbody className="table-body text-center">
-                {filteredSiteUser?.map((item, index) => (
-                  <React.Fragment key={index}>
-                    <tr>
-                      <td>{++index}</td>
-                      <td>{item.firstName}</td>
-                      <td>{item.lastName}</td>
-                      <td>{item.username}</td>
-                      <td>
-                        {item.active == true ? (
-                          <p className="NormalTextSizing">فعال</p>
-                        ) : (
-                          <p className="NormalTextSizing">غیرفعال</p>
-                        )}
-                      </td>
-
-                      <td>
-                        {item.domain == 1 && (
-                          <p className="NormalTextSizing">سایت</p>
-                        )}
-                        {item.domain == 2 && (
-                          <p className="NormalTextSizing">سایت و ادمین</p>
-                        )}
-                      </td>
-                      <td>
-                        {item.userRoles[0]?.role?.name == "admin" && (
-                          <p className="NormalTextSizing">ادمین</p>
-                        )}
-                        {item.userRoles[0]?.role?.name == "master" && (
-                          <p className="NormalTextSizing">مدیر</p>
-                        )}
-                        {item.userRoles[0]?.role?.name == "customer" && (
-                          <p className="NormalTextSizing">مشتری</p>
-                        )}
-                      </td>
-                      <td>
-                        <div className="d-flex flex-row justify-content-center">
-                          <EditUserBtnfunction
-                            setDataUpdated={setDataUpdated}
-                            data={dataCome[--index]}
-                            setConfirmModal={setConfirmModal}
-                          />
-                        </div>
-                      </td>
-                    </tr>
-                  </React.Fragment>
-                ))}
-              </tbody>
-            </table>
-          </FixTablePlace>
-
-          <div className="d-block d-lg-none container">
-            {filteredSiteUser?.map((item, index) => (
-              <React.Fragment key={index}>
-                <MAINTABELSTYLE>
-                  <div className="eachTabelStyle">
-                    <p className="NormalTextSizing">نام :</p>
-
-                    <div className="SecondValueTabel NormalTextSizing">
-                      {item.firstName}
-                    </div>
-                  </div>
-
-                  <div className="eachTabelStyle">
-                    <p className="NormalTextSizing">نام خانوادگی :</p>
-                    <div
-                      className="SecondValueTabel NormalTextSizing"
-                      style={{ verticalAlign: "middle" }}
-                    >
-                      {item.lastName}
-                    </div>
-                  </div>
-                  <div className="eachTabelStyle">
-                    <p className="NormalTextSizing">شماره همراه :</p>
-
-                    <div
-                      className="SecondValueTabel NormalTextSizing"
-                      style={{ verticalAlign: "middle" }}
-                    >
-                      {item.username}
-                    </div>
-                  </div>
-
-                  <div className="eachTabelStyle">
-                    <p className="NormalTextSizing">وضعیت :</p>
-                    {item.active == true ? (
-                      <p
-                        style={{ backgroundColor: "unset" }}
-                        className="NormalTextSizing"
-                      >
-                        فعال
-                      </p>
-                    ) : (
-                      <p
-                        style={{ backgroundColor: "unset" }}
-                        className="NormalTextSizing"
-                      >
-                        غیرفعال
-                      </p>
-                    )}
-                  </div>
-
-                  <div className="eachTabelStyle">
-                    <p className="NormalTextSizing">نوع دسترسی :</p>
-                    {item.domain == 1 && (
-                      <p
-                        style={{ backgroundColor: "unset" }}
-                        className="NormalTextSizing"
-                      >
-                        سایت
-                      </p>
-                    )}
-                    {item.domain == 2 && (
-                      <p
-                        style={{ backgroundColor: "unset" }}
-                        className="NormalTextSizing"
-                      >
-                        سایت و ادمین
-                      </p>
-                    )}
-                  </div>
-
-                  <div className="eachTabelStyle">
-                    <p className="NormalTextSizing">دسترسی :</p>
-                    {item.userRoles[0]?.role?.name == "admin" && (
-                      <p
-                        style={{ backgroundColor: "unset" }}
-                        className="NormalTextSizing"
-                      >
-                        ادمین
-                      </p>
-                    )}
-                    {item.userRoles[0]?.role?.name == "master" && (
-                      <p
-                        style={{ backgroundColor: "unset" }}
-                        className="NormalTextSizing"
-                      >
-                        مدیر
-                      </p>
-                    )}
-                    {item.userRoles[0]?.role?.name == "customer" && (
-                      <p
-                        style={{ backgroundColor: "unset" }}
-                        className="NormalTextSizing"
-                      >
-                        مشتری
-                      </p>
-                    )}
-                  </div>
-
-                  <div className="eachTabelStyle">
-                    <p className="NormalTextSizing">عملیات :</p>
-                    <div className="d-flex flex-row justify-content-center">
-                      <EditUserBtnfunction
-                        setDataUpdated={setDataUpdated}
-                        data={dataCome[--index]}
-                        setConfirmModal={setConfirmModal}
-                      />
-                    </div>
-                  </div>
-                </MAINTABELSTYLE>
-              </React.Fragment>
-            ))}
-          </div>
+          {/* no user found */}
+          {!trackLoading && filteredUsers && filteredUsers.length === 0 && (
+            <div className="container mt-4">
+              <p className="NormalTextSizing text-center">
+                هیچ کاربری یافت نشد.
+              </p>
+            </div>
+          )}
         </>
       )}
 

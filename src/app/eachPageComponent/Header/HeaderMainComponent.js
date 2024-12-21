@@ -3,15 +3,24 @@
 import React, { useState, useEffect } from "react";
 import { useDispatch } from "react-redux";
 import { HeaderList, headerEdit } from "@/app/Store/thunks";
-import styled from "styled-components";
+import styled, { createGlobalStyle } from "styled-components";
 import DeleteIcon from "@mui/icons-material/Delete";
-//import base components
+import AddCircleIcon from "@mui/icons-material/AddCircle";
+// Import base components
 import ProfileComponent from "@/app/BaseComponent/ProfileComponent";
 import NavBarToggleBurgerButton from "@/app/BaseComponent/NavBarToggleBurgerButton";
-// improt modals
+// Import modals
 import ConfirmModal from "@/app/BaseComponent/ConfirmingModal";
 import ErrorModal from "@/app/BaseComponent/ErrorModal";
 import AreYouShureModal from "@/app/BaseComponent/AreYouSureModal";
+import CloseIcon from '@mui/icons-material/Close';
+
+// Global styles to set box-sizing
+const GlobalStyle = createGlobalStyle`
+  *, *::before, *::after {
+    box-sizing: border-box;
+  }
+`;
 
 // Styled components
 
@@ -45,7 +54,6 @@ const Container = styled.div`
 `;
 
 const HeadermakeOrder = styled.div`
-  /* background-color: white; */
   padding: 10px;
   color: white;
   .textHeaderStyle {
@@ -53,9 +61,7 @@ const HeadermakeOrder = styled.div`
   }
 
   @media (max-width: 980px) {
-    /* background-color: rgb(26, 32, 53) !important; */
     .textHeaderStyle {
-      /* color: white !important; */
     }
   }
 `;
@@ -63,7 +69,7 @@ const HeadermakeOrder = styled.div`
 const InputField = styled.input`
   padding: 10px;
   width: 36%;
-  margin-right: 10px;
+  /* margin-right: 10px; */
   border: 1px solid #ccc;
   border-radius: 5px;
 `;
@@ -91,8 +97,11 @@ const Button = styled.button`
 const RemoveButtonStyle = styled.button`
   color: #e53935 !important;
   background-color: transparent !important;
+  border: none;
+  cursor: pointer;
 `;
 
+// حذف حاشیه از لیست‌های اصلی و زیر لیست‌ها
 const HeaderListWrapper = styled.ul`
   list-style-type: none;
   padding-left: 0;
@@ -100,25 +109,48 @@ const HeaderListWrapper = styled.ul`
 
 const HeaderItem = styled.li`
   padding: 15px;
-  margin-bottom: 15px;
+  margin-bottom: 20px; /* افزایش فاصله بین جعبه‌ها */
   background-color: #f9f9f9;
   border: 1px solid #ddd;
-  border-radius: 5px;
+  border-radius: 8px;
+  box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+  position: relative;
 `;
 
 const SubItemList = styled.ul`
-  margin-right: 15px;
-  margin-top: 10px;
-  padding-right: 20px;
+  margin-top: 15px; /* افزایش فاصله بین جعبه اصلی و زیرجعبه */
+  padding-right: 20px; 
+  list-style-type: none;
 `;
 
 const SubItem = styled.li`
-  padding: 5px 0;
+  padding: 10px;
+  margin-bottom: 10px; /* فاصله بین زیر آیتم‌ها */
+  background-color: #fff; /* تغییر رنگ پس‌زمینه */
+  border: 1px solid #ccc;
+  border-radius: 5px;
+  box-shadow: 0 1px 1px rgba(0, 0, 0, 0.1);
+  position: relative;
 `;
 
 const StrongText = styled.strong`
   display: block;
   margin-bottom: 5px;
+`;
+
+const AddSubItemContainer = styled.div`
+  margin-top: 10px;
+  display: flex;
+  flex-direction: row;
+  gap : 10px;
+  align-items: flex-start;
+  @media (max-width : 980px) {
+    flex-direction: column;
+  }
+  .addSubItemInput {
+    width: 100%;
+    margin-bottom: 10px;
+  }
 `;
 
 export default function HeaderMainComponent({ toggleShow }) {
@@ -127,8 +159,7 @@ export default function HeaderMainComponent({ toggleShow }) {
   const [headerData, setHeaderData] = useState([]);
   const [newItem, setNewItem] = useState({ title: "", link: "", subItems: [] });
   const [newSubItem, setNewSubItem] = useState({ title: "", link: "" });
-  const [activeHeaderIndex, setActiveHeaderIndex] = useState(null);
-  const [nestedPath, setNestedPath] = useState([]);
+  const [addSubItemPath, setAddSubItemPath] = useState(null); // Path where to show add sub-item input
   const [isRemovingHeader, setIsRemovingHeader] = useState(false); // Track if removing a header or sub-item
 
   const [openModal, setOpenModal] = useState(false);
@@ -140,8 +171,13 @@ export default function HeaderMainComponent({ toggleShow }) {
   // Fetch header data from API on mount
   useEffect(() => {
     const fetchData = async () => {
-      const dataComeAPI = await dispatch(HeaderList()).unwrap();
-      setHeaderData(dataComeAPI?.content || []);
+      try {
+        const dataComeAPI = await dispatch(HeaderList()).unwrap();
+        setHeaderData(dataComeAPI?.content || []);
+      } catch (error) {
+        console.error("Error fetching header data:", error);
+        setOpenModal3(true);
+      }
     };
 
     fetchData();
@@ -170,43 +206,92 @@ export default function HeaderMainComponent({ toggleShow }) {
   };
 
   // Recursive function to render sub-items
-  const renderSubItems = (subItems, headerIndex, currentPath) => {
+  const renderSubItems = (subItems, currentPath) => {
     return (
       <SubItemList>
         {subItems.map((subItem, subIndex) => {
           const newPath = [...currentPath, subIndex];
+          const isAddSubItem =
+            addSubItemPath &&
+            addSubItemPath.length === newPath.length &&
+            addSubItemPath.every((val, idx) => val === newPath[idx]);
+
           return (
-            <SubItem key={subIndex}>
-              <div className="d-flex flex-row align-items-center">
-                <div className="d-flex flex-row align-items-center gap-1">
-                  <StrongText>{subItem.title}</StrongText>
-                  <Button
-                    type="button"
-                    className="me-1"
-                    $secondary
-                    onClick={() =>
-                      selectSubItemForSubItem(headerIndex, newPath)
-                    }
+            <React.Fragment key={subIndex}>
+              <SubItem>
+                <div className="d-flex flex-row align-items-center justify-content-between">
+                  <div className="d-flex flex-row align-items-center gap-1">
+                    <StrongText className="NormalTextSizing">{subItem.title}</StrongText>
+                    <Button
+                      type="button"
+                      style={{
+                        backgroundImage: "unset",
+                        backgroundColor: "unset",
+                        color: "#43A047",
+                      }}
+                      className="me-1"
+                      $secondary
+                      onClick={() => selectSubItemForSubItem(newPath)}
+                    >
+                      <AddCircleIcon />
+                    </Button>
+                  </div>
+
+                  <RemoveButtonStyle
+                    onClick={() => openRemoveModal(newPath, false)}
                   >
-                    اضافه کردن ساب ایتم به {subItem.title}
-                  </Button>
+                    <DeleteIcon className="text-danger" />
+                  </RemoveButtonStyle>
                 </div>
 
-                <Button
-                  type="button"
-                  style={{ background: "unset" }}
-                  onClick={() => openRemoveModal(newPath, false)}
-                >
-                  <DeleteIcon className="text-danger" />
-                </Button>
-              </div>
+                {/* Render add sub-item input below this sub-item if path matches */}
+                {isAddSubItem && (
+                  <AddSubItemContainer className="container">
+                    <InputField
+                      className="addSubItemInput"
+                      type="text"
+                      name="title"
+                      placeholder="عنوان ساب ایتم"
+                      value={newSubItem.title}
+                      onChange={handleSubInputChange}
+                    />
+                    <InputField
+                      className="addSubItemInput"
+                      type="text"
+                      name="link"
+                      placeholder="لینک ساب ایتم"
+                      value={newSubItem.link}
+                      onChange={handleSubInputChange}
+                    />
+                    <div className="d-flex flex-row align-items-center">
+                      <Button
+                        type="button"
+                        $secondary
+                        onClick={() => addSubItem(newPath)}
+                        style={{whiteSpace : "nowrap"}}
+                      >
+                        اضافه کردن
+                      </Button>
+                      <Button
+                        type="button"
+                        style={{
+                          backgroundImage: "unset",
+                          backgroundColor: "unset",
+                          color: "#e53935",
+                        }}
+                        onClick={() => setAddSubItemPath(null)}
+                      >
+                        <CloseIcon className="text-danger" />
+                      </Button>
+                    </div>
+                  </AddSubItemContainer>
+                )}
 
-              {/* Render nested sub-items recursively */}
-              {subItem.subItems.length > 0 &&
-                renderSubItems(subItem.subItems, headerIndex, newPath)}
-
-              {/* Button to add sub-items recursively */}
-            </SubItem>
+                {/* Render nested sub-items recursively */}
+                {subItem.subItems.length > 0 &&
+                  renderSubItems(subItem.subItems, newPath)}
+              </SubItem>
+            </React.Fragment>
           );
         })}
       </SubItemList>
@@ -218,12 +303,13 @@ export default function HeaderMainComponent({ toggleShow }) {
     setSelectedPath(path); // Store the sub-item or header path
     setIsRemovingHeader(isHeader); // Track if we are removing a header or sub-item
     setOpenModal(true); // Open modal
+    setAddSubItemPath(null); // Close any open add sub-item inputs
   };
 
-  // Close modal
-  const closeModal = () => setOpenModal(false);
-  const closeModal2 = () => setOpenModal2(false);
-  const closeModal3 = () => setOpenModal3(false);
+  // Close modals
+  const closeModalHandler = () => setOpenModal(false);
+  const closeModal2Handler = () => setOpenModal2(false);
+  const closeModal3Handler = () => setOpenModal3(false);
 
   function closeModalOnTimeout() {
     setTimeout(() => {
@@ -236,40 +322,37 @@ export default function HeaderMainComponent({ toggleShow }) {
     if (isRemovingHeader) {
       removeItem(selectedPath[0]); // Remove header
     } else {
-      removeSubItem(activeHeaderIndex, selectedPath); // Remove sub-item
+      removeSubItem(selectedPath); // Remove sub-item
     }
-    closeModal(); // Close the modal
+    closeModalHandler(); // Close the modal
   };
 
-  // Set active header index for adding sub-items
+  // Set addSubItemPath for adding sub-items
   const selectHeaderForSubItem = (index) => {
-    setActiveHeaderIndex(index);
-    setNestedPath([]); // Reset path
+    setAddSubItemPath([index]);
+    setNewSubItem({ title: "", link: "" });
   };
 
-  // Set active sub-item path for adding nested sub-items
-  const selectSubItemForSubItem = (headerIndex, path) => {
-    setActiveHeaderIndex(headerIndex);
-    setNestedPath(path);
+  const selectSubItemForSubItem = (path) => {
+    setAddSubItemPath(path);
+    setNewSubItem({ title: "", link: "" });
   };
 
   // Add new sub-item to the selected header or sub-item
-  const addSubItem = () => {
+  const addSubItem = (path) => {
     if (newSubItem.title && newSubItem.link) {
       const updatedHeader = [...headerData];
-      let target = updatedHeader[activeHeaderIndex];
+      let target = updatedHeader[path[0]];
 
-      if (nestedPath.length > 0) {
-        // Navigate to the correct nested sub-item using the path
-        for (const index of nestedPath) {
-          target = target.subItems[index];
-        }
+      for (let i = 1; i < path.length; i++) {
+        target = target.subItems[path[i]];
       }
 
       target.subItems.push({ ...newSubItem, subItems: [] });
 
       setHeaderData(updatedHeader);
       setNewSubItem({ title: "", link: "" });
+      setAddSubItemPath(null);
     } else {
       setOpenModal2(true);
     }
@@ -282,20 +365,17 @@ export default function HeaderMainComponent({ toggleShow }) {
   };
 
   // Remove a sub-item using the path
-  const removeSubItem = (headerIndex, path) => {
+  const removeSubItem = (path) => {
     const updatedHeader = [...headerData];
-    let target = updatedHeader[headerIndex];
+    let target = updatedHeader[path[0]];
 
-    if (path.length === 1) {
-      target.subItems = target.subItems.filter((_, i) => i !== path[0]);
-    } else {
-      for (let i = 0; i < path.length - 1; i++) {
-        target = target.subItems[path[i]];
-      }
-      target.subItems = target.subItems.filter(
-        (_, i) => i !== path[path.length - 1]
-      );
+    for (let i = 1; i < path.length - 1; i++) {
+      target = target.subItems[path[i]];
     }
+
+    target.subItems = target.subItems.filter(
+      (_, i) => i !== path[path.length - 1]
+    );
 
     setHeaderData(updatedHeader);
   };
@@ -306,19 +386,19 @@ export default function HeaderMainComponent({ toggleShow }) {
       const finalDataSending = {
         content: headerData,
       };
-      const response = await dispatch(
-        headerEdit({ header: finalDataSending })
-      ).unwrap();
+      await dispatch(headerEdit({ header: finalDataSending })).unwrap();
       setOpenModal3(true);
       closeModalOnTimeout();
     } catch (error) {
       console.error("Error submitting header data:", error);
-      alert("Failed to submit header data.");
+      setOpenModal3(true);
+      closeModalOnTimeout();
     }
   };
 
   return (
     <>
+      <GlobalStyle />
       <HeadermakeOrder className="d-flex flex-row mb-3 justify-content-between">
         <div className="d-block d-lg-none">
           <NavBarToggleBurgerButton func={() => toggleShow("main")} />
@@ -363,29 +443,80 @@ export default function HeaderMainComponent({ toggleShow }) {
           {headerData.length > 0 ? (
             <HeaderListWrapper>
               {headerData.map((item, index) => (
-                <HeaderItem key={index}>
-                  <div className="d-flex flex-row align-items-center gap-1">
-                    <StrongText>{item.title}</StrongText>
-                    <Button
-                      type="button"
-                      className="me-1"
-                      $secondary
-                      onClick={() => selectHeaderForSubItem(index)}
-                    >
-                      اضافه کردن ساب ایتم به {item.title}
-                    </Button>
-                    <RemoveButtonStyle
-                      onClick={() => openRemoveModal([index], true)}
-                    >
-                      حذف هدر اصلی
-                    </RemoveButtonStyle>
-                  </div>
+                <React.Fragment key={index}>
+                  <HeaderItem>
+                    <div className="d-flex flex-row align-items-center gap-1">
+                      <StrongText className="NormalTextSizing">{item.title}</StrongText>
+                      <Button
+                        type="button"
+                        className="me-1"
+                        style={{
+                          backgroundImage: "unset",
+                          backgroundColor: "unset",
+                          color: "#43A047",
+                        }}
+                        $secondary
+                        onClick={() => selectHeaderForSubItem(index)}
+                      >
+                        <AddCircleIcon />
+                      </Button>
+                      <RemoveButtonStyle
+                        onClick={() => openRemoveModal([index], true)}
+                      >
+                        حذف هدر اصلی
+                      </RemoveButtonStyle>
+                    </div>
 
-                  {/* Render sub-items */}
-                  {renderSubItems(item.subItems, index, [])}
+                    {/* Render sub-items */}
+                    {item.subItems.length > 0 &&
+                      renderSubItems(item.subItems, [index])}
 
-                  {/* Button to add sub-items */}
-                </HeaderItem>
+                    {/* Render add sub-item input below this header if path matches */}
+                    {addSubItemPath &&
+                      addSubItemPath.length === 1 &&
+                      addSubItemPath[0] === index && (
+                        <AddSubItemContainer>
+                          <InputField
+                            className="addSubItemInput"
+                            type="text"
+                            name="title"
+                            placeholder="عنوان ساب ایتم"
+                            value={newSubItem.title}
+                            onChange={handleSubInputChange}
+                          />
+                          <InputField
+                            className="addSubItemInput"
+                            type="text"
+                            name="link"
+                            placeholder="لینک ساب ایتم"
+                            value={newSubItem.link}
+                            onChange={handleSubInputChange}
+                          />
+                          <div className="d-flex flex-row align-items-center">
+                            <Button
+                              type="button"
+                              style={{whiteSpace : "nowrap"}}
+                              $secondary
+                              onClick={() => addSubItem([index])}
+                            >
+                              اضافه کردن
+                            </Button>
+                            <Button
+                              type="button"
+                              style={{
+                                backgroundImage: "unset",
+                                backgroundColor: "unset",
+                                color: "#e53935",
+                              }}
+                              onClick={() => setAddSubItemPath(null)}
+                            >
+                              <CloseIcon className="text-danger" />
+                            </Button>
+                          </div>
+                        </AddSubItemContainer>
+                      )}
+                  </HeaderItem>
+                </React.Fragment>
               ))}
             </HeaderListWrapper>
           ) : (
@@ -393,37 +524,10 @@ export default function HeaderMainComponent({ toggleShow }) {
           )}
         </div>
 
-        {/* Input for new sub-item */}
-        {activeHeaderIndex !== null && (
-          <div style={{ marginBottom: "20px", marginTop: "20px" }}>
-            <InputField
-              type="text"
-              name="title"
-              placeholder="Sub-item Title"
-              value={newSubItem.title}
-              onChange={handleSubInputChange}
-            />
-            <InputField
-              type="text"
-              name="link"
-              placeholder="Sub-item Link"
-              value={newSubItem.link}
-              onChange={handleSubInputChange}
-            />
-            <Button
-              type="button"
-              className="me-1"
-              $secondary
-              onClick={addSubItem}
-            >
-              اضافه کردن ساب ایتم
-            </Button>
-          </div>
-        )}
-
         {/* Submit Button */}
         <Button
           type="button"
+          $secondary
           onClick={submitHeaderData}
           style={{ marginTop: "20px" }}
         >
@@ -431,24 +535,21 @@ export default function HeaderMainComponent({ toggleShow }) {
         </Button>
 
         {/* Modal for confirming header or sub-item removal */}
-
         <AreYouShureModal
           open={openModal}
-          onClose={closeModal}
+          onClose={closeModalHandler}
           func={confirmRemove}
-          text={`از حذف ${" "}${
-            isRemovingHeader ? "هدر" : "ساب ایتم"
-          }${" "}مطمعن هستید`}
+          text={`از حذف ${isRemovingHeader ? "هدر" : "ساب ایتم"} مطمئن هستید؟`}
         />
 
         <ErrorModal
           open={openModal2}
-          onClose={closeModal2}
+          onClose={closeModal2Handler}
           text={"لطفا تایتل و لینک را وارد کنید"}
         />
         <ConfirmModal
           open={openModal3}
-          onClose={closeModal3}
+          onClose={closeModal3Handler}
           text={"هدر با موفقیت تغییر یافت"}
         />
       </Container>

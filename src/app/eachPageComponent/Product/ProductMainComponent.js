@@ -11,23 +11,61 @@ import NavBarToggleBurgerButton from "@/app/BaseComponent/NavBarToggleBurgerButt
 import { useSelector, useDispatch } from "react-redux";
 import { list } from "../../Store/thunks.js";
 import { productListData } from "@/app/Store/slice";
-import { Card, CardContent, CardMedia, Typography } from "@mui/material";
+import {
+  Card,
+  CardContent,
+  CardMedia,
+  Typography,
+  Button,
+} from "@mui/material";
 import styled from "styled-components";
 
 const HeadermakeOrder = styled.div`
-  /* background-color: white; */
   padding: 10px;
   color: white;
   .textHeaderStyle {
     color: black;
   }
-
   @media (max-width: 980px) {
-    /* background-color: rgb(26, 32, 53) !important; */
     .textHeaderStyle {
-      /* color: white !important; */
+      color: black;
     }
   }
+`;
+
+const TableContainer = styled.div`
+  margin-top: 20px;
+`;
+
+const StyledTable = styled.table`
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 20px;
+  th,
+  td {
+    border: 1px solid #ddd;
+    padding: 8px;
+    text-align: center;
+  }
+  th {
+    background-color: #f2f2f2;
+    font-weight: bold;
+  }
+`;
+
+const ProductCard = styled(Card)`
+  background-color: white !important;
+  color: black !important;
+  border: 1px solid #ddd;
+  box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+`;
+
+const ImageWrapper = styled(CardMedia)`
+  height: 100px;
+  width: 100px;
+  margin: 0 auto;
+  border-radius: 5px;
+  object-fit: cover;
 `;
 
 const CARD = styled(Card)`
@@ -36,15 +74,15 @@ const CARD = styled(Card)`
   border: 1px solid #ddd;
   box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
   display: flex;
-  flex-direction : column;
+  flex-direction: column;
   .MuiCardContent-root {
     .titleHonors {
       font-size: 20px;
       font-weight: 500;
     }
   }
-  .css-46bh2p-MuiCardContent-root:last-child{
-    padding-bottom : 10px;
+  .css-46bh2p-MuiCardContent-root:last-child {
+    padding-bottom: 10px;
   }
 `;
 
@@ -52,16 +90,16 @@ const GridbaseDiv = styled.div`
   display: grid;
   grid-template-columns: repeat(4, 1fr);
   grid-gap: 20px;
-  @media (max-width : 980px) {
-    grid-template-columns: repeat(3 , 1fr);
+  @media (max-width: 980px) {
+    grid-template-columns: repeat(3, 1fr);
   }
-  @media (max-width : 768px) {
-    grid-template-columns: repeat(2 , 1fr);
+  @media (max-width: 768px) {
+    grid-template-columns: repeat(2, 1fr);
   }
 `;
 
 const ButtonColor = styled.button`
-  background-image: linear-gradient(195deg, #42424a 0%, #191919 100%);
+  background-image: linear-gradient(195deg, #66bb6a 0%, #43a047 100%);
 `;
 
 const TYPOGRAPHY = styled(Typography)`
@@ -78,26 +116,24 @@ export default function HonorsMainComponent({ toggleShow }) {
   // edit honors
   const [editedHonor, setEditedHonor] = useState(null);
 
-  // const [content, setContent] = useState("");
-
   const datacome = useSelector(productListData);
 
-  // console.log(datacome);
-
   useEffect(() => {
-    dispatch(list());
+    const fetchProducts = async () => {
+      const productsData = await dispatch(list()).unwrap();
+      setProducts(productsData);
+    };
+    fetchProducts();
   }, [dispatch]);
 
-  // saving the changes
-  // const handleHonorSave = async (event) => {
-  //   event.preventDefault();
-  //   await dispatch(updateHonor({ ...editedHonor, content }));
-  //   setEditedHonor(null);
-  // };
+  const handleEditProduct = (product) => {
+    setEditedProduct(product);
+    setActiveKey("editProduct");
+  };
 
-  // cancelingEdit
   const handleCancelEdit = () => {
-    setEditedHonor(null);
+    setEditedProduct(null);
+    setActiveKey("viewProducts");
   };
 
   return (
@@ -106,6 +142,7 @@ export default function HonorsMainComponent({ toggleShow }) {
         <div className="d-block d-lg-none">
           <NavBarToggleBurgerButton func={() => toggleShow("main")} />
         </div>
+
         <div>
           {activekey === "editUserPage" && !editedHonor && (
             <>
@@ -161,16 +198,55 @@ export default function HonorsMainComponent({ toggleShow }) {
       </div>
 
       {activekey === "editUserPage" && !editedHonor && (
+        <TableContainer>
+          <StyledTable>
+            <thead>
+              <tr>
+                <th>عکس</th>
+                <th>نام محصول</th>
+                <th>کد محصول</th>
+                <th>عملیات</th>
+              </tr>
+            </thead>
+            <tbody>
+              {datacome &&
+                datacome?.map((product, index) => (
+                  <tr key={index}>
+                    <td>
+                      {datacome && datacome.info?.imgData?.[0]?.src && (
+                        <ProductCard>
+                          <ImageWrapper
+                            component="img"
+                            src={`${process.env.NEXT_PUBLIC_BACK_END_SERVER}/system/download/${product.info.imgData[0].src}`}
+                          />
+                        </ProductCard>
+                      )}
+                    </td>
+                    <td>{product.name}</td>
+                    <td>{product.code}</td>
+                    <td>
+                      <Button
+                        variant="contained"
+                        color="secondary"
+                        onClick={() => handleEditProduct(product)}
+                      >
+                        ویرایش
+                      </Button>
+                    </td>
+                  </tr>
+                ))}
+            </tbody>
+          </StyledTable>
+        </TableContainer>
+      )}
+
+      {activekey === "editUserPage" && !editedHonor && (
         <>
-          <GridbaseDiv
-            className="mt-3 container"
-            style={{ cursor: "pointer" }}
-          >
+          <GridbaseDiv className="mt-3 container" style={{ cursor: "pointer" }}>
             {datacome &&
               datacome.map((data, index) => (
                 <div key={index}>
                   <CARD
-                    
                     onClick={() => {
                       setEditedHonor(data);
                     }}
