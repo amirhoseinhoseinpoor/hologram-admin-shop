@@ -30,19 +30,36 @@ const HeadermakeOrder = styled.div`
 `;
 
 const ButtonColor = styled.button`
-  background-image: linear-gradient(195deg, #42424a 0%, #191919 100%);
+  background-image: linear-gradient(195deg, #66BB6A 0%, #43A047 100%);
 `;
 
 const CARD = styled(Card)`
-  background-color: #dfdcdc !important;
+  background-color: white !important;
   color: black !important;
   border: 1px solid #ddd;
-  box-shadow: unset;
+  box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+  display: flex;
+  flex-direction : column;
   .MuiCardContent-root {
     .titleHonors {
       font-size: 20px;
       font-weight: 500;
     }
+  }
+  .css-46bh2p-MuiCardContent-root:last-child{
+    padding-bottom : 10px;
+  }
+`;
+
+const GridbaseDiv = styled.div`
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  grid-gap: 20px;
+  @media (max-width : 980px) {
+    grid-template-columns: repeat(3 , 1fr);
+  }
+  @media (max-width : 768px) {
+    grid-template-columns: repeat(2 , 1fr);
   }
 `;
 
@@ -136,15 +153,15 @@ export default function HonorsMainComponent({ toggleShow }) {
       {/* content */}
       {activekey === "editUserPage" && !editedHonor && (
         <>
-          <div
-            className="mt-3 d-flex flex-column gap-3 container"
+          <GridbaseDiv
+            className="mt-3 container"
             style={{ cursor: "pointer" }}
           >
             {dataCome.length > 0 ? (
               dataCome.map((data, index) => (
                 <React.Fragment key={index}>
                   <CARD
-                    className="d-flex flex-row"
+                    
                     onClick={() => {
                       setEditedHonor(data);
                       // setContent(data.content); // Set content when editing
@@ -154,7 +171,7 @@ export default function HonorsMainComponent({ toggleShow }) {
                       component="img"
                       src={`${process.env.NEXT_PUBLIC_BACK_END_SERVER}/system/download/${data.src}`}
                       sx={{
-                        width: "150px",
+                        width: "100%",
                         maxHeight: "100%",
                         borderRadius: "2px",
                       }}
@@ -173,7 +190,7 @@ export default function HonorsMainComponent({ toggleShow }) {
             ) : (
               <Typography variant="body2">No data available</Typography>
             )}
-          </div>
+          </GridbaseDiv>
         </>
       )}
 

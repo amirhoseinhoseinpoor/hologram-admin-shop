@@ -15,6 +15,9 @@ const NavDropDown = styled(NavDropdown)`
     border-radius: 4px;
     box-shadow: 1px 1px 5px gray;
   }
+  .dropdown-toggle::after{
+    display: none;
+  }
 `;
 
 const NavBarInsideDiv = styled.div`

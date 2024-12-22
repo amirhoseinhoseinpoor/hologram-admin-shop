@@ -5,10 +5,16 @@ import { useDispatch } from "react-redux";
 import { listorders, whosOrder, updateOrderStatus } from "@/app/Store/thunks";
 import SearchIcon from "@mui/icons-material/Search";
 import styled from "styled-components";
+import {
+  Select,
+  MenuItem,
+  FormControl,
+  InputLabel,
+  Skeleton,
+} from "@mui/material";
 // import base components
 import ProfileComponent from "@/app/BaseComponent/ProfileComponent";
 import NavBarToggleBurgerButton from "@/app/BaseComponent/NavBarToggleBurgerButton";
-import LoadingCss from "@/app/BaseComponent/LoadingCss";
 import ConfirmingModal from "@/app/BaseComponent/ConfirmingModal";
 import ErrorModal from "@/app/BaseComponent/ErrorModal";
 // import component
@@ -64,8 +70,14 @@ const SearchInputMainDiv = styled.div`
   }
 `;
 
-const SeeOrderButton = styled.button`
-  background-color: ${(props) => props.color || "#1572e8"};
+// const SeeOrderButton = styled.button`
+//   background-color: ${(props) => props.color || "#1572e8"};
+// `;
+
+const AlignCenter = styled(Select)`
+  .css-jedpe8-MuiSelect-select-MuiInputBase-input-MuiOutlinedInput-input.MuiSelect-select {
+    text-align: center;
+  }
 `;
 
 export default function OrderMainComponent({ toggleShow }) {
@@ -73,191 +85,128 @@ export default function OrderMainComponent({ toggleShow }) {
 
   const [activekey, setActiveKey] = useState("seeTable");
   const [seeOrder, setSeeOrder] = useState(null);
-  const [orders, setOrders] = useState(null);
-  const [ordersCanceled, setOrdersCanceled] = useState(null);
-  const [searchTerm, setSearchTerm] = useState("");
-  const [filteredOrders, setFilteredOrders] = useState(null);
-  const [filteredOrdersUSER, setFilteredOrdersUSER] = useState(null);
-  const [filteredOrdersCanceled, setFilteredOrdersCanceled] = useState(null);
+  const [orders, setOrders] = useState([]);
+  const [filteredOrders, setFilteredOrders] = useState([]);
   const [usersData, setUsersData] = useState({});
-  const [usersDataCanceled, setUsersDataCanceled] = useState({});
   const [selectedStatus, setSelectedStatus] = useState({});
-  const [waitingForAdmin, setWaitingForAdmin] = useState(null);
-  const [WaitingForUser, setWaitingForUser] = useState(null);
+  const [searchTerm, setSearchTerm] = useState("");
+  const [currentStatus, setCurrentStatus] = useState("1"); // وضعیت پیش‌فرض
+  const [currentSubStatus, setCurrentSubStatus] = useState(null); // null یا 'admin' یا 'user'
   const [trackLoadingProduct, setTrackLoadingProduct] = useState(false);
 
-  // modal state
+  // وضعیت‌های مودال
   const [openModal2, setOpenModal2] = useState(false);
   const [openModal3, setOpenModal3] = useState(false);
-  // Close modal
+  // بستن مودال‌ها
   const closeModal2 = () => setOpenModal2(false);
   const closeModal3 = () => setOpenModal3(false);
 
   const normalizeString = (str) => str.replace(/\s+/g, "").toLowerCase();
 
-  // Add useEffect to handle filtering whenever orders, usersData, or searchTerm changes
-  useEffect(() => {
-    if (!orders || !usersData) return;
+  // تابع دریافت سفارش‌ها بر اساس وضعیت
+  const fetchOrders = async (status) => {
+    try {
+      setTrackLoadingProduct(true);
+      const ordersData = await dispatch(listorders({ status })).unwrap();
 
-    // If there's no search term, show all orders
-    if (!searchTerm) {
-      setFilteredOrders(waitingForAdmin);
-      setFilteredOrdersUSER(WaitingForUser);
-      setFilteredOrdersCanceled(ordersCanceled);
-      return;
+      // دریافت اطلاعات کاربران برای همه سفارش‌ها
+      const userPromises = ordersData.map(async (item) => {
+        const userDataCome = await dispatch(
+          whosOrder({ id: item.createdBy })
+        ).unwrap();
+        return { id: item.createdBy, userData: userDataCome[0] }; // دسترسی به اولین عنصر آرایه userData
+      });
+
+      // منتظر ماندن برای دریافت همه اطلاعات کاربران
+      const userDataArray = await Promise.all(userPromises);
+
+      // ایجاد یک نقشه از userId به userData
+      const userDataMap = userDataArray.reduce((acc, user) => {
+        acc[user.id] = user.userData;
+        return acc;
+      }, {});
+
+      setUsersData(userDataMap);
+      setOrders(ordersData);
+    } catch (error) {
+      console.error("Error during dispatch:", error);
+      setOpenModal3(true);
+    } finally {
+      setTrackLoadingProduct(false);
     }
-
-    // Filter orders based on user's firstName and lastName
-    const filtered = waitingForAdmin.filter((order) => {
-      const user = usersData[order.createdBy];
-      if (!user) return false;
-
-      const fullName = `${user.firstName || ""} ${user.lastName || ""}`;
-      const normalizedFullName = normalizeString(fullName);
-      const normalizedSearchTerm = normalizeString(searchTerm);
-
-      return normalizedFullName.includes(normalizedSearchTerm);
-    });
-
-    const filteredUSER = WaitingForUser.filter((order) => {
-      const user = usersData[order.createdBy];
-      if (!user) return false;
-
-      const fullName = `${user.firstName || ""} ${user.lastName || ""}`;
-      const normalizedFullName = normalizeString(fullName);
-      const normalizedSearchTerm = normalizeString(searchTerm);
-
-      return normalizedFullName.includes(normalizedSearchTerm);
-    });
-
-    const filteredCanceled = ordersCanceled?.filter((order) => {
-      const user = usersData[order.createdBy];
-      if (!user) return false;
-
-      const fullName = `${user.firstName || ""} ${user.lastName || ""}`;
-      const normalizedFullName = normalizeString(fullName);
-      const normalizedSearchTerm = normalizeString(searchTerm);
-
-      return normalizedFullName.includes(normalizedSearchTerm);
-    });
-    setFilteredOrders(filtered);
-    setFilteredOrdersUSER(filteredUSER);
-    setFilteredOrdersCanceled(filteredCanceled);
-  }, [
-    orders,
-    usersData,
-    searchTerm,
-    waitingForAdmin,
-    WaitingForUser,
-    ordersCanceled,
-  ]);
-
-  const handleCancelOrders = () => {
-    const fetchData = async (status) => {
-      if (ordersCanceled) {
-        setUsersDataCanceled({});
-        setOrdersCanceled(null);
-      } else {
-        try {
-          setTrackLoadingProduct(true);
-          const ordersData = await dispatch(listorders({ status })).unwrap();
-
-          // Fetch user data for all orders
-          const userPromises = ordersData.map(async (item) => {
-            const userDataCome = await dispatch(
-              whosOrder({ id: item.createdBy })
-            ).unwrap();
-
-            return { id: item.createdBy, userData: userDataCome[0] }; // Access the first item of the userData array
-          });
-
-          // Wait for all user data to be fetched
-          const userDataArray = await Promise.all(userPromises);
-
-          // Create a mapping of userId to userData
-          const userDataMap = userDataArray.reduce((acc, user) => {
-            acc[user.id] = user.userData; // Store the first element directly instead of the array
-            return acc;
-          }, {});
-
-          setUsersDataCanceled(userDataMap); // Set the user data map
-          setOrdersCanceled(ordersData); // Set orders
-          setTrackLoadingProduct(false);
-        } catch (error) {
-          console.error("Error during dispatch:", error);
-          setOpenModal3(true);
-          setTrackLoadingProduct(false);
-        }
-      }
-    };
-    fetchData(5);
   };
 
   useEffect(() => {
-    const fetchData = async (status) => {
-      try {
-        const ordersData = await dispatch(listorders({ status })).unwrap();
+    fetchOrders(currentStatus);
+  }, [dispatch, currentStatus]);
 
-        const userPromises = ordersData.map(async (item) => {
-          const userDataCome = await dispatch(
-            whosOrder({ id: item.createdBy })
-          ).unwrap();
+  // تابع فیلترینگ سفارش‌ها بر اساس وضعیت و زیر وضعیت
+  useEffect(() => {
+    if (!orders || !usersData) return;
 
-          // Return the user data
-          return { id: item.createdBy, userData: userDataCome[0] }; // Access the first item of the userData array
-        });
+    let filtered = orders;
 
-        // Wait for all user data to be fetched
-        const userDataArray = await Promise.all(userPromises);
-
-        // Create a mapping of userId to userData
-        const userDataMap = userDataArray.reduce((acc, user) => {
-          acc[user.id] = user.userData; // Store the first element directly instead of the array
-          return acc;
-        }, {});
-
-        setUsersData(userDataMap);
-        setOrders(ordersData);
-
-        // Separate orders with and without request comment
-        const waitingForAdmin = ordersData.filter((order) => {
-          // Check if the requestComment is an empty object
+    if (currentStatus === "1" && currentSubStatus) {
+      // اگر وضعیت=1 و زیر وضعیت انتخاب شده است
+      if (currentSubStatus === "admin") {
+        filtered = orders.filter((order) => {
           return (
             !order.reqComment || Object.keys(order.reqComment).length === 0
           );
         });
-        const withComment = ordersData.filter((order) => {
+      } else if (currentSubStatus === "user") {
+        filtered = orders.filter((order) => {
           return order.reqComment && Object.keys(order.reqComment).length > 0;
         });
-
-        setWaitingForAdmin(waitingForAdmin);
-        setWaitingForUser(withComment);
-      } catch (error) {
-        setOpenModal3(true);
-        console.error("Error during dispatch:", error);
       }
-    };
+    }
 
-    fetchData(1);
-  }, [dispatch]);
+    if (searchTerm) {
+      const normalizedSearchTerm = normalizeString(searchTerm);
+      filtered = filtered.filter((order) => {
+        const user = usersData[order.createdBy];
+        if (!user) return false;
 
-  function closeModalOnTimeout() {
-    setTimeout(() => {
-      setOpenModal2(false);
-    }, 3000);
-  }
+        const fullName = `${user.firstName || ""} ${user.lastName || ""}`;
+        const normalizedFullName = normalizeString(fullName);
 
-  // Handle status change
+        return normalizedFullName.includes(normalizedSearchTerm);
+      });
+    }
+
+    setFilteredOrders(filtered);
+  }, [orders, usersData, searchTerm, currentStatus, currentSubStatus]);
+
+  // تابع تغییر وضعیت سفارش
   const handleStatusChange = async (orderCode, newStatus) => {
     try {
       await dispatch(
         updateOrderStatus({ code: orderCode, status: newStatus })
       ).unwrap();
       setOpenModal2(true);
-      closeModalOnTimeout();
+      setTimeout(() => {
+        setOpenModal2(false);
+      }, 3000);
+      // بروزرسانی سفارش‌ها پس از تغییر وضعیت
+      fetchOrders(currentStatus);
     } catch (error) {
       setOpenModal3(true);
       console.error("Error updating status:", error);
+    }
+  };
+
+  // تابع مدیریت تغییرات در Dropdown
+  const handleDropdownChange = (e) => {
+    const value = e.target.value;
+    if (value === "1_admin") {
+      setCurrentStatus("1");
+      setCurrentSubStatus("admin");
+    } else if (value === "1_user") {
+      setCurrentStatus("1");
+      setCurrentSubStatus("user");
+    } else {
+      setCurrentStatus(value);
+      setCurrentSubStatus(null);
     }
   };
 
@@ -274,88 +223,104 @@ export default function OrderMainComponent({ toggleShow }) {
             </div>
             <ProfileComponent colorGet={"#191919"} />
           </HeadermakeOrder>
-          {/* Add a search input field */}
-          <SearchInputMainDiv className="me-2 mt-4 position-relative">
-            <input
-              className="inputSreachStyle"
-              type="text"
-              placeholder="جستجو..."
-              value={searchTerm}
-              onChange={(e) => setSearchTerm(e.target.value)}
-            />
-            <SearchIcon className="SearchIconStyle" />
-          </SearchInputMainDiv>
-
-          {filteredOrders && filteredOrders.length > 0 && (
-            <FixTablePlace className="container">
-              <p className="me-2 NormalTextSizing mb-2">
-                سفارشات در انتظار برسی
-              </p>
-              <OrderTabel
-                setSeeOrder={setSeeOrder}
-                setActiveKey={setActiveKey}
-                selectedStatus={selectedStatus}
-                setSelectedStatus={setSelectedStatus}
-                handleStatusChange={handleStatusChange}
-                mainArray={filteredOrders}
-                userMainData={usersData}
+          <div className="d-flex flex-row justify-content-between container align-items-center">
+            {/* فیلد جستجو */}
+            <SearchInputMainDiv className="me-2 mt-4 position-relative">
+              <input
+                className="inputSreachStyle"
+                type="text"
+                placeholder="جستجو..."
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
               />
-            </FixTablePlace>
-          )}
-
-          {filteredOrdersUSER && filteredOrdersUSER.length > 0 && (
-            <FixTablePlace className="container">
-              <p className="me-2 NormalTextSizing mb-2">
-                سفارشات در انتظار کاربر
-              </p>
-              <OrderTabel
-                setSeeOrder={setSeeOrder}
-                setActiveKey={setActiveKey}
-                selectedStatus={selectedStatus}
-                setSelectedStatus={setSelectedStatus}
-                handleStatusChange={handleStatusChange}
-                mainArray={filteredOrdersUSER}
-                userMainData={usersData}
-              />
-            </FixTablePlace>
-          )}
-
-          <div className="container mt-4 mb-4">
-            <SeeOrderButton
-              color="#6861ce"
-              onClick={handleCancelOrders}
-              type="button"
-              style={{
-                width: "180px",
-                display: "flex",
-                justifyContent: "center",
-              }}
-            >
-              {trackLoadingProduct ? (
-                <LoadingCss />
-              ) : ordersCanceled ? (
-                `پنهان کردن سفارشات لغو شده`
-              ) : (
-                `دیدن سفارشات لغو شده`
-              )}
-            </SeeOrderButton>
+              <SearchIcon className="SearchIconStyle" />
+            </SearchInputMainDiv>
+            <div>
+              <FormControl
+                variant="outlined"
+                size="small"
+                sx={{ minWidth: 150 }}
+              >
+                <InputLabel sx={{ fontFamily: "unset" }}>
+                  فیلتر بر اساس وضعیت
+                </InputLabel>
+                <AlignCenter
+                  sx={{
+                    fontFamily: "unset",
+                    padding: "0px",
+                  }}
+                  label="فیلتر بر اساس وضعیت"
+                  value={
+                    currentStatus === "1"
+                      ? currentSubStatus
+                        ? `1_${currentSubStatus}`
+                        : "1"
+                      : currentStatus
+                  }
+                  onChange={handleDropdownChange}
+                >
+                  <MenuItem sx={{ fontFamily: "unset" }} value="1">
+                    درحال برسی
+                  </MenuItem>
+                  <MenuItem sx={{ fontFamily: "unset" }} value="1_admin">
+                    منتظر تایید مدیر
+                  </MenuItem>
+                  <MenuItem sx={{ fontFamily: "unset" }} value="1_user">
+                    منتظر تایید کاربر
+                  </MenuItem>
+                  <MenuItem sx={{ fontFamily: "unset" }} value="2">
+                    درحال تولید
+                  </MenuItem>
+                  <MenuItem sx={{ fontFamily: "unset" }} value="3">
+                    درحال ارسال
+                  </MenuItem>
+                  <MenuItem sx={{ fontFamily: "unset" }} value="4">
+                    تحویل داده شده
+                  </MenuItem>
+                  <MenuItem sx={{ fontFamily: "unset" }} value="5">
+                    لغو شده
+                  </MenuItem>
+                </AlignCenter>
+              </FormControl>
+            </div>
           </div>
-          
-          {/* orders canceled */}
-          {filteredOrdersCanceled && filteredOrdersCanceled.length > 0 && (
-            <FixTablePlace className="container">
-              <p className="me-2 NormalTextSizing mb-2">سفارشات لغو شده</p>
-              <OrderTabel
-                setSeeOrder={setSeeOrder}
-                setActiveKey={setActiveKey}
-                selectedStatus={selectedStatus}
-                setSelectedStatus={setSelectedStatus}
-                handleStatusChange={handleStatusChange}
-                mainArray={filteredOrdersCanceled}
-                userMainData={usersDataCanceled}
-              />
-            </FixTablePlace>
-          )}
+
+          <FixTablePlace className="container">
+            <>
+              {trackLoadingProduct ? (
+                <>
+                  <p className="me-2 NormalTextSizing mb-2">سفارشات</p>
+                  <Skeleton
+                    animation="wave"
+                    variant="rounded"
+                    className="w-100"
+                    height={250}
+                  />
+                </>
+              ) : (
+                <>
+                  {filteredOrders && filteredOrders.length > 0 ? (
+                    <>
+                      <p className="me-2 NormalTextSizing mb-2">سفارشات</p>
+                      <OrderTabel
+                        setSeeOrder={setSeeOrder}
+                        setActiveKey={setActiveKey}
+                        selectedStatus={selectedStatus}
+                        setSelectedStatus={setSelectedStatus}
+                        handleStatusChange={handleStatusChange}
+                        mainArray={filteredOrders}
+                        userMainData={usersData}
+                      />
+                    </>
+                  ) : (
+                    <p className="me-2 NormalTextSizing mb-2">
+                      هیچ سفارشی یافت نشد.
+                    </p>
+                  )}
+                </>
+              )}
+            </>
+          </FixTablePlace>
         </>
       )}
       {activekey === "seeOrder" && (
@@ -365,7 +330,7 @@ export default function OrderMainComponent({ toggleShow }) {
           seeOrder={seeOrder}
         />
       )}
-      {/* modals */}
+      {/* مودال‌ها */}
       <ConfirmingModal
         open={openModal2}
         onClose={closeModal2}
