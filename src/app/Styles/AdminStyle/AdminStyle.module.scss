@@ -8,6 +8,18 @@
   gap: 10px;
 }
 
+.titleStyleHeader{
+  color: var.$sidebarColor;
+  display: flex;
+  margin-top: 20px;
+  padding-bottom: 10px;
+  justify-content: center;
+  width: 90%;
+  border-bottom: 1px solid #42424a;
+}
+
+
+
 .offcanvasheader :global {
   button {
     margin: 0 !important;
@@ -15,6 +27,10 @@
   .offcanvas-title{
     color: var.$sidebarColorActive;
   }
+}
+
+.offcanvasHeaderResponsive{
+  width: 100% !important;
 }
 
 
@@ -31,7 +47,7 @@
 }
 
 .sidebar {
-  width: 19%;
+  width: 20%;
   background-color: white;
   color: #fff;
   box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
@@ -41,10 +57,12 @@
 }
 
 .sidebarMain {
+  position: sticky;
+  top: 0;
   display: flex;
   flex-direction: column;
   gap: 7px;
-  width: 95%;
+  width: 94%;
   justify-content: center;
   border-bottom: none;
 }
@@ -60,7 +78,8 @@
     text-align: start;
     width: 100%;
     border: none;
-    padding: 7px 27px 7px 7px;
+    padding: 7px 7px 7px 7px;
+    position: relative;
   }
   .nav-link.active {
     background-image: var.$sideBarMainBackground;
@@ -68,6 +87,16 @@
     border: none;
     border-radius: 10px;
   }
+
+}
+
+.addBorderSideBar{
+  border-bottom: 1px solid #42424a !important;
+}
+.addBorderSideBar2{
+  width: 87%;
+  border-bottom: 1px solid #42424a !important;
+  bottom: 0;
 }
 
 .sidebarMain .nav {
@@ -126,5 +155,6 @@
   }
   .navbaritemheader > div {
     align-items: unset !important;
+    justify-content: center;
   }
 }

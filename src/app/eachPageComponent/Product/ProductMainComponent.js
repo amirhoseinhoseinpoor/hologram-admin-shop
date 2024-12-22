@@ -6,23 +6,50 @@ import AddProduct from "./AddProduct";
 import EditProduct from "./EditProduct";
 // import base component
 import ProfileComponent from "@/app/BaseComponent/ProfileComponent";
+import AreYouShureModal from "@/app/BaseComponent/AreYouSureModal";
+import ConfirmingModal from "@/app/BaseComponent/ConfirmingModal";
+import ErrorModal from "@/app/BaseComponent/ErrorModal";
 import NavBarToggleBurgerButton from "@/app/BaseComponent/NavBarToggleBurgerButton";
 //redux import
 import { useSelector, useDispatch } from "react-redux";
 import { list } from "../../Store/thunks.js";
 import { productListData } from "@/app/Store/slice";
-import {
-  Card,
-  CardContent,
-  CardMedia,
-  Typography,
-  Button,
-} from "@mui/material";
+import { deleted } from "../../Store/thunks.js";
+// improt styles
+import { Card, CardMedia, Typography } from "@mui/material";
+import MoreHorizIcon from "@mui/icons-material/MoreHoriz";
+import DeleteIcon from "@mui/icons-material/Delete";
+import EditIcon from "@mui/icons-material/Edit";
+import { NavDropdown } from "react-bootstrap";
 import styled from "styled-components";
+
+const NavDropDown = styled(NavDropdown)`
+  .dropdown-menu {
+    border: 1px solid gray;
+    width: 230px;
+    padding: 12px;
+    margin-top: 3px;
+    border-radius: 4px;
+    box-shadow: 1px 1px 5px gray;
+  }
+  .dropdown-toggle::after {
+    display: none;
+  }
+`;
+
+const NavBarInsideDiv = styled.div`
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  /* padding-bottom: 10px; */
+  /* border-bottom: 1.4px solid #e1e5ea; */
+`;
 
 const HeadermakeOrder = styled.div`
   padding: 10px;
   color: white;
+  background-color:rgb(225, 223, 223);
+  border-radius: 4px;
   .textHeaderStyle {
     color: black;
   }
@@ -46,6 +73,7 @@ const StyledTable = styled.table`
     border: 1px solid #ddd;
     padding: 8px;
     text-align: center;
+    vertical-align: middle;
   }
   th {
     background-color: #f2f2f2;
@@ -54,9 +82,9 @@ const StyledTable = styled.table`
 `;
 
 const ProductCard = styled(Card)`
-  background-color: white !important;
+  background-color: #f5f5f5;
   color: black !important;
-  border: 1px solid #ddd;
+  /* border: 1px solid #ddd; */
   box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
 `;
 
@@ -88,13 +116,13 @@ const CARD = styled(Card)`
 
 const GridbaseDiv = styled.div`
   display: grid;
-  grid-template-columns: repeat(4, 1fr);
+  grid-template-columns: repeat(2, 1fr);
   grid-gap: 20px;
   @media (max-width: 980px) {
-    grid-template-columns: repeat(3, 1fr);
+    grid-template-columns: repeat(2, 1fr);
   }
   @media (max-width: 768px) {
-    grid-template-columns: repeat(2, 1fr);
+    grid-template-columns: repeat(1, 1fr);
   }
 `;
 
@@ -113,27 +141,72 @@ export default function HonorsMainComponent({ toggleShow }) {
   // add honors
   const [activekey, setActiveKey] = useState("editUserPage");
 
+  const [dataUpdated, setDataUpdated] = useState(false);
+
   // edit honors
   const [editedHonor, setEditedHonor] = useState(null);
+  const [openModal, setOpenModal] = useState(false);
+  const [openModal2, setOpenModal2] = useState(false);
+  const [openModal3, setOpenModal3] = useState(false);
+  const [dataForDelete, setDataForDelete] = useState(null);
+
+  const closeModal = () => setOpenModal(false);
+  const closeModal2 = () => setOpenModal2(false);
+  const closeModal3 = () => setOpenModal3(false);
 
   const datacome = useSelector(productListData);
 
   useEffect(() => {
-    const fetchProducts = async () => {
-      const productsData = await dispatch(list()).unwrap();
-      setProducts(productsData);
+    const fetchData = async () => {
+      try {
+        await dispatch(list());
+      } catch (error) {
+        console.error("Error fetching data:", error);
+      } finally {
+        setDataUpdated(false);
+      }
     };
-    fetchProducts();
-  }, [dispatch]);
+    fetchData();
+  }, [dispatch, dataUpdated]);
 
   const handleEditProduct = (product) => {
-    setEditedProduct(product);
-    setActiveKey("editProduct");
+    setEditedHonor(product);
   };
 
   const handleCancelEdit = () => {
-    setEditedProduct(null);
-    setActiveKey("viewProducts");
+    setEditedHonor(null);
+  };
+
+  const areYouShureFunction = (product) => {
+    setDataForDelete(product); 
+    setOpenModal(true); 
+  };
+
+  function closeModalOnTimeout() {
+    setTimeout(() => {
+      setOpenModal2(false);
+    }, 3000);
+  }
+
+  const handleDelete = async (e) => {
+    e.preventDefault();
+    setOpenModal(false);
+    try {
+      const deleteProduct = await dispatch(
+        deleted({ code: dataForDelete.code, name: dataForDelete.name })
+      );
+
+      if (deleteProduct.payload.message === "Success") {
+        setOpenModal2(true);
+        closeModalOnTimeout();
+      } else {
+        setOpenModal3(true);
+      }
+    } catch (error) {
+      console.error("Error deleting product:", error);
+    } finally {
+      setDataUpdated(true);
+    }
   };
 
   return (
@@ -146,21 +219,22 @@ export default function HonorsMainComponent({ toggleShow }) {
         <div>
           {activekey === "editUserPage" && !editedHonor && (
             <>
-              <div className="NormalTextSizing textHeaderStyle d-flex align-items-center">
+              <div className="NormalTextSizing text-decoration-underline textHeaderStyle d-flex align-items-center">
                 ویرایش محصولات
               </div>
             </>
           )}
           {activekey === "addUser" && !editedHonor && (
             <>
-              <div className="NormalTextSizing textHeaderStyle d-flex align-items-center">
+              <div className="text-decoration-underline NormalTextSizing textHeaderStyle d-flex align-items-center">
                 افزودن محصول
               </div>
+              
             </>
           )}
           {editedHonor && (
             <>
-              <div className="NormalTextSizing textHeaderStyle d-flex align-items-center">
+              <div className="NormalTextSizing text-decoration-underline textHeaderStyle d-flex align-items-center">
                 ویرایش محصول
               </div>
             </>
@@ -198,13 +272,13 @@ export default function HonorsMainComponent({ toggleShow }) {
       </div>
 
       {activekey === "editUserPage" && !editedHonor && (
-        <TableContainer>
+        <TableContainer className="container">
           <StyledTable>
             <thead>
               <tr>
                 <th>عکس</th>
                 <th>نام محصول</th>
-                <th>کد محصول</th>
+                <th className="d-none d-lg-table-cell">کد محصول</th>
                 <th>عملیات</th>
               </tr>
             </thead>
@@ -213,7 +287,7 @@ export default function HonorsMainComponent({ toggleShow }) {
                 datacome?.map((product, index) => (
                   <tr key={index}>
                     <td>
-                      {datacome && datacome.info?.imgData?.[0]?.src && (
+                      {product && product.info?.imgData?.[0]?.src && (
                         <ProductCard>
                           <ImageWrapper
                             component="img"
@@ -223,15 +297,63 @@ export default function HonorsMainComponent({ toggleShow }) {
                       )}
                     </td>
                     <td>{product.name}</td>
-                    <td>{product.code}</td>
+                    <td className="d-none d-lg-table-cell">{product.code}</td>
                     <td>
-                      <Button
+                      {/* <Button
+                        style={{fontFamily : "unset"}}
                         variant="contained"
                         color="secondary"
                         onClick={() => handleEditProduct(product)}
                       >
                         ویرایش
-                      </Button>
+                      </Button> */}
+                      <NavDropDown
+                        title={
+                          <>
+                            <MoreHorizIcon
+                              style={{
+                                color: "#191919",
+                                cursor: "pointer",
+                                fontSize: "28px",
+                                cursor: "pointer",
+                              }}
+                            />
+                          </>
+                        }
+                        id="basic-nav-dropdown"
+                      >
+                        <NavBarInsideDiv>
+                          <div
+                            onClick={() => {
+                              setEditedHonor(product);
+                            }}
+                            style={{
+                              borderBottom: "1px solid black",
+                              cursor: "pointer",
+                            }}
+                            className="d-flex flex-row gap-2 align-items-center pb-2"
+                          >
+                            <p className="VodeoDisSizing  text-end">ویرایش</p>
+                            <div style={{ color: "#F3802C" }}>
+                              <EditIcon className="subitem" />
+                            </div>
+                          </div>
+
+                          <div
+                            onClick={() => areYouShureFunction(product)}
+                            style={{
+                              cursor: "pointer",
+                            }}
+                            className="d-flex flex-row gap-2 align-items-center mt-2"
+                          >
+                            <p className="VodeoDisSizing text-end">حذف</p>
+                            <div style={{ color: "#F3802C" }}>
+                              <DeleteIcon className="text-danger subitem" />
+                            </div>
+                          </div>
+                        </NavBarInsideDiv>
+                        <div className="d-flex justify-content-end"></div>
+                      </NavDropDown>
                     </td>
                   </tr>
                 ))}
@@ -240,7 +362,7 @@ export default function HonorsMainComponent({ toggleShow }) {
         </TableContainer>
       )}
 
-      {activekey === "editUserPage" && !editedHonor && (
+      {/* {activekey === "editUserPage" && !editedHonor && (
         <>
           <GridbaseDiv className="mt-3 container" style={{ cursor: "pointer" }}>
             {datacome &&
@@ -277,36 +399,10 @@ export default function HonorsMainComponent({ toggleShow }) {
                   </CARD>
                 </div>
               ))}
-            {/* {honorsData.map((honor, index) => (
-              <React.Fragment key={index}>
-                <CARD
-                  className="d-flex flex-row"
-                  onClick={() => {
-                    setEditedHonor(honor);
-                    setContent(honor.content); // Set content when editing
-                  }}
-                >
-                  <CardMedia
-                    component="img"
-                    src={honor.src}
-                    sx={{
-                      width: "120px",
-                      maxHeight: "100%",
-                      borderRadius: "2px",
-                    }}
-                  />
-                  <CardContent className="d-flex flex-column justify-content-around">
-                    <Typography className="titleHonors">
-                      {honor.title}
-                    </Typography>
-                    <Typography className="dateHonors">{honor.date}</Typography>
-                  </CardContent>
-                </CARD>
-              </React.Fragment>
-            ))} */}
+           
           </GridbaseDiv>
         </>
-      )}
+      )} */}
 
       {activekey === "addUser" && !editedHonor && (
         <>
@@ -322,6 +418,23 @@ export default function HonorsMainComponent({ toggleShow }) {
           />
         </>
       )}
+      {/* modals */}
+      <AreYouShureModal
+        open={openModal}
+        onClose={closeModal}
+        text={"ایا از حذف محصول مطمعن هستید"}
+        func={handleDelete}
+      />
+      <ConfirmingModal
+        open={openModal2}
+        onClose={closeModal2}
+        text={"عملیات با موفقیت انجام شد"}
+      />
+      <ErrorModal
+        open={openModal3}
+        onClose={closeModal3}
+        text={"خطا از لاگین بودن خود اطمینان حاصل فرمایید"}
+      />
     </section>
   );
 }

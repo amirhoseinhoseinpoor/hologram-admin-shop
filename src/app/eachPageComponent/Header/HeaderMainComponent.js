@@ -56,6 +56,8 @@ const Container = styled.div`
 const HeadermakeOrder = styled.div`
   padding: 10px;
   color: white;
+  background-color:rgb(225, 223, 223);
+  border-radius: 4px;
   .textHeaderStyle {
     color: black;
   }
@@ -403,7 +405,7 @@ export default function HeaderMainComponent({ toggleShow }) {
         <div className="d-block d-lg-none">
           <NavBarToggleBurgerButton func={() => toggleShow("main")} />
         </div>
-        <div className="NormalTextSizing textHeaderStyle d-flex align-items-center">
+        <div className="NormalTextSizing text-decoration-underline textHeaderStyle d-flex align-items-center">
           ساخت هدر
         </div>
         <ProfileComponent colorGet={"#191919"} />

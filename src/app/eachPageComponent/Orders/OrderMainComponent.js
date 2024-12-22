@@ -12,6 +12,7 @@ import {
   InputLabel,
   Skeleton,
 } from "@mui/material";
+
 // import base components
 import ProfileComponent from "@/app/BaseComponent/ProfileComponent";
 import NavBarToggleBurgerButton from "@/app/BaseComponent/NavBarToggleBurgerButton";
@@ -20,11 +21,12 @@ import ErrorModal from "@/app/BaseComponent/ErrorModal";
 // import component
 import OrderTabel from "./OrderTabel";
 
+
 const FixTablePlace = styled.div`
   @media (min-width: 980px) {
     position: relative;
     margin-top: 60px;
-    p {
+    .fixingTabel {
       position: absolute;
       transform: translate(-50%, 50%);
       left: 50%;
@@ -39,9 +41,10 @@ const FixTablePlace = styled.div`
 `;
 
 const HeadermakeOrder = styled.div`
-  /* background-color: white; */
   padding: 10px;
   color: white;
+  background-color: rgb(225, 223, 223);
+  border-radius: 4px;
   .textHeaderStyle {
     color: black;
   }
@@ -77,6 +80,16 @@ const SearchInputMainDiv = styled.div`
 const AlignCenter = styled(Select)`
   .css-jedpe8-MuiSelect-select-MuiInputBase-input-MuiOutlinedInput-input.MuiSelect-select {
     text-align: center;
+  }
+  .MuiSelect-icon {
+    right: auto; /* Reset default positioning */
+    left: 0px; /* Position arrow on the left */
+  }
+  .css-jedpe8-MuiSelect-select-MuiInputBase-input-MuiOutlinedInput-input.css-jedpe8-MuiSelect-select-MuiInputBase-input-MuiOutlinedInput-input.css-jedpe8-MuiSelect-select-MuiInputBase-input-MuiOutlinedInput-input {
+    padding-left: 32px;
+  }
+  .css-jedpe8-MuiSelect-select-MuiInputBase-input-MuiOutlinedInput-input.css-jedpe8-MuiSelect-select-MuiInputBase-input-MuiOutlinedInput-input.css-jedpe8-MuiSelect-select-MuiInputBase-input-MuiOutlinedInput-input{
+    padding-right : 10px !important; 
   }
 `;
 
@@ -218,7 +231,7 @@ export default function OrderMainComponent({ toggleShow }) {
             <div className="d-block d-lg-none">
               <NavBarToggleBurgerButton func={() => toggleShow("main")} />
             </div>
-            <div className="NormalTextSizing textHeaderStyle d-flex align-items-center">
+            <div className="NormalTextSizing text-decoration-underline textHeaderStyle d-flex align-items-center">
               مدیریت سفارشات
             </div>
             <ProfileComponent colorGet={"#191919"} />
@@ -289,7 +302,7 @@ export default function OrderMainComponent({ toggleShow }) {
             <>
               {trackLoadingProduct ? (
                 <>
-                  <p className="me-2 NormalTextSizing mb-2">سفارشات</p>
+                  <p className="me-2 NormalTextSizing mb-2 fixingTabel">سفارشات</p>
                   <Skeleton
                     animation="wave"
                     variant="rounded"
@@ -301,7 +314,7 @@ export default function OrderMainComponent({ toggleShow }) {
                 <>
                   {filteredOrders && filteredOrders.length > 0 ? (
                     <>
-                      <p className="me-2 NormalTextSizing mb-2">سفارشات</p>
+                      <p className="me-2 NormalTextSizing mb-2 fixingTabel">سفارشات</p>
                       <OrderTabel
                         setSeeOrder={setSeeOrder}
                         setActiveKey={setActiveKey}

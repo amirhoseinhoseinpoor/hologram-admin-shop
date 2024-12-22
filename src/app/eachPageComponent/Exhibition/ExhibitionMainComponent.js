@@ -16,9 +16,10 @@ import { exhibitionList } from "@/app/Store/thunks";
 import { formatPersianDate } from "@/app/utils/persionDateUtils";
 
 const HeadermakeOrder = styled.div`
-  /* background-color: white; */
-  padding: 10px;
+ padding: 10px;
   color: white;
+  background-color:rgb(225, 223, 223);
+  border-radius: 4px;
   .textHeaderStyle {
     color: black;
   }
@@ -51,13 +52,13 @@ const CARD = styled(Card)`
 
 const GridbaseDiv = styled.div`
   display: grid;
-  grid-template-columns: repeat(4, 1fr);
+  grid-template-columns: repeat(2, 1fr);
   grid-gap: 20px;
   @media (max-width : 980px) {
-    grid-template-columns: repeat(3 , 1fr);
+    grid-template-columns: repeat(2 , 1fr);
   }
   @media (max-width : 768px) {
-    grid-template-columns: repeat(2 , 1fr);
+    grid-template-columns: repeat(1 , 1fr);
   }
 `;
 
@@ -102,21 +103,21 @@ export default function HonorsMainComponent({ toggleShow }) {
         </div>
         {activekey === "editUserPage" && !editedHonor && (
           <>
-            <div className="NormalTextSizing textHeaderStyle d-flex align-items-center">
+            <div className="NormalTextSizing text-decoration-underline textHeaderStyle d-flex align-items-center">
               ویرایش نمایشگاه
             </div>
           </>
         )}
         {activekey === "addUser" && !editedHonor && (
           <>
-            <div className="NormalTextSizing textHeaderStyle d-flex align-items-center">
+            <div className="NormalTextSizing text-decoration-underline textHeaderStyle d-flex align-items-center">
               افزودن نمایشگاه
             </div>
           </>
         )}
         {editedHonor && (
           <>
-            <div className="NormalTextSizing textHeaderStyle d-flex align-items-center">
+            <div className="NormalTextSizing text-decoration-underline textHeaderStyle d-flex align-items-center">
               ویرایش نمایشگاه
             </div>
           </>
