@@ -179,7 +179,7 @@ export default function AddUserBtn({
                 name="username"
                 placeholder="شماره همراه"
                 className="form-control"
-                value={newUserData.cardId}
+                value={newUserData.username}
                 onChange={handleInputChange}
                 required
               />

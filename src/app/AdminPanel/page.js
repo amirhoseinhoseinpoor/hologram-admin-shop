@@ -7,6 +7,8 @@ import { Offcanvas, Navbar, Nav } from "react-bootstrap";
 import React, { useState, lazy, Suspense } from "react";
 import dynamic from "next/dynamic";
 import CustomCloseButton from "../BaseComponent/CustomCloseButton.js";
+import { DndProvider } from "react-dnd";
+import { HTML5Backend } from "react-dnd-html5-backend";
 
 // mui icons import
 import SpaceDashboardIcon from "@mui/icons-material/SpaceDashboard";
@@ -20,11 +22,17 @@ import ViewArrayIcon from "@mui/icons-material/ViewArray";
 import VideocamIcon from "@mui/icons-material/Videocam";
 import PeopleIcon from "@mui/icons-material/People";
 import SettingsIcon from "@mui/icons-material/Settings";
+import PersonIcon from "@mui/icons-material/Person";
 
 // import components
 const DefineUser = lazy(() =>
   import("../eachPageComponent/DefineUser/DefineUserTable.js")
 );
+
+const CustomerUser = lazy(() =>
+  import("../eachPageComponent/CustomerUser/CustomerUserTabel.js")
+);
+
 const HonorsMainComponent = lazy(() =>
   import("../eachPageComponent/Honors/HonorsMainComponent.js")
 );
@@ -199,18 +207,18 @@ const AdminPanel = () => {
             eventKey="defineUser"
             title={
               <>
-                <PeopleIcon /> مدیریت کاربر
+                <PersonIcon /> کاربر های سیستم
               </>
             }
           ></Tab>
-          {/* <Tab
-            eventKey="setting"
+          <Tab
+            eventKey="customerUser"
             title={
               <>
-                <SettingsIcon /> تنظیمات
+                <PeopleIcon /> مدیریت مشتریان
               </>
             }
-          ></Tab> */}
+          ></Tab>
         </Tabs>
       </aside>
 
@@ -231,16 +239,16 @@ const AdminPanel = () => {
               className={`${style.offcanvasheader} ${style.nextoffcanvas} ${style.offcanvasHeaderResponsive} justify-content-between position-relative`}
               closeButton={false}
             >
-              
-                <Offcanvas.Title className="me-2">لوگو</Offcanvas.Title>
-                <CustomCloseButton
-                  className="me-2"
-                  color={"#262626"}
-                  onClick={() => handleClose("main")}
-                />
-              
+              <Offcanvas.Title className="me-2">لوگو</Offcanvas.Title>
+              <CustomCloseButton
+                className="me-2"
+                color={"#262626"}
+                onClick={() => handleClose("main")}
+              />
 
-              <div className={`${style.addBorderSideBar2} position-absolute`}></div>
+              <div
+                className={`${style.addBorderSideBar2} position-absolute`}
+              ></div>
             </Offcanvas.Header>
 
             <Nav className="align-items-center gap-3">
@@ -329,18 +337,18 @@ const AdminPanel = () => {
                   eventKey="defineUser"
                   title={
                     <>
-                      <PeopleIcon /> مدیریت کاربر
+                      <PersonIcon /> کاربر های سیستم
                     </>
                   }
                 ></Tab>
-                {/* <Tab
-                  eventKey="setting"
+                <Tab
+                  eventKey="customerUser"
                   title={
                     <>
-                      <SettingsIcon /> تنظیمات
+                      <PeopleIcon /> مدیریت مشتریان
                     </>
                   }
-                ></Tab> */}
+                ></Tab>
               </Tabs>
             </Nav>
           </Navbar.Offcanvas>
@@ -358,7 +366,10 @@ const AdminPanel = () => {
         )}
         {activeTab === "header" && (
           <div className={style.tabContent}>
-            <HeaderMainComponent toggleShow={toggleShow} />
+            <DndProvider backend={HTML5Backend}>
+              <HeaderMainComponent toggleShow={toggleShow} />
+            </DndProvider>
+            
           </div>
         )}
         {activeTab === "Product" && (
@@ -400,9 +411,13 @@ const AdminPanel = () => {
             </Suspense>
           </div>
         )}
-        {/* {activeTab === "setting" && (
-          <div className={style.tabContent}>Tab content for Settings</div>
-        )} */}
+        {activeTab === "customerUser" && (
+          <div className={style.tabContent}>
+            <Suspense fallback={<div>Loading...</div>}>
+              <CustomerUser toggleShow={toggleShow} />
+            </Suspense>
+          </div>
+        )}
       </div>
     </section>
   );

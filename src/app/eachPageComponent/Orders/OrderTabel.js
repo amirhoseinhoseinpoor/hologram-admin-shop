@@ -8,11 +8,13 @@ import MoreHorizIcon from "@mui/icons-material/MoreHoriz";
 import { NavDropdown } from "react-bootstrap";
 import DeleteIcon from "@mui/icons-material/Delete";
 import EditIcon from "@mui/icons-material/Edit";
+import AssignmentIcon from '@mui/icons-material/Assignment';
+// improt areyou sure moda
 
-const SeeOrderButton = styled.button`
-  background-color: ${(props) => props.color || "#1572e8"};
-  background-image: linear-gradient(195deg, #66bb6a 0%, #43a047 100%);
-`;
+// const SeeOrderButton = styled.button`
+//   background-color: ${(props) => props.color || "#1572e8"};
+//   background-image: linear-gradient(195deg, #66bb6a 0%, #43a047 100%);
+// `;
 
 const NavBarInsideDiv = styled.div`
   display: flex;
@@ -124,9 +126,8 @@ export default function OrderTabelDesctop({
   handleStatusChange,
   setSelectedStatus,
   selectedStatus,
+  areYouShureFunction,
 }) {
-  console.log(mainArray);
-
   const [openModals, setOpenModals] = useState({});
 
   const handleCloseModal = (itemCode) => {
@@ -180,7 +181,7 @@ export default function OrderTabelDesctop({
                   {item.code}
                 </td>
                 <td>
-                  {/* <Modal
+                  <Modal
                     open={openModals[item.code] || false}
                     onClose={() => handleCloseModal(item.code)}
                     aria-labelledby="modal-modal-title"
@@ -231,7 +232,7 @@ export default function OrderTabelDesctop({
                         </AlignCenter>
                       </FormControl>
                     </Box>
-                  </Modal> */}
+                  </Modal>
 
                   {/* <div onClick={() => handleOpenModal(item.code)}>
                     <MoreHorizIcon style={{ cursor: "pointer" }} />
@@ -254,6 +255,19 @@ export default function OrderTabelDesctop({
                   >
                     <NavBarInsideDiv>
                       <div
+                        onClick={() => handleOpenModal(item.code)}
+                        style={{
+                          borderBottom: "1px solid black",
+                          cursor: "pointer",
+                        }}
+                        className="d-flex flex-row gap-2 align-items-center pb-2"
+                      >
+                        <p className="VodeoDisSizing  text-end">تغیروضعیت</p>
+                        <div style={{ color: "#F3802C" }}>
+                          <AssignmentIcon className="subitem" />
+                        </div>
+                      </div>
+                      <div
                         onClick={() => {
                           setActiveKey("seeOrder");
                           setSeeOrder(item);
@@ -262,7 +276,7 @@ export default function OrderTabelDesctop({
                           borderBottom: "1px solid black",
                           cursor: "pointer",
                         }}
-                        className="d-flex flex-row gap-2 align-items-center pb-2"
+                        className="d-flex flex-row gap-2 align-items-center pb-2 mt-2"
                       >
                         <p className="VodeoDisSizing  text-end">ویرایش</p>
                         <div style={{ color: "#F3802C" }}>
@@ -271,7 +285,7 @@ export default function OrderTabelDesctop({
                       </div>
 
                       <div
-                        onClick={() => areYouShureFunction(product)}
+                        onClick={() => areYouShureFunction(item.code)}
                         style={{
                           cursor: "pointer",
                         }}
@@ -434,6 +448,19 @@ export default function OrderTabelDesctop({
                   >
                     <NavBarInsideDiv>
                       <div
+                        onClick={() => handleOpenModal(item.code)}
+                        style={{
+                          borderBottom: "1px solid black",
+                          cursor: "pointer",
+                        }}
+                        className="d-flex flex-row gap-2 align-items-center pb-2"
+                      >
+                        <p className="VodeoDisSizing  text-end">تغیروضعیت</p>
+                        <div style={{ color: "#F3802C" }}>
+                          <AssignmentIcon className="subitem" />
+                        </div>
+                      </div>
+                      <div
                         onClick={() => {
                           setActiveKey("seeOrder");
                           setSeeOrder(item);
@@ -442,7 +469,7 @@ export default function OrderTabelDesctop({
                           borderBottom: "1px solid black",
                           cursor: "pointer",
                         }}
-                        className="d-flex flex-row gap-2 align-items-center pb-2"
+                        className="d-flex flex-row gap-2 align-items-center pb-2 mt-2"
                       >
                         <p className="VodeoDisSizing  text-end">ویرایش</p>
                         <div style={{ color: "#F3802C" }}>

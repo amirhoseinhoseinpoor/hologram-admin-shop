@@ -10,16 +10,16 @@ import ConfirmingModal from "@/app/BaseComponent/ConfirmingModal";
 import ErrorModal from "@/app/BaseComponent/ErrorModal";
 import ProfileComponent from "@/app/BaseComponent/ProfileComponent";
 import { Skeleton } from "@mui/material";
+import SearchIcon from "@mui/icons-material/Search";
+import styled from "styled-components";
 // import components
 import AddUserBtn from "../DefineUser/AddUserBtn";
 import EditUserBtnfunction from "./EditUserBtn";
-import SearchIcon from "@mui/icons-material/Search";
-import styled from "styled-components";
 
 const HeadermakeOrder = styled.div`
   padding: 10px;
   color: white;
-  background-color:rgb(225, 223, 223);
+  background-color: rgb(225, 223, 223);
   border-radius: 4px;
   .textHeaderStyle {
     color: black;
@@ -88,10 +88,6 @@ const MAINTABELSTYLE = styled.div`
   }
 `;
 
-const SeeOrderButton = styled.button`
-  background-color: ${(props) => props.color || "#1572e8"};
-`;
-
 const FixTablePlace = styled.div`
   @media (min-width: 980px) {
     position: relative;
@@ -144,9 +140,6 @@ export default function DefineUser({ toggleShow }) {
   const [searchTerm, setSearchTerm] = useState("");
   const [filteredUsers, setFilteredUsers] = useState(null);
 
-  // domain filter states (default 2 => ادمین)
-  const [selectedDomain, setSelectedDomain] = useState("2");
-
   // loading
   const [trackLoading, setTrackLoading] = useState(false);
 
@@ -165,9 +158,7 @@ export default function DefineUser({ toggleShow }) {
     const fetchUsers = async () => {
       try {
         setTrackLoading(true);
-        const dataResponse = await dispatch(
-          getuser({ domain: selectedDomain })
-        ).unwrap();
+        const dataResponse = await dispatch(getuser({ domain: 2 })).unwrap();
         setUsers(dataResponse);
         setDataUpdated(false);
       } catch (error) {
@@ -178,7 +169,7 @@ export default function DefineUser({ toggleShow }) {
       }
     };
     fetchUsers();
-  }, [dispatch, selectedDomain, dataUpdated]);
+  }, [dispatch, dataUpdated]);
 
   // handle search filter
   useEffect(() => {
@@ -222,13 +213,13 @@ export default function DefineUser({ toggleShow }) {
         </SearchInputMainDiv>
 
         {/* domain filter */}
-        <SelectFilter
+        {/* <SelectFilter
           value={selectedDomain}
           onChange={(e) => setSelectedDomain(e.target.value)}
         >
           <option value="2">کاربرهای ادمین</option>
           <option value="1">کاربرهای سایت</option>
-        </SelectFilter>
+        </SelectFilter> */}
       </div>
       {/* add user */}
       <div className="d-flex justify-content-end  mb-3 container">
@@ -256,9 +247,7 @@ export default function DefineUser({ toggleShow }) {
               {/* desktop table */}
               <FixTablePlace className="d-none d-lg-block container">
                 <p className="me-2 NormalTextSizing mb-2 pTagForStyle">
-                  {selectedDomain === "2"
-                    ? "کاربر های ادمین"
-                    : "کاربر های سایت"}
+                  کاربر های ادمین
                 </p>
                 <table className="table table-striped tabelStyle">
                   <thead>

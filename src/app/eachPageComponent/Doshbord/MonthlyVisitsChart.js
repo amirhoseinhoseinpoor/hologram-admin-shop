@@ -48,7 +48,7 @@ const MonthlyVisitsChart = () => {
   const [error, setError] = useState(false);
 
   // انتخاب توکن از استور Redux
-  const token = useAppSelector((state) => state.auth.token);
+  const token = useAppSelector((state) => state.auth.token.token);
 
   useEffect(() => {
     const fetchMonthlyVisits = async () => {
