@@ -118,7 +118,7 @@ const HeaderItem = styled.li`
 `;
 
 const SubItemList = styled.ul`
-  margin-top: 15px; /* افزایش فاصله بین جعبه اصلی و زیرجعبه */
+ 
   padding-right: 20px;
   list-style-type: none;
 `;
@@ -478,8 +478,8 @@ export default function HeaderMainComponent({ toggleShow }) {
           moveSubItem={moveSubItem}
         >
           <SubItem>
-            <div className="d-flex flex-row align-items-center justify-content-between">
-              <div className="d-flex flex-row align-items-center gap-1">
+            <div className="d-flex flex-row align-items-center justify-content-between p-2">
+              <div className="d-flex flex-row align-items-center gap-1 mb-1">
                 <StrongText className="NormalTextSizing">
                   {subItem.title}
                 </StrongText>
@@ -607,7 +607,7 @@ export default function HeaderMainComponent({ toggleShow }) {
                     moveHeader={moveHeader}
                   >
                     <HeaderItem>
-                      <div className="d-flex flex-row align-items-center gap-1">
+                      <div className="d-flex flex-row align-items-center gap-1 mb-1">
                         <StrongText className="NormalTextSizing">
                           {item.title}
                         </StrongText>
