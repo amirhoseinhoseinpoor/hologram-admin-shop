@@ -1,20 +1,19 @@
-import React, { useState, useEffect, useRef, useCallback } from "react";
+"use client";
+
+import React, { useState, useEffect, useRef } from "react";
 import { useDispatch } from "react-redux";
 import { HeaderList, headerEdit } from "@/app/Store/thunks";
 import styled, { createGlobalStyle } from "styled-components";
 import DeleteIcon from "@mui/icons-material/Delete";
 import AddCircleIcon from "@mui/icons-material/AddCircle";
-import { useDrag, useDrop } from "react-dnd";
-import { DndProvider, useDragLayer } from "react-dnd";
-import { HTML5Backend } from "react-dnd-html5-backend";
-// Import base components
 import ProfileComponent from "@/app/BaseComponent/ProfileComponent";
 import NavBarToggleBurgerButton from "@/app/BaseComponent/NavBarToggleBurgerButton";
-// Import modals
 import ConfirmModal from "@/app/BaseComponent/ConfirmingModal";
 import ErrorModal from "@/app/BaseComponent/ErrorModal";
 import AreYouShureModal from "@/app/BaseComponent/AreYouSureModal";
 import CloseIcon from "@mui/icons-material/Close";
+import { useDrag, useDrop, DndProvider } from "react-dnd";
+import { HTML5Backend } from "react-dnd-html5-backend";
 
 // Global styles to set box-sizing
 const GlobalStyle = createGlobalStyle`
@@ -24,7 +23,6 @@ const GlobalStyle = createGlobalStyle`
 `;
 
 // Styled components
-
 const MainTitleDiv = styled.div`
   margin-bottom: 20px;
   display: flex;
@@ -72,7 +70,6 @@ const HeadermakeOrder = styled.div`
 const InputField = styled.input`
   padding: 10px;
   width: 36%;
-  /* margin-right: 10px; */
   border: 1px solid #ccc;
   border-radius: 5px;
 `;
@@ -121,7 +118,7 @@ const HeaderItem = styled.li`
 `;
 
 const SubItemList = styled.ul`
-  margin-top: 15px; /* افزایش فاصله بین جعبه اصلی و زیرجعبه */
+ 
   padding-right: 20px;
   list-style-type: none;
 `;
@@ -156,367 +153,132 @@ const AddSubItemContainer = styled.div`
   }
 `;
 
-// Helper functions (outside of components):
-function arraysAreEqual(a, b) {
-  if (a === b) return true;
-  if (a == null || b == null) return false;
-  if (a.length !== b.length) return false;
-
-  for (var i = 0; i < a.length; ++i) {
-      if (a[i] !== b[i]) return false;
-  }
-  return true;
-}
-
-function isDescendant(parentPath, childPath) {
-  if (childPath.length <= parentPath.length) return false;
-  for (let i = 0; i < parentPath.length; i++) {
-      if (parentPath[i] !== childPath[i]) return false;
-  }
-  return true;
-}
-
-// Drag and Drop logic for reordering headers
-const Header = ({
-  item,
-  index,
-  moveItem,
-  newSubItem,
-  handleSubInputChange,
-  setAddSubItemPath,
-  addSubItem,
-  addSubItemPath,
-  selectSubItemForSubItem,
-  openRemoveModal,
-  headerData,
-  setHeaderData,
-  selectHeaderForSubItem,
-}) => {
-  const dragRef = useRef(null);
-  const dropRef = useRef(null);
-
-  const [, drag] = useDrag(
-    () => ({
-      type: "ITEM",
-      item: { index },
-      collect: (monitor) => ({
-        isDragging: monitor.isDragging(),
-      }),
-    }),
-    [index]
-  );
-
-  const [, drop] = useDrop(
-    () => ({
-      accept: "ITEM",
-      hover: (draggedItem) => {
-        if (draggedItem.index !== index) {
-          moveItem(draggedItem.index, index);
-        }
-      },
-    }),
-    [moveItem, index]
-  );
-
-  useEffect(() => {
-    drag(drop(dragRef.current));
-  }, [drag, drop]);
-
-
-  const moveSubItem = useCallback((draggedPath, targetPath) => {
-    if (arraysAreEqual(draggedPath, targetPath)) return;
-
-    setHeaderData(prevHeaderData => {
-        // Create a DEEP COPY of the previous state *inside* the functional update
-        const updatedHeader = JSON.parse(JSON.stringify(prevHeaderData));
-
-        const findAndRemoveByPath = (obj, path) => {
-            if (path.length === 1) {
-                return obj.splice(path[0], 1)[0];
-            } else {
-                let current = obj;
-                for (let i = 0; i < path.length - 1; i++) {
-                    current = current[path[i]].subItems;
-                    if (!current) return null;
-                }
-                return current.splice(path[path.length - 1], 1)[0];
-            }
-        };
-
-        const insertByPath = (obj, path, item) => {
-            if (path.length === 1) {
-                obj.splice(path[0], 0, item);
-            } else {
-                let current = obj;
-                for (let i = 0; i < path.length - 1; i++) {
-                    current = current[path[i]].subItems;
-                }
-                current.splice(path[path.length - 1], 0, item);
-            }
-        };
-
-        try {
-            const draggedItem = findAndRemoveByPath(updatedHeader, draggedPath);
-            if (draggedItem) {
-                insertByPath(updatedHeader, targetPath, draggedItem);
-            }
-        } catch (error) {
-            console.error("Error during move operation:", error, { draggedPath, targetPath, prevHeaderData });
-            return prevHeaderData; // VERY IMPORTANT: Return previous state on error
-        }
-
-        return updatedHeader; // Return the updated state
-    });
-}, [setHeaderData]);
-
-  // Recursive function to render sub-items
-
-  return (
-    <HeaderItem ref={dragRef}>
-      <div className="d-flex flex-row align-items-center gap-1">
-        <StrongText className="NormalTextSizing">{item.title}</StrongText>
-        <Button
-          type="button"
-          className="me-1"
-          style={{
-            backgroundImage: "unset",
-            backgroundColor: "unset",
-            color: "#43A047",
-          }}
-          $secondary
-          onClick={() => selectHeaderForSubItem(index)}
-        >
-          <AddCircleIcon />
-        </Button>
-        <RemoveButtonStyle onClick={() => openRemoveModal([index], true)}>
-          حذف هدر اصلی
-        </RemoveButtonStyle>
-      </div>
-
-      {/* Render sub-items */}
-      {item.subItems.length > 0 && (
-        <SubItemsComponent
-          subItems={item.subItems}
-          currentPath={[index]}
-          moveSubItem={moveSubItem}
-          newSubItemProps={newSubItem}
-          handleSubInputChange={handleSubInputChange}
-          setAddSubItemPath={setAddSubItemPath}
-          addSubItemPath={addSubItemPath}
-          selectSubItemForSubItem={selectSubItemForSubItem}
-          openRemoveModal={openRemoveModal}
-          addSubItem={addSubItem}
-        />
-      )}
-
-      {/* Render add sub-item input below this header if path matches */}
-      {addSubItemPath &&
-        addSubItemPath.length === 1 &&
-        addSubItemPath[0] === index && (
-          <AddSubItemContainer>
-            <InputField
-              className="addSubItemInput"
-              type="text"
-              name="title"
-              placeholder="عنوان ساب ایتم"
-              value={newSubItem.title}
-              onChange={handleSubInputChange}
-            />
-            <InputField
-              className="addSubItemInput"
-              type="text"
-              name="link"
-              placeholder="لینک ساب ایتم"
-              value={newSubItem.link}
-              onChange={handleSubInputChange}
-            />
-            <div className="d-flex flex-row align-items-center">
-              <Button
-                type="button"
-                style={{ whiteSpace: "nowrap" }}
-                $secondary
-                onClick={() => addSubItem([index])}
-              >
-                اضافه کردن
-              </Button>
-              <Button
-                type="button"
-                style={{
-                  backgroundImage: "unset",
-                  backgroundColor: "unset",
-                  color: "#e53935",
-                }}
-                onClick={() => setAddSubItemPath(null)}
-              >
-                <CloseIcon className="text-danger" />
-              </Button>
-            </div>
-          </AddSubItemContainer>
-        )}
-    </HeaderItem>
-  );
+const ItemTypes = {
+  HEADER: "header",
+  SUBITEM: "subitem",
 };
 
-const SubItemsComponent = ({
-  subItems,
-  currentPath,
-  moveSubItem,
-  newSubItem,
-  handleSubInputChange,
-  setAddSubItemPath,
-  addSubItemPath,
-  selectSubItemForSubItem,
-}) => {
-  return (
-    <SubItemList>
-      {subItems.map((subItem, subIndex) => {
-        const newPath = [...currentPath, subIndex];
-        const isAddSubItem =
-          addSubItemPath &&
-          addSubItemPath.length === newPath.length &&
-          addSubItemPath.every((val, idx) => val === newPath[idx]);
-
-        return (
-          <SubItemComponent
-            key={subIndex}
-            subItem={subItem}
-            newPath={newPath}
-            moveSubItem={moveSubItem}
-            newSubItemProps={newSubItem}
-            handleSubInputChange={handleSubInputChange}
-            setAddSubItemPath={setAddSubItemPath}
-            selectSubItemForSubItem={selectSubItemForSubItem}
-            isAddSubItem={isAddSubItem}
-            addSubItemPath={addSubItemPath}
-          />
-        );
-      })}
-    </SubItemList>
-  );
+// Utility function for swapping items
+const moveItemInArray = (array, fromIndex, toIndex) => {
+  const updatedArray = [...array];
+  const [movedItem] = updatedArray.splice(fromIndex, 1);
+  updatedArray.splice(toIndex, 0, movedItem);
+  return updatedArray;
 };
 
-const SubItemComponent = ({
-  subItem,
-  newPath,
-  moveSubItem,
-  newSubItemProps,
-  handleSubInputChange,
-  setAddSubItemPath,
-  addSubItemPath,
-  selectSubItemForSubItem,
-  isAddSubItem,
-}) => {
+// Utility function to deeply clone the header data
+const deepClone = (obj) => JSON.parse(JSON.stringify(obj));
+
+// Helper functions to manipulate nested data
+const getItemByPath = (data, path) => {
+  return path.reduce((acc, index) => {
+    if (!acc || !acc.subItems) return undefined;
+    return acc.subItems[index];
+  }, { subItems: data });
+};
+
+const removeItemByPath = (data, path) => {
+  const newData = deepClone(data);
+  if (path.length === 1) {
+    newData.splice(path[0], 1);
+  } else {
+    const parentPath = path.slice(0, -1);
+    const parent = getItemByPath(newData, parentPath);
+    if (parent && parent.subItems) {
+      parent.subItems.splice(path[path.length - 1], 1);
+    }
+  }
+  return newData;
+};
+
+const insertItemByPath = (data, path, item) => {
+  const newData = deepClone(data);
+  if (path.length === 1) {
+    newData.splice(path[0], 0, item);
+  } else {
+    const parentPath = path.slice(0, -1);
+    const parent = getItemByPath(newData, parentPath);
+    if (parent && parent.subItems) {
+      parent.subItems.splice(path[path.length - 1], 0, item);
+    }
+  }
+  return newData;
+};
+
+// Ensure all items have subItems arrays
+const ensureSubItems = (items) => {
+  items.forEach(item => {
+    if (!item.subItems) {
+      item.subItems = [];
+    }
+    if (item.subItems.length > 0) {
+      ensureSubItems(item.subItems);
+    }
+  });
+};
+
+// Drag-and-drop wrapper for header items
+const DraggableHeaderItem = ({ children, index, moveHeader }) => {
   const ref = useRef(null);
 
+  const [, drag] = useDrag({
+    type: ItemTypes.HEADER,
+    item: { index },
+  });
 
-  const [{ isDragging }, drag] = useDrag(() => ({
-    type: "SUB_ITEM",
-    item: { path: newPath },
-    collect: (monitor) => ({ isDragging: monitor.isDragging() }),
-}));
-
-const [, drop] = useDrop(useCallback(() => ({
-    accept: "SUB_ITEM",
-    canDrop: (item) => {
-        const draggedPath = item.path;
-        const targetPath = newPath;
-        return !isDescendant(targetPath, draggedPath) && !arraysAreEqual(draggedPath, targetPath); // Prevent drop on self or descendants
+  const [, drop] = useDrop({
+    accept: ItemTypes.HEADER,
+    hover: (draggedItem) => {
+      if (draggedItem.index !== index) {
+        moveHeader(draggedItem.index, index);
+        draggedItem.index = index;
+      }
     },
-    hover(item) {
-        if (!ref.current) return;
-        const draggedPath = item.path;
-        const targetPath = newPath;
-        if (!arraysAreEqual(draggedPath, targetPath) && !isDescendant(targetPath, draggedPath)) {
-            moveSubItem(draggedPath, targetPath);
-        }
+  });
+
+  drag(drop(ref));
+
+  return <div ref={ref}>{children}</div>;
+};
+
+// Drag-and-drop wrapper for sub-items
+const DraggableSubItem = ({ children, path, moveSubItem }) => {
+  const ref = useRef(null);
+
+  const [, drag] = useDrag({
+    type: ItemTypes.SUBITEM,
+    item: { path },
+  });
+
+  const [, drop] = useDrop({
+    accept: ItemTypes.SUBITEM,
+    drop: (draggedItem) => {
+      const draggedPath = draggedItem.path;
+      if (
+        draggedPath.length === path.length &&
+        draggedPath.every((val, idx) => val === path[idx])
+      ) {
+        return; // Prevent dropping on itself
+      }
+      if (isDescendant(draggedPath, path)) {
+        return; // Prevent dropping on its own descendant
+      }
+      moveSubItem(draggedPath, path);
     },
-}), [moveSubItem, newPath]),);
+  });
 
-useEffect(() => { drag(drop(ref.current)); }, [drag, drop]);
+  drag(drop(ref));
 
-  return (
-    <React.Fragment>
-      <SubItem ref={ref} style={{ opacity: isDragging ? 0.5 : 1 }}>
-        <div className="d-flex flex-row align-items-center justify-content-between">
-          <div className="d-flex flex-row align-items-center gap-1">
-            <StrongText className="NormalTextSizing">
-              {subItem?.title && <>{subItem?.title}</>}
-            </StrongText>
-            <Button
-              type="button"
-              style={{
-                backgroundImage: "unset",
-                backgroundColor: "unset",
-                color: "#43A047",
-              }}
-              className="me-1"
-              $secondary
-              onClick={() => selectSubItemForSubItem(newPath)}
-            >
-              <AddCircleIcon />
-            </Button>
-          </div>
+  return <div ref={ref}>{children}</div>;
+};
 
-          <RemoveButtonStyle onClick={() => openRemoveModal(newPath, false)}>
-            <DeleteIcon className="text-danger" />
-          </RemoveButtonStyle>
-        </div>
-      </SubItem>
-      {isAddSubItem && (
-        <AddSubItemContainer className="container">
-          <InputField
-            className="addSubItemInput"
-            type="text"
-            name="title"
-            placeholder="عنوان ساب ایتم"
-            value={newSubItemProps.title}
-            onChange={handleSubInputChange}
-          />
-          <InputField
-            className="addSubItemInput"
-            type="text"
-            name="link"
-            placeholder="لینک ساب ایتم"
-            value={newSubItemProps.link}
-            onChange={handleSubInputChange}
-          />
-          <div className="d-flex flex-row align-items-center">
-            <Button
-              type="button"
-              $secondary
-              onClick={() => addSubItem(newPath)}
-              style={{ whiteSpace: "nowrap" }}
-            >
-              اضافه کردن
-            </Button>
-            <Button
-              type="button"
-              style={{
-                backgroundImage: "unset",
-                backgroundColor: "unset",
-                color: "#e53935",
-              }}
-              onClick={() => setAddSubItemPath(null)}
-            >
-              <CloseIcon className="text-danger" />
-            </Button>
-          </div>
-        </AddSubItemContainer>
-      )}
-      {subItem.subItems && subItem.subItems.length > 0 && (
-        <SubItemsComponent
-          subItems={subItem.subItems}
-          currentPath={newPath}
-          moveSubItem={moveSubItem}
-          newSubItem={newSubItemProps}
-          handleSubInputChange={handleSubInputChange}
-          setAddSubItemPath={setAddSubItemPath}
-          addSubItemPath={addSubItemPath}
-          selectSubItemForSubItem={selectSubItemForSubItem}
-        />
-      )}
-    </React.Fragment>
-  );
+// Helper function to check if toPath is a descendant of fromPath
+const isDescendant = (fromPath, toPath) => {
+  if (toPath.length < fromPath.length) return false;
+  for (let i = 0; i < fromPath.length; i++) {
+    if (fromPath[i] !== toPath[i]) return false;
+  }
+  return true;
 };
 
 export default function HeaderMainComponent({ toggleShow }) {
@@ -539,7 +301,9 @@ export default function HeaderMainComponent({ toggleShow }) {
     const fetchData = async () => {
       try {
         const dataComeAPI = await dispatch(HeaderList()).unwrap();
-        setHeaderData(dataComeAPI?.content || []);
+        const content = dataComeAPI?.content || [];
+        ensureSubItems(content);
+        setHeaderData(content);
       } catch (error) {
         console.error("Error fetching header data:", error);
         setOpenModal3(true);
@@ -567,7 +331,8 @@ export default function HeaderMainComponent({ toggleShow }) {
   // Add new header item
   const addItem = () => {
     if (newItem.title && newItem.link) {
-      setHeaderData([...headerData, { ...newItem, subItems: [] }]);
+      const newHeader = { ...newItem, subItems: [] };
+      setHeaderData((prev) => [...prev, newHeader]);
       setNewItem({ title: "", link: "", subItems: [] });
     } else {
       setOpenModal2(true);
@@ -587,6 +352,7 @@ export default function HeaderMainComponent({ toggleShow }) {
   const closeModal2Handler = () => setOpenModal2(false);
   const closeModal3Handler = () => setOpenModal3(false);
 
+  // Close confirm modal after timeout
   function closeModalOnTimeout() {
     setTimeout(() => {
       setOpenModal3(false);
@@ -617,11 +383,18 @@ export default function HeaderMainComponent({ toggleShow }) {
   // Add new sub-item to the selected header or sub-item
   const addSubItem = (path) => {
     if (newSubItem.title && newSubItem.link) {
-      const updatedHeader = [...headerData];
+      const updatedHeader = deepClone(headerData);
       let target = updatedHeader[path[0]];
 
       for (let i = 1; i < path.length; i++) {
+        if (!target.subItems) {
+          target.subItems = [];
+        }
         target = target.subItems[path[i]];
+      }
+
+      if (!target.subItems) {
+        target.subItems = [];
       }
 
       target.subItems.push({ ...newSubItem, subItems: [] });
@@ -636,24 +409,12 @@ export default function HeaderMainComponent({ toggleShow }) {
 
   // Remove a header item
   const removeItem = (index) => {
-    const updatedHeader = headerData.filter((_, i) => i !== index);
-    setHeaderData(updatedHeader);
+    setHeaderData((prev) => removeItemByPath(prev, [index]));
   };
 
   // Remove a sub-item using the path
   const removeSubItem = (path) => {
-    const updatedHeader = [...headerData];
-    let target = updatedHeader[path[0]];
-
-    for (let i = 1; i < path.length - 1; i++) {
-      target = target.subItems[path[i]];
-    }
-
-    target.subItems = target.subItems.filter(
-      (_, i) => i !== path[path.length - 1]
-    );
-
-    setHeaderData(updatedHeader);
+    setHeaderData((prev) => removeItemByPath(prev, path));
   };
 
   // Submit the header data to the API
@@ -672,11 +433,124 @@ export default function HeaderMainComponent({ toggleShow }) {
     }
   };
 
-  const moveItem = (draggedIndex, targetIndex) => {
-    const updatedHeader = [...headerData];
-    const draggedItem = updatedHeader.splice(draggedIndex, 1)[0];
-    updatedHeader.splice(targetIndex, 0, draggedItem);
-    setHeaderData(updatedHeader);
+  // Move header items
+  const moveHeader = (fromIndex, toIndex) => {
+    setHeaderData((prev) => moveItemInArray(prev, fromIndex, toIndex));
+  };
+
+  // Move sub-items
+  const moveSubItem = (fromPath, toPath) => {
+    if (
+      fromPath.length === 0 ||
+      toPath.length === 0 ||
+      isDescendant(fromPath, toPath)
+    )
+      return;
+
+    const updatedHeaders = deepClone(headerData);
+
+    // Get the item to move
+    const itemToMove = getItemByPath(updatedHeaders, fromPath);
+    if (!itemToMove) return;
+
+    // Remove the item from fromPath
+    const updatedAfterRemoval = removeItemByPath(updatedHeaders, fromPath);
+
+    // Insert the item at toPath
+    const updatedAfterInsertion = insertItemByPath(updatedAfterRemoval, toPath, itemToMove);
+
+    setHeaderData(updatedAfterInsertion);
+  };
+
+  const RenderSubItems = (subItems, parentPath) => {
+    return subItems.map((subItem, subIndex) => {
+      if (!subItem) return null; // Prevent rendering undefined items
+      const newPath = [...parentPath, subIndex];
+      const isAddSubItem =
+        addSubItemPath &&
+        addSubItemPath.length === newPath.length &&
+        addSubItemPath.every((val, idx) => val === newPath[idx]);
+
+      return (
+        <DraggableSubItem
+          key={newPath.join('-')}
+          path={newPath}
+          moveSubItem={moveSubItem}
+        >
+          <SubItem>
+            <div className="d-flex flex-row align-items-center justify-content-between p-2">
+              <div className="d-flex flex-row align-items-center gap-1">
+                <StrongText className="NormalTextSizing">
+                  {subItem.title}
+                </StrongText>
+                <Button
+                  type="button"
+                  style={{
+                    backgroundImage: "unset",
+                    backgroundColor: "unset",
+                    color: "#43A047",
+                  }}
+                  className="me-1"
+                  $secondary
+                  onClick={() => selectSubItemForSubItem(newPath)}
+                >
+                  <AddCircleIcon />
+                </Button>
+              </div>
+              <RemoveButtonStyle onClick={() => openRemoveModal(newPath, false)}>
+                <DeleteIcon className="text-danger" />
+              </RemoveButtonStyle>
+            </div>
+
+            {/* Render add sub-item input below this sub-item if path matches */}
+            {isAddSubItem && (
+              <AddSubItemContainer className="container">
+                <InputField
+                  className="addSubItemInput"
+                  type="text"
+                  name="title"
+                  placeholder="عنوان ساب ایتم"
+                  value={newSubItem.title}
+                  onChange={handleSubInputChange}
+                />
+                <InputField
+                  className="addSubItemInput"
+                  type="text"
+                  name="link"
+                  placeholder="لینک ساب ایتم"
+                  value={newSubItem.link}
+                  onChange={handleSubInputChange}
+                />
+                <div className="d-flex flex-row align-items-center">
+                  <Button
+                    type="button"
+                    $secondary
+                    onClick={() => addSubItem(newPath)}
+                    style={{ whiteSpace: "nowrap" }}
+                  >
+                    اضافه کردن
+                  </Button>
+                  <Button
+                    type="button"
+                    style={{
+                      backgroundImage: "unset",
+                      backgroundColor: "unset",
+                      color: "#e53935",
+                    }}
+                    onClick={() => setAddSubItemPath(null)}
+                  >
+                    <CloseIcon className="text-danger" />
+                  </Button>
+                </div>
+              </AddSubItemContainer>
+            )}
+
+            {/* Render nested sub-items recursively */}
+            {subItem.subItems && subItem.subItems.length > 0 && RenderSubItems(subItem.subItems, newPath)}
+          </SubItem>
+        </DraggableSubItem>
+      );
+    });
   };
 
   return (
@@ -722,26 +596,98 @@ export default function HeaderMainComponent({ toggleShow }) {
             </Button>
           </MainTitleDiv>
 
-          <HeaderListWrapper>
-            {headerData.map((item, index) => (
-              <Header
-                item={item}
-                key={index}
-                index={index}
-                moveItem={moveItem}
-                newSubItem={newSubItem}
-                handleSubInputChange={handleSubInputChange}
-                setAddSubItemPath={setAddSubItemPath}
-                addSubItem={addSubItem}
-                addSubItemPath={addSubItemPath}
-                selectSubItemForSubItem={selectSubItemForSubItem}
-                openRemoveModal={openRemoveModal}
-                headerData={headerData}
-                setHeaderData={setHeaderData}
-                selectHeaderForSubItem={selectHeaderForSubItem}
-              />
-            ))}
-          </HeaderListWrapper>
+          {/* Render the current header structure */}
+          <div>
+            {headerData.length > 0 ? (
+              <HeaderListWrapper>
+                {headerData.map((item, index) => (
+                  <DraggableHeaderItem
+                    key={index}
+                    index={index}
+                    moveHeader={moveHeader}
+                  >
+                    <HeaderItem>
+                      <div className="d-flex flex-row align-items-center gap-1">
+                        <StrongText className="NormalTextSizing">
+                          {item.title}
+                        </StrongText>
+                        <Button
+                          type="button"
+                          className="me-1"
+                          style={{
+                            backgroundImage: "unset",
+                            backgroundColor: "unset",
+                            color: "#43A047",
+                          }}
+                          $secondary
+                          onClick={() => selectHeaderForSubItem(index)}
+                        >
+                          <AddCircleIcon />
+                        </Button>
+                        <RemoveButtonStyle
+                          onClick={() => openRemoveModal([index], true)}
+                        >
+                          <DeleteIcon className="text-danger" />
+                        </RemoveButtonStyle>
+                      </div>
+
+                      {/* Render sub-items */}
+                      <SubItemList>
+                        {item.subItems && item.subItems.length > 0 && RenderSubItems(item.subItems, [index])}
+                      </SubItemList>
+
+                      {/* Render add sub-item input below this header if path matches */}
+                      {addSubItemPath &&
+                        addSubItemPath.length === 1 &&
+                        addSubItemPath[0] === index && (
+                          <AddSubItemContainer>
+                            <InputField
+                              className="addSubItemInput"
+                              type="text"
+                              name="title"
+                              placeholder="عنوان ساب ایتم"
+                              value={newSubItem.title}
+                              onChange={handleSubInputChange}
+                            />
+                            <InputField
+                              className="addSubItemInput"
+                              type="text"
+                              name="link"
+                              placeholder="لینک ساب ایتم"
+                              value={newSubItem.link}
+                              onChange={handleSubInputChange}
+                            />
+                            <div className="d-flex flex-row align-items-center">
+                              <Button
+                                type="button"
+                                style={{ whiteSpace: "nowrap" }}
+                                $secondary
+                                onClick={() => addSubItem([index])}
+                              >
+                                اضافه کردن
+                              </Button>
+                              <Button
+                                type="button"
+                                style={{
+                                  backgroundImage: "unset",
+                                  backgroundColor: "unset",
+                                  color: "#e53935",
+                                }}
+                                onClick={() => setAddSubItemPath(null)}
+                              >
+                                <CloseIcon className="text-danger" />
+                              </Button>
+                            </div>
+                          </AddSubItemContainer>
+                        )}
+                    </HeaderItem>
+                  </DraggableHeaderItem>
+                ))}
+              </HeaderListWrapper>
+            ) : (
+              <p>هدر خود را بسازید</p>
+            )}
+          </div>
 
           {/* Submit Button */}
           <Button
