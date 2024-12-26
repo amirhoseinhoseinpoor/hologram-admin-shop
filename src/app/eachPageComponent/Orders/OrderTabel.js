@@ -5,10 +5,37 @@ import { formatPersianDate } from "@/app/utils/persionDateUtils";
 import { Modal, Box } from "@mui/material";
 // import icons
 import MoreHorizIcon from "@mui/icons-material/MoreHoriz";
+import { NavDropdown } from "react-bootstrap";
+import DeleteIcon from "@mui/icons-material/Delete";
+import EditIcon from "@mui/icons-material/Edit";
+import AssignmentIcon from '@mui/icons-material/Assignment';
+// improt areyou sure moda
 
-const SeeOrderButton = styled.button`
-  background-color: ${(props) => props.color || "#1572e8"};
-  background-image: linear-gradient(195deg, #66bb6a 0%, #43a047 100%);
+// const SeeOrderButton = styled.button`
+//   background-color: ${(props) => props.color || "#1572e8"};
+//   background-image: linear-gradient(195deg, #66bb6a 0%, #43a047 100%);
+// `;
+
+const NavBarInsideDiv = styled.div`
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  /* padding-bottom: 10px; */
+  /* border-bottom: 1.4px solid #e1e5ea; */
+`;
+
+const NavDropDown = styled(NavDropdown)`
+  .dropdown-menu {
+    border: 1px solid gray;
+    width: 230px;
+    padding: 12px;
+    margin-top: 3px;
+    border-radius: 4px;
+    box-shadow: 1px 1px 5px gray;
+  }
+  .dropdown-toggle::after {
+    display: none;
+  }
 `;
 
 const StyledTable = styled.table`
@@ -29,6 +56,22 @@ const StyledTable = styled.table`
   }
 `;
 
+const AlignCenter = styled(Select)`
+  .css-jedpe8-MuiSelect-select-MuiInputBase-input-MuiOutlinedInput-input.MuiSelect-select {
+    text-align: center;
+  }
+  .MuiSelect-icon {
+    right: auto !important; /* Reset default positioning */
+    left: 0px !important; /* Position arrow on the left */
+  }
+  .css-jedpe8-MuiSelect-select-MuiInputBase-input-MuiOutlinedInput-input.css-jedpe8-MuiSelect-select-MuiInputBase-input-MuiOutlinedInput-input.css-jedpe8-MuiSelect-select-MuiInputBase-input-MuiOutlinedInput-input {
+    padding-left: 32px;
+  }
+  .css-jedpe8-MuiSelect-select-MuiInputBase-input-MuiOutlinedInput-input.css-jedpe8-MuiSelect-select-MuiInputBase-input-MuiOutlinedInput-input.css-jedpe8-MuiSelect-select-MuiInputBase-input-MuiOutlinedInput-input {
+    padding-right: 10px !important;
+  }
+`;
+
 const MAINTABELSTYLE = styled.div`
   border: 1.5px solid gray;
   padding: 7px;
@@ -41,7 +84,7 @@ const MAINTABELSTYLE = styled.div`
     grid-gap: 10px;
     border-bottom: 1px solid #ccc;
     text-align: center;
-    p {
+    .tabelheaderStyle {
       background-color: #f1f1f1;
       padding: 12px 0px;
       border-radius: 4px;
@@ -83,6 +126,7 @@ export default function OrderTabelDesctop({
   handleStatusChange,
   setSelectedStatus,
   selectedStatus,
+  areYouShureFunction,
 }) {
   const [openModals, setOpenModals] = useState({});
 
@@ -105,7 +149,7 @@ export default function OrderTabelDesctop({
               <th>نام خانوادگی</th>
               <th>شماره همراه</th>
               <th>تاریخ</th>
-              <th>سفارش</th>
+              <th>کدرهگیری</th>
               <th>عملیات</th>
             </tr>
           </thead>
@@ -126,14 +170,15 @@ export default function OrderTabelDesctop({
                   {formatPersianDate(item.date)}
                 </td>
                 <td style={{ verticalAlign: "middle" }}>
-                  <SeeOrderButton
+                  {/* <SeeOrderButton
                     onClick={() => {
                       setActiveKey("seeOrder");
                       setSeeOrder(item);
                     }}
                   >
                     مشاهده سفارش
-                  </SeeOrderButton>
+                  </SeeOrderButton> */}
+                  {item.code}
                 </td>
                 <td>
                   <Modal
@@ -152,7 +197,7 @@ export default function OrderTabelDesctop({
                         <InputLabel sx={{ fontFamily: "unset" }}>
                           وضعیت
                         </InputLabel>
-                        <Select
+                        <AlignCenter
                           sx={{
                             fontFamily: "unset",
                             padding: "0px",
@@ -168,7 +213,7 @@ export default function OrderTabelDesctop({
                             handleStatusChange(item.code, newStatus);
                           }}
                         >
-                          {/* Add your status options here */}
+                          
                           <MenuItem sx={{ fontFamily: "unset" }} value="1">
                             درحال برسی
                           </MenuItem>
@@ -184,14 +229,76 @@ export default function OrderTabelDesctop({
                           <MenuItem sx={{ fontFamily: "unset" }} value="5">
                             لغو شده
                           </MenuItem>
-                        </Select>
+                        </AlignCenter>
                       </FormControl>
                     </Box>
                   </Modal>
 
-                  <div onClick={() => handleOpenModal(item.code)}>
+                  {/* <div onClick={() => handleOpenModal(item.code)}>
                     <MoreHorizIcon style={{ cursor: "pointer" }} />
-                  </div>
+                  </div> */}
+
+                  <NavDropDown
+                    title={
+                      <>
+                        <MoreHorizIcon
+                          style={{
+                            color: "#191919",
+                            cursor: "pointer",
+                            fontSize: "28px",
+                            cursor: "pointer",
+                          }}
+                        />
+                      </>
+                    }
+                    id="basic-nav-dropdown"
+                  >
+                    <NavBarInsideDiv>
+                      <div
+                        onClick={() => handleOpenModal(item.code)}
+                        style={{
+                          borderBottom: "1px solid black",
+                          cursor: "pointer",
+                        }}
+                        className="d-flex flex-row gap-2 align-items-center pb-2"
+                      >
+                        <p className="VodeoDisSizing  text-end">تغیروضعیت</p>
+                        <div style={{ color: "#F3802C" }}>
+                          <AssignmentIcon className="subitem" />
+                        </div>
+                      </div>
+                      <div
+                        onClick={() => {
+                          setActiveKey("seeOrder");
+                          setSeeOrder(item);
+                        }}
+                        style={{
+                          borderBottom: "1px solid black",
+                          cursor: "pointer",
+                        }}
+                        className="d-flex flex-row gap-2 align-items-center pb-2 mt-2"
+                      >
+                        <p className="VodeoDisSizing  text-end">ویرایش</p>
+                        <div style={{ color: "#F3802C" }}>
+                          <EditIcon className="subitem" />
+                        </div>
+                      </div>
+
+                      <div
+                        onClick={() => areYouShureFunction(item.code)}
+                        style={{
+                          cursor: "pointer",
+                        }}
+                        className="d-flex flex-row gap-2 align-items-center mt-2"
+                      >
+                        <p className="VodeoDisSizing text-end">حذف</p>
+                        <div style={{ color: "#F3802C" }}>
+                          <DeleteIcon className="text-danger subitem" />
+                        </div>
+                      </div>
+                    </NavBarInsideDiv>
+                    <div className="d-flex justify-content-end"></div>
+                  </NavDropDown>
                 </td>
               </tr>
             ))}
@@ -204,7 +311,7 @@ export default function OrderTabelDesctop({
           <React.Fragment key={index}>
             <MAINTABELSTYLE>
               <div className="eachTabelStyle">
-                <p className="NormalTextSizing">نام :</p>
+                <p className="NormalTextSizing tabelheaderStyle">نام :</p>
 
                 <div className="SecondValueTabel">
                   {userMainData[item.createdBy]?.firstName}
@@ -212,7 +319,9 @@ export default function OrderTabelDesctop({
               </div>
 
               <div className="eachTabelStyle">
-                <p className="NormalTextSizing">نام خانوادگی :</p>
+                <p className="NormalTextSizing tabelheaderStyle">
+                  نام خانوادگی :
+                </p>
                 <div
                   className="SecondValueTabel"
                   style={{ verticalAlign: "middle" }}
@@ -221,7 +330,9 @@ export default function OrderTabelDesctop({
                 </div>
               </div>
               <div className="eachTabelStyle">
-                <p className="NormalTextSizing">شماره همراه :</p>
+                <p className="NormalTextSizing tabelheaderStyle">
+                  شماره همراه :
+                </p>
 
                 <div
                   className="SecondValueTabel"
@@ -232,7 +343,7 @@ export default function OrderTabelDesctop({
               </div>
 
               <div className="eachTabelStyle">
-                <p className="NormalTextSizing">تاریخ :</p>
+                <p className="NormalTextSizing tabelheaderStyle">تاریخ :</p>
                 <div
                   className="SecondValueTabel"
                   style={{ verticalAlign: "middle" }}
@@ -242,27 +353,27 @@ export default function OrderTabelDesctop({
               </div>
 
               <div className="eachTabelStyle">
-                <p className="NormalTextSizing">سفارش :</p>
+                <p className="NormalTextSizing tabelheaderStyle">کد رهگیری :</p>
                 <div
                   className="SecondValueTabel"
                   style={{ verticalAlign: "middle" }}
                 >
-                  <SeeOrderButton
+                  {/* <SeeOrderButton
                     onClick={() => {
                       setActiveKey("seeOrder");
                       setSeeOrder(item);
                     }}
                   >
                     مشاهده سفارش
-                  </SeeOrderButton>
+                  </SeeOrderButton> */}
+                  {item.code}
                 </div>
               </div>
 
               <div className="eachTabelStyle">
-                <p className="NormalTextSizing">عملیات :</p>
+                <p className="NormalTextSizing tabelheaderStyle">عملیات :</p>
                 <div className="SecondValueTabel">
                   {/* Status Select */}
-                  
 
                   <Modal
                     open={openModals[item.code] || false}
@@ -280,7 +391,7 @@ export default function OrderTabelDesctop({
                         <InputLabel sx={{ fontFamily: "unset" }}>
                           وضعیت
                         </InputLabel>
-                        <Select
+                        <AlignCenter
                           sx={{
                             fontFamily: "unset",
                             padding: "0px",
@@ -311,14 +422,76 @@ export default function OrderTabelDesctop({
                           <MenuItem sx={{ fontFamily: "unset" }} value="5">
                             لغو شده
                           </MenuItem>
-                        </Select>
+                        </AlignCenter>
                       </FormControl>
                     </Box>
                   </Modal>
 
-                  <div onClick={() => handleOpenModal(item.code)}>
+                  {/* <div onClick={() => handleOpenModal(item.code)}>
                     <MoreHorizIcon style={{ cursor: "pointer" }} />
-                  </div>
+                  </div> */}
+
+                  <NavDropDown
+                    title={
+                      <>
+                        <MoreHorizIcon
+                          style={{
+                            color: "#191919",
+                            cursor: "pointer",
+                            fontSize: "28px",
+                            cursor: "pointer",
+                          }}
+                        />
+                      </>
+                    }
+                    id="basic-nav-dropdown"
+                  >
+                    <NavBarInsideDiv>
+                      <div
+                        onClick={() => handleOpenModal(item.code)}
+                        style={{
+                          borderBottom: "1px solid black",
+                          cursor: "pointer",
+                        }}
+                        className="d-flex flex-row gap-2 align-items-center pb-2"
+                      >
+                        <p className="VodeoDisSizing  text-end">تغیروضعیت</p>
+                        <div style={{ color: "#F3802C" }}>
+                          <AssignmentIcon className="subitem" />
+                        </div>
+                      </div>
+                      <div
+                        onClick={() => {
+                          setActiveKey("seeOrder");
+                          setSeeOrder(item);
+                        }}
+                        style={{
+                          borderBottom: "1px solid black",
+                          cursor: "pointer",
+                        }}
+                        className="d-flex flex-row gap-2 align-items-center pb-2 mt-2"
+                      >
+                        <p className="VodeoDisSizing  text-end">ویرایش</p>
+                        <div style={{ color: "#F3802C" }}>
+                          <EditIcon className="subitem" />
+                        </div>
+                      </div>
+
+                      <div
+                        onClick={() => areYouShureFunction(product)}
+                        style={{
+                          cursor: "pointer",
+                        }}
+                        className="d-flex flex-row gap-2 align-items-center mt-2"
+                      >
+                        <p className="VodeoDisSizing text-end">حذف</p>
+                        <div style={{ color: "#F3802C" }}>
+                          <DeleteIcon className="text-danger subitem" />
+                        </div>
+                      </div>
+                    </NavBarInsideDiv>
+                    <div className="d-flex justify-content-end"></div>
+                  </NavDropDown>
                 </div>
               </div>
             </MAINTABELSTYLE>

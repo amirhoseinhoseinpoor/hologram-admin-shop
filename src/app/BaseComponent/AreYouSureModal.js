@@ -140,6 +140,7 @@ export default function AreYouShureModal({ open, onClose, text, func }) {
                 variant="contained"
                 onClick={onClose}
                 style={{
+                  backgroundColor : "#43A047",
                   marginLeft: "10px",
                   fontFamily: "unset",
                   marginTop: "20px",

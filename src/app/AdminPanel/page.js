@@ -7,6 +7,8 @@ import { Offcanvas, Navbar, Nav } from "react-bootstrap";
 import React, { useState, lazy, Suspense } from "react";
 import dynamic from "next/dynamic";
 import CustomCloseButton from "../BaseComponent/CustomCloseButton.js";
+import { DndProvider } from "react-dnd";
+import { HTML5Backend } from "react-dnd-html5-backend";
 
 // mui icons import
 import SpaceDashboardIcon from "@mui/icons-material/SpaceDashboard";
@@ -20,13 +22,17 @@ import ViewArrayIcon from "@mui/icons-material/ViewArray";
 import VideocamIcon from "@mui/icons-material/Videocam";
 import PeopleIcon from "@mui/icons-material/People";
 import SettingsIcon from "@mui/icons-material/Settings";
-
-
+import PersonIcon from "@mui/icons-material/Person";
 
 // import components
 const DefineUser = lazy(() =>
   import("../eachPageComponent/DefineUser/DefineUserTable.js")
 );
+
+const CustomerUser = lazy(() =>
+  import("../eachPageComponent/CustomerUser/CustomerUserTabel.js")
+);
+
 const HonorsMainComponent = lazy(() =>
   import("../eachPageComponent/Honors/HonorsMainComponent.js")
 );
@@ -113,6 +119,8 @@ const AdminPanel = () => {
   return (
     <section className={` ${style.adminPanel}`}>
       <aside className={`${style.sidebar} d-lg-flex d-none me-2 my-2`}>
+        <h4 className={`${style.titleStyleHeader} title`}>Logo</h4>
+
         <Tabs
           activeKey={activeTab}
           onSelect={(k) => setActiveTab(k)}
@@ -127,14 +135,18 @@ const AdminPanel = () => {
               </>
             }
           ></Tab>
+
           <Tab
             eventKey="Orders"
             title={
               <>
-                <ListAltIcon/> سفارشات
+                <ListAltIcon /> سفارشات
               </>
             }
           ></Tab>
+
+          <Tab title={<div className={style.addBorderSideBar}></div>} />
+
           <Tab
             eventKey="header"
             title={
@@ -195,18 +207,18 @@ const AdminPanel = () => {
             eventKey="defineUser"
             title={
               <>
-                <PeopleIcon /> مدیریت کاربر
+                <PersonIcon /> کاربر های سیستم
               </>
             }
           ></Tab>
-          {/* <Tab
-            eventKey="setting"
+          <Tab
+            eventKey="customerUser"
             title={
               <>
-                <SettingsIcon /> تنظیمات
+                <PeopleIcon /> مدیریت مشتریان
               </>
             }
-          ></Tab> */}
+          ></Tab>
         </Tabs>
       </aside>
 
@@ -224,11 +236,19 @@ const AdminPanel = () => {
             id="basic-navbar-nav"
           >
             <Offcanvas.Header
-              className={`${style.offcanvasheader} ${style.nextoffcanvas}`}
+              className={`${style.offcanvasheader} ${style.nextoffcanvas} ${style.offcanvasHeaderResponsive} justify-content-between position-relative`}
               closeButton={false}
             >
-              <Offcanvas.Title>لوگو</Offcanvas.Title>
-              <CustomCloseButton color={'#262626'} onClick={() => handleClose("main")} />
+              <Offcanvas.Title className="me-2">لوگو</Offcanvas.Title>
+              <CustomCloseButton
+                className="me-2"
+                color={"#262626"}
+                onClick={() => handleClose("main")}
+              />
+
+              <div
+                className={`${style.addBorderSideBar2} position-absolute`}
+              ></div>
             </Offcanvas.Header>
 
             <Nav className="align-items-center gap-3">
@@ -254,6 +274,9 @@ const AdminPanel = () => {
                     </>
                   }
                 ></Tab>
+
+                <Tab title={<div className={style.addBorderSideBar}></div>} />
+
                 <Tab
                   eventKey="header"
                   title={
@@ -314,18 +337,18 @@ const AdminPanel = () => {
                   eventKey="defineUser"
                   title={
                     <>
-                      <PeopleIcon /> مدیریت کاربر
+                      <PersonIcon /> کاربر های سیستم
                     </>
                   }
                 ></Tab>
-                {/* <Tab
-                  eventKey="setting"
+                <Tab
+                  eventKey="customerUser"
                   title={
                     <>
-                      <SettingsIcon /> تنظیمات
+                      <PeopleIcon /> مدیریت مشتریان
                     </>
                   }
-                ></Tab> */}
+                ></Tab>
               </Tabs>
             </Nav>
           </Navbar.Offcanvas>
@@ -333,61 +356,68 @@ const AdminPanel = () => {
 
         {activeTab === "Doshbord" && (
           <div className={style.tabContent}>
-            <DoshbordMainComponent toggleShow={toggleShow}/>
+            <DoshbordMainComponent toggleShow={toggleShow} />
           </div>
         )}
         {activeTab === "Orders" && (
           <div className={style.tabContent}>
-            <OrderMainComponent toggleShow={toggleShow}/>
+            <OrderMainComponent toggleShow={toggleShow} />
           </div>
         )}
         {activeTab === "header" && (
           <div className={style.tabContent}>
-            <HeaderMainComponent toggleShow={toggleShow}/>
+            <DndProvider backend={HTML5Backend}>
+              <HeaderMainComponent toggleShow={toggleShow} />
+            </DndProvider>
+            
           </div>
         )}
         {activeTab === "Product" && (
           <div className={style.tabContent}>
-            <ProductMainComponent toggleShow={toggleShow}/>
+            <ProductMainComponent toggleShow={toggleShow} />
           </div>
         )}
         {activeTab === "Blogs" && (
           <div className={style.tabContent}>
-            <BlogsMainComponent toggleShow={toggleShow}/>
+            <BlogsMainComponent toggleShow={toggleShow} />
           </div>
         )}
         {activeTab === "Honors" && (
           <div className={style.tabContent}>
             <Suspense fallback={<div>loading...</div>}>
-              <HonorsMainComponent toggleShow={toggleShow}/>
+              <HonorsMainComponent toggleShow={toggleShow} />
             </Suspense>
           </div>
         )}
         {activeTab === "Exhibition" && (
           <div className={style.tabContent}>
-            <ExhibitionMainComponent toggleShow={toggleShow}/>
+            <ExhibitionMainComponent toggleShow={toggleShow} />
           </div>
         )}
         {activeTab === "Banner" && (
           <div className={style.tabContent}>
-            <BannerMainComponent toggleShow={toggleShow}/>
+            <BannerMainComponent toggleShow={toggleShow} />
           </div>
         )}
         {activeTab === "Video" && (
           <div className={style.tabContent}>
-            <VideoMainComponent toggleShow={toggleShow}/>
+            <VideoMainComponent toggleShow={toggleShow} />
           </div>
         )}
         {activeTab === "defineUser" && (
           <div className={style.tabContent}>
             <Suspense fallback={<div>Loading...</div>}>
-              <DefineUser toggleShow={toggleShow}/>
+              <DefineUser toggleShow={toggleShow} />
             </Suspense>
           </div>
         )}
-        {/* {activeTab === "setting" && (
-          <div className={style.tabContent}>Tab content for Settings</div>
-        )} */}
+        {activeTab === "customerUser" && (
+          <div className={style.tabContent}>
+            <Suspense fallback={<div>Loading...</div>}>
+              <CustomerUser toggleShow={toggleShow} />
+            </Suspense>
+          </div>
+        )}
       </div>
     </section>
   );

@@ -1,8 +1,9 @@
 import { useEffect, useState } from "react";
 import React from "react";
 import MakeOrder from "./MakeOrderComponents/MakeOrder";
+// import redux
 import { useDispatch } from "react-redux";
-import { listorders, whosOrder, updateOrderStatus } from "@/app/Store/thunks";
+import { listorders, whosOrder, updateOrderStatus , deleteOrder } from "@/app/Store/thunks";
 import SearchIcon from "@mui/icons-material/Search";
 import styled from "styled-components";
 import {
@@ -12,11 +13,13 @@ import {
   InputLabel,
   Skeleton,
 } from "@mui/material";
+
 // import base components
 import ProfileComponent from "@/app/BaseComponent/ProfileComponent";
 import NavBarToggleBurgerButton from "@/app/BaseComponent/NavBarToggleBurgerButton";
 import ConfirmingModal from "@/app/BaseComponent/ConfirmingModal";
 import ErrorModal from "@/app/BaseComponent/ErrorModal";
+import AreYouShureModal from "@/app/BaseComponent/AreYouSureModal";
 // import component
 import OrderTabel from "./OrderTabel";
 
@@ -24,7 +27,7 @@ const FixTablePlace = styled.div`
   @media (min-width: 980px) {
     position: relative;
     margin-top: 60px;
-    p {
+    .fixingTabel {
       position: absolute;
       transform: translate(-50%, 50%);
       left: 50%;
@@ -39,9 +42,10 @@ const FixTablePlace = styled.div`
 `;
 
 const HeadermakeOrder = styled.div`
-  /* background-color: white; */
   padding: 10px;
   color: white;
+  background-color: rgb(225, 223, 223);
+  border-radius: 4px;
   .textHeaderStyle {
     color: black;
   }
@@ -70,13 +74,19 @@ const SearchInputMainDiv = styled.div`
   }
 `;
 
-// const SeeOrderButton = styled.button`
-//   background-color: ${(props) => props.color || "#1572e8"};
-// `;
-
 const AlignCenter = styled(Select)`
   .css-jedpe8-MuiSelect-select-MuiInputBase-input-MuiOutlinedInput-input.MuiSelect-select {
     text-align: center;
+  }
+  .MuiSelect-icon {
+    right: auto; /* Reset default positioning */
+    left: 0px; /* Position arrow on the left */
+  }
+  .css-jedpe8-MuiSelect-select-MuiInputBase-input-MuiOutlinedInput-input.css-jedpe8-MuiSelect-select-MuiInputBase-input-MuiOutlinedInput-input.css-jedpe8-MuiSelect-select-MuiInputBase-input-MuiOutlinedInput-input {
+    padding-left: 32px;
+  }
+  .css-jedpe8-MuiSelect-select-MuiInputBase-input-MuiOutlinedInput-input.css-jedpe8-MuiSelect-select-MuiInputBase-input-MuiOutlinedInput-input.css-jedpe8-MuiSelect-select-MuiInputBase-input-MuiOutlinedInput-input {
+    padding-right: 10px !important;
   }
 `;
 
@@ -93,17 +103,20 @@ export default function OrderMainComponent({ toggleShow }) {
   const [currentStatus, setCurrentStatus] = useState("1"); // وضعیت پیش‌فرض
   const [currentSubStatus, setCurrentSubStatus] = useState(null); // null یا 'admin' یا 'user'
   const [trackLoadingProduct, setTrackLoadingProduct] = useState(false);
+  const [dataForDelete, setDataForDelete] = useState(null);
+  const [updateData, setUpdateData] = useState(false);
 
   // وضعیت‌های مودال
+  const [openModal, setOpenModal] = useState(false);
   const [openModal2, setOpenModal2] = useState(false);
   const [openModal3, setOpenModal3] = useState(false);
   // بستن مودال‌ها
+  const closeModal = () => setOpenModal(false);
   const closeModal2 = () => setOpenModal2(false);
   const closeModal3 = () => setOpenModal3(false);
 
   const normalizeString = (str) => str.replace(/\s+/g, "").toLowerCase();
 
-  // تابع دریافت سفارش‌ها بر اساس وضعیت
   const fetchOrders = async (status) => {
     try {
       setTrackLoadingProduct(true);
@@ -133,12 +146,13 @@ export default function OrderMainComponent({ toggleShow }) {
       setOpenModal3(true);
     } finally {
       setTrackLoadingProduct(false);
+      setUpdateData(true);
     }
   };
 
   useEffect(() => {
     fetchOrders(currentStatus);
-  }, [dispatch, currentStatus]);
+  }, [dispatch, currentStatus , updateData]);
 
   // تابع فیلترینگ سفارش‌ها بر اساس وضعیت و زیر وضعیت
   useEffect(() => {
@@ -210,6 +224,35 @@ export default function OrderMainComponent({ toggleShow }) {
     }
   };
 
+  const areYouShureFunction = (item) => {
+    setDataForDelete(item);
+    setOpenModal(true);
+  };
+  
+  function closeModalOnTimeout() {
+    setTimeout(() => {
+      setOpenModal2(false);
+    }, 3000);
+  }
+
+  const handleDelete = async () => {
+    try {
+      const fetchData = await dispatch(deleteOrder({ code : dataForDelete })).unwrap();
+      if (
+        fetchData.firstData.statusCode == 200 &&
+        fetchData.secondData.statusCode == 200
+      ) {
+        setOpenModal2(true);
+        closeModalOnTimeout();
+      }
+    } catch (error) {
+      setOpenModal3(true);
+    } finally {
+      setOpenModal(false);
+      setUpdateData(true);
+    }
+  };
+
   return (
     <section>
       {activekey === "seeTable" && (
@@ -218,7 +261,7 @@ export default function OrderMainComponent({ toggleShow }) {
             <div className="d-block d-lg-none">
               <NavBarToggleBurgerButton func={() => toggleShow("main")} />
             </div>
-            <div className="NormalTextSizing textHeaderStyle d-flex align-items-center">
+            <div className="NormalTextSizing text-decoration-underline textHeaderStyle d-flex align-items-center">
               مدیریت سفارشات
             </div>
             <ProfileComponent colorGet={"#191919"} />
@@ -289,7 +332,9 @@ export default function OrderMainComponent({ toggleShow }) {
             <>
               {trackLoadingProduct ? (
                 <>
-                  <p className="me-2 NormalTextSizing mb-2">سفارشات</p>
+                  <p className="me-2 NormalTextSizing mb-2 fixingTabel">
+                    سفارشات
+                  </p>
                   <Skeleton
                     animation="wave"
                     variant="rounded"
@@ -301,8 +346,11 @@ export default function OrderMainComponent({ toggleShow }) {
                 <>
                   {filteredOrders && filteredOrders.length > 0 ? (
                     <>
-                      <p className="me-2 NormalTextSizing mb-2">سفارشات</p>
+                      <p className="me-2 NormalTextSizing mb-2 fixingTabel">
+                        سفارشات
+                      </p>
                       <OrderTabel
+                        areYouShureFunction={areYouShureFunction}
                         setSeeOrder={setSeeOrder}
                         setActiveKey={setActiveKey}
                         selectedStatus={selectedStatus}
@@ -331,6 +379,12 @@ export default function OrderMainComponent({ toggleShow }) {
         />
       )}
       {/* مودال‌ها */}
+      <AreYouShureModal
+        open={openModal}
+        onClose={closeModal}
+        text={"ایا از حذف سفارش مطمئن هستیذ؟"}
+        func={handleDelete}
+      />
       <ConfirmingModal
         open={openModal2}
         onClose={closeModal2}
