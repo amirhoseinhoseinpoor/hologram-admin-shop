@@ -479,7 +479,7 @@ export default function HeaderMainComponent({ toggleShow }) {
         >
           <SubItem>
             <div className="d-flex flex-row align-items-center justify-content-between p-2">
-              <div className="d-flex flex-row align-items-center gap-1 mb-1">
+              <div className="d-flex flex-row align-items-center gap-1">
                 <StrongText className="NormalTextSizing">
                   {subItem.title}
                 </StrongText>
@@ -607,7 +607,7 @@ export default function HeaderMainComponent({ toggleShow }) {
                     moveHeader={moveHeader}
                   >
                     <HeaderItem>
-                      <div className="d-flex flex-row align-items-center gap-1 mb-1">
+                      <div className="d-flex flex-row align-items-center gap-1">
                         <StrongText className="NormalTextSizing">
                           {item.title}
                         </StrongText>
