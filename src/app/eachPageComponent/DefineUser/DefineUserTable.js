@@ -21,6 +21,7 @@ const HeadermakeOrder = styled.div`
   color: white;
   background-color: rgb(225, 223, 223);
   border-radius: 4px;
+  margin : 7px 15px;
   .textHeaderStyle {
     color: black;
   }

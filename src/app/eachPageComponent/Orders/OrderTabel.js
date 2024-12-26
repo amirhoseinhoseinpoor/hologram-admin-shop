@@ -262,10 +262,11 @@ export default function OrderTabelDesctop({
                         }}
                         className="d-flex flex-row gap-2 align-items-center pb-2"
                       >
-                        <p className="VodeoDisSizing  text-end">تغیروضعیت</p>
+                        
                         <div style={{ color: "#F3802C" }}>
                           <AssignmentIcon className="subitem" />
                         </div>
+                        <p className="VodeoDisSizing  text-end">تغیروضعیت</p>
                       </div>
                       <div
                         onClick={() => {
@@ -278,10 +279,11 @@ export default function OrderTabelDesctop({
                         }}
                         className="d-flex flex-row gap-2 align-items-center pb-2 mt-2"
                       >
-                        <p className="VodeoDisSizing  text-end">ویرایش</p>
+                        
                         <div style={{ color: "#F3802C" }}>
                           <EditIcon className="subitem" />
                         </div>
+                        <p className="VodeoDisSizing  text-end">ویرایش</p>
                       </div>
 
                       <div
@@ -291,10 +293,11 @@ export default function OrderTabelDesctop({
                         }}
                         className="d-flex flex-row gap-2 align-items-center mt-2"
                       >
-                        <p className="VodeoDisSizing text-end">حذف</p>
+                        
                         <div style={{ color: "#F3802C" }}>
                           <DeleteIcon className="text-danger subitem" />
                         </div>
+                        <p className="VodeoDisSizing text-end">حذف</p>
                       </div>
                     </NavBarInsideDiv>
                     <div className="d-flex justify-content-end"></div>
@@ -455,10 +458,11 @@ export default function OrderTabelDesctop({
                         }}
                         className="d-flex flex-row gap-2 align-items-center pb-2"
                       >
-                        <p className="VodeoDisSizing  text-end">تغیروضعیت</p>
+                        
                         <div style={{ color: "#F3802C" }}>
                           <AssignmentIcon className="subitem" />
                         </div>
+                        <p className="VodeoDisSizing  text-end">تغیروضعیت</p>
                       </div>
                       <div
                         onClick={() => {
@@ -471,10 +475,10 @@ export default function OrderTabelDesctop({
                         }}
                         className="d-flex flex-row gap-2 align-items-center pb-2 mt-2"
                       >
-                        <p className="VodeoDisSizing  text-end">ویرایش</p>
                         <div style={{ color: "#F3802C" }}>
                           <EditIcon className="subitem" />
                         </div>
+                        <p className="VodeoDisSizing  text-end">ویرایش</p>
                       </div>
 
                       <div
@@ -484,10 +488,10 @@ export default function OrderTabelDesctop({
                         }}
                         className="d-flex flex-row gap-2 align-items-center mt-2"
                       >
-                        <p className="VodeoDisSizing text-end">حذف</p>
                         <div style={{ color: "#F3802C" }}>
                           <DeleteIcon className="text-danger subitem" />
                         </div>
+                        <p className="VodeoDisSizing text-end">حذف</p>
                       </div>
                     </NavBarInsideDiv>
                     <div className="d-flex justify-content-end"></div>

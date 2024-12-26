@@ -7,9 +7,16 @@ import EditBlogs from "./EditBlogs";
 import { Card, CardContent, CardMedia, Typography } from "@mui/material";
 import styled from "styled-components";
 import { formatPersianDate } from "@/app/utils/persionDateUtils";
+import PreviewIcon from "@mui/icons-material/Preview";
+import DeleteIcon from "@mui/icons-material/Delete";
+
 // import baseComponents
 import ProfileComponent from "@/app/BaseComponent/ProfileComponent";
 import NavBarToggleBurgerButton from "@/app/BaseComponent/NavBarToggleBurgerButton";
+import AreYouShureModal from "@/app/BaseComponent/AreYouSureModal";
+import ConfirmingModal from "@/app/BaseComponent/ConfirmingModal";
+import ErrorModal from "@/app/BaseComponent/ErrorModal";
+
 //redux import
 import { useDispatch } from "react-redux";
 import { blogsList } from "@/app/Store/thunks";
@@ -17,8 +24,9 @@ import { blogsList } from "@/app/Store/thunks";
 const HeadermakeOrder = styled.div`
   padding: 10px;
   color: white;
-  background-color:rgb(225, 223, 223);
+  background-color: rgb(225, 223, 223);
   border-radius: 4px;
+  margin: 7px 15px;
   .textHeaderStyle {
     color: black;
   }
@@ -37,32 +45,35 @@ const CARD = styled(Card)`
   border: 1px solid #ddd;
   box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
   display: flex;
-  flex-direction : column;
+  flex-direction: column;
   .MuiCardContent-root {
     .titleHonors {
       font-size: 20px;
       font-weight: 500;
     }
   }
-  .css-46bh2p-MuiCardContent-root:last-child{
-    padding-bottom : 10px;
+  .css-46bh2p-MuiCardContent-root:last-child {
+    padding-bottom: 10px;
   }
 `;
 
 const GridbaseDiv = styled.div`
   display: grid;
   grid-template-columns: repeat(2, 1fr);
-  grid-gap: 20px;
-  @media (max-width : 980px) {
-    grid-template-columns: repeat(2 , 1fr);
+  grid-gap: 100px;
+  width: 60%;
+  @media (max-width: 980px) {
+    grid-template-columns: repeat(2, 1fr);
   }
-  @media (max-width : 768px) {
-    grid-template-columns: repeat(1 , 1fr);
+  @media (max-width: 768px) {
+    grid-template-columns: repeat(1, 1fr);
+    width: 70%;
+    grid-gap: 50px;
   }
 `;
 
 const ButtonColor = styled.button`
-  background-image: linear-gradient(195deg, #66BB6A 0%, #43A047 100%);
+  background-image: linear-gradient(195deg, #66bb6a 0%, #43a047 100%);
 `;
 
 const TYPOGRAPHY = styled(Typography)`
@@ -76,6 +87,16 @@ export default function HonorsMainComponent({ toggleShow }) {
   const [activekey, setActiveKey] = useState("editUserPage");
   const [editedHonor, setEditedHonor] = useState(null);
   const [dataCome, setDataCome] = useState([]);
+  const [indexDeleted, setIndexDeleted] = useState(null);
+  const [updateData, setUpdateData] = useState(false);
+
+  const [openModal2, setOpenModal2] = useState(false);
+  const [openModal3, setOpenModal3] = useState(false);
+  const [openModal4, setOpenModal4] = useState(false);
+
+  const closeModal2 = () => setOpenModal2(false);
+  const closeModal3 = () => setOpenModal3(false);
+  const closeModal4 = () => setOpenModal4(false);
 
   useEffect(() => {
     const fechData = async () => {
@@ -84,11 +105,42 @@ export default function HonorsMainComponent({ toggleShow }) {
         setDataCome(dataComeAPI || []);
       } catch (error) {
         console.error("Error fetching data:", error);
+      } finally {
+        setUpdateData(false);
       }
     };
 
     fechData();
-  }, [dispatch]);
+  }, [dispatch, updateData]);
+
+  const handleDelete = async (e) => {
+    e.preventDefault();
+    setOpenModal4(false);
+    try {
+      const deleteVideo = await dispatch(
+        blogsDeleted({ code: editedHonor.code })
+      );
+      if (deleteVideo.payload.message === "Success") {
+        setOpenModal2(true);
+        closeModalOnTimeout();
+      } else {
+        setOpenModal3(true);
+      }
+    } catch (error) {
+      console.error("Error deleting honors:", error);
+    }
+  };
+
+  const areYouShureFunction2 = (e) => {
+    e.preventDefault();
+    setOpenModal4(true);
+  };
+
+  function closeModalOnTimeout() {
+    setTimeout(() => {
+      setOpenModal2(false);
+    }, 3000);
+  }
 
   // cancelingEdit
   const handleCancelEdit = () => {
@@ -157,36 +209,53 @@ export default function HonorsMainComponent({ toggleShow }) {
       {/* content */}
       {activekey === "editUserPage" && !editedHonor && (
         <>
-          <GridbaseDiv
-            className="mt-3 container"
-            style={{ cursor: "pointer" }}
-          >
+          <GridbaseDiv className="mt-3 container" style={{ cursor: "pointer" }}>
             {dataCome.length > 0 ? (
               dataCome.map((honor, index) => (
                 <React.Fragment key={index}>
-                  <CARD
-                   
-                    onClick={() => {
-                      setEditedHonor(honor);
-                    }}
-                  >
-                    <CardMedia
-                      component="img"
-                      src={`${process.env.NEXT_PUBLIC_BACK_END_SERVER}/system/download/${honor.content.imageSrc}`}
-                      sx={{
-                        width: "100%",
-                        maxHeight: "100%",
-                        borderRadius: "2px",
+                  <CARD>
+                    <div className="d-flex mb-1 mt-1 justify-content-lg-between container">
+                      <div
+                        onClick={() => {
+                          setEditedHonor(data);
+                        }}
+                      >
+                        <PreviewIcon style={{ color: "#3892F3" }} />
+                      </div>
+
+                      <div
+                        onClick={(e) => {
+                          setIndexDeleted(data.code);
+                          areYouShureFunction2(e);
+                        }}
+                      >
+                        <DeleteIcon style={{ color: "#e81d46" }} />
+                      </div>
+                    </div>
+
+                    <div
+                      onClick={() => {
+                        setEditedHonor(data);
                       }}
-                    />
-                    <CardContent className="d-flex flex-column justify-content-around">
-                      <TYPOGRAPHY className="titleHonors">
-                        {honor.content.title}
-                      </TYPOGRAPHY>
-                      <TYPOGRAPHY className="dateHonors">
-                        {formatPersianDate(honor.date)}
-                      </TYPOGRAPHY>
-                    </CardContent>
+                    >
+                      <CardMedia
+                        component="img"
+                        src={`${process.env.NEXT_PUBLIC_BACK_END_SERVER}/system/download/${honor.content.imageSrc}`}
+                        sx={{
+                          width: "100%",
+                          maxHeight: "100%",
+                          borderRadius: "2px",
+                        }}
+                      />
+                      <CardContent className="d-flex flex-column justify-content-around">
+                        <TYPOGRAPHY className="titleHonors">
+                          {honor.content.title}
+                        </TYPOGRAPHY>
+                        <TYPOGRAPHY className="dateHonors">
+                          {formatPersianDate(honor.date)}
+                        </TYPOGRAPHY>
+                      </CardContent>
+                    </div>
                   </CARD>
                 </React.Fragment>
               ))
@@ -213,6 +282,22 @@ export default function HonorsMainComponent({ toggleShow }) {
           />
         </>
       )}
+      <AreYouShureModal
+        open={openModal4}
+        onClose={closeModal4}
+        text={"ایا از حذف وبلاگ مطمعن هستید"}
+        func={handleDelete}
+      />
+      <ConfirmingModal
+        open={openModal2}
+        onClose={closeModal2}
+        text={"عملیات با موفقیت انجام شد"}
+      />
+      <ErrorModal
+        open={openModal3}
+        onClose={closeModal3}
+        text={"خطا از لاگین بودن خود اطمینان حاصل فرمایید"}
+      />
     </section>
   );
 }

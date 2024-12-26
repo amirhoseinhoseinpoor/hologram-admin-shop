@@ -16,7 +16,7 @@ import { list } from "../../Store/thunks.js";
 import { productListData } from "@/app/Store/slice";
 import { deleted } from "../../Store/thunks.js";
 // improt styles
-import { Card, CardMedia, Typography } from "@mui/material";
+import { Card, CardMedia, Typography, Skeleton } from "@mui/material";
 import MoreHorizIcon from "@mui/icons-material/MoreHoriz";
 import DeleteIcon from "@mui/icons-material/Delete";
 import EditIcon from "@mui/icons-material/Edit";
@@ -48,8 +48,9 @@ const NavBarInsideDiv = styled.div`
 const HeadermakeOrder = styled.div`
   padding: 10px;
   color: white;
-  background-color:rgb(225, 223, 223);
+  background-color: rgb(225, 223, 223);
   border-radius: 4px;
+  margin: 7px 15px;
   .textHeaderStyle {
     color: black;
   }
@@ -60,24 +61,67 @@ const HeadermakeOrder = styled.div`
   }
 `;
 
-const TableContainer = styled.div`
-  margin-top: 20px;
+// const TableContainer = styled.div`
+//   margin-top: 20px;
+// `;
+
+// const StyledTable = styled.table`
+//   width: 100%;
+//   border-collapse: collapse;
+//   margin-top: 20px;
+//   th,
+//   td {
+//     border: 1px solid #ddd;
+//     padding: 8px;
+//     text-align: center;
+//     vertical-align: middle;
+//   }
+//   th {
+//     background-color: #f2f2f2;
+//     font-weight: bold;
+//   }
+// `;
+
+const FixTablePlace = styled.div`
+  @media (min-width: 980px) {
+    position: relative;
+    margin-top: 60px;
+    .fixingTabel {
+      position: absolute;
+      transform: translate(-50%, 50%);
+      left: 50%;
+      width: 94%;
+      top: -55px;
+      border-radius: 10px;
+      padding: 18px 12px;
+      background-image: linear-gradient(195deg, #42424a 0%, #191919 100%);
+      color: white;
+    }
+  }
 `;
 
 const StyledTable = styled.table`
-  width: 100%;
-  border-collapse: collapse;
-  margin-top: 20px;
   th,
   td {
-    border: 1px solid #ddd;
-    padding: 8px;
-    text-align: center;
     vertical-align: middle;
   }
-  th {
-    background-color: #f2f2f2;
-    font-weight: bold;
+
+  @media (min-width: 980px) {
+    border-collapse: separate;
+    border-radius: 12px;
+    overflow: hidden;
+    width: 100%;
+
+    th,
+    td {
+      padding: 10px;
+      text-align: center;
+      vertical-align: middle;
+    }
+    th {
+      background-color: #f2f2f2;
+      padding-top: 55px;
+    }
   }
 `;
 
@@ -142,6 +186,7 @@ export default function HonorsMainComponent({ toggleShow }) {
   const [activekey, setActiveKey] = useState("editUserPage");
 
   const [dataUpdated, setDataUpdated] = useState(false);
+  const [trackLoadingProduct, setTrackLoadingProduct] = useState(false);
 
   // edit honors
   const [editedHonor, setEditedHonor] = useState(null);
@@ -159,11 +204,13 @@ export default function HonorsMainComponent({ toggleShow }) {
   useEffect(() => {
     const fetchData = async () => {
       try {
+        setTrackLoadingProduct(true);
         await dispatch(list());
       } catch (error) {
         console.error("Error fetching data:", error);
       } finally {
         setDataUpdated(false);
+        setTrackLoadingProduct(false);
       }
     };
     fetchData();
@@ -178,8 +225,8 @@ export default function HonorsMainComponent({ toggleShow }) {
   };
 
   const areYouShureFunction = (product) => {
-    setDataForDelete(product); 
-    setOpenModal(true); 
+    setDataForDelete(product);
+    setOpenModal(true);
   };
 
   function closeModalOnTimeout() {
@@ -229,7 +276,6 @@ export default function HonorsMainComponent({ toggleShow }) {
               <div className="text-decoration-underline NormalTextSizing textHeaderStyle d-flex align-items-center">
                 افزودن محصول
               </div>
-              
             </>
           )}
           {editedHonor && (
@@ -272,34 +318,52 @@ export default function HonorsMainComponent({ toggleShow }) {
       </div>
 
       {activekey === "editUserPage" && !editedHonor && (
-        <TableContainer className="container">
-          <StyledTable>
-            <thead>
-              <tr>
-                <th>عکس</th>
-                <th>نام محصول</th>
-                <th className="d-none d-lg-table-cell">کد محصول</th>
-                <th>عملیات</th>
-              </tr>
-            </thead>
-            <tbody>
-              {datacome &&
-                datacome?.map((product, index) => (
-                  <tr key={index}>
-                    <td>
-                      {product && product.info?.imgData?.[0]?.src && (
-                        <ProductCard>
-                          <ImageWrapper
-                            component="img"
-                            src={`${process.env.NEXT_PUBLIC_BACK_END_SERVER}/system/download/${product.info.imgData[0].src}`}
-                          />
-                        </ProductCard>
-                      )}
-                    </td>
-                    <td>{product.name}</td>
-                    <td className="d-none d-lg-table-cell">{product.code}</td>
-                    <td>
-                      {/* <Button
+        <>
+          {trackLoadingProduct ? (
+            <FixTablePlace className="container">
+              <p className="me-2 NormalTextSizing mb-2 fixingTabel">محصولات</p>
+              <Skeleton
+                animation="wave"
+                variant="rounded"
+                className="w-100"
+                height={250}
+              />
+            </FixTablePlace>
+          ) : (
+            <>
+              <FixTablePlace className="container">
+                <p className="me-2 NormalTextSizing mb-2 fixingTabel">
+                  محصولات
+                </p>
+                <StyledTable className="table table-striped">
+                  <thead>
+                    <tr>
+                      <th>عکس</th>
+                      <th>نام محصول</th>
+                      <th className="d-none d-lg-table-cell">کد محصول</th>
+                      <th>عملیات</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {datacome &&
+                      datacome?.map((product, index) => (
+                        <tr key={index}>
+                          <td>
+                            {product && product.info?.imgData?.[0]?.src && (
+                              <ProductCard>
+                                <ImageWrapper
+                                  component="img"
+                                  src={`${process.env.NEXT_PUBLIC_BACK_END_SERVER}/system/download/${product.info.imgData[0].src}`}
+                                />
+                              </ProductCard>
+                            )}
+                          </td>
+                          <td>{product.name}</td>
+                          <td className="d-none d-lg-table-cell">
+                            {product.code}
+                          </td>
+                          <td>
+                            {/* <Button
                         style={{fontFamily : "unset"}}
                         variant="contained"
                         color="secondary"
@@ -307,59 +371,64 @@ export default function HonorsMainComponent({ toggleShow }) {
                       >
                         ویرایش
                       </Button> */}
-                      <NavDropDown
-                        title={
-                          <>
-                            <MoreHorizIcon
-                              style={{
-                                color: "#191919",
-                                cursor: "pointer",
-                                fontSize: "28px",
-                                cursor: "pointer",
-                              }}
-                            />
-                          </>
-                        }
-                        id="basic-nav-dropdown"
-                      >
-                        <NavBarInsideDiv>
-                          <div
-                            onClick={() => {
-                              setEditedHonor(product);
-                            }}
-                            style={{
-                              borderBottom: "1px solid black",
-                              cursor: "pointer",
-                            }}
-                            className="d-flex flex-row gap-2 align-items-center pb-2"
-                          >
-                            <p className="VodeoDisSizing  text-end">ویرایش</p>
-                            <div style={{ color: "#F3802C" }}>
-                              <EditIcon className="subitem" />
-                            </div>
-                          </div>
+                            <NavDropDown
+                              title={
+                                <>
+                                  <MoreHorizIcon
+                                    style={{
+                                      color: "#191919",
+                                      cursor: "pointer",
+                                      fontSize: "28px",
+                                      cursor: "pointer",
+                                    }}
+                                  />
+                                </>
+                              }
+                              id="basic-nav-dropdown"
+                            >
+                              <NavBarInsideDiv>
+                                <div
+                                  onClick={() => {
+                                    setEditedHonor(product);
+                                  }}
+                                  style={{
+                                    borderBottom: "1px solid black",
+                                    cursor: "pointer",
+                                  }}
+                                  className="d-flex flex-row gap-2 align-items-center pb-2"
+                                >
+                                  <div style={{ color: "#F3802C" }}>
+                                    <EditIcon className="subitem" />
+                                  </div>
+                                  <p className="VodeoDisSizing  text-end">
+                                    ویرایش
+                                  </p>
+                                </div>
 
-                          <div
-                            onClick={() => areYouShureFunction(product)}
-                            style={{
-                              cursor: "pointer",
-                            }}
-                            className="d-flex flex-row gap-2 align-items-center mt-2"
-                          >
-                            <p className="VodeoDisSizing text-end">حذف</p>
-                            <div style={{ color: "#F3802C" }}>
-                              <DeleteIcon className="text-danger subitem" />
-                            </div>
-                          </div>
-                        </NavBarInsideDiv>
-                        <div className="d-flex justify-content-end"></div>
-                      </NavDropDown>
-                    </td>
-                  </tr>
-                ))}
-            </tbody>
-          </StyledTable>
-        </TableContainer>
+                                <div
+                                  onClick={() => areYouShureFunction(product)}
+                                  style={{
+                                    cursor: "pointer",
+                                  }}
+                                  className="d-flex flex-row gap-2 align-items-center mt-2"
+                                >
+                                  <div style={{ color: "#F3802C" }}>
+                                    <DeleteIcon className="text-danger subitem" />
+                                  </div>
+                                  <p className="VodeoDisSizing text-end">حذف</p>
+                                </div>
+                              </NavBarInsideDiv>
+                              <div className="d-flex justify-content-end"></div>
+                            </NavDropDown>
+                          </td>
+                        </tr>
+                      ))}
+                  </tbody>
+                </StyledTable>
+              </FixTablePlace>
+            </>
+          )}
+        </>
       )}
 
       {/* {activekey === "editUserPage" && !editedHonor && (
