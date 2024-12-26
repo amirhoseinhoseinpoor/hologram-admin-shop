@@ -26,6 +26,17 @@ export const login = createAsyncThunk(
         }
       );
 
+      const gettingRole = await axios.get(
+        `${process.env.NEXT_PUBLIC_BACK_END_SERVER}/users/${response2.data[0].code}/permissions`,
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+
+      console.log(gettingRole);
+
       return {
         token,
         firstName: response2.data[0].firstName,
@@ -1347,7 +1358,6 @@ export const deleteOrder = createAsyncThunk(
     const state = thunkAPI.getState();
     const token = state.auth.token.token;
     try {
-      
       const secondResponse = await axios.patch(
         `${process.env.NEXT_PUBLIC_BACK_END_SERVER}/order/status/${code}/5`,
         {},
@@ -1371,7 +1381,7 @@ export const deleteOrder = createAsyncThunk(
       const secondDataCome = secondResponse.data;
 
       return {
-        firstData : data,
+        firstData: data,
         secondData: secondDataCome,
       };
     } catch (error) {
