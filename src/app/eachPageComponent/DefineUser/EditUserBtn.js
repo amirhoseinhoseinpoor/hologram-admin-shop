@@ -167,6 +167,7 @@ function EditUserBtnfunction({ data, setDataUpdated, setConfirmModal }) {
       >
         ویرایش
       </EditUserBtn>
+      
       <EditUserModal show={showEditModal} onHide={handleEditModalClose}>
         <Modal.Header closeButton>
           <Modal.Title>ویرایش کاربر</Modal.Title>

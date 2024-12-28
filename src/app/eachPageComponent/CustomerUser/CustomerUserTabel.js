@@ -259,8 +259,8 @@ export default function CustomerUserTabel({ toggleShow }) {
                       <th>نام خانوادگی</th>
                       <th>شماره همراه</th>
                       <th>وضعیت</th>
-                      <th>نوع دسترسی</th>
-                      <th>دسترسی</th>
+                      {/* <th>نوع دسترسی</th>
+                      <th>دسترسی</th> */}
                       <th>عملیات</th>
                     </tr>
                   </thead>
@@ -272,13 +272,13 @@ export default function CustomerUserTabel({ toggleShow }) {
                         <td>{item.lastName}</td>
                         <td>{item.username}</td>
                         <td>{item.active ? "فعال" : "غیرفعال"}</td>
-                        <td>{item.domain === 1 ? "سایت" : "سایت و ادمین"}</td>
+                        {/* <td>{item.domain === 1 ? "سایت" : "سایت و ادمین"}</td>
                         <td>
                           {item.userRoles[0]?.role?.name === "admin" && "ادمین"}
                           {item.userRoles[0]?.role?.name === "master" && "مدیر"}
                           {item.userRoles[0]?.role?.name === "customer" &&
                             "مشتری"}
-                        </td>
+                        </td> */}
                         <td>
                           <div className="d-flex flex-row justify-content-center">
                             <EditUserBtnfunction

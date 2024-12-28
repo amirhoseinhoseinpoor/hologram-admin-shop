@@ -2,11 +2,35 @@
 import React, { useState, useEffect } from "react";
 import { Modal, Button } from "react-bootstrap";
 import styled from "styled-components";
+import MoreHorizIcon from "@mui/icons-material/MoreHoriz";
 // import redux
 import { useDispatch } from "react-redux";
 import { editUser, deleteUser } from "@/app/Store/thunks";
 // import base component
-import AreYouShureModal from "@/app/BaseComponent/AreYouSureModal";;
+import AreYouShureModal from "@/app/BaseComponent/AreYouSureModal";
+import { NavDropdown } from "react-bootstrap";
+import EditIcon from "@mui/icons-material/Edit";
+
+
+const NavDropDown = styled(NavDropdown)`
+  .dropdown-menu {
+    border: 1px solid gray;
+    width: 230px;
+    padding: 12px;
+    margin-top: 3px;
+    border-radius: 4px;
+    box-shadow: 1px 1px 5px gray;
+  }
+  .dropdown-toggle::after {
+    display: none;
+  }
+`;
+
+const NavBarInsideDiv = styled.div`
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+`;
 
 const EditUserModal = styled(Modal)`
   .modal-dialog {
@@ -81,13 +105,13 @@ function EditUserBtnfunction({ data, setDataUpdated, setConfirmModal }) {
   const [openModal, setOpenModal] = useState(false);
   const closeModal = () => setOpenModal(false);
 
-//   const handleDomainChange = (event) => {
-//     setWhereLogin(event.target.value);
-//   };
+  //   const handleDomainChange = (event) => {
+  //     setWhereLogin(event.target.value);
+  //   };
 
-//   const handleRoleChange = (event) => {
-//     setrolesChange(event.target.value);
-//   };
+  //   const handleRoleChange = (event) => {
+  //     setrolesChange(event.target.value);
+  //   };
 
   const handleActiveStateChange = (event) => {
     setFactorType(event.target.value);
@@ -161,12 +185,42 @@ function EditUserBtnfunction({ data, setDataUpdated, setConfirmModal }) {
 
   return (
     <>
-      <EditUserBtn
-        className="NormalTextSizing"
-        onClick={handleEditModalShow}
+      
+      <NavDropDown
+        title={
+          <>
+            <MoreHorizIcon
+              style={{
+                color: "#191919",
+                cursor: "pointer",
+                fontSize: "28px",
+                cursor: "pointer",
+              }}
+            />
+          </>
+        }
+        id="basic-nav-dropdown"
       >
-        ویرایش
-      </EditUserBtn>
+        <NavBarInsideDiv>
+          <div
+            onClick={handleEditModalShow}
+            style={{
+              
+              cursor: "pointer",
+            }}
+            className="d-flex flex-row gap-2 align-items-center pb-1"
+          >
+            <div style={{ color: "#F3802C" }}>
+              <EditIcon className="subitem" />
+            </div>
+            <p className="NormalTextSizing text-end" >ویرایش</p>
+          </div>
+
+          
+        </NavBarInsideDiv>
+        <div className="d-flex justify-content-end"></div>
+      </NavDropDown>
+
       <EditUserModal show={showEditModal} onHide={handleEditModalClose}>
         <Modal.Header closeButton>
           <Modal.Title>ویرایش کاربر</Modal.Title>
@@ -268,7 +322,7 @@ function EditUserBtnfunction({ data, setDataUpdated, setConfirmModal }) {
               </select>
             </div> */}
             <div className="d-flex flex-row justify-content-between">
-              <Button variant="primary" type="submit">
+              <Button style={{backgroundColor : "#43A047" , border : "unset"}} type="submit">
                 ذخیره
               </Button>
               <DeleteButtonStyle

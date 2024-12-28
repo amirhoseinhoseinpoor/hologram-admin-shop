@@ -48,7 +48,7 @@ const AddUserBtnstyle = styled(Button)`
   text-align: center;
   cursor: pointer;
   border-radius: 4px;
-  background-image : linear-gradient(195deg, #42424a 0%, #191919 100%);
+  background-image : linear-gradient(195deg, #66BB6A 0%, #43A047 100%);
 `;
 
 export default function AddUserBtn({

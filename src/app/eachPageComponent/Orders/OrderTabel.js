@@ -8,7 +8,7 @@ import MoreHorizIcon from "@mui/icons-material/MoreHoriz";
 import { NavDropdown } from "react-bootstrap";
 import DeleteIcon from "@mui/icons-material/Delete";
 import EditIcon from "@mui/icons-material/Edit";
-import AssignmentIcon from '@mui/icons-material/Assignment';
+import AssignmentIcon from "@mui/icons-material/Assignment";
 // improt areyou sure moda
 
 // const SeeOrderButton = styled.button`
@@ -178,7 +178,15 @@ export default function OrderTabelDesctop({
                   >
                     مشاهده سفارش
                   </SeeOrderButton> */}
-                  {item.code}
+                  <p
+                    style={{color: "#43A047" , cursor : "pointer"}}
+                    onClick={() => {
+                      setActiveKey("seeOrder");
+                      setSeeOrder(item);
+                    }}
+                  >
+                    {item.code}
+                  </p>
                 </td>
                 <td>
                   <Modal
@@ -213,7 +221,6 @@ export default function OrderTabelDesctop({
                             handleStatusChange(item.code, newStatus);
                           }}
                         >
-                          
                           <MenuItem sx={{ fontFamily: "unset" }} value="1">
                             درحال برسی
                           </MenuItem>
@@ -262,7 +269,6 @@ export default function OrderTabelDesctop({
                         }}
                         className="d-flex flex-row gap-2 align-items-center pb-2"
                       >
-                        
                         <div style={{ color: "#F3802C" }}>
                           <AssignmentIcon className="subitem" />
                         </div>
@@ -279,7 +285,6 @@ export default function OrderTabelDesctop({
                         }}
                         className="d-flex flex-row gap-2 align-items-center pb-2 mt-2"
                       >
-                        
                         <div style={{ color: "#F3802C" }}>
                           <EditIcon className="subitem" />
                         </div>
@@ -293,7 +298,6 @@ export default function OrderTabelDesctop({
                         }}
                         className="d-flex flex-row gap-2 align-items-center mt-2"
                       >
-                        
                         <div style={{ color: "#F3802C" }}>
                           <DeleteIcon className="text-danger subitem" />
                         </div>
@@ -458,7 +462,6 @@ export default function OrderTabelDesctop({
                         }}
                         className="d-flex flex-row gap-2 align-items-center pb-2"
                       >
-                        
                         <div style={{ color: "#F3802C" }}>
                           <AssignmentIcon className="subitem" />
                         </div>

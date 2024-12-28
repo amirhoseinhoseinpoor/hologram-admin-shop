@@ -211,7 +211,7 @@ export default function HonorsMainComponent({ toggleShow }) {
         <>
           <GridbaseDiv className="mt-3 container" style={{ cursor: "pointer" }}>
             {dataCome.length > 0 ? (
-              dataCome.map((honor, index) => (
+              dataCome.map((data, index) => (
                 <React.Fragment key={index}>
                   <CARD>
                     <div className="d-flex mb-1 mt-1 justify-content-lg-between container">
@@ -225,7 +225,7 @@ export default function HonorsMainComponent({ toggleShow }) {
 
                       <div
                         onClick={(e) => {
-                          setIndexDeleted(data.code);
+                          setIndexDeleted(data?.code);
                           areYouShureFunction2(e);
                         }}
                       >
@@ -240,7 +240,7 @@ export default function HonorsMainComponent({ toggleShow }) {
                     >
                       <CardMedia
                         component="img"
-                        src={`${process.env.NEXT_PUBLIC_BACK_END_SERVER}/system/download/${honor.content.imageSrc}`}
+                        src={`${process.env.NEXT_PUBLIC_BACK_END_SERVER}/system/download/${data.content.imageSrc}`}
                         sx={{
                           width: "100%",
                           maxHeight: "100%",
@@ -249,10 +249,10 @@ export default function HonorsMainComponent({ toggleShow }) {
                       />
                       <CardContent className="d-flex flex-column justify-content-around">
                         <TYPOGRAPHY className="titleHonors">
-                          {honor.content.title}
+                          {data.content.title}
                         </TYPOGRAPHY>
                         <TYPOGRAPHY className="dateHonors">
-                          {formatPersianDate(honor.date)}
+                          {formatPersianDate(data.date)}
                         </TYPOGRAPHY>
                       </CardContent>
                     </div>

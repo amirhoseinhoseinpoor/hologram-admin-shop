@@ -222,7 +222,7 @@ export default function HonorsMainComponent({ toggleShow }) {
 
                       <div
                         onClick={(e) => {
-                          setIndexDeleted(data.code);
+                          setIndexDeleted(data?.code);
                           areYouShureFunction2(e);
                         }}
                       >

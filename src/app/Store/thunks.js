@@ -356,22 +356,28 @@ export const countProduct = createAsyncThunk(
   }
 );
 
-export const list = createAsyncThunk("product/list", async (thunkAPI) => {
-  try {
-    const response = await axios.get(
-      `${process.env.NEXT_PUBLIC_BACK_END_SERVER}/product/list`
-    );
-    const data = response.data;
+export const list = createAsyncThunk(
+  "product/list",
+  async ({ page, limit }, thunkAPI) => {
+   
+    try {
+      const response = await axios.get(
+        `${process.env.NEXT_PUBLIC_BACK_END_SERVER}/product/listPaginated?page=${page}&limit=${limit}`
+      );
+      const data = response.data;
 
-    return data;
-  } catch (error) {
-    if (error.response && error.response.status === 400) {
-      return thunkAPI.rejectWithValue("ارور سمت من");
-    } else {
-      return thunkAPI.rejectWithValue("مشکلی به وجود امده لطفا بعدا تلاش کنید");
+      return data;
+    } catch (error) {
+      if (error.response && error.response.status === 400) {
+        return thunkAPI.rejectWithValue("ارور سمت من");
+      } else {
+        return thunkAPI.rejectWithValue(
+          "مشکلی به وجود امده لطفا بعدا تلاش کنید"
+        );
+      }
     }
   }
-});
+);
 
 export const deleted = createAsyncThunk(
   "product/deleted",
