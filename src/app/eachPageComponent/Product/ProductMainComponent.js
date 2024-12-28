@@ -10,6 +10,7 @@ import AreYouShureModal from "@/app/BaseComponent/AreYouSureModal";
 import ConfirmingModal from "@/app/BaseComponent/ConfirmingModal";
 import ErrorModal from "@/app/BaseComponent/ErrorModal";
 import NavBarToggleBurgerButton from "@/app/BaseComponent/NavBarToggleBurgerButton";
+import Pagination from "@/app/BaseComponent/Pagination";
 //redux import
 import { useSelector, useDispatch } from "react-redux";
 import { list } from "../../Store/thunks.js";
@@ -99,20 +100,19 @@ const SearchInputMainDiv = styled.div`
 // `;
 
 const FixTablePlace = styled.div`
-    position: relative;
-    margin-top: 60px;
-    .fixingTabel {
-      position: absolute;
-      transform: translate(-50%, 50%);
-      left: 50%;
-      width: 94%;
-      top: -55px;
-      border-radius: 10px;
-      padding: 18px 12px;
-      background-image: linear-gradient(195deg, #42424a 0%, #191919 100%);
-      color: white;
-    }
-  
+  position: relative;
+  margin-top: 60px;
+  .fixingTabel {
+    position: absolute;
+    transform: translate(-50%, 50%);
+    left: 50%;
+    width: 94%;
+    top: -55px;
+    border-radius: 10px;
+    padding: 18px 12px;
+    background-image: linear-gradient(195deg, #42424a 0%, #191919 100%);
+    color: white;
+  }
 `;
 
 const StyledTable = styled.table`
@@ -121,22 +121,21 @@ const StyledTable = styled.table`
     vertical-align: middle;
   }
 
-    border-collapse: separate;
-    border-radius: 12px;
-    overflow: hidden;
-    width: 100%;
+  border-collapse: separate;
+  border-radius: 12px;
+  overflow: hidden;
+  width: 100%;
 
-    th,
-    td {
-      padding: 10px;
-      text-align: center;
-      vertical-align: middle;
-    }
-    th {
-      background-color: #f2f2f2;
-      padding-top: 55px;
-    }
-  
+  th,
+  td {
+    padding: 10px;
+    text-align: center;
+    vertical-align: middle;
+  }
+  th {
+    background-color: #f2f2f2;
+    padding-top: 55px;
+  }
 `;
 
 const ProductCard = styled(Card)`
@@ -187,6 +186,9 @@ export default function HonorsMainComponent({ toggleShow }) {
   const [searchTerm, setSearchTerm] = useState("");
   const [filteredOrders, setFilteredOrders] = useState([]);
 
+  const [currentPage, setCurrentPage] = useState(1);
+  const [totalPages, setTotalPages] = useState(1);
+
   // edit honors
   const [editedHonor, setEditedHonor] = useState(null);
   const [openModal, setOpenModal] = useState(false);
@@ -201,24 +203,25 @@ export default function HonorsMainComponent({ toggleShow }) {
   const datacome = useSelector(productListData);
 
   console.log(datacome);
-  
 
   const normalizeString = (str) => str.replace(/\s+/g, "").toLowerCase();
 
+  // useEffect(() => {
+  //   const fetchData = async () => {
+
+  //   };
+  //   fetchData();
+  // }, [dispatch, dataUpdated]);
+
+  const fetchData = async (page) => {
+    const dataResponse = await dispatch(list({ page, limit: 10 })).unwrap();
+    setTotalPages(dataResponse?.pageCount);
+    setCurrentPage(dataResponse?.page);
+  };
+
   useEffect(() => {
-    const fetchData = async () => {
-      try {
-        setTrackLoadingProduct(true);
-        await dispatch(list({page : 1 , limit : 10}));
-      } catch (error) {
-        console.error("Error fetching data:", error);
-      } finally {
-        setDataUpdated(false);
-        setTrackLoadingProduct(false);
-      }
-    };
-    fetchData();
-  }, [dispatch, dataUpdated]);
+    fetchData(currentPage);
+  }, [dataUpdated, currentPage, dispatch]);
 
   const handleEditProduct = (product) => {
     setEditedHonor(product);
@@ -240,7 +243,7 @@ export default function HonorsMainComponent({ toggleShow }) {
   }
 
   useEffect(() => {
-    if (!datacome.data) {
+    if (!datacome?.data) {
       return;
     }
 
@@ -469,6 +472,12 @@ export default function HonorsMainComponent({ toggleShow }) {
                       </tbody>
                     </StyledTable>
                   </FixTablePlace>
+                  {/* Pagination Component */}
+                  <Pagination
+                    currentPage={currentPage}
+                    totalPages={totalPages}
+                    onPageChange={(page) => setCurrentPage(page)}
+                  />
                 </>
               ) : (
                 <>

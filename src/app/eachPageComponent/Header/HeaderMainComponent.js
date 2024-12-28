@@ -107,6 +107,16 @@ const HeaderListWrapper = styled.ul`
   padding-left: 0;
 `;
 
+// const HeaderItem = styled.li`
+//   padding: 15px;
+//   margin-bottom: 20px; /* افزایش فاصله بین جعبه‌ها */
+//   background-color: #f9f9f9;
+//   border: 1px solid #ddd;
+//   border-radius: 8px;
+//   box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+//   position: relative;
+// `;
+
 const HeaderItem = styled.li`
   padding: 15px;
   margin-bottom: 20px; /* افزایش فاصله بین جعبه‌ها */
@@ -115,7 +125,16 @@ const HeaderItem = styled.li`
   border-radius: 8px;
   box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
   position: relative;
+  cursor: grab;
+  user-select: none;
+
+  ${(props) =>
+    props.isDragging &&
+    css`
+      cursor: grabbing;
+    `}
 `;
+
 
 const SubItemList = styled.ul`
  

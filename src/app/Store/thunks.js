@@ -1146,14 +1146,18 @@ export const sendNewMessage = createAsyncThunk(
 
 export const listorders = createAsyncThunk(
   "order/list",
-  async ({ status }, thunkAPI) => {
+  async (
+    { status, sortBy = "createdAt", sortOrder = "desc", page = 1, limit = 10 },
+    thunkAPI
+  ) => {
     const state = thunkAPI.getState();
     const token = state.auth.token.token;
 
     try {
       const response = await axios.get(
-        `${process.env.NEXT_PUBLIC_BACK_END_SERVER}/order/list?status=${status}`,
+        `${process.env.NEXT_PUBLIC_BACK_END_SERVER}/order/list`,
         {
+          params: { status, sortBy, sortOrder, page, limit },
           headers: {
             Authorization: token ? `Bearer ${token}` : "",
           },

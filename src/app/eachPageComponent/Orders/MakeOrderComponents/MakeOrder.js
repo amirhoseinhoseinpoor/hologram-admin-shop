@@ -8,12 +8,14 @@ import PusherChat from "./Talkjs";
 import styled from "styled-components";
 // import base component
 import NavBarToggleBurgerButton from "@/app/BaseComponent/NavBarToggleBurgerButton";
+import ProfileComponent from "@/app/BaseComponent/ProfileComponent";
 
 const HeadermakeOrder = styled.div`
   padding: 10px;
   color: white;
   background-color: rgb(225, 223, 223);
   border-radius: 4px;
+  margin: 7px 15px;
   .textHeaderStyle {
     color: black;
   }
@@ -43,7 +45,7 @@ const StepSixComponent = dynamic(() => import("./StepSixComponent"), {
 
 const StepSeven = dynamic(() => import("./StepSevenComponent"));
 
-export default function MakeOrder({ seeOrder, setActiveKey , toggleShow }) {
+export default function MakeOrder({ seeOrder, setActiveKey, toggleShow }) {
   const [step, setStep] = useState(1);
 
   useEffect(() => {
@@ -151,13 +153,17 @@ export default function MakeOrder({ seeOrder, setActiveKey , toggleShow }) {
         <div className="NormalTextSizing text-decoration-underline textHeaderStyle d-flex align-items-center">
           مدیریت سفارشات
         </div>
+        <ProfileComponent colorGet={"#191919"} />
+      </HeadermakeOrder>
+      <div className="d-flex justify-content-end mb-4 mt-2 ms-3">
         <p
           onClick={() => setActiveKey("seeTable")}
           className={`discription ${style.seeOrderButtonStyle}`}
         >
           بازگشت به سفارشات
         </p>
-      </HeadermakeOrder>
+      </div>
+
       <ProcessTracker currentStep={step} />
       {renderStepContent()}
     </section>

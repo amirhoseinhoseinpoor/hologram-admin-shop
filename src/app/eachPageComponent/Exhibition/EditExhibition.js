@@ -374,15 +374,15 @@ export default function EditHonors({
               انصراف
             </button>
           </div>
-          <div>
+          {/* <div>
             <button
               className="mt-2 mb-2 deleteButtonStyle"
               type="button"
               onClick={areYouShureFunction2}
             >
               حذف مقاله
-            </button>
-          </div>
+            </button>ص
+          </div> */}
         </BUTTONSSTYLE>
         
         {/* modal  */}
