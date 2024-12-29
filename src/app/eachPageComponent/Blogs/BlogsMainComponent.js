@@ -162,15 +162,23 @@ export default function HonorsMainComponent({ toggleShow }) {
         )}
         {activekey === "addUser" && !editedHonor && (
           <>
-            <div className="NormalTextSizing text-decoration-underline textHeaderStyle d-flex align-items-center">
+            <div
+              style={{ cursor: "pointer" }}
+              onClick={() => setActiveKey("editUserPage")}
+              className="NormalTextSizing text-decoration-underline textHeaderStyle d-flex align-items-center"
+            >
               افزودن مقالات
             </div>
           </>
         )}
         {editedHonor && (
           <>
-            <div className="NormalTextSizing text-decoration-underline textHeaderStyle d-flex align-items-center">
-              ویرایش مقالات
+            <div
+              style={{ cursor: "pointer" }}
+              onClick={handleCancelEdit}
+              className="NormalTextSizing text-decoration-underline textHeaderStyle d-flex align-items-center"
+            >
+              مقالات
             </div>
           </>
         )}
@@ -188,7 +196,7 @@ export default function HonorsMainComponent({ toggleShow }) {
             </div>
           </>
         )}
-        {activekey === "addUser" && !editedHonor && (
+        {/* {activekey === "addUser" && !editedHonor && (
           <>
             <div>
               <ButtonColor onClick={() => setActiveKey("editUserPage")}>
@@ -196,14 +204,14 @@ export default function HonorsMainComponent({ toggleShow }) {
               </ButtonColor>
             </div>
           </>
-        )}
-        {editedHonor && (
+        )} */}
+        {/* {editedHonor && (
           <>
             <div>
               <ButtonColor onClick={handleCancelEdit}>مقالات</ButtonColor>
             </div>
           </>
-        )}
+        )} */}
       </div>
 
       {/* content */}

@@ -23,6 +23,7 @@ import VideocamIcon from "@mui/icons-material/Videocam";
 import PeopleIcon from "@mui/icons-material/People";
 import SettingsIcon from "@mui/icons-material/Settings";
 import PersonIcon from "@mui/icons-material/Person";
+import ArrowDropDownIcon from "@mui/icons-material/ArrowDropDown";
 
 // import components
 const DefineUser = lazy(() =>
@@ -148,75 +149,91 @@ const AdminPanel = () => {
           <Tab title={<div className={style.addBorderSideBar}></div>} />
 
           <Tab
+            title={
+              <div
+                style={{ cursor: "default" }}
+                className="d-flex flex-row justify-content-between"
+              >
+                <div>
+                  <SettingsIcon /> تنظیمات
+                </div>
+                <div>
+                  <ArrowDropDownIcon />
+                </div>
+              </div>
+            }
+          />
+
+          <Tab
             eventKey="header"
             title={
-              <>
+              <div className="pe-2">
                 <PatternIcon /> ساخت هدر
-              </>
+              </div>
             }
           ></Tab>
           <Tab
             eventKey="Product"
             title={
-              <>
+              <div className="pe-2">
                 <StorefrontIcon /> محصولات
-              </>
+              </div>
             }
           ></Tab>
           <Tab
             eventKey="Blogs"
             title={
-              <>
+              <div className="pe-2">
                 <BookIcon /> مقالات
-              </>
+              </div>
             }
           ></Tab>
           <Tab
             eventKey="Honors"
             title={
-              <>
+              <div className="pe-2">
                 <MilitaryTechIcon /> افتخارات
-              </>
+              </div>
             }
           ></Tab>
           <Tab
             eventKey="Exhibition"
             title={
-              <>
+              <div className="pe-2">
                 <BalconyIcon /> نمایشگاه ها
-              </>
+              </div>
             }
           ></Tab>
           <Tab
             eventKey="Banner"
             title={
-              <>
+              <div className="pe-2">
                 <ViewArrayIcon /> بنر
-              </>
+              </div>
             }
           ></Tab>
           <Tab
             eventKey="Video"
             title={
-              <>
+              <div className="pe-2">
                 <VideocamIcon /> ویدیو
-              </>
+              </div>
             }
           ></Tab>
           <Tab
             eventKey="defineUser"
             title={
-              <>
+              <div className="pe-2">
                 <PersonIcon /> کاربر های سیستم
-              </>
+              </div>
             }
           ></Tab>
           <Tab
             eventKey="customerUser"
             title={
-              <>
+              <div className="pe-2">
                 <PeopleIcon /> مدیریت مشتریان
-              </>
+              </div>
             }
           ></Tab>
         </Tabs>
@@ -278,75 +295,91 @@ const AdminPanel = () => {
                 <Tab title={<div className={style.addBorderSideBar}></div>} />
 
                 <Tab
+                  title={
+                    <div
+                      style={{ cursor: "default" }}
+                      className="d-flex flex-row justify-content-between"
+                    >
+                      <div>
+                        <SettingsIcon /> تنظیمات
+                      </div>
+                      <div>
+                        <ArrowDropDownIcon />
+                      </div>
+                    </div>
+                  }
+                />
+
+                <Tab
                   eventKey="header"
                   title={
-                    <>
+                    <div className="pe-2">
                       <PatternIcon /> ساخت هدر
-                    </>
+                    </div>
                   }
                 ></Tab>
                 <Tab
                   eventKey="Product"
                   title={
-                    <>
+                    <div className="pe-2">
                       <StorefrontIcon /> محصولات
-                    </>
+                    </div>
                   }
                 ></Tab>
                 <Tab
                   eventKey="Blogs"
                   title={
-                    <>
+                    <div className="pe-2">
                       <BookIcon /> مقالات
-                    </>
+                    </div>
                   }
                 ></Tab>
                 <Tab
                   eventKey="Honors"
                   title={
-                    <>
+                    <div className="pe-2">
                       <MilitaryTechIcon /> افتخارات
-                    </>
+                    </div>
                   }
                 ></Tab>
                 <Tab
                   eventKey="Exhibition"
                   title={
-                    <>
+                    <div className="pe-2">
                       <BalconyIcon /> نمایشگاه ها
-                    </>
+                    </div>
                   }
                 ></Tab>
                 <Tab
                   eventKey="Banner"
                   title={
-                    <>
+                    <div className="pe-2">
                       <ViewArrayIcon /> بنر
-                    </>
+                    </div>
                   }
                 ></Tab>
                 <Tab
                   eventKey="Video"
                   title={
-                    <>
+                    <div className="pe-2">
                       <VideocamIcon /> ویدیو
-                    </>
+                    </div>
                   }
                 ></Tab>
                 <Tab
                   eventKey="defineUser"
                   title={
-                    <>
+                    <div className="pe-2">
                       <PersonIcon /> کاربر های سیستم
-                    </>
+                    </div>
                   }
                 ></Tab>
                 <Tab
                   eventKey="customerUser"
                   title={
-                    <>
+                    <div className="pe-2">
                       <PeopleIcon /> مدیریت مشتریان
-                    </>
+                    </div>
                   }
                 ></Tab>
               </Tabs>
@@ -369,7 +402,6 @@ const AdminPanel = () => {
             <DndProvider backend={HTML5Backend}>
               <HeaderMainComponent toggleShow={toggleShow} />
             </DndProvider>
-            
           </div>
         )}
         {activeTab === "Product" && (

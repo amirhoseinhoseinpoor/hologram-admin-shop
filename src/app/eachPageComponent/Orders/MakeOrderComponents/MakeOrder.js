@@ -150,19 +150,23 @@ export default function MakeOrder({ seeOrder, setActiveKey, toggleShow }) {
         <div className="d-block d-lg-none">
           <NavBarToggleBurgerButton func={() => toggleShow("main")} />
         </div>
-        <div className="NormalTextSizing text-decoration-underline textHeaderStyle d-flex align-items-center">
-          مدیریت سفارشات
+        <div
+          onClick={() => setActiveKey("seeTable")}
+          style={{cursor : "pointer"}}
+          className="NormalTextSizing text-decoration-underline textHeaderStyle d-flex align-items-center"
+        >
+          بازگشت به سفارشات
         </div>
         <ProfileComponent colorGet={"#191919"} />
       </HeadermakeOrder>
-      <div className="d-flex justify-content-end mb-4 mt-2 ms-3">
+      {/* <div className="d-flex justify-content-end mb-4 mt-2 ms-3">
         <p
           onClick={() => setActiveKey("seeTable")}
           className={`discription ${style.seeOrderButtonStyle}`}
         >
           بازگشت به سفارشات
         </p>
-      </div>
+      </div> */}
 
       <ProcessTracker currentStep={step} />
       {renderStepContent()}

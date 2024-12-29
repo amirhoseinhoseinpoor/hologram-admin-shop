@@ -300,15 +300,19 @@ export default function HonorsMainComponent({ toggleShow }) {
           )}
           {activekey === "addUser" && !editedHonor && (
             <>
-              <div className="text-decoration-underline NormalTextSizing textHeaderStyle d-flex align-items-center">
-                افزودن محصول
+              <div  style={{ cursor: "pointer" }} onClick={() => setActiveKey("editUserPage")} className="text-decoration-underline NormalTextSizing textHeaderStyle d-flex align-items-center">
+                محصولات
               </div>
             </>
           )}
           {editedHonor && (
             <>
-              <div className="NormalTextSizing text-decoration-underline textHeaderStyle d-flex align-items-center">
-                ویرایش محصول
+              <div
+                style={{ cursor: "pointer" }}
+                onClick={handleCancelEdit}
+                className="NormalTextSizing text-decoration-underline textHeaderStyle d-flex align-items-center"
+              >
+                محصولات
               </div>
             </>
           )}
@@ -337,7 +341,7 @@ export default function HonorsMainComponent({ toggleShow }) {
             </div>
           </>
         )}
-        {activekey === "addUser" && !editedHonor && (
+        {/* {activekey === "addUser" && !editedHonor && (
           <>
             <div>
               <ButtonColor onClick={() => setActiveKey("editUserPage")}>
@@ -345,14 +349,14 @@ export default function HonorsMainComponent({ toggleShow }) {
               </ButtonColor>
             </div>
           </>
-        )}
-        {editedHonor && (
+        )} */}
+        {/* {editedHonor && (
           <>
             <div>
               <ButtonColor onClick={handleCancelEdit}>محصولات</ButtonColor>
             </div>
           </>
-        )}
+        )} */}
       </div>
 
       {activekey === "editUserPage" && !editedHonor && (

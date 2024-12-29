@@ -84,7 +84,7 @@ export default function HonorsMainComponent({ toggleShow }) {
 
   const [activekey, setActiveKey] = useState("editUserPage");
   const [editedHonor, setEditedHonor] = useState(null);
-  const [indexDeleted, setIndexDeleted] = useState(null);  
+  const [indexDeleted, setIndexDeleted] = useState(null);
   const [dataCome, setDataCome] = useState([]);
   const [updateData, setUpdateData] = useState(false);
 
@@ -119,9 +119,7 @@ export default function HonorsMainComponent({ toggleShow }) {
     e.preventDefault();
     setOpenModal4(false);
     try {
-      const deleteVideo = await dispatch(
-        honorsDeleted({ code: indexDeleted })
-      );
+      const deleteVideo = await dispatch(honorsDeleted({ code: indexDeleted }));
 
       if (deleteVideo.payload.message === "Success") {
         setUpdateData(true);
@@ -161,15 +159,23 @@ export default function HonorsMainComponent({ toggleShow }) {
         )}
         {activekey === "addUser" && !editedHonor && (
           <>
-            <div className="NormalTextSizing text-decoration-underline textHeaderStyle d-flex align-items-center">
-              افزودن افتخارات
+            <div
+              style={{ cursor: "pointer" }}
+              onClick={() => setActiveKey("editUserPage")}
+              className="NormalTextSizing text-decoration-underline textHeaderStyle d-flex align-items-center"
+            >
+              افتخارات
             </div>
           </>
         )}
         {editedHonor && (
           <>
-            <div className="NormalTextSizing text-decoration-underline textHeaderStyle d-flex align-items-center">
-              ویرایش افتخارات
+            <div
+              style={{ cursor: "pointer" }}
+              onClick={handleCancelEdit}
+              className="NormalTextSizing text-decoration-underline textHeaderStyle d-flex align-items-center"
+            >
+              افتخارات
             </div>
           </>
         )}
@@ -186,7 +192,7 @@ export default function HonorsMainComponent({ toggleShow }) {
             </div>
           </>
         )}
-        {activekey === "addUser" && !editedHonor && (
+        {/* {activekey === "addUser" && !editedHonor && (
           <>
             <div>
               <ButtonColor onClick={() => setActiveKey("editUserPage")}>
@@ -201,7 +207,7 @@ export default function HonorsMainComponent({ toggleShow }) {
               <ButtonColor onClick={handleCancelEdit}>افتخارات</ButtonColor>
             </div>
           </>
-        )}
+        )} */}
       </div>
 
       {/* content */}
@@ -221,10 +227,12 @@ export default function HonorsMainComponent({ toggleShow }) {
                         <PreviewIcon style={{ color: "#3892F3" }} />
                       </div>
 
-                      <div onClick={(e) => {
-                        setIndexDeleted(data.code)
-                        areYouShureFunction2(e)
-                      }}>
+                      <div
+                        onClick={(e) => {
+                          setIndexDeleted(data.code);
+                          areYouShureFunction2(e);
+                        }}
+                      >
                         <DeleteIcon style={{ color: "#e81d46" }} />
                       </div>
                     </div>

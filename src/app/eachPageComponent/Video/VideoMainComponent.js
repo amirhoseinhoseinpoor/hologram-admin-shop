@@ -163,15 +163,23 @@ export default function HonorsMainComponent({ toggleShow }) {
         )}
         {activekey === "addUser" && !editedHonor && (
           <>
-            <div className="NormalTextSizing text-decoration-underline textHeaderStyle d-flex align-items-center">
-              افزودن ویدیو
+            <div
+              style={{ cursor: "pointer" }}
+              onClick={() => setActiveKey("editUserPage")}
+              className="NormalTextSizing text-decoration-underline textHeaderStyle d-flex align-items-center"
+            >
+              ویدیو
             </div>
           </>
         )}
         {editedHonor && (
           <>
-            <div className="NormalTextSizing text-decoration-underline textHeaderStyle d-flex align-items-center">
-              ویرایش ویدیو
+            <div
+              style={{ cursor: "pointer" }}
+              onClick={handleCancelEdit}
+              className="NormalTextSizing text-decoration-underline textHeaderStyle d-flex align-items-center"
+            >
+              ویدیو
             </div>
           </>
         )}
@@ -189,7 +197,7 @@ export default function HonorsMainComponent({ toggleShow }) {
             </div>
           </>
         )}
-        {activekey === "addUser" && !editedHonor && (
+        {/* {activekey === "addUser" && !editedHonor && (
           <>
             <div>
               <ButtonColor onClick={() => setActiveKey("editUserPage")}>
@@ -204,7 +212,7 @@ export default function HonorsMainComponent({ toggleShow }) {
               <ButtonColor onClick={handleCancelEdit}>ویدیو</ButtonColor>
             </div>
           </>
-        )}
+        )} */}
       </div>
 
       {/* content */}
