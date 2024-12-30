@@ -4,7 +4,13 @@ import React, { useState, useEffect } from "react";
 
 import AddBlogs from "./AddBlogs";
 import EditBlogs from "./EditBlogs";
-import { Card, CardContent, CardMedia, Typography } from "@mui/material";
+import {
+  Card,
+  CardContent,
+  CardMedia,
+  Typography,
+  Skeleton,
+} from "@mui/material";
 import styled from "styled-components";
 import { formatPersianDate } from "@/app/utils/persionDateUtils";
 import PreviewIcon from "@mui/icons-material/Preview";
@@ -89,6 +95,7 @@ export default function HonorsMainComponent({ toggleShow }) {
   const [dataCome, setDataCome] = useState([]);
   const [indexDeleted, setIndexDeleted] = useState(null);
   const [updateData, setUpdateData] = useState(false);
+  const [trackLoadingProduct, setTrackLoadingProduct] = useState(false);
 
   const [openModal2, setOpenModal2] = useState(false);
   const [openModal3, setOpenModal3] = useState(false);
@@ -101,11 +108,14 @@ export default function HonorsMainComponent({ toggleShow }) {
   useEffect(() => {
     const fechData = async () => {
       try {
+        setTrackLoadingProduct(true);
+
         const dataComeAPI = await dispatch(blogsList()).unwrap();
         setDataCome(dataComeAPI || []);
       } catch (error) {
         console.error("Error fetching data:", error);
       } finally {
+        setTrackLoadingProduct(false);
         setUpdateData(false);
       }
     };
@@ -162,15 +172,23 @@ export default function HonorsMainComponent({ toggleShow }) {
         )}
         {activekey === "addUser" && !editedHonor && (
           <>
-            <div className="NormalTextSizing text-decoration-underline textHeaderStyle d-flex align-items-center">
+            <div
+              style={{ cursor: "pointer" }}
+              onClick={() => setActiveKey("editUserPage")}
+              className="NormalTextSizing text-decoration-underline textHeaderStyle d-flex align-items-center"
+            >
               افزودن مقالات
             </div>
           </>
         )}
         {editedHonor && (
           <>
-            <div className="NormalTextSizing text-decoration-underline textHeaderStyle d-flex align-items-center">
-              ویرایش مقالات
+            <div
+              style={{ cursor: "pointer" }}
+              onClick={handleCancelEdit}
+              className="NormalTextSizing text-decoration-underline textHeaderStyle d-flex align-items-center"
+            >
+              مقالات
             </div>
           </>
         )}
@@ -188,7 +206,7 @@ export default function HonorsMainComponent({ toggleShow }) {
             </div>
           </>
         )}
-        {activekey === "addUser" && !editedHonor && (
+        {/* {activekey === "addUser" && !editedHonor && (
           <>
             <div>
               <ButtonColor onClick={() => setActiveKey("editUserPage")}>
@@ -196,71 +214,90 @@ export default function HonorsMainComponent({ toggleShow }) {
               </ButtonColor>
             </div>
           </>
-        )}
-        {editedHonor && (
+        )} */}
+        {/* {editedHonor && (
           <>
             <div>
               <ButtonColor onClick={handleCancelEdit}>مقالات</ButtonColor>
             </div>
           </>
-        )}
+        )} */}
       </div>
 
       {/* content */}
       {activekey === "editUserPage" && !editedHonor && (
         <>
           <GridbaseDiv className="mt-3 container" style={{ cursor: "pointer" }}>
-            {dataCome.length > 0 ? (
-              dataCome.map((honor, index) => (
-                <React.Fragment key={index}>
-                  <CARD>
-                    <div className="d-flex mb-1 mt-1 justify-content-lg-between container">
-                      <div
-                        onClick={() => {
-                          setEditedHonor(data);
-                        }}
-                      >
-                        <PreviewIcon style={{ color: "#3892F3" }} />
-                      </div>
-
-                      <div
-                        onClick={(e) => {
-                          setIndexDeleted(data.code);
-                          areYouShureFunction2(e);
-                        }}
-                      >
-                        <DeleteIcon style={{ color: "#e81d46" }} />
-                      </div>
-                    </div>
-
-                    <div
-                      onClick={() => {
-                        setEditedHonor(data);
-                      }}
-                    >
-                      <CardMedia
-                        component="img"
-                        src={`${process.env.NEXT_PUBLIC_BACK_END_SERVER}/system/download/${honor.content.imageSrc}`}
-                        sx={{
-                          width: "100%",
-                          maxHeight: "100%",
-                          borderRadius: "2px",
-                        }}
-                      />
-                      <CardContent className="d-flex flex-column justify-content-around">
-                        <TYPOGRAPHY className="titleHonors">
-                          {honor.content.title}
-                        </TYPOGRAPHY>
-                        <TYPOGRAPHY className="dateHonors">
-                          {formatPersianDate(honor.date)}
-                        </TYPOGRAPHY>
-                      </CardContent>
-                    </div>
-                  </CARD>
-                </React.Fragment>
-              ))
+            {trackLoadingProduct ? (
+              <>
+                <Skeleton
+                  animation="wave"
+                  variant="rounded"
+                  className="w-100"
+                  height={300}
+                />
+                <Skeleton
+                  animation="wave"
+                  variant="rounded"
+                  className="w-100"
+                  height={300}
+                />
+              </>
             ) : (
-              <TYPOGRAPHY variant="body2">No data available</TYPOGRAPHY>
+              <>
+                {dataCome.length > 0 ? (
+                  dataCome.map((data, index) => (
+                    <React.Fragment key={index}>
+                      <CARD>
+                        <div className="d-flex mb-1 mt-1 justify-content-lg-between container">
+                          <div
+                            onClick={() => {
+                              setEditedHonor(data);
+                            }}
+                          >
+                            <PreviewIcon style={{ color: "#3892F3" }} />
+                          </div>
+
+                          <div
+                            onClick={(e) => {
+                              setIndexDeleted(data?.code);
+                              areYouShureFunction2(e);
+                            }}
+                          >
+                            <DeleteIcon style={{ color: "#e81d46" }} />
+                          </div>
+                        </div>
+
+                        <div
+                          onClick={() => {
+                            setEditedHonor(data);
+                          }}
+                        >
+                          <CardMedia
+                            component="img"
+                            src={`${process.env.NEXT_PUBLIC_BACK_END_SERVER}/system/download/${data.content.imageSrc}`}
+                            sx={{
+                              width: "100%",
+                              maxHeight: "100%",
+                              borderRadius: "2px",
+                            }}
+                          />
+                          <CardContent className="d-flex flex-column justify-content-around">
+                            <TYPOGRAPHY className="titleHonors">
+                              {data.content.title}
+                            </TYPOGRAPHY>
+                            <TYPOGRAPHY className="dateHonors">
+                              {formatPersianDate(data.date)}
+                            </TYPOGRAPHY>
+                          </CardContent>
+                        </div>
+                      </CARD>
+                    </React.Fragment>
+                  ))
+                ) : (
+                  <TYPOGRAPHY variant="body2">No data available</TYPOGRAPHY>
+                )}
+              </>
             )}
           </GridbaseDiv>
         </>

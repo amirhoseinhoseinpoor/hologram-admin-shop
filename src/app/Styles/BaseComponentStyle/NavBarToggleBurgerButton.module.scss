@@ -2,7 +2,7 @@
 /* components/NavIcon3.module.css */
 .navIcon3 {
   width: 25px;
-  height: 17px;
+  height: 20px;
   position: relative;
   cursor: pointer;
   transition: 0.5s ease-in-out;
@@ -14,17 +14,18 @@
 .navIcon3 span {
   display: block;
   position: absolute;
-  height: 4px;
+  height: 3px;
   width: 100%;
   background: white;
   border-radius: 5px;
   opacity: 1;
   left: 0;
   transition: 0.25s ease-in-out;
+  background-color: black;
 }
 
 .navIcon3 span:nth-child(1) {
-  top: 0px;
+  top: 1px;
 }
 
 .navIcon3 span:nth-child(2),
@@ -33,10 +34,16 @@
 }
 
 .navIcon3 span:nth-child(4) {
-  top: 18px;
+  top: 17px;
 }
 
 /* Hover effect */
+.navIcon3:hover {
+  span{
+    background-color: #66BB6A;
+  }
+}
+
 .navIcon3:hover span:nth-child(1) {
   top: 18px;
   width: 0%;

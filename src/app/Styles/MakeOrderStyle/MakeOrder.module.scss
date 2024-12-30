@@ -18,7 +18,10 @@
   border: 1px solid #dee2e6;
   padding: 3px 5px;
   border-radius: 4px;
-  background-image: linear-gradient(195deg, #42424a 0%, #191919 100%);
+  background-image: var.$greenImageColor;
+  color: white;
+  width: fit-content;
+
 }
 
 .numberColorForcall {

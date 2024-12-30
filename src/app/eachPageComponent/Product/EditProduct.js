@@ -1004,7 +1004,7 @@ export default function EditHonors({
             انصراف
           </button>
         </div>
-        <div>
+        {/* <div>
           <button
             className="mt-2 mb-2 deleteButtonStyle"
             type="button"
@@ -1012,7 +1012,7 @@ export default function EditHonors({
           >
             حذف محصول
           </button>
-        </div>
+        </div> */}
       </BUTTONSSTYLE>
 
       {/* modal  */}

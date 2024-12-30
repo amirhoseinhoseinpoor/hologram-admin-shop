@@ -15,9 +15,11 @@ import { honorsList } from "../../Store/thunks.js";
 import { honorsDeleted } from "../../Store/thunks.js";
 import { Card, CardContent, CardMedia, Typography } from "@mui/material";
 import { formatPersianDate } from "@/app/utils/persionDateUtils";
+
 import styled from "styled-components";
 import PreviewIcon from "@mui/icons-material/Preview";
 import DeleteIcon from "@mui/icons-material/Delete";
+import {Skeleton} from "@mui/material";
 
 const HeadermakeOrder = styled.div`
   padding: 10px;
@@ -84,9 +86,10 @@ export default function HonorsMainComponent({ toggleShow }) {
 
   const [activekey, setActiveKey] = useState("editUserPage");
   const [editedHonor, setEditedHonor] = useState(null);
-  const [indexDeleted, setIndexDeleted] = useState(null);  
+  const [indexDeleted, setIndexDeleted] = useState(null);
   const [dataCome, setDataCome] = useState([]);
   const [updateData, setUpdateData] = useState(false);
+  const [trackLoadingProduct, setTrackLoadingProduct] = useState(false);
 
   const [openModal2, setOpenModal2] = useState(false);
   const [openModal3, setOpenModal3] = useState(false);
@@ -99,11 +102,13 @@ export default function HonorsMainComponent({ toggleShow }) {
   useEffect(() => {
     const fechData = async () => {
       try {
+        setTrackLoadingProduct(true);
         const dataComeAPI = await dispatch(honorsList()).unwrap();
         setDataCome(dataComeAPI || []);
       } catch (error) {
         console.error("Error fetching data:", error);
       } finally {
+        setTrackLoadingProduct(false);
         setUpdateData(false);
       }
     };
@@ -119,9 +124,7 @@ export default function HonorsMainComponent({ toggleShow }) {
     e.preventDefault();
     setOpenModal4(false);
     try {
-      const deleteVideo = await dispatch(
-        honorsDeleted({ code: indexDeleted })
-      );
+      const deleteVideo = await dispatch(honorsDeleted({ code: indexDeleted }));
 
       if (deleteVideo.payload.message === "Success") {
         setUpdateData(true);
@@ -161,15 +164,23 @@ export default function HonorsMainComponent({ toggleShow }) {
         )}
         {activekey === "addUser" && !editedHonor && (
           <>
-            <div className="NormalTextSizing text-decoration-underline textHeaderStyle d-flex align-items-center">
-              افزودن افتخارات
+            <div
+              style={{ cursor: "pointer" }}
+              onClick={() => setActiveKey("editUserPage")}
+              className="NormalTextSizing text-decoration-underline textHeaderStyle d-flex align-items-center"
+            >
+              افتخارات
             </div>
           </>
         )}
         {editedHonor && (
           <>
-            <div className="NormalTextSizing text-decoration-underline textHeaderStyle d-flex align-items-center">
-              ویرایش افتخارات
+            <div
+              style={{ cursor: "pointer" }}
+              onClick={handleCancelEdit}
+              className="NormalTextSizing text-decoration-underline textHeaderStyle d-flex align-items-center"
+            >
+              افتخارات
             </div>
           </>
         )}
@@ -186,7 +197,7 @@ export default function HonorsMainComponent({ toggleShow }) {
             </div>
           </>
         )}
-        {activekey === "addUser" && !editedHonor && (
+        {/* {activekey === "addUser" && !editedHonor && (
           <>
             <div>
               <ButtonColor onClick={() => setActiveKey("editUserPage")}>
@@ -201,62 +212,84 @@ export default function HonorsMainComponent({ toggleShow }) {
               <ButtonColor onClick={handleCancelEdit}>افتخارات</ButtonColor>
             </div>
           </>
-        )}
+        )} */}
       </div>
 
       {/* content */}
       {activekey === "editUserPage" && !editedHonor && (
         <>
           <GridbaseDiv className="mt-3 container" style={{ cursor: "pointer" }}>
-            {dataCome.length > 0 ? (
-              dataCome.map((data, index) => (
-                <React.Fragment key={index}>
-                  <CARD>
-                    <div className="d-flex mb-1 mt-1 justify-content-lg-between container">
-                      <div
-                        onClick={() => {
-                          setEditedHonor(data);
-                        }}
-                      >
-                        <PreviewIcon style={{ color: "#3892F3" }} />
-                      </div>
-
-                      <div onClick={(e) => {
-                        setIndexDeleted(data.code)
-                        areYouShureFunction2(e)
-                      }}>
-                        <DeleteIcon style={{ color: "#e81d46" }} />
-                      </div>
-                    </div>
-
-                    <div
-                      onClick={() => {
-                        setEditedHonor(data);
-                      }}
-                    >
-                      <CardMedia
-                        component="img"
-                        src={`${process.env.NEXT_PUBLIC_BACK_END_SERVER}/system/download/${data.src}`}
-                        sx={{
-                          width: "100%",
-                          maxHeight: "100%",
-                          borderRadius: "2px",
-                        }}
-                      />
-                      <CardContent className="d-flex flex-column justify-content-around">
-                        <TYPOGRAPHY className="titleHonors">
-                          {data.title}
-                        </TYPOGRAPHY>
-                        <TYPOGRAPHY className="dateHonors">
-                          {formatPersianDate(data.date)}
-                        </TYPOGRAPHY>
-                      </CardContent>
-                    </div>
-                  </CARD>
-                </React.Fragment>
-              ))
+            {trackLoadingProduct ? (
+              <>
+                <Skeleton
+                  animation="wave"
+                  variant="rounded"
+                  className="w-100"
+                  height={300}
+                />
+                <Skeleton
+                  animation="wave"
+                  variant="rounded"
+                  className="w-100"
+                  height={300}
+                />
+                
+              </>
             ) : (
-              <Typography variant="body2">No data available</Typography>
+              <>
+                {dataCome.length > 0 ? (
+                  dataCome.map((data, index) => (
+                    <React.Fragment key={index}>
+                      <CARD>
+                        <div className="d-flex mb-1 mt-1 justify-content-lg-between container">
+                          <div
+                            onClick={() => {
+                              setEditedHonor(data);
+                            }}
+                          >
+                            <PreviewIcon style={{ color: "#3892F3" }} />
+                          </div>
+
+                          <div
+                            onClick={(e) => {
+                              setIndexDeleted(data.code);
+                              areYouShureFunction2(e);
+                            }}
+                          >
+                            <DeleteIcon style={{ color: "#e81d46" }} />
+                          </div>
+                        </div>
+
+                        <div
+                          onClick={() => {
+                            setEditedHonor(data);
+                          }}
+                        >
+                          <CardMedia
+                            component="img"
+                            src={`${process.env.NEXT_PUBLIC_BACK_END_SERVER}/system/download/${data.src}`}
+                            sx={{
+                              width: "100%",
+                              maxHeight: "100%",
+                              borderRadius: "2px",
+                            }}
+                          />
+                          <CardContent className="d-flex flex-column justify-content-around">
+                            <TYPOGRAPHY className="titleHonors">
+                              {data.title}
+                            </TYPOGRAPHY>
+                            <TYPOGRAPHY className="dateHonors">
+                              {formatPersianDate(data.date)}
+                            </TYPOGRAPHY>
+                          </CardContent>
+                        </div>
+                      </CARD>
+                    </React.Fragment>
+                  ))
+                ) : (
+                  <Typography variant="body2">No data available</Typography>
+                )}
+              </>
             )}
           </GridbaseDiv>
         </>

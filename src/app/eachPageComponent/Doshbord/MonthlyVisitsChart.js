@@ -3,7 +3,10 @@
 'use client';
 
 import React, { useEffect, useState } from 'react';
-import { useAppSelector } from '@/app/Store/store';
+// import redux 
+import { useSelector } from 'react-redux';
+import { token } from '@/app/Store/slice';
+
 import axios from 'axios';
 import { Bar } from 'react-chartjs-2';
 import {
@@ -48,11 +51,12 @@ const MonthlyVisitsChart = () => {
   const [error, setError] = useState(false);
 
   // انتخاب توکن از استور Redux
-  const token = useAppSelector((state) => state.auth.token.token);
+  const tokenCome = useSelector(token);
+  
 
   useEffect(() => {
     const fetchMonthlyVisits = async () => {
-      if (!token) {
+      if (!tokenCome) {
         console.error('توکن احراز هویت یافت نشد.');
         setError(true);
         setLoading(false);
@@ -64,7 +68,7 @@ const MonthlyVisitsChart = () => {
           `${process.env.NEXT_PUBLIC_BACK_END_SERVER}/analytics/monthly-visits`,
           {
             headers: {
-              Authorization: `Bearer ${token}`,
+              Authorization: `Bearer ${tokenCome?.token}`,
             },
             params: {
               year: new Date().getFullYear(), // دریافت داده‌ها برای سال جاری
@@ -94,7 +98,7 @@ const MonthlyVisitsChart = () => {
     };
 
     fetchMonthlyVisits();
-  }, [token]);
+  }, [tokenCome]);
 
   // آماده‌سازی داده‌ها برای نمودار
   const chartData = {

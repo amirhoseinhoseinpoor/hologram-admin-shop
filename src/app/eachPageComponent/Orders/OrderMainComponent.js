@@ -1,9 +1,15 @@
-import { useEffect, useState } from "react";
-import React from "react";
+// src/app/eachPageComponent/Orders/OrderMainComponent.jsx
+
+import React, { useEffect, useState } from "react";
 import MakeOrder from "./MakeOrderComponents/MakeOrder";
-// import redux
+// Import Redux hooks and thunks
 import { useDispatch } from "react-redux";
-import { listorders, whosOrder, updateOrderStatus , deleteOrder } from "@/app/Store/thunks";
+import {
+  listorders,
+  whosOrder,
+  updateOrderStatus,
+  deleteOrder,
+} from "@/app/Store/thunks";
 import SearchIcon from "@mui/icons-material/Search";
 import styled from "styled-components";
 import {
@@ -14,15 +20,17 @@ import {
   Skeleton,
 } from "@mui/material";
 
-// import base components
+// Import base components
 import ProfileComponent from "@/app/BaseComponent/ProfileComponent";
 import NavBarToggleBurgerButton from "@/app/BaseComponent/NavBarToggleBurgerButton";
 import ConfirmingModal from "@/app/BaseComponent/ConfirmingModal";
 import ErrorModal from "@/app/BaseComponent/ErrorModal";
 import AreYouShureModal from "@/app/BaseComponent/AreYouSureModal";
-// import component
+// Import components
 import OrderTabel from "./OrderTabel";
+import Pagination from "@/app/BaseComponent/Pagination";
 
+// Styled Components
 const FixTablePlace = styled.div`
   @media (min-width: 980px) {
     position: relative;
@@ -46,15 +54,19 @@ const HeadermakeOrder = styled.div`
   color: white;
   background-color: rgb(225, 223, 223);
   border-radius: 4px;
-  margin : 7px 15px;
+  margin: 7px 15px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+
   .textHeaderStyle {
     color: black;
   }
 
   @media (max-width: 980px) {
-    /* background-color: rgb(26, 32, 53) !important; */
+    /* Responsive styles if needed */
     .textHeaderStyle {
-      /* color: white !important; */
+      /* Additional styles */
     }
   }
 `;
@@ -62,11 +74,16 @@ const HeadermakeOrder = styled.div`
 const SearchInputMainDiv = styled.div`
   margin-bottom: 10px;
   width: 50%;
+  position: relative;
+
   .inputSreachStyle {
     font-size: 15px;
     width: 100%;
-    padding: 4px;
+    padding: 5px 4px 5px 30px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
   }
+
   .SearchIconStyle {
     position: absolute;
     transform: translate(50%, -50%);
@@ -76,93 +93,125 @@ const SearchInputMainDiv = styled.div`
 `;
 
 const AlignCenter = styled(Select)`
-  .css-jedpe8-MuiSelect-select-MuiInputBase-input-MuiOutlinedInput-input.MuiSelect-select {
+  .MuiSelect-select {
     text-align: center;
   }
   .MuiSelect-icon {
     right: auto; /* Reset default positioning */
     left: 0px; /* Position arrow on the left */
   }
-  .css-jedpe8-MuiSelect-select-MuiInputBase-input-MuiOutlinedInput-input.css-jedpe8-MuiSelect-select-MuiInputBase-input-MuiOutlinedInput-input.css-jedpe8-MuiSelect-select-MuiInputBase-input-MuiOutlinedInput-input {
+  .MuiSelect-select {
     padding-left: 32px;
-  }
-  .css-jedpe8-MuiSelect-select-MuiInputBase-input-MuiOutlinedInput-input.css-jedpe8-MuiSelect-select-MuiInputBase-input-MuiOutlinedInput-input.css-jedpe8-MuiSelect-select-MuiInputBase-input-MuiOutlinedInput-input {
     padding-right: 10px !important;
+  }
+`;
+
+const SortControls = styled.div`
+  display: flex;
+  justify-content: flex-end;
+  align-items: center;
+  margin-bottom: 10px;
+
+  select {
+    padding: 5px 10px;
+    margin-left: 10px;
+    border-radius: 4px;
+    border: 1px solid #ccc;
   }
 `;
 
 export default function OrderMainComponent({ toggleShow }) {
   const dispatch = useDispatch();
 
+  // Component States
   const [activekey, setActiveKey] = useState("seeTable");
   const [seeOrder, setSeeOrder] = useState(null);
   const [orders, setOrders] = useState([]);
   const [filteredOrders, setFilteredOrders] = useState([]);
   const [usersData, setUsersData] = useState({});
-  const [selectedStatus, setSelectedStatus] = useState({});
   const [searchTerm, setSearchTerm] = useState("");
-  const [currentStatus, setCurrentStatus] = useState("1"); // وضعیت پیش‌فرض
-  const [currentSubStatus, setCurrentSubStatus] = useState(null); // null یا 'admin' یا 'user'
+  const [currentStatus, setCurrentStatus] = useState("1"); // Default status
+  const [currentSubStatus, setCurrentSubStatus] = useState(null); // null or 'admin' or 'user'
   const [trackLoadingProduct, setTrackLoadingProduct] = useState(false);
   const [dataForDelete, setDataForDelete] = useState(null);
   const [updateData, setUpdateData] = useState(false);
 
-  // وضعیت‌های مودال
+  // Pagination states
+  const [currentPage, setCurrentPage] = useState(1);
+  const itemsPerPage = 10; // Define as per requirement
+  const [totalPages, setTotalPages] = useState(1);
+
+  // Sorting states
+  const [sortField, setSortField] = useState("createdAt"); // default sort field
+  const [sortOrder, setSortOrder] = useState("desc"); // default sort order
+
+  // Status selection states
+  const [selectedStatus, setSelectedStatus] = useState({}); // Initialize as an empty object
+
+  // Modal states
   const [openModal, setOpenModal] = useState(false);
   const [openModal2, setOpenModal2] = useState(false);
   const [openModal3, setOpenModal3] = useState(false);
-  // بستن مودال‌ها
+  // Close modals
   const closeModal = () => setOpenModal(false);
   const closeModal2 = () => setOpenModal2(false);
   const closeModal3 = () => setOpenModal3(false);
 
+  // Function to normalize strings for search
   const normalizeString = (str) => str.replace(/\s+/g, "").toLowerCase();
 
-  const fetchOrders = async (status) => {
+  // Fetch Orders Function
+  const fetchOrders = async (status, page = 1, limit = itemsPerPage) => {
     try {
       setTrackLoadingProduct(true);
-      const ordersData = await dispatch(listorders({ status })).unwrap();
+      const ordersData = await dispatch(
+        listorders({ status, sortBy: sortField, sortOrder, page, limit })
+      ).unwrap();
 
-      // دریافت اطلاعات کاربران برای همه سفارش‌ها
-      const userPromises = ordersData.map(async (item) => {
+      // Fetch user data for all orders
+      const userPromises = ordersData.data.map(async (item) => {
         const userDataCome = await dispatch(
           whosOrder({ id: item.createdBy })
         ).unwrap();
-        return { id: item.createdBy, userData: userDataCome[0] }; // دسترسی به اولین عنصر آرایه userData
+        return { id: item.createdBy, userData: userDataCome[0] }; // Access the first element of userData array
       });
 
-      // منتظر ماندن برای دریافت همه اطلاعات کاربران
+      // Wait for all user data to be fetched
       const userDataArray = await Promise.all(userPromises);
 
-      // ایجاد یک نقشه از userId به userData
+      // Create a map from userId to userData
       const userDataMap = userDataArray.reduce((acc, user) => {
         acc[user.id] = user.userData;
         return acc;
       }, {});
 
       setUsersData(userDataMap);
-      setOrders(ordersData);
+      setOrders(ordersData.data);
+      setTotalPages(ordersData.totalPages);
     } catch (error) {
       console.error("Error during dispatch:", error);
       setOpenModal3(true);
     } finally {
       setTrackLoadingProduct(false);
-      setUpdateData(true);
+      setUpdateData(false);
     }
   };
 
+  // Fetch orders on component mount and when dependencies change
   useEffect(() => {
-    fetchOrders(currentStatus);
-  }, [dispatch, currentStatus , updateData]);
+    fetchOrders(currentStatus, currentPage, itemsPerPage);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [dispatch, currentStatus, currentPage, sortField, sortOrder, updateData]);
 
-  // تابع فیلترینگ سفارش‌ها بر اساس وضعیت و زیر وضعیت
+  // Filtering and Pagination
   useEffect(() => {
-    if (!orders || !usersData) return;
+    // Since sorting is handled server-side, no client-side sorting is needed
+    // However, we'll handle search filtering here
 
     let filtered = orders;
 
+    // Apply sub-status filters
     if (currentStatus === "1" && currentSubStatus) {
-      // اگر وضعیت=1 و زیر وضعیت انتخاب شده است
       if (currentSubStatus === "admin") {
         filtered = orders.filter((order) => {
           return (
@@ -176,23 +225,57 @@ export default function OrderMainComponent({ toggleShow }) {
       }
     }
 
+    // Apply search filter
     if (searchTerm) {
       const normalizedSearchTerm = normalizeString(searchTerm);
       filtered = filtered.filter((order) => {
         const user = usersData[order.createdBy];
         if (!user) return false;
 
-        const fullName = `${user.firstName || ""} ${user.lastName || ""}`;
+        const fullName = `${user.firstName || ""} ${user.lastName || ""} ${user.username || ""}`;
         const normalizedFullName = normalizeString(fullName);
 
         return normalizedFullName.includes(normalizedSearchTerm);
       });
     }
 
+    setTotalPages(Math.ceil(filtered.length / itemsPerPage));
+    setCurrentPage(1); 
     setFilteredOrders(filtered);
-  }, [orders, usersData, searchTerm, currentStatus, currentSubStatus]);
+  }, [
+    orders,
+    usersData,
+    searchTerm,
+    currentStatus,
+    currentSubStatus,
+    itemsPerPage,
+  ]);
 
-  // تابع تغییر وضعیت سفارش
+  // Handle Sorting Change
+  const handleSortChange = (e) => {
+    const value = e.target.value;
+    if (value === "createdAt_asc") {
+      setSortField("createdAt");
+      setSortOrder("asc");
+    } else if (value === "createdAt_desc") {
+      setSortField("createdAt");
+      setSortOrder("desc");
+    } else if (value === "firstName_asc") {
+      setSortField("firstName");
+      setSortOrder("asc");
+    } else if (value === "firstName_desc") {
+      setSortField("firstName");
+      setSortOrder("desc");
+    } else if (value === "lastName_asc") {
+      setSortField("lastName");
+      setSortOrder("asc");
+    } else if (value === "lastName_desc") {
+      setSortField("lastName");
+      setSortOrder("desc");
+    }
+  };
+
+  // Handle Status Change
   const handleStatusChange = async (orderCode, newStatus) => {
     try {
       await dispatch(
@@ -202,15 +285,15 @@ export default function OrderMainComponent({ toggleShow }) {
       setTimeout(() => {
         setOpenModal2(false);
       }, 3000);
-      // بروزرسانی سفارش‌ها پس از تغییر وضعیت
-      fetchOrders(currentStatus);
+      // Refresh orders after status change
+      fetchOrders(currentStatus, currentPage, itemsPerPage);
     } catch (error) {
       setOpenModal3(true);
       console.error("Error updating status:", error);
     }
   };
 
-  // تابع مدیریت تغییرات در Dropdown
+  // Handle Dropdown Change for Status Filtering
   const handleDropdownChange = (e) => {
     const value = e.target.value;
     if (value === "1_admin") {
@@ -225,26 +308,26 @@ export default function OrderMainComponent({ toggleShow }) {
     }
   };
 
-  const areYouShureFunction = (item) => {
-    setDataForDelete(item);
+  // Handle Delete Confirmation
+  const areYouShureFunction = (itemCode) => {
+    setDataForDelete(itemCode);
     setOpenModal(true);
   };
-  
-  function closeModalOnTimeout() {
-    setTimeout(() => {
-      setOpenModal2(false);
-    }, 3000);
-  }
 
+  // Handle Delete Operation
   const handleDelete = async () => {
     try {
-      const fetchData = await dispatch(deleteOrder({ code : dataForDelete })).unwrap();
+      const fetchData = await dispatch(
+        deleteOrder({ code: dataForDelete })
+      ).unwrap();
       if (
-        fetchData.firstData.statusCode == 200 &&
-        fetchData.secondData.statusCode == 200
+        fetchData.firstData.statusCode === 200 &&
+        fetchData.secondData.statusCode === 200
       ) {
         setOpenModal2(true);
-        closeModalOnTimeout();
+        setTimeout(() => {
+          setOpenModal2(false);
+        }, 3000);
       }
     } catch (error) {
       setOpenModal3(true);
@@ -252,6 +335,11 @@ export default function OrderMainComponent({ toggleShow }) {
       setOpenModal(false);
       setUpdateData(true);
     }
+  };
+
+  // Handle Page Change from Pagination Component
+  const handlePageChange = (page) => {
+    setCurrentPage(page);
   };
 
   return (
@@ -267,9 +355,10 @@ export default function OrderMainComponent({ toggleShow }) {
             </div>
             <ProfileComponent colorGet={"#191919"} />
           </HeadermakeOrder>
+
           <div className="d-flex flex-row justify-content-between container align-items-center">
-            {/* فیلد جستجو */}
-            <SearchInputMainDiv className="me-2 mt-4 position-relative">
+            {/* Search Field */}
+            <SearchInputMainDiv className="me-2 mt-4">
               <input
                 className="inputSreachStyle"
                 type="text"
@@ -279,6 +368,7 @@ export default function OrderMainComponent({ toggleShow }) {
               />
               <SearchIcon className="SearchIconStyle" />
             </SearchInputMainDiv>
+
             <div>
               <FormControl
                 variant="outlined"
@@ -329,6 +419,23 @@ export default function OrderMainComponent({ toggleShow }) {
             </div>
           </div>
 
+          {/* Sorting Controls */}
+          {/* <SortControls className="container">
+            <label htmlFor="sort">مرتب‌سازی بر اساس:</label>
+            <select
+              id="sort"
+              onChange={handleSortChange}
+              value={`${sortField}_${sortOrder}`}
+            >
+              <option value="createdAt_desc">تاریخ (نزولی)</option>
+              <option value="createdAt_asc">تاریخ (صعودی)</option>
+              <option value="firstName_asc">نام (الفبایی صعودی)</option>
+              <option value="firstName_desc">نام (الفبایی نزولی)</option>
+              <option value="lastName_asc">نام خانوادگی (الفبایی صعودی)</option>
+              <option value="lastName_desc">نام خانوادگی (الفبایی نزولی)</option>
+            </select>
+          </SortControls> */}
+
           <FixTablePlace className="container">
             <>
               {trackLoadingProduct ? (
@@ -360,6 +467,12 @@ export default function OrderMainComponent({ toggleShow }) {
                         mainArray={filteredOrders}
                         userMainData={usersData}
                       />
+                      {/* Pagination Component */}
+                      <Pagination
+                        currentPage={currentPage}
+                        totalPages={totalPages}
+                        onPageChange={handlePageChange}
+                      />
                     </>
                   ) : (
                     <p className="me-2 NormalTextSizing mb-2">
@@ -379,11 +492,11 @@ export default function OrderMainComponent({ toggleShow }) {
           seeOrder={seeOrder}
         />
       )}
-      {/* مودال‌ها */}
+      {/* Modals */}
       <AreYouShureModal
         open={openModal}
         onClose={closeModal}
-        text={"ایا از حذف سفارش مطمئن هستیذ؟"}
+        text={"ایا از حذف سفارش مطمئن هستید؟"}
         func={handleDelete}
       />
       <ConfirmingModal

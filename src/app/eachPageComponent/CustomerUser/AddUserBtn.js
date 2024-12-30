@@ -3,6 +3,7 @@ import React, { useState, useEffect } from "react";
 import { Modal, Button } from "react-bootstrap";
 import styled from "styled-components";
 
+
 // import redux
 import { useDispatch } from "react-redux";
 import { addUser, getuser } from "@/app/Store/thunks";
@@ -48,8 +49,10 @@ const AddUserBtnstyle = styled(Button)`
   text-align: center;
   cursor: pointer;
   border-radius: 4px;
-  background-image : linear-gradient(195deg, #42424a 0%, #191919 100%);
+  background-image : linear-gradient(195deg, #66BB6A 0%, #43A047 100%);;
 `;
+
+
 
 export default function AddUserBtn({
   setDataUpdated,

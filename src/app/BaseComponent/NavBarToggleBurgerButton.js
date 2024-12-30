@@ -10,10 +10,10 @@ export default function NavBarToggleBurgerButton({func}) {
       aria-controls="basic-navbar-nav"
     >
       <div className={style.navIcon3}>
-        <span style={{backgroundColor : "black"}}></span>
-        <span style={{backgroundColor : "black"}}></span>
-        <span style={{backgroundColor : "black"}}></span>
-        <span style={{backgroundColor : "black"}}></span>
+        <span></span>
+        <span></span>
+        <span></span>
+        <span></span>
       </div>
     </Navbar.Toggle>
   );

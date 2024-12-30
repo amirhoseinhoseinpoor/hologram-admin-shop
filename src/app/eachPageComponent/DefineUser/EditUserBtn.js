@@ -6,7 +6,32 @@ import styled from "styled-components";
 import { useDispatch } from "react-redux";
 import { editUser, deleteUser } from "@/app/Store/thunks";
 // import base component
-import AreYouShureModal from "@/app/BaseComponent/AreYouSureModal";;
+import AreYouShureModal from "@/app/BaseComponent/AreYouSureModal";
+import { NavDropdown } from "react-bootstrap";
+import MoreHorizIcon from "@mui/icons-material/MoreHoriz";
+import EditIcon from "@mui/icons-material/Edit";
+
+const NavDropDown = styled(NavDropdown)`
+  .dropdown-menu {
+    border: 1px solid gray;
+    width: 230px;
+    padding: 12px;
+    margin-top: 3px;
+    border-radius: 4px;
+    box-shadow: 1px 1px 5px gray;
+  }
+  .dropdown-toggle::after {
+    display: none;
+  }
+`;
+
+const NavBarInsideDiv = styled.div`
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+`;
+
+
 
 const EditUserModal = styled(Modal)`
   .modal-dialog {
@@ -43,18 +68,6 @@ const EditUserModal = styled(Modal)`
   }
 `;
 
-const EditUserBtn = styled.button`
-  border: none;
-  color: white;
-  padding: 5px;
-  text-align: center;
-  text-decoration: none;
-  display: inline-block;
-  margin: 4px 2px;
-  cursor: pointer;
-  border-radius: 4px;
-  background-image: linear-gradient(195deg, #66bb6a 0%, #43a047 100%);
-`;
 
 const DeleteButtonStyle = styled.button`
   border: none;
@@ -161,12 +174,42 @@ function EditUserBtnfunction({ data, setDataUpdated, setConfirmModal }) {
 
   return (
     <>
-      <EditUserBtn
-        className="NormalTextSizing"
-        onClick={handleEditModalShow}
+
+      <NavDropDown
+        title={
+          <>
+            <MoreHorizIcon
+              style={{
+                color: "#191919",
+                cursor: "pointer",
+                fontSize: "28px",
+                cursor: "pointer",
+              }}
+            />
+          </>
+        }
+        id="basic-nav-dropdown"
       >
-        ویرایش
-      </EditUserBtn>
+        <NavBarInsideDiv>
+          <div
+            onClick={handleEditModalShow}
+            style={{
+              
+              cursor: "pointer",
+            }}
+            className="d-flex flex-row gap-2 align-items-center pb-1"
+          >
+            <div style={{ color: "#F3802C" }}>
+              <EditIcon className="subitem" />
+            </div>
+            <p className="NormalTextSizing text-end" >ویرایش</p>
+          </div>
+
+          
+        </NavBarInsideDiv>
+        <div className="d-flex justify-content-end"></div>
+      </NavDropDown>
+      
       <EditUserModal show={showEditModal} onHide={handleEditModalClose}>
         <Modal.Header closeButton>
           <Modal.Title>ویرایش کاربر</Modal.Title>
