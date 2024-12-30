@@ -144,7 +144,7 @@ export default function OrderTabelDesctop({
         <StyledTable className="table table-striped">
           <thead className="text-center">
             <tr className="table-head">
-              <th>ردیف</th>
+              <th className="NormalTextSizing">ردیف</th>
               <th>نام</th>
               <th>نام خانوادگی</th>
               <th>شماره همراه</th>
@@ -156,7 +156,12 @@ export default function OrderTabelDesctop({
           <tbody className="table-body text-center">
             {mainArray?.map((item, index) => (
               <tr key={index}>
-                <td style={{ verticalAlign: "middle" }}>{++index}</td>
+                <td
+                  style={{ verticalAlign: "middle" }}
+                  className="VodeoDisSizing"
+                >
+                  {++index}
+                </td>
                 <td style={{ verticalAlign: "middle" }}>
                   {userMainData[item.createdBy]?.firstName}
                 </td>
@@ -179,7 +184,8 @@ export default function OrderTabelDesctop({
                     مشاهده سفارش
                   </SeeOrderButton> */}
                   <p
-                    style={{color: "#43A047" , cursor : "pointer"}}
+                    style={{ color: "#43A047", cursor: "pointer" }}
+                    className="text-decoration-underline"
                     onClick={() => {
                       setActiveKey("seeOrder");
                       setSeeOrder(item);
@@ -365,15 +371,16 @@ export default function OrderTabelDesctop({
                   className="SecondValueTabel"
                   style={{ verticalAlign: "middle" }}
                 >
-                  {/* <SeeOrderButton
+                  <p
+                    style={{ color: "#43A047", cursor: "pointer" }}
+                    className="text-decoration-underline"
                     onClick={() => {
                       setActiveKey("seeOrder");
                       setSeeOrder(item);
                     }}
                   >
-                    مشاهده سفارش
-                  </SeeOrderButton> */}
-                  {item.code}
+                    {item.code}
+                  </p>
                 </div>
               </div>
 

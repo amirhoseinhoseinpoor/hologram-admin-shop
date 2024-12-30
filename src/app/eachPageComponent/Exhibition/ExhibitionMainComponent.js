@@ -165,7 +165,7 @@ export default function HonorsMainComponent({ toggleShow }) {
         {activekey === "editUserPage" && !editedHonor && (
           <>
             <div className="NormalTextSizing text-decoration-underline textHeaderStyle d-flex align-items-center">
-              ویرایش نمایشگاه
+              مدیریت نمایشگاه
             </div>
           </>
         )}
@@ -176,7 +176,7 @@ export default function HonorsMainComponent({ toggleShow }) {
               onClick={() => setActiveKey("editUserPage")}
               className="NormalTextSizing text-decoration-underline textHeaderStyle d-flex align-items-center"
             >
-              نمایشگاه
+              مدیریت نمایشگاه
             </div>
           </>
         )}
@@ -187,7 +187,7 @@ export default function HonorsMainComponent({ toggleShow }) {
               onClick={handleCancelEdit}
               className="NormalTextSizing text-decoration-underline textHeaderStyle d-flex align-items-center"
             >
-              نمایشگاه
+              مدیریت نمایشگاه
             </div>
           </>
         )}
@@ -204,22 +204,6 @@ export default function HonorsMainComponent({ toggleShow }) {
             </div>
           </>
         )}
-        {/* {activekey === "addUser" && !editedHonor && (
-          <>
-            <div>
-              <ButtonColor onClick={() => setActiveKey("editUserPage")}>
-                ویرایش نمایشگاه
-              </ButtonColor>
-            </div>
-          </>
-        )}
-        {editedHonor && (
-          <>
-            <div>
-              <ButtonColor onClick={handleCancelEdit}>نمایشگاه</ButtonColor>
-            </div>
-          </>
-        )} */}
       </div>
 
       {/* content */}
@@ -304,7 +288,7 @@ export default function HonorsMainComponent({ toggleShow }) {
       {activekey === "addUser" && !editedHonor && (
         <>
           <div>
-            <AddExhibition />
+            <AddExhibition setActiveKey={setActiveKey}/>
           </div>
         </>
       )}
