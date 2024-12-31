@@ -350,7 +350,7 @@ export default function HeaderMainComponent({ toggleShow }) {
   // Add new header item
   const addItem = () => {
     if (newItem.title && newItem.link) {
-      const newHeader = { ...newItem, subItems: [] };
+      const newHeader = { ...newItem, id: Date.now(), subItems: [] };
       setHeaderData((prev) => [...prev, newHeader]);
       setNewItem({ title: "", link: "", subItems: [] });
     } else {
@@ -416,7 +416,7 @@ export default function HeaderMainComponent({ toggleShow }) {
         target.subItems = [];
       }
 
-      target.subItems.push({ ...newSubItem, subItems: [] });
+      target.subItems.push({ ...newSubItem, id: Date.now(), subItems: [] });
 
       setHeaderData(updatedHeader);
       setNewSubItem({ title: "", link: "" });
@@ -492,7 +492,7 @@ export default function HeaderMainComponent({ toggleShow }) {
 
       return (
         <DraggableSubItem
-          key={newPath.join('-')}
+          key={subItem.id}
           path={newPath}
           moveSubItem={moveSubItem}
         >
@@ -621,7 +621,7 @@ export default function HeaderMainComponent({ toggleShow }) {
               <HeaderListWrapper>
                 {headerData.map((item, index) => (
                   <DraggableHeaderItem
-                    key={index}
+                    key={item.id}
                     index={index}
                     moveHeader={moveHeader}
                   >

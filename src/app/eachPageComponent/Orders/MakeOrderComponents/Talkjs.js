@@ -51,6 +51,7 @@ const ChatBox = ({
   const [moveForward, setMoveForward] = useState(false);
   const [FinalPaternModal, setFinalPaternModal] = useState(false);
   const [SendingFinalPattern, setSendingFinalPattern] = useState([]);
+  
   const [openModal2, setOpenModal2] = useState(false);
   const [patternImageUrls, setPatternImageUrls] = useState({});
 
@@ -170,7 +171,7 @@ const ChatBox = ({
             uploadFile({ file: image, tag, type, isPublic })
           ).unwrap();
 
-          newMessageObject.imageUrl = response.filename; // Use filename with extension
+          newMessageObject.imageUrl = response; // filename returned from thunk
         } catch (error) {
           console.error("Image upload failed:", error);
           return;
@@ -191,11 +192,9 @@ const ChatBox = ({
   // Function to update messages on the server
   const updateMessagesOnServer = async (updatedMessages) => {
     try {
-      // Assuming sendNewMessage action can be used to update the chat
       await dispatch(sendNewMessage({ code, newMessageSend: updatedMessages }));
     } catch (error) {
       console.error("Failed to update messages:", error);
-      // Optionally handle the error (e.g., revert state, show notification)
     }
   };
 
@@ -228,20 +227,17 @@ const ChatBox = ({
     const fetchImages = async () => {
       if (chatFinalImage?.images && Array.isArray(chatFinalImage.images)) {
         try {
-          // Store only image IDs in SendingFinalPattern
           setSendingFinalPattern(chatFinalImage.images || []);
 
-          // Fetch image URLs and update patternImageUrls
           const imageUrls = await Promise.all(
             chatFinalImage.images.map(async (filename) => {
               const imageData = await dispatch(
                 fetchPrivateImage({ filename })
               ).unwrap();
-              return { filename, url: imageData }; // Assuming imageData is the URL
+              return { filename, url: imageData };
             })
           );
 
-          // Update patternImageUrls with fetched URLs
           setPatternImageUrls((prevUrls) => {
             const newUrls = { ...prevUrls };
             imageUrls.forEach(({ filename, url }) => {
@@ -302,36 +298,29 @@ const ChatBox = ({
 
   const handleChatImageSendFunc = async () => {
     try {
-      // Collect all image IDs (existing and new)
       const fileIds = await Promise.all(
         SendingFinalPattern.map(async (item) => {
           if (typeof item === "object" && item.file) {
-            // New image upload
             const tag = "chatBoxImage";
             const type = 1;
             const isPublic = false;
             const file = item.file;
 
-            // Upload the new image and get its new ID
             const fileIdSrc = await dispatch(
               uploadFile({ file, tag, type, isPublic })
             ).unwrap();
-            return fileIdSrc.filename; // Return filename with extension
+            return fileIdSrc; // filename returned from thunk
           } else if (typeof item === "string") {
-            // Existing image ID, include as-is
             return item;
           } else {
-            // Unexpected item type, skip or handle accordingly
             console.warn("Unexpected item in SendingFinalPattern:", item);
             return null;
           }
         })
       );
 
-      // Filter out any nulls (unexpected items)
       const validFileIds = fileIds.filter((id) => id !== null);
 
-      // Send all image IDs to the API
       const responseDispatchImage = await dispatch(
         chatImageSend({
           code,
@@ -344,11 +333,9 @@ const ChatBox = ({
         closeModalOnTimeout();
       } else {
         console.error("Failed to send images:", responseDispatchImage);
-        // Optionally handle unsuccessful response
       }
     } catch (error) {
       console.error("Error sending chat images:", error);
-      // Optionally handle error (e.g., show notification to user)
     }
   };
 
@@ -499,7 +486,7 @@ const ChatBox = ({
                           >
                             <Box
                               component="img"
-                              src={`${process.env.NEXT_PUBLIC_BACK_END_SERVER}${msg.imageUrl}`}
+                              src={`${process.env.NEXT_PUBLIC_BACK_END_SERVER}/system/download/${msg.imageUrl}`}
                               alt="uploaded"
                               className={style.modalStyleclass}
                               sx={ModalStyle}
@@ -511,7 +498,7 @@ const ChatBox = ({
                               onClick={handleOpen}
                               className={`${style.imageChatStyle}`}
                               component="img"
-                              src={`${process.env.NEXT_PUBLIC_BACK_END_SERVER}${msg.imageUrl}`}
+                              src={`${process.env.NEXT_PUBLIC_BACK_END_SERVER}/system/download/${msg.imageUrl}`}
                               alt="uploaded"
                             />
                             <div
@@ -721,111 +708,61 @@ const ChatBox = ({
                 {Array.isArray(SendingFinalPattern) &&
                   SendingFinalPattern.map((fileObj, index) => (
                     <React.Fragment key={index}>
-                      {typeof fileObj === "string" ? (
-                        <div className="position-relative">
-                          <Box
-                            className={`${style.imageChatStyle}  mb-2 mt-2`}
-                            component="img"
-                            src={`${process.env.NEXT_PUBLIC_BACK_END_SERVER}${fileObj}`}
-                            alt={`uploaded ${index}`}
-                          />
-                          <div
-                            className={style.deleteIconStyle}
-                            onClick={() => handleRemoveFinalPattern(index)}
+                      <div className="position-relative">
+                        <Box
+                          className={`${style.imageChatStyle} mb-2 mt-2`}
+                          component="img"
+                          src={
+                            typeof fileObj === "string"
+                              ? `${patternImageUrls[fileObj] || fileObj}`
+                              : fileObj?.imageUrl
+                          }
+                          alt={`uploaded ${index}`}
+                        />
+                        <div
+                          className={style.deleteIconStyle}
+                          onClick={() => handleRemoveFinalPattern(index)}
+                        >
+                          <svg
+                            width={17}
+                            height={17}
+                            viewBox="0 0 12 12"
+                            fill="none"
+                            xmlns="http://www.w3.org/2000/svg"
                           >
-                            <svg
-                              width={17}
-                              height={17}
-                              viewBox="0 0 12 12"
-                              fill="none"
-                              xmlns="http://www.w3.org/2000/svg"
-                            >
-                              <path
-                                d="M10.5 2.98828C8.835 2.82328 7.16 2.73828 5.49 2.73828C4.5 2.73828 3.51 2.78828 2.52 2.88828L1.5 2.98828"
-                                stroke="#FF4F3F"
-                                strokeLinecap="round"
-                                strokeLinejoin="round"
-                              />
-                              <path
-                                d="M4.25 2.485L4.36 1.83C4.44 1.355 4.5 1 5.345 1H6.655C7.5 1 7.565 1.375 7.64 1.835L7.75 2.485"
-                                stroke="#FF4F3F"
-                                strokeLinecap="round"
-                                strokeLinejoin="round"
-                              />
-                              <path
-                                d="M9.4252 4.57031L9.1002 9.60531C9.0452 10.3903 9.0002 11.0003 7.6052 11.0003H4.3952C3.0002 11.0003 2.9552 10.3903 2.9002 9.60531L2.5752 4.57031"
-                                stroke="#FF4F3F"
-                                strokeLinecap="round"
-                                strokeLinejoin="round"
-                              />
-                              <path
-                                d="M5.16504 8.25H6.83004"
-                                stroke="#FF4F3F"
-                                strokeLinecap="round"
-                                strokeLinejoin="round"
-                              />
-                              <path
-                                d="M4.75 6.25H7.25"
-                                stroke="#FF4F3F"
-                                strokeLinecap="round"
-                                strokeLinejoin="round"
-                              />
-                            </svg>
-                          </div>
+                            <path
+                              d="M10.5 2.98828C8.835 2.82328 7.16 2.73828 5.49 2.73828C4.5 2.73828 3.51 2.78828 2.52 2.88828L1.5 2.98828"
+                              stroke="#FF4F3F"
+                              strokeLinecap="round"
+                              strokeLinejoin="round"
+                            />
+                            <path
+                              d="M4.25 2.485L4.36 1.83C4.44 1.355 4.5 1 5.345 1H6.655C7.5 1 7.565 1.375 7.64 1.835L7.75 2.485"
+                              stroke="#FF4F3F"
+                              strokeLinecap="round"
+                              strokeLinejoin="round"
+                            />
+                            <path
+                              d="M9.4252 4.57031L9.1002 9.60531C9.0452 10.3903 9.0002 11.0003 7.6052 11.0003H4.3952C3.0002 11.0003 2.9552 10.3903 2.9002 9.60531L2.5752 4.57031"
+                              stroke="#FF4F3F"
+                              strokeLinecap="round"
+                              strokeLinejoin="round"
+                            />
+                            <path
+                              d="M5.16504 8.25H6.83004"
+                              stroke="#FF4F3F"
+                              strokeLinecap="round"
+                              strokeLinejoin="round"
+                            />
+                            <path
+                              d="M4.75 6.25H7.25"
+                              stroke="#FF4F3F"
+                              strokeLinecap="round"
+                              strokeLinejoin="round"
+                            />
+                          </svg>
                         </div>
-                      ) : (
-                        <div className="position-relative">
-                          <Box
-                            className={`${style.imageChatStyle}  mb-2 mt-2`}
-                            component="img"
-                            src={`${process.env.NEXT_PUBLIC_BACK_END_SERVER}${fileObj.imageUrl}`}
-                            alt={`uploaded ${index}`}
-                          />
-                          <div
-                            className={style.deleteIconStyle}
-                            onClick={() => handleRemoveFinalPattern(index)}
-                          >
-                            <svg
-                              width={17}
-                              height={17}
-                              viewBox="0 0 12 12"
-                              fill="none"
-                              xmlns="http://www.w3.org/2000/svg"
-                            >
-                              <path
-                                d="M10.5 2.98828C8.835 2.82328 7.16 2.73828 5.49 2.73828C4.5 2.73828 3.51 2.78828 2.52 2.88828L1.5 2.98828"
-                                stroke="#FF4F3F"
-                                strokeLinecap="round"
-                                strokeLinejoin="round"
-                              />
-                              <path
-                                d="M4.25 2.485L4.36 1.83C4.44 1.355 4.5 1 5.345 1H6.655C7.5 1 7.565 1.375 7.64 1.835L7.75 2.485"
-                                stroke="#FF4F3F"
-                                strokeLinecap="round"
-                                strokeLinejoin="round"
-                              />
-                              <path
-                                d="M9.4252 4.57031L9.1002 9.60531C9.0452 10.3903 9.0002 11.0003 7.6052 11.0003H4.3952C3.0002 11.0003 2.9552 10.3903 2.9002 9.60531L2.5752 4.57031"
-                                stroke="#FF4F3F"
-                                strokeLinecap="round"
-                                strokeLinejoin="round"
-                              />
-                              <path
-                                d="M5.16504 8.25H6.83004"
-                                stroke="#FF4F3F"
-                                strokeLinecap="round"
-                                strokeLinejoin="round"
-                              />
-                              <path
-                                d="M4.75 6.25H7.25"
-                                stroke="#FF4F3F"
-                                strokeLinecap="round"
-                                strokeLinejoin="round"
-                              />
-                            </svg>
-                          </div>
-                        </div>
-                      )}
+                      </div>
                     </React.Fragment>
                   ))}
               </div>
