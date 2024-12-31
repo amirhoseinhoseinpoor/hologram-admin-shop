@@ -139,10 +139,9 @@ const StyledTable = styled.table`
 `;
 
 const ProductCard = styled(Card)`
-  background-color: #f5f5f5;
+  background-color: transparent;
   color: black !important;
-  /* border: 1px solid #ddd; */
-  box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+  box-shadow: unset;
 `;
 
 const ImageWrapper = styled(CardMedia)`
@@ -409,6 +408,7 @@ export default function HonorsMainComponent({ toggleShow }) {
                                     color: "#43A047",
                                     cursor: "pointer",
                                   }}
+                                  className="text-decoration-underline"
                                   onClick={() => {
                                     setEditedHonor(product);
                                   }}

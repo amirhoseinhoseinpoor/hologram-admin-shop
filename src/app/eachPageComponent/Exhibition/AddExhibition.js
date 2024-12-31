@@ -39,7 +39,33 @@ const LABELIMAGEUPLOAD = styled.label`
   width: fit-content;
 `;
 
-export default function AddHonors() {
+const BorderDiv = styled.div`
+  border: 2px solid #42424a;
+  border-radius: 6px;
+  padding: 10px;
+`;
+
+const BUTTONSSTYLE = styled.div`
+  .cancelButtonStyle {
+    color: #e91e63;
+    background-color: unset;
+    border: 1px solid #e91e63;
+    padding-right: 10px;
+    padding-left: 10px;
+  }
+
+  .deleteButtonStyle {
+    color: #ff4f3f !important;
+    background-color: transparent;
+  }
+  .confirmButtonStyle {
+    padding: 0 60px !important;
+    color: white;
+    background-color: #43a047;
+  }
+`;
+
+export default function AddHonors({ setActiveKey }) {
   const dispatch = useDispatch();
 
   const [content, setContent] = useState("");
@@ -157,119 +183,139 @@ export default function AddHonors() {
 
   return (
     <>
+      <p className="QASize text-center mb-4 mt-2">افزودن نمایشگاه</p>
       <form onSubmit={areYouShureFunction} className="container">
-        <label className="mt-1 NormalTextSizing" htmlFor="bannerTitle">
-          عنوان:{" "}
-        </label>
-        <input
-          id="bannerTitle"
-          value={bannerTitle}
-          onChange={handleTitleChange}
-        />
-
-        <p className="NormalTextSizing mt-1 mb-1 me-1">عکس اصلی مقاله</p>
-        {bannerImage ? (
-          <>
-            <div
-              className="d-flex flex-column position-relative"
-              style={{ width: "fit-content" }}
-            >
-              <BOX
-                component="img"
-                src={
-                  `${process.env.NEXT_PUBLIC_BACK_END_SERVER}/system/download/${bannerImage}` ||
-                  ""
-                }
-                alt="UserColorImage"
+        <BorderDiv className="d-flex flex-row justify-content-between">
+          <div className="me-3 w-50">
+            <div className="d-flex flex-row align-items-center gap-2">
+              <label
+                style={{ whiteSpace: "nowrap" }}
+                className="mt-2 seeOrderFont"
+                htmlFor="bannerTitle"
+              >
+                عنوان :
+              </label>
+              <input
+                className="w-100"
+                id="bannerTitle"
+                value={bannerTitle}
+                onChange={handleTitleChange}
               />
-
-              <DELETEUPLODEDIMAGE onClick={() => setBannerImage(null)}>
-                <svg
-                  width={17}
-                  height={17}
-                  viewBox="0 0 12 12"
-                  fill="none"
-                  xmlns="http://www.w3.org/2000/svg"
-                >
-                  <path
-                    d="M10.5 2.98828C8.835 2.82328 7.16 2.73828 5.49 2.73828C4.5 2.73828 3.51 2.78828 2.52 2.88828L1.5 2.98828"
-                    stroke="#FF4F3F"
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                  />
-                  <path
-                    d="M4.25 2.485L4.36 1.83C4.44 1.355 4.5 1 5.345 1H6.655C7.5 1 7.565 1.375 7.64 1.835L7.75 2.485"
-                    stroke="#FF4F3F"
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                  />
-                  <path
-                    d="M9.4252 4.57031L9.1002 9.60531C9.0452 10.3903 9.0002 11.0003 7.6052 11.0003H4.3952C3.0002 11.0003 2.9552 10.3903 2.9002 9.60531L2.5752 4.57031"
-                    stroke="#FF4F3F"
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                  />
-                  <path
-                    d="M5.16504 8.25H6.83004"
-                    stroke="#FF4F3F"
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                  />
-                  <path
-                    d="M4.75 6.25H7.25"
-                    stroke="#FF4F3F"
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                  />
-                </svg>
-              </DELETEUPLODEDIMAGE>
             </div>
-          </>
-        ) : (
-          <>
-            <LABELIMAGEUPLOAD htmlFor="blogImage">
-              <div className="d-flex flex-column text-center p-1">
-                <div>
+            <div className="d-flex flex-row align-items-center gap-2 mt-3">
+              <label
+                style={{ whiteSpace: "nowrap" }}
+                className="mt-2 seeOrderFont"
+                htmlFor="bannerTags"
+              >
+                تگ ها : (با , ازهم جدا شوند)
+              </label>
+              <input
+                className="w-100"
+                id="bannerTags"
+                value={bannerTags}
+                onChange={handleTagsChange}
+              />
+            </div>
+          </div>
+          {bannerImage ? (
+            <>
+              <div
+                className="d-flex flex-column position-relative"
+                style={{ width: "fit-content" }}
+              >
+                <BOX
+                  component="img"
+                  src={
+                    `${process.env.NEXT_PUBLIC_BACK_END_SERVER}/system/download/${bannerImage}` ||
+                    ""
+                  }
+                  alt="UserColorImage"
+                />
+
+                <DELETEUPLODEDIMAGE onClick={() => setBannerImage(null)}>
                   <svg
-                    width={21}
-                    height={21}
-                    viewBox="0 0 18 18"
+                    width={17}
+                    height={17}
+                    viewBox="0 0 12 12"
                     fill="none"
                     xmlns="http://www.w3.org/2000/svg"
                   >
                     <path
-                      d="M2.25 11.25C2.25 13.3713 2.25 14.432 2.90901 15.091C3.56802 15.75 4.62868 15.75 6.75 15.75H11.25C13.3713 15.75 14.432 15.75 15.091 15.091C15.75 14.432 15.75 13.3713 15.75 11.25"
-                      stroke="#404040"
+                      d="M10.5 2.98828C8.835 2.82328 7.16 2.73828 5.49 2.73828C4.5 2.73828 3.51 2.78828 2.52 2.88828L1.5 2.98828"
+                      stroke="#FF4F3F"
                       strokeLinecap="round"
                       strokeLinejoin="round"
                     />
                     <path
-                      d="M9 12V2.25M9 2.25L12 5.53125M9 2.25L6 5.53125"
-                      stroke="#404040"
+                      d="M4.25 2.485L4.36 1.83C4.44 1.355 4.5 1 5.345 1H6.655C7.5 1 7.565 1.375 7.64 1.835L7.75 2.485"
+                      stroke="#FF4F3F"
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                    />
+                    <path
+                      d="M9.4252 4.57031L9.1002 9.60531C9.0452 10.3903 9.0002 11.0003 7.6052 11.0003H4.3952C3.0002 11.0003 2.9552 10.3903 2.9002 9.60531L2.5752 4.57031"
+                      stroke="#FF4F3F"
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                    />
+                    <path
+                      d="M5.16504 8.25H6.83004"
+                      stroke="#FF4F3F"
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                    />
+                    <path
+                      d="M4.75 6.25H7.25"
+                      stroke="#FF4F3F"
                       strokeLinecap="round"
                       strokeLinejoin="round"
                     />
                   </svg>
-                </div>
-                <p className={`colorTheInputFile discription`}>
-                  بارگذاری فایل .png یا .jpg
-                </p>
+                </DELETEUPLODEDIMAGE>
               </div>
-            </LABELIMAGEUPLOAD>
-            <input
-              className="d-none"
-              type="file"
-              accept={`${process.env.NEXT_PUBLIC_INPUT_IMAGE_FORMAT}`}
-              id="blogImage"
-              onChange={handleBannerImageUpload}
-            />
-          </>
-        )}
-
-        <label className="mt-3 NormalTextSizing" htmlFor="bannerTags">
-          تگ ها : (با , ازهم جدا شوند)
-        </label>
-        <input id="bannerTags" value={bannerTags} onChange={handleTagsChange} />
+            </>
+          ) : (
+            <>
+              <LABELIMAGEUPLOAD htmlFor="blogImage">
+                <div className="d-flex flex-column text-center p-1">
+                  <div>
+                    <svg
+                      width={21}
+                      height={21}
+                      viewBox="0 0 18 18"
+                      fill="none"
+                      xmlns="http://www.w3.org/2000/svg"
+                    >
+                      <path
+                        d="M2.25 11.25C2.25 13.3713 2.25 14.432 2.90901 15.091C3.56802 15.75 4.62868 15.75 6.75 15.75H11.25C13.3713 15.75 14.432 15.75 15.091 15.091C15.75 14.432 15.75 13.3713 15.75 11.25"
+                        stroke="#404040"
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                      />
+                      <path
+                        d="M9 12V2.25M9 2.25L12 5.53125M9 2.25L6 5.53125"
+                        stroke="#404040"
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                      />
+                    </svg>
+                  </div>
+                  <p className={`colorTheInputFile discription`}>
+                    بارگذاری فایل .png یا .jpg
+                  </p>
+                </div>
+              </LABELIMAGEUPLOAD>
+              <input
+                className="d-none"
+                type="file"
+                accept={`${process.env.NEXT_PUBLIC_INPUT_IMAGE_FORMAT}`}
+                id="blogImage"
+                onChange={handleBannerImageUpload}
+              />
+            </>
+          )}
+        </BorderDiv>
 
         <div className="mt-4">
           <Editor
@@ -306,9 +352,20 @@ export default function AddHonors() {
             }}
           />
         </div>
-        <button className="bg-success mt-3 mb-3" type="submit">
-          اضافه کردن نمایشگاه
-        </button>
+
+        <BUTTONSSTYLE className="d-flex flex-row mt-3 mb-3 justify-content-around">
+          <button className="confirmButtonStyle" type="submit">
+            تایید
+          </button>
+          <button
+            className="cancelButtonStyle"
+            type="button"
+            onClick={() => setActiveKey("editUserPage")}
+          >
+            انصراف
+          </button>
+        </BUTTONSSTYLE>
+
         {/* modals */}
         <AreYouShureModal
           open={openModal}
