@@ -136,16 +136,6 @@ export default function MakeOrder({ seeOrder, setActiveKey, toggleShow }) {
   };
   return (
     <section>
-      {/* <div
-        className={`${style.makeorderHeader} mb-4 d-flex justify-content-end`}
-      >
-        <p
-          onClick={() => setActiveKey("seeTable")}
-          className={`discription ${style.seeOrderButtonStyle}`}
-        >
-          بازگشت به سفارشات
-        </p>
-      </div> */}
       <HeadermakeOrder className="d-flex flex-row mb-3 justify-content-between">
         <div className="d-block d-lg-none">
           <NavBarToggleBurgerButton func={() => toggleShow("main")} />

@@ -15,6 +15,7 @@ import {
 } from "@/app/Store/thunks";
 import AreYouShureModal from "@/app/BaseComponent/AreYouSureModal";
 import ConfirmingModal from "@/app/BaseComponent/ConfirmingModal";
+import ZoomModal from "@/app/BaseComponent/ZoomModal";
 import socket from "@/app/utils/socket";
 
 const ModalStyle = {
@@ -51,11 +52,20 @@ const ChatBox = ({
   const [moveForward, setMoveForward] = useState(false);
   const [FinalPaternModal, setFinalPaternModal] = useState(false);
   const [SendingFinalPattern, setSendingFinalPattern] = useState([]);
-  
+  const [userChoiseImage, setUserChoiseImage] = useState(null);
+
   const [openModal2, setOpenModal2] = useState(false);
   const [patternImageUrls, setPatternImageUrls] = useState({});
+  const [openModal3, setOpenModal3] = useState(null);
+
 
   const closeModal2 = () => setOpenModal2(false);
+  const closeModal3 = () => setOpenModal3(null);
+
+
+  const handleZoomFinalPattern = (fileObj) => {
+    setOpenModal3(fileObj);
+  };
 
   const dontHavePattern = SendingFinalPattern.length === 0;
 
@@ -89,7 +99,7 @@ const ChatBox = ({
   // Initialize chat socket
   useEffect(() => {
     if (!socket) {
-      console.error('Socket not initialized.');
+      console.error("Socket not initialized.");
       return;
     }
 
@@ -113,6 +123,22 @@ const ChatBox = ({
       socket.off("message");
     };
   }, [code, chatData]);
+
+  useEffect(() => {
+    const fetchImages = async () => {
+      if (chatFinalImage?.userChoices) {
+        try {
+          const imageData = await dispatch(
+            fetchPrivateImage({ filename: chatFinalImage?.userChoices[0] })
+          ).unwrap();
+          setUserChoiseImage(imageData);
+        } catch (error) {
+          console.error("Failed to fetch image:", error);
+        }
+      }
+    };
+    fetchImages();
+  }, [chatFinalImage, dispatch]);
 
   const handleEditMessage = (index) => {
     setEditIndex(index);
@@ -573,6 +599,24 @@ const ChatBox = ({
           </div>
         </div>
 
+        {userChoiseImage && (
+          <div className={`mt-3 ${style.confirmImage} `}>
+            <div className="d-flex flex-row mb-2 mt-2 align-items-center">
+              <div>
+                <Box
+                  onClick={() => handleZoomFinalPattern(userChoiseImage)}
+                  className={`${style.imageChatStyle} `}
+                  component="img"
+                  src={userChoiseImage}
+                  style={{ width: "200px", height: "100%" }}
+                  alt="uploaded"
+                />
+              </div>
+              <p className="VodeoDisSizing me-2">طرح مورد تایید</p>
+            </div>
+          </div>
+        )}
+
         <div className="position-relative mt-3 d-flex">
           {selectedImage ? (
             <>
@@ -821,6 +865,12 @@ const ChatBox = ({
         onClose={closeModal}
         text={"ایا از حذف پیام مطمئن هستید ؟"}
         func={() => handleDeleteMessage(messageToDeleteIndex)}
+      />
+      <ZoomModal
+        open={openModal3}
+        onClose={closeModal3}
+        src={openModal3}
+        alt={`zoomModalImage`}
       />
     </div>
   );
