@@ -379,6 +379,29 @@ export const list = createAsyncThunk(
   }
 );
 
+export const prodNameAndNav = createAsyncThunk(
+  "product/prodNameAndNav",
+  async (_, thunkAPI) => {
+   
+    try {
+      const response = await axios.get(
+        `${process.env.NEXT_PUBLIC_BACK_END_SERVER}/product/names-navIds`
+      );
+      const data = response.data;
+
+      return data;
+    } catch (error) {
+      if (error.response && error.response.status === 400) {
+        return thunkAPI.rejectWithValue("ارور سمت من");
+      } else {
+        return thunkAPI.rejectWithValue(
+          "مشکلی به وجود امده لطفا بعدا تلاش کنید"
+        );
+      }
+    }
+  }
+);
+
 export const deleted = createAsyncThunk(
   "product/deleted",
   async ({ code, name }, thunkAPI) => {

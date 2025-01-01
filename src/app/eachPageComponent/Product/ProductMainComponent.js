@@ -201,16 +201,9 @@ export default function HonorsMainComponent({ toggleShow }) {
 
   const datacome = useSelector(productListData);
 
-  console.log(datacome);
+  // console.log(datacome);
 
   const normalizeString = (str) => str.replace(/\s+/g, "").toLowerCase();
-
-  // useEffect(() => {
-  //   const fetchData = async () => {
-
-  //   };
-  //   fetchData();
-  // }, [dispatch, dataUpdated]);
 
   const fetchData = async (page) => {
     const dataResponse = await dispatch(list({ page, limit: 10 })).unwrap();
@@ -293,14 +286,14 @@ export default function HonorsMainComponent({ toggleShow }) {
           {activekey === "editUserPage" && !editedHonor && (
             <>
               <div className="NormalTextSizing text-decoration-underline textHeaderStyle d-flex align-items-center">
-                ویرایش محصولات
+                مدیریت محصولات
               </div>
             </>
           )}
           {activekey === "addUser" && !editedHonor && (
             <>
               <div  style={{ cursor: "pointer" }} onClick={() => setActiveKey("editUserPage")} className="text-decoration-underline NormalTextSizing textHeaderStyle d-flex align-items-center">
-                محصولات
+              مدیریت محصولات
               </div>
             </>
           )}
@@ -311,7 +304,7 @@ export default function HonorsMainComponent({ toggleShow }) {
                 onClick={handleCancelEdit}
                 className="NormalTextSizing text-decoration-underline textHeaderStyle d-flex align-items-center"
               >
-                محصولات
+                مدیریت محصولات
               </div>
             </>
           )}
