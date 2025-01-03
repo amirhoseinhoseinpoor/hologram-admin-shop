@@ -45,7 +45,7 @@ const StepSixComponent = dynamic(() => import("./StepSixComponent"), {
 
 const StepSeven = dynamic(() => import("./StepSevenComponent"));
 
-export default function MakeOrder({ seeOrder, setActiveKey, toggleShow }) {
+export default function MakeOrder({ seeOrder, setActiveKey, toggleShow , setUpdateData }) {
   const [step, setStep] = useState(1);
 
   useEffect(() => {
@@ -57,7 +57,8 @@ export default function MakeOrder({ seeOrder, setActiveKey, toggleShow }) {
   const [disabelInputStep4, setDisabelInputStep4] = useState(false);
 
   // Function to go to the next step
-  const handleNextStep = () => {
+  const handleNextStep = () => {    
+    setUpdateData(true);
     setStep((prevStep) => prevStep + 1);
   };
 
@@ -106,6 +107,7 @@ export default function MakeOrder({ seeOrder, setActiveKey, toggleShow }) {
             chatFinalImage={seeOrder.chatImage}
             code={seeOrder.code}
             step={seeOrder.step}
+            setUpdateData={setUpdateData}
             handleNextStep={handleNextStep}
             handlePreviousStep={handlePreviousStep}
           />

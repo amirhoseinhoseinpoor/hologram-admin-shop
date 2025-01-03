@@ -251,6 +251,18 @@ export default function OrderMainComponent({ toggleShow }) {
     itemsPerPage,
   ]);
 
+
+  useEffect(() => {
+    if (seeOrder) {
+      const updatedOrder = orders?.find(
+        (order) => order.code === seeOrder?.code
+      );     
+      setSeeOrder(updatedOrder);
+      
+    }
+  }, [updateData , seeOrder ,orders]);
+
+  
   // Handle Sorting Change
   const handleSortChange = (e) => {
     const value = e.target.value;
@@ -487,6 +499,7 @@ export default function OrderMainComponent({ toggleShow }) {
       )}
       {activekey === "seeOrder" && (
         <MakeOrder
+          setUpdateData={setUpdateData}
           toggleShow={toggleShow}
           setActiveKey={setActiveKey}
           seeOrder={seeOrder}

@@ -20,6 +20,8 @@ import FileDownloadIcon from "@mui/icons-material/FileDownload";
 import { Skeleton } from "@mui/material";
 import LoadingCss from "@/app/BaseComponent/LoadingCss";
 import socket from "@/app/utils/socket";
+// import utils
+import { downloadImage } from "@/app/utils/downloadImage";
 
 const ModalStyle = {
   position: "absolute",
@@ -39,12 +41,16 @@ const ChatBox = ({
   code,
   step,
   data,
-  chatFinalImage,
+  chatFinalImage: initialChatImage,
+  setUpdateData,
 }) => {
   const dispatch = useDispatch();
 
   const [message, setMessage] = useState("");
   const [messages, setMessages] = useState([]);
+  const [chatImage, setChatImage] = useState(
+    initialChatImage || { images: [], userChoices: [] }
+  );
   const [image, setImage] = useState(null);
   const chatBoxRef = useRef(null);
   const [editIndex, setEditIndex] = useState(null);
@@ -57,6 +63,7 @@ const ChatBox = ({
   const [SendingFinalPattern, setSendingFinalPattern] = useState([]);
   const [userChoiseImage, setUserChoiseImage] = useState(null);
   const [loadingImageSend, setLoadingImageSend] = useState(false);
+  const [loadinfinalPattern, setLoadinfinalPattern] = useState(false);
 
   const [openModal2, setOpenModal2] = useState(false);
   const [patternImageUrls, setPatternImageUrls] = useState({});
@@ -88,11 +95,6 @@ const ChatBox = ({
   // Close modal
   const closeModal = () => setOpenModal(false);
 
-  // modal part state and function
-  const [open, setOpen] = useState(false);
-  const handleOpen = () => setOpen(true);
-  const handleClose = () => setOpen(false);
-
   const areYouShureFunction = (index) => {
     setMessageToDeleteIndex(index);
     setOpenModal(true);
@@ -105,17 +107,27 @@ const ChatBox = ({
       return;
     }
 
-    // Set initial messages
+    socket.emit("joinRoom", { code });
+
     setMessages(Array.isArray(chatData) ? chatData : []);
 
-    // Listen for chat updates
     socket.on("message", (data) => {
       if (data.code === code) {
         setMessages(Array.isArray(data.chat) ? data.chat : []);
       }
+      if (data.chatImage) {
+        setChatImage(data.chatImage);
+      }
     });
 
-    // Handle connection errors
+    socket.on("chatImageUpdate", (data) => {
+      if (data.code === code) {
+        if (data.chatImage) {
+          setChatImage(data.chatImage);
+        }
+      }
+    });
+
     socket.on("connect_error", (err) => {
       console.error("Chat Socket Connection Error:", err.message);
     });
@@ -123,15 +135,17 @@ const ChatBox = ({
     // Clean up the listener on unmount
     return () => {
       socket.off("message");
+      socket.off("chatImageUpdate");
+      socket.emit("leaveRoom", { code });
     };
   }, [code, chatData]);
 
   useEffect(() => {
     const fetchImages = async () => {
-      if (chatFinalImage?.userChoices) {
+      if (chatImage?.userChoices) {
         try {
           const imageData = await dispatch(
-            fetchPrivateImage({ filename: chatFinalImage?.userChoices[0] })
+            fetchPrivateImage({ filename: chatImage?.userChoices[0] })
           ).unwrap();
           setUserChoiseImage(imageData);
         } catch (error) {
@@ -140,7 +154,7 @@ const ChatBox = ({
       }
     };
     fetchImages();
-  }, [chatFinalImage, dispatch]);
+  }, [chatImage, dispatch]);
 
   const handleEditMessage = (index) => {
     setEditIndex(index);
@@ -256,12 +270,12 @@ const ChatBox = ({
 
   useEffect(() => {
     const fetchImages = async () => {
-      if (chatFinalImage?.images && Array.isArray(chatFinalImage.images)) {
+      if (chatImage?.images && Array.isArray(chatImage.images)) {
         try {
-          setSendingFinalPattern(chatFinalImage.images || []);
+          setSendingFinalPattern(chatImage.images || []);
 
           const imageUrls = await Promise.all(
-            chatFinalImage.images.map(async (filename) => {
+            chatImage.images.map(async (filename) => {
               const imageData = await dispatch(
                 fetchPrivateImage({ filename })
               ).unwrap();
@@ -283,7 +297,7 @@ const ChatBox = ({
     };
 
     fetchImages();
-  }, [dispatch, chatFinalImage]);
+  }, [dispatch, chatImage]);
 
   const handleFileUpload = (event) => {
     const files = Array.from(event.target.files);
@@ -329,6 +343,7 @@ const ChatBox = ({
 
   const handleChatImageSendFunc = async () => {
     try {
+      setLoadinfinalPattern(true);
       const fileIds = await Promise.all(
         SendingFinalPattern.map(async (item) => {
           if (typeof item === "object" && item.file) {
@@ -367,6 +382,8 @@ const ChatBox = ({
       }
     } catch (error) {
       console.error("Error sending chat images:", error);
+    } finally {
+      setLoadinfinalPattern(false);
     }
   };
 
@@ -508,25 +525,11 @@ const ChatBox = ({
                     <>
                       {imageCache[msg.imageUrl] ? (
                         <>
-                          {/* Image Modal */}
-                          <Modal
-                            open={open}
-                            onClose={handleClose}
-                            aria-labelledby="modal-modal-title"
-                            aria-describedby="modal-modal-description"
-                          >
-                            <Box
-                              component="img"
-                              src={imageCache[msg.imageUrl]}
-                              alt="uploaded"
-                              className={style.modalStyleclass}
-                              sx={ModalStyle}
-                            ></Box>
-                          </Modal>
-
                           <div className={style.allTextStyle}>
                             <Box
-                              onClick={handleOpen}
+                              onClick={() =>
+                                handleZoomFinalPattern(imageCache[msg.imageUrl])
+                              }
                               className={`${style.imageChatStyle}`}
                               component="img"
                               src={imageCache[msg.imageUrl]}
@@ -546,27 +549,11 @@ const ChatBox = ({
                                 <p
                                   style={{ cursor: "pointer" }}
                                   onClick={() => {
-                                    const link = document.createElement("a");
-
-                                    // Check if imageCache[msg.imageUrl] is a blob or a base64 URL
-                                    let filename = "finalPayment.png"; // Default filename
-                                    if (
-                                      imageCache[msg.imageUrl].includes(
-                                        "data:image/png"
-                                      )
-                                    ) {
-                                      filename = "finalPayment.png";
-                                    } else if (
-                                      imageCache[msg.imageUrl].includes(
-                                        "data:image/svg+xml"
-                                      )
-                                    ) {
-                                      filename = "finalPayment.svg";
-                                    }
-
-                                    link.href = imageCache[msg.imageUrl];
-                                    link.download = filename; // Set filename with correct extension
-                                    link.click(); // Trigger the download
+                                    const date = new Date();
+                                    downloadImage(
+                                      imageCache[msg.imageUrl],
+                                      `${date}.png`
+                                    );
                                   }}
                                 >
                                   <FileDownloadIcon
@@ -657,7 +644,18 @@ const ChatBox = ({
                   alt="uploaded"
                 />
               </div>
-              <p className="VodeoDisSizing me-2">طرح مورد تایید</p>
+              <div className="d-flex flex-column gap-3">
+                <p className="VodeoDisSizing me-2">طرح مورد تایید</p>
+                <p
+                  onClick={() => {
+                    const date = new Date();
+                    downloadImage(userChoiseImage, `${date}.png`);
+                  }}
+                  className={`me-2 text-center ${style.donsloadFinalUserStyle} NormalTextSizing`}
+                >
+                  دانلود طرح
+                </p>
+              </div>
             </div>
           </div>
         )}
@@ -675,6 +673,7 @@ const ChatBox = ({
                 ) : (
                   <>
                     <Box
+                      onClick={() => handleZoomFinalPattern(selectedImage)}
                       component="img"
                       src={selectedImage}
                       alt="uploaded"
@@ -823,6 +822,7 @@ const ChatBox = ({
                           alt={`uploaded ${index}`}
                         />
                         <div
+                          style={{ cursor: "pointer" }}
                           className={style.deleteIconStyle}
                           onClick={() => handleRemoveFinalPattern(index)}
                         >
@@ -865,6 +865,50 @@ const ChatBox = ({
                             />
                           </svg>
                         </div>
+
+                        <p
+                          className={style.downloadImageFinalP}
+                          style={{ cursor: "pointer" }}
+                          onClick={() => {
+                            const link = document.createElement("a");
+
+                            let filename = "finalPayment.png";
+
+                            if (typeof fileObj === "string") {
+                              if (
+                                patternImageUrls[fileObj] ||
+                                fileObj.includes("data:image/png")
+                              ) {
+                                filename = "finalPayment.png";
+                              } else if (
+                                patternImageUrls[fileObj] ||
+                                fileObj.includes("data:image/svg+xml")
+                              ) {
+                                filename = "finalPayment.svg";
+                              }
+
+                              link.href = patternImageUrls[fileObj] || fileObj;
+                              link.download = filename;
+                              link.click();
+                            } else {
+                              if (
+                                fileObj?.imageUrl.includes("data:image/png")
+                              ) {
+                                filename = "finalPayment.png";
+                              } else if (
+                                fileObj?.imageUrl.includes("data:image/svg+xml")
+                              ) {
+                                filename = "finalPayment.svg";
+                              }
+
+                              link.href = fileObj?.imageUrl;
+                              link.download = filename;
+                              link.click();
+                            }
+                          }}
+                        >
+                          <FileDownloadIcon style={{ color: "white" }} />
+                        </p>
                       </div>
                     </React.Fragment>
                   ))}
@@ -899,10 +943,17 @@ const ChatBox = ({
                 {!dontHavePattern && (
                   <div className="ms-2">
                     <button
+                      disabled={loadinfinalPattern}
                       onClick={handleChatImageSendFunc}
                       className={style.confirmpatternButtonStyle}
                     >
-                      تایید نهایی
+                      {loadinfinalPattern ? (
+                        <>
+                          <LoadingCss />
+                        </>
+                      ) : (
+                        <>تایید نهایی</>
+                      )}
                     </button>
                   </div>
                 )}
