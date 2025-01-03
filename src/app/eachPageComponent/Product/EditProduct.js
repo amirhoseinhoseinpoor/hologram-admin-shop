@@ -1,24 +1,24 @@
 import React, { useState, useEffect } from "react";
 import styled from "styled-components";
 import { useDispatch } from "react-redux";
-import { deleted } from "@/app/Store/thunks";
-import { uploadFile, productEdit } from "@/app/Store/thunks";
+import { deleted, uploadFile, productEdit, HeaderList, prodNameAndNav } from "@/app/Store/thunks";
 import { Box } from "@mui/material";
 import AreYouShureModal from "@/app/BaseComponent/AreYouSureModal";
 import ConfirmModal from "@/app/BaseComponent/ConfirmingModal";
 import ErrorModal from "@/app/BaseComponent/ErrorModal";
 
+// Styled Components
 const BUTTONSSTYLE = styled.div`
   .cancelButtonStyle {
     color: #48abf7;
-    background-color: rgba(72, 171, 247, .1);
+    background-color: rgba(72, 171, 247, 0.1);
   }
 
   .deleteButtonStyle {
     color: #ff4f3f !important;
     background-color: transparent;
   }
-  .confirmButtonStyle{
+  .confirmButtonStyle {
     color: white;
     background-color: #1572e8;
   }
@@ -65,8 +65,12 @@ export default function EditHonors({
 }) {
   const dispatch = useDispatch();
 
-  const [name, setName] = useState("");
+  // State Variables
+  const [selectedNavId, setSelectedNavId] = useState("");
+  const [availableItems, setAvailableItems] = useState([]);
+  const [usedNavIds, setUsedNavIds] = useState([]);
 
+  const [name, setName] = useState("");
   const [title, setTitle] = useState("");
   const [subtitle, setSubtitle] = useState("");
   const [subtitleCompelete, setSubtitleCompelete] = useState("");
@@ -77,14 +81,12 @@ export default function EditHonors({
     { title: "", description: "", src: "", poster: "" },
   ]);
 
-  console.log(colors);
-
-  // modal state
+  // Modal States
   const [openModal, setOpenModal] = useState(false);
   const [openModal2, setOpenModal2] = useState(false);
   const [openModal3, setOpenModal3] = useState(false);
   const [openModal4, setOpenModal4] = useState(false);
-  // Close modal
+  // Close modal functions
   const closeModal = () => setOpenModal(false);
   const closeModal2 = () => setOpenModal2(false);
   const closeModal3 = () => setOpenModal3(false);
@@ -93,6 +95,64 @@ export default function EditHonors({
   const [objectUrls, setObjectUrls] = useState({});
   const [posterObjectUrls, setPosterObjectUrls] = useState({});
 
+  // Define top-level navigation titles to exclude
+  const excludedTopLevelTitles = ["خانه", "محصولات", "مقالات", "تماس با ما", "درباره‌ی ما"];
+
+  // Fetch Header and Product Data on Mount
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const dataComeAPI = await dispatch(HeaderList()).unwrap();
+        const prodComeApi = await dispatch(prodNameAndNav()).unwrap();
+
+        const content = dataComeAPI?.content || [];
+        setHeaderCome(content);
+
+        const usedIds = prodComeApi.map((prod) => prod.navId);
+        setUsedNavIds(usedIds);
+      } catch (error) {
+        console.error("Error fetching header data:", error);
+        // Optionally handle error modal here
+      }
+    };
+
+    fetchData();
+  }, [dispatch]);
+
+  const [headerCome, setHeaderCome] = useState([]);
+
+  // Flatten Header Items Excluding Specified Top-Level Titles
+  useEffect(() => {
+    // Function to recursively flatten header items, excluding specified top-level titles
+    const flattenHeader = (items, isTopLevel = true) => {
+      let flatList = [];
+      items.forEach((item) => {
+        if (isTopLevel && excludedTopLevelTitles.includes(item.title)) {
+          // Skip adding this top-level item but process its subItems
+          if (item.subItems && item.subItems.length > 0) {
+            flatList = flatList.concat(flattenHeader(item.subItems, false));
+          }
+        } else {
+          // Add the current item
+          flatList.push({ id: item.id, title: item.title });
+          // Process subItems if any
+          if (item.subItems && item.subItems.length > 0) {
+            flatList = flatList.concat(flattenHeader(item.subItems, false));
+          }
+        }
+      });
+      return flatList;
+    };
+
+    const allHeaderItems = flattenHeader(headerCome);
+    const filteredItems = allHeaderItems.filter(
+      (item) => !usedNavIds.includes(item.id.toString()) || item.id.toString() === editedHonor.navId.toString()
+    );
+    setAvailableItems(filteredItems);
+    setSelectedNavId(editedHonor.navId.toString());
+  }, [headerCome, usedNavIds, editedHonor.navId]);
+
+  // Initialize form fields with editedHonor data
   useEffect(() => {
     if (editedHonor) {
       setName(editedHonor.name || "");
@@ -112,10 +172,7 @@ export default function EditHonors({
     }
   }, [editedHonor]);
 
-  useEffect(() => {
-    console.log(editedHonor);
-  }, [editedHonor]);
-
+  // Handle File Changes for Images/Videos
   const handleFileChange = (e, index, setFunction, state) => {
     const file = e.target.files[0];
     const objectUrl = URL.createObjectURL(file);
@@ -144,6 +201,7 @@ export default function EditHonors({
     }));
   };
 
+  // Handlers to Add/Remove Colors, Sizes, Images, Media
   const handleAddColor = () => {
     setColors([...colors, { name: "", src: "" }]);
   };
@@ -171,11 +229,7 @@ export default function EditHonors({
   const handleRemoveImgData = (index) => {
     if (imgData.length > 1) {
       setImgData(imgData.filter((_, i) => i !== index));
-      // setObjectUrls((prev) => {
-      //   const updated = { ...prev };
-      //   delete updated[index];
-      //   return updated;
-      // });
+      // Optionally remove object URLs if necessary
     }
   };
 
@@ -187,6 +241,7 @@ export default function EditHonors({
     setMedia(media.filter((_, i) => i !== index));
   };
 
+  // Handle Delete Product
   const handleDelete = async (e) => {
     e.preventDefault();
     setOpenModal4(false);
@@ -203,25 +258,30 @@ export default function EditHonors({
       }
     } catch (error) {
       console.error("Error deleting product:", error);
+      setOpenModal3(true);
     }
   };
 
+  // Handle Form Submission with Confirmation Modal
   const areYouShureFunction = (e) => {
     e.preventDefault();
     setOpenModal(true);
   };
 
+  // Handle Delete Confirmation
   const areYouShureFunction2 = (e) => {
     e.preventDefault();
     setOpenModal4(true);
   };
 
+  // Close Confirm Modal After Timeout
   function closeModalOnTimeout() {
     setTimeout(() => {
       setOpenModal2(false);
     }, 3000);
   }
 
+  // Handle Final Form Submission
   const handleSubmit = async (e) => {
     e.preventDefault();
     setOpenModal(false);
@@ -241,7 +301,6 @@ export default function EditHonors({
             ).unwrap();
 
             updatedItem.src = fileId;
-          } else if (typeof item.src !== "object" && item.src) {
           }
 
           if (typeof item.poster === "object" && item.poster) {
@@ -255,9 +314,8 @@ export default function EditHonors({
             ).unwrap();
 
             updatedItem.poster = fileId;
-          } else if (typeof item.poster !== "object" && item.poster) {
           }
-          return item;
+          return updatedItem;
         })
       );
 
@@ -295,7 +353,6 @@ export default function EditHonors({
             ).unwrap();
 
             updatedItem.src = fileId;
-          } else if (typeof item.src !== "object" && item.src) {
           }
 
           if (typeof item.poster === "object" && item.poster) {
@@ -310,9 +367,8 @@ export default function EditHonors({
             console.log(fileId);
 
             updatedItem.poster = fileId;
-          } else if (typeof item.poster !== "object" && item.poster) {
           }
-          return item;
+          return updatedItem;
         })
       );
 
@@ -329,6 +385,7 @@ export default function EditHonors({
       // Create the final product object
       const productData = {
         name,
+        navId: selectedNavId,
         info,
         media: uploadedMedia,
       };
@@ -344,22 +401,49 @@ export default function EditHonors({
         closeModalOnTimeout();
       }
     } catch (error) {
-      console.error("Error creating product:", error);
+      console.error("Error editing product:", error);
+      setOpenModal3(true);
     }
   };
 
   return (
     <form className="container" onSubmit={areYouShureFunction}>
-      {/* <label htmlFor="bannerImage">Image:</label>
-        <input type="file" id="bannerImage" onChange={handleImageChange} /> */}
-      <label htmlFor="name">اسم محصول :</label>
-      <input
-        type="text"
-        id="name"
-        value={name}
-        onChange={(e) => setName(e.target.value)}
-        required
-      />
+      {/* Navigation Item Selection Dropdown */}
+      <div className="d-flex flex-row align-items-center gap-2">
+        <label
+          style={{ whiteSpace: "nowrap" }}
+          className=" seeOrderFont"
+          htmlFor="productSelect"
+        >
+          انتخاب محصول :
+        </label>
+        <select
+          className="w-100"
+          id="productSelect"
+          value={selectedNavId}
+          onChange={(e) => {
+            const selectedItem = availableItems.find(
+              (item) => item.id.toString() === e.target.value
+            );
+            setSelectedNavId(e.target.value);
+            setName(selectedItem ? selectedItem.title : "");
+          }}
+          required
+        >
+          <option value="" disabled>
+            انتخاب کنید
+          </option>
+          {availableItems.map((item) => (
+            <option key={item.id} value={item.id}>
+              {item.title}
+            </option>
+          ))}
+        </select>
+      </div>
+
+      
+
+      {/* Title Field */}
       <label htmlFor="bannerDate">عنوان :</label>
       <input
         type="text"
@@ -368,6 +452,8 @@ export default function EditHonors({
         onChange={(e) => setTitle(e.target.value)}
         required
       />
+
+      {/* Subtitle Field */}
       <label htmlFor="bannerTags">توضیحات :</label>
       <input
         type="text"
@@ -376,6 +462,8 @@ export default function EditHonors({
         onChange={(e) => setSubtitle(e.target.value)}
         required
       />
+
+      {/* Complete Subtitle Field */}
       <label htmlFor="DiscriptionCompelete">توضیحات تکمیلی :</label>
       <textarea
         type="text"
@@ -385,6 +473,7 @@ export default function EditHonors({
         required
       />
 
+      {/* Colors Section */}
       <BorderInputBox className="mt-2">
         <label>رنگ ها :</label>
         <DivAdjustColorDivs columns="repeat(2, 1fr)">
@@ -392,7 +481,7 @@ export default function EditHonors({
             <div style={{ height: "fit-content" }} className="mt-2" key={index}>
               {color?.src === "" ? (
                 <>
-                  <label className="labelInsteadOfInput" htmlFor="imageColor">
+                  <label className="labelInsteadOfInput" htmlFor={`imageColor-${index}`}>
                     <div className="d-flex flex-column text-center p-1">
                       <div>
                         <svg
@@ -425,6 +514,16 @@ export default function EditHonors({
                     </div>
                   </label>
                   <input
+                    type="file"
+                    className="d-none"
+                    id={`imageColor-${index}`}
+                    accept={`${process.env.NEXT_PUBLIC_INPUT_IMAGE_FORMAT}`}
+                    onChange={(e) =>
+                      handleFileChange(e, index, setColors, colors)
+                    }
+                    required
+                  />
+                  <input
                     type="text"
                     placeholder="اسم رنگ"
                     value={color.name}
@@ -444,7 +543,6 @@ export default function EditHonors({
                   style={{ width: "fit-content" }}
                 >
                   <BOX
-                    // onClick={() => handleOpen(logo)}
                     component="img"
                     src={`${process.env.NEXT_PUBLIC_BACK_END_SERVER}/system/download/${color?.src}`}
                     alt="UserColorImage"
@@ -485,6 +583,7 @@ export default function EditHonors({
         </button>
       </BorderInputBox>
 
+      {/* Sizes Section */}
       <BorderInputBox className="mt-3">
         <label>سایز ها :</label>
         {sizes.map((size, index) => (
@@ -518,6 +617,7 @@ export default function EditHonors({
         </button>
       </BorderInputBox>
 
+      {/* Image and Video Section */}
       <BorderInputBox className="mt-3">
         <label>عکس ها و فیلم های محصول :</label>
         <DivAdjustColorDivs columns="repeat(1, 1fr)">
@@ -533,7 +633,7 @@ export default function EditHonors({
                   <>
                     <label
                       className="labelInsteadOfInput"
-                      htmlFor="ImageVideoForProduct"
+                      htmlFor={`ImageVideoForProduct-${index}`}
                     >
                       <div className="d-flex flex-column text-center p-1">
                         <div>
@@ -568,7 +668,7 @@ export default function EditHonors({
                     </label>
                     <input
                       className="d-none"
-                      id="ImageVideoForProduct"
+                      id={`ImageVideoForProduct-${index}`}
                       accept={`${process.env.NEXT_PUBLIC_INPUT_IMAGE_AND_VIDEO_FORMAT}`}
                       type="file"
                       onChange={(e) =>
@@ -584,7 +684,6 @@ export default function EditHonors({
                       style={{ width: "fit-content" }}
                     >
                       <BOX
-                        // onClick={() => handleOpen(logo)}
                         component={item.type === "1" ? "img" : "video"}
                         src={`${process.env.NEXT_PUBLIC_BACK_END_SERVER}/system/download/${item.src}`}
                         alt="UserColorImage"
@@ -594,39 +693,8 @@ export default function EditHonors({
                   </>
                 )}
 
-                {/* <input
-                  type="file"
-                  onChange={(e) =>
-                    handleFileChange(e, index, setImgData, imgData)
-                  }
-                /> */}
+                {/* Type Selection */}
               </div>
-
-              {/* {item.src && !objectUrls[index] && (
-                <Box
-                  component={item.type === "1" ? "img" : "video"}
-                  src={`${process.env.NEXT_PUBLIC_BACK_END_SERVER}/system/download/${item.src}`}
-                  sx={{
-                    width: "140px",
-                    maxHeight: "100%",
-                    borderRadius: "2px",
-                  }}
-                  controls={item.type === "2"}
-                />
-              )} */}
-
-              {/* {objectUrls[index] && (
-                <Box
-                  component={item.type === "1" ? "img" : "video"}
-                  src={objectUrls[index]}
-                  sx={{
-                    width: "140px",
-                    maxHeight: "100%",
-                    borderRadius: "2px",
-                  }}
-                  controls={item.type === "2"}
-                />
-              )} */}
 
               <select
                 value={item.type}
@@ -643,15 +711,16 @@ export default function EditHonors({
                 <option value={2}>فیلم :</option>
               </select>
 
+              {/* Poster for Videos */}
               {item.type === "2" && (
                 <>
                   <div className="d-flex flex-column">
-                    <span className="mb-1">پوستر فیلم</span>
+                    <span className="mb-1">پوستر فیلم :</span>
                     {item?.poster === "" ? (
                       <>
                         <label
                           className="labelInsteadOfInput"
-                          htmlFor="posterFilm"
+                          htmlFor={`posterFilm-${index}`}
                         >
                           <div className="d-flex flex-column text-center p-1">
                             <div>
@@ -685,18 +754,14 @@ export default function EditHonors({
                           </div>
                         </label>
                         <input
-                          accept={`${process.env.NEXT_PUBLIC_INPUT_IMAGE_FORMAT}`}
                           className="d-none"
-                          id="posterFilm"
+                          id={`posterFilm-${index}`}
+                          accept={`${process.env.NEXT_PUBLIC_INPUT_IMAGE_FORMAT}`}
                           type="file"
                           onChange={(e) =>
-                            handleFileChangePoster(
-                              e,
-                              index,
-                              setImgData,
-                              imgData
-                            )
+                            handleFileChangePoster(e, index, setImgData, media)
                           }
+                          required
                         />
                       </>
                     ) : (
@@ -706,42 +771,23 @@ export default function EditHonors({
                           style={{ width: "fit-content" }}
                         >
                           <BOX
-                            // onClick={() => handleOpen(logo)}
                             component="img"
-                            src={`${process.env.NEXT_PUBLIC_BACK_END_SERVER}/system/download/${item?.poster}`}
+                            src={`${process.env.NEXT_PUBLIC_BACK_END_SERVER}/system/download/${item.poster}`}
                             alt="UserColorImage"
                           />
                         </div>
                       </>
                     )}
-
-                    {/* <input
-                      type="file"
-                      onChange={(e) =>
-                        handleFileChangePoster(e, index, setImgData, imgData)
-                      }
-                    /> */}
                   </div>
-                  {/* {posterObjectUrls[index] && (
-                    <Box
-                      component="img"
-                      src={posterObjectUrls[index]}
-                      sx={{
-                        width: "140px",
-                        maxHeight: "100%",
-                        borderRadius: "2px",
-                      }}
-                    />
-                  )} */}
+                  <button
+                    className="bg-danger me-2"
+                    type="button"
+                    onClick={() => handleRemoveImgData(index)}
+                  >
+                    حذف
+                  </button>
                 </>
               )}
-              <button
-                className="bg-danger me-2"
-                type="button"
-                onClick={() => handleRemoveImgData(index)}
-              >
-                حذف
-              </button>
             </div>
           ))}
         </DivAdjustColorDivs>
@@ -754,6 +800,7 @@ export default function EditHonors({
         </button>
       </BorderInputBox>
 
+      {/* Media Section */}
       <BorderInputBox className="mt-3">
         <label>فیلم ها:</label>
         <DivAdjustColorDivs style={{ width: "100%" }} columns="repeat(1, 1fr)">
@@ -778,7 +825,7 @@ export default function EditHonors({
                 <input
                   style={{ width: "45%" }}
                   type="text"
-                  placeholder="Description"
+                  placeholder="توضیحات"
                   value={item.description}
                   onChange={(e) =>
                     setMedia(
@@ -801,7 +848,7 @@ export default function EditHonors({
                     <>
                       <label
                         className="labelInsteadOfInput"
-                        htmlFor="MediaVideo"
+                        htmlFor={`MediaVideo-${index}`}
                       >
                         <div className="d-flex flex-column text-center p-1">
                           <div>
@@ -834,7 +881,7 @@ export default function EditHonors({
                       </label>
                       <input
                         className="d-none"
-                        id="MediaVideo"
+                        id={`MediaVideo-${index}`}
                         accept={`${process.env.NEXT_PUBLIC_INPUT_VIDEO_FORMAT}`}
                         type="file"
                         onChange={(e) =>
@@ -850,7 +897,6 @@ export default function EditHonors({
                         style={{ width: "fit-content" }}
                       >
                         <BOX
-                          // onClick={() => handleOpen(logo)}
                           component="video"
                           src={`${process.env.NEXT_PUBLIC_BACK_END_SERVER}/system/download/${item.src}`}
                           controls
@@ -858,132 +904,8 @@ export default function EditHonors({
                       </div>
                     </>
                   )}
-                  {/* <div className=" d-flex flex-row align-items-center">
-                    <input
-                      type="file"
-                      onChange={(e) =>
-                        handleFileChange(e, index, setMedia, media)
-                      }
-                    />
-                    {item.src && !objectUrls[index] && (
-                      <Box
-                        component="video"
-                        src={`${process.env.NEXT_PUBLIC_BACK_END_SERVER}/system/download/${item.src}`}
-                        sx={{
-                          width: "140px",
-                          maxHeight: "100%",
-                          borderRadius: "2px",
-                        }}
-                        controls
-                      />
-                    )}
-
-                    {objectUrls[index] && (
-                      <Box
-                        component="video"
-                        src={objectUrls[index]}
-                        sx={{
-                          width: "140px",
-                          maxHeight: "100%",
-                          borderRadius: "2px",
-                        }}
-                        controls
-                      />
-                    )}
-                  </div> */}
                 </div>
               </DivAdjustColorDivs>
-
-              <div className="d-flex flex-column">
-                <span>پوستر فیلم :</span>
-                {item?.poster === "" ? (
-                  <>
-                    <label
-                      className="labelInsteadOfInput"
-                      htmlFor="PosterVideoVideo"
-                    >
-                      <div className="d-flex flex-column text-center p-1">
-                        <div>
-                          <svg
-                            width={21}
-                            height={21}
-                            viewBox="0 0 18 18"
-                            fill="none"
-                            xmlns="http://www.w3.org/2000/svg"
-                          >
-                            <path
-                              d="M2.25 11.25C2.25 13.3713 2.25 14.432 2.90901 15.091C3.56802 15.75 4.62868 15.75 6.75 15.75H11.25C13.3713 15.75 14.432 15.75 15.091 15.091C15.75 14.432 15.75 13.3713 15.75 11.25"
-                              stroke="#404040"
-                              strokeLinecap="round"
-                              strokeLinejoin="round"
-                            />
-                            <path
-                              d="M9 12V2.25M9 2.25L12 5.53125M9 2.25L6 5.53125"
-                              stroke="#404040"
-                              strokeLinecap="round"
-                              strokeLinejoin="round"
-                            />
-                          </svg>
-                        </div>
-                        <p className={`colorTheInputFile discription`}>
-                          بارگذاری فایل .png یا .jpg
-                        </p>
-                      </div>
-                    </label>
-                    <input
-                      className="d-none"
-                      id="PosterVideoVideo"
-                      accept={`${process.env.NEXT_PUBLIC_INPUT_IMAGE_FORMAT}`}
-                      type="file"
-                      onChange={(e) =>
-                        handleFileChangePoster(e, index, setMedia, media)
-                      }
-                      required
-                    />
-                  </>
-                ) : (
-                  <>
-                    <div
-                      className="d-flex flex-column"
-                      style={{ width: "fit-content" }}
-                    >
-                      <BOX
-                        // onClick={() => handleOpen(logo)}
-                        component="img"
-                        src={`${process.env.NEXT_PUBLIC_BACK_END_SERVER}/system/download/${item.poster}`}
-                        controls
-                      />
-                    </div>
-                  </>
-                )}
-                {/* <div>
-                  <input
-                    type="file"
-                    onChange={(e) =>
-                      handleFileChangePoster(e, index, setMedia, media)
-                    }
-                  />
-                  {posterObjectUrls[index] && (
-                    <Box
-                      component="img"
-                      src={posterObjectUrls[index]}
-                      sx={{
-                        width: "140px",
-                        maxHeight: "100%",
-                        borderRadius: "2px",
-                      }}
-                    />
-                  )}
-                </div> */}
-              </div>
-
-              <button
-                className="bg-danger mt-2 mb-2"
-                type="button"
-                onClick={() => handleRemoveMedia(index)}
-              >
-                حذف
-              </button>
             </div>
           ))}
         </DivAdjustColorDivs>
@@ -995,6 +917,8 @@ export default function EditHonors({
           اضافه کردن ویدیو
         </button>
       </BorderInputBox>
+
+      {/* Action Buttons */}
       <BUTTONSSTYLE className="d-flex flex-row justify-content-between container">
         <div className="d-flex flex-row mt-3 mb-3 gap-3">
           <button type="submit" className="confirmButtonStyle">
@@ -1004,7 +928,7 @@ export default function EditHonors({
             انصراف
           </button>
         </div>
-        {/* <div>
+        <div>
           <button
             className="mt-2 mb-2 deleteButtonStyle"
             type="button"
@@ -1012,10 +936,10 @@ export default function EditHonors({
           >
             حذف محصول
           </button>
-        </div> */}
+        </div>
       </BUTTONSSTYLE>
 
-      {/* modal  */}
+      {/* Confirmation Modals */}
       <AreYouShureModal
         open={openModal}
         onClose={closeModal}
@@ -1036,7 +960,7 @@ export default function EditHonors({
       <ErrorModal
         open={openModal3}
         onClose={closeModal3}
-        text={"خطا از لاگین بودن خود اطمینان حاصل فرمایید"}
+        text={"خطا در عملیات، لطفاً دوباره تلاش کنید"}
       />
     </form>
   );
