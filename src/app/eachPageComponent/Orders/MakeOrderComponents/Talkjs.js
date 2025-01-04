@@ -76,7 +76,10 @@ const ChatBox = ({
   const closeModal = useCallback(() => setOpenModal(false), []);
   const closeModal2 = useCallback(() => setOpenModal2(false), []);
   const closeModal3 = useCallback(() => setOpenModal3(null), []);
-  const closeFinalPatternModal = useCallback(() => setFinalPatternModal(false), []);
+  const closeFinalPatternModal = useCallback(
+    () => setFinalPatternModal(false),
+    []
+  );
   const closeZoomModal = useCallback(() => {
     setOpenModal3(null);
   }, []);
@@ -104,7 +107,6 @@ const ChatBox = ({
     setFinalPatternModal(true);
   }, []);
 
-  // Initialize chat socket
   useEffect(() => {
     if (!socket) {
       console.error("Socket not initialized.");
@@ -115,32 +117,31 @@ const ChatBox = ({
 
     setMessages(Array.isArray(chatData) ? chatData : []);
 
-    // Listen for chat updates
-    const handleMessage = (data) => {
+    socket.on("message", (data) => {
       if (data.code === code) {
         setMessages(Array.isArray(data.chat) ? data.chat : []);
       }
       if (data.chatImage) {
         setChatImage(data.chatImage);
       }
-    };
+    });
 
-    const handleChatImageUpdate = (data) => {
-      if (data.code === code && data.chatImage) {
-        setChatImage(data.chatImage);
+    socket.on("chatImageUpdate", (data) => {
+      if (data.code === code) {
+        if (data.chatImage) {
+          setChatImage(data.chatImage);
+        }
       }
-    };
+    });
 
-    socket.on("message", handleMessage);
-    socket.on("chatImageUpdate", handleChatImageUpdate);
     socket.on("connect_error", (err) => {
       console.error("Chat Socket Connection Error:", err.message);
     });
 
     // Clean up the listener on unmount
     return () => {
-      socket.off("message", handleMessage);
-      socket.off("chatImageUpdate", handleChatImageUpdate);
+      socket.off("message");
+      socket.off("chatImageUpdate");
       socket.emit("leaveRoom", { code });
     };
   }, [code, chatData]);
@@ -254,7 +255,9 @@ const ChatBox = ({
   const updateMessagesOnServer = useCallback(
     async (updatedMessages) => {
       try {
-        await dispatch(sendNewMessage({ code, newMessageSend: updatedMessages }));
+        await dispatch(
+          sendNewMessage({ code, newMessageSend: updatedMessages })
+        );
       } catch (error) {
         console.error("Failed to update messages:", error);
       }
@@ -286,12 +289,9 @@ const ChatBox = ({
   }, []);
 
   // Remove a final pattern image
-  const handleRemoveFinalPattern = useCallback(
-    (index) => {
-      setSendingFinalPattern((prev) => prev.filter((_, i) => i !== index));
-    },
-    []
-  );
+  const handleRemoveFinalPattern = useCallback((index) => {
+    setSendingFinalPattern((prev) => prev.filter((_, i) => i !== index));
+  }, []);
 
   // Fetch images for chatImage.images
   useEffect(() => {
@@ -440,9 +440,9 @@ const ChatBox = ({
           </div>
         </div>
 
-        {chatImage?.images?.length > 0 && (
+        {chatImage?.userChoices?.length > 0 && (
           <div className={`mt-3 ${style.confirmImage}`}>
-            {userChoiseImage ? (
+            {userChoiseImage && (
               <div className="d-flex flex-row mb-2 mt-2 align-items-center">
                 <div>
                   <Box
@@ -464,7 +464,10 @@ const ChatBox = ({
                   <p
                     onClick={() => {
                       const date = new Date();
-                      downloadImage(userChoiseImage, `${date.toISOString()}.png`);
+                      downloadImage(
+                        userChoiseImage,
+                        `${date.toISOString()}.png`
+                      );
                     }}
                     className={`me-2 text-center ${style.donsloadFinalUserStyle} NormalTextSizing`}
                   >
@@ -472,82 +475,9 @@ const ChatBox = ({
                   </p>
                 </div>
               </div>
-            ) : (
-              <div className={`d-flex flex-column mb-2 text-center mt-2 `}>
-                {ConvertedImage?.allImages?.length === 0 ? (
-                  <div
-                    className={style.downloadButtonStyle}
-                    onClick={() => setFinalPaternModal(true)}
-                  >
-                    <Skeleton
-                      className="mt-3 mb-3"
-                      variant="rounded"
-                      style={{ width: "200px" }}
-                      height={130}
-                    />
-                    <div className={style.insideButtonDownload}>
-                      <ArrowDownwardIcon />
-                    </div>
-                  </div>
-                ) : (
-                  ConvertedImage?.allImages?.map((item, index) => (
-                    <div className="d-flex flex-row mb-2 mt-2" key={index}>
-                      <div>
-                        <Box
-                          onClick={() => handleZoomFinalPattern(item)}
-                          className={`${style.imageChatStyle}`}
-                          component="img"
-                          src={item}
-                          style={{
-                            width: "100px",
-                            height: "100%",
-                            cursor: "pointer",
-                            objectFit: "cover",
-                          }}
-                          alt="uploaded"
-                        />
-                      </div>
-                      <div className="d-flex flex-column justify-content-center">
-                        <div className="me-2">
-                          <p className="smallest">
-                            آیا طرح نهایی مورد تایید شماست؟
-                          </p>
-                        </div>
-                        <div className={`d-flex flex-row gap-2 mt-1 me-1`}>
-                          <button
-                            disabled={loadingFinalPatConfirm}
-                            onClick={() => handleUserChoice(index)}
-                            style={{
-                              cursor: "pointer",
-                              backgroundColor: loadingFinalPatConfirm
-                                ? "#5F5F5F"
-                                : "",
-                            }}
-                            className={`${style.confirmFirstButton} smallest`}
-                          >
-                            بله، مورد تایید است
-                          </button>
-                          <button
-                            className={`${style.confirmSecondButton} smallest`}
-                            style={{ cursor: "pointer" }}
-                            onClick={() => {
-                              const date = new Date();
-                              downloadImage(item, `${date.toISOString()}.png`);
-                            }}
-                          >
-                            دانلود طرح
-                          </button>
-                        </div>
-                      </div>
-                    </div>
-                  ))
-                )}
-              </div>
             )}
           </div>
         )}
-
-      
 
         {/* Image Sending Area */}
         <div className="position-relative mt-3 d-flex">
@@ -686,7 +616,10 @@ const ChatBox = ({
         {moveForward && (
           <button
             type="button"
-            onClick={handleNextStep}
+            onClick={() => {
+              handleNextStep()
+              setUpdateData(true);
+            }}
             className={`${style.continueButton}`}
           >
             رد کردن
@@ -705,7 +638,7 @@ const ChatBox = ({
           <div style={ModalStyle} className={style.ModalPatternStyle}>
             <div className={style.sendingFinalPatternImage}>
               {SendingFinalPattern.map((fileObj, index) => (
-                <div className="position-relative" key={index}>
+                <div className={style.newfinaiStyle} key={index}>
                   <Box
                     className={`${style.imageChatStyle} mb-2 mt-2`}
                     component="img"
@@ -786,12 +719,16 @@ const ChatBox = ({
 
                       if (typeof fileObj === "string") {
                         if (
-                          patternImageUrls[fileObj]?.includes("data:image/png") ||
+                          patternImageUrls[fileObj]?.includes(
+                            "data:image/png"
+                          ) ||
                           patternImageUrls[fileObj]?.includes("data:image/jpeg")
                         ) {
                           filename = "finalPayment.png";
                         } else if (
-                          patternImageUrls[fileObj]?.includes("data:image/svg+xml")
+                          patternImageUrls[fileObj]?.includes(
+                            "data:image/svg+xml"
+                          )
                         ) {
                           filename = "finalPayment.svg";
                         }
@@ -800,9 +737,7 @@ const ChatBox = ({
                         link.download = filename;
                         link.click();
                       } else {
-                        if (
-                          fileObj?.imageUrl.includes("data:image/png")
-                        ) {
+                        if (fileObj?.imageUrl.includes("data:image/png")) {
                           filename = "finalPayment.png";
                         } else if (
                           fileObj?.imageUrl.includes("data:image/svg+xml")

@@ -127,6 +127,8 @@ export default function OrderTabelDesctop({
   setSelectedStatus,
   selectedStatus,
   areYouShureFunction,
+  setUpdateData,
+  updateData,
 }) {
   const [openModals, setOpenModals] = useState({});
 
@@ -136,6 +138,19 @@ export default function OrderTabelDesctop({
 
   const handleOpenModal = (itemCode) => {
     setOpenModals((prev) => ({ ...prev, [itemCode]: true }));
+  };
+
+  const handleDataGoInside = async (item) => {
+    // await setUpdateData(true);
+
+    // if (!updateData) {
+    //   await setActiveKey("seeOrder");
+    //   await setSeeOrder(item);
+    // }
+    setUpdateData(true);
+    setActiveKey("seeOrder");
+    setSeeOrder(item);
+
   };
 
   return (
@@ -186,10 +201,12 @@ export default function OrderTabelDesctop({
                   <p
                     style={{ color: "#43A047", cursor: "pointer" }}
                     className="text-decoration-underline"
-                    onClick={() => {
-                      setActiveKey("seeOrder");
-                      setSeeOrder(item);
-                    }}
+                    // onClick={() => {
+                    //   setUpdateData(true);
+                    //   setActiveKey("seeOrder");
+                    //   setSeeOrder(item);
+                    // }}
+                    onClick={() => handleDataGoInside(item)}
                   >
                     {item.code}
                   </p>
