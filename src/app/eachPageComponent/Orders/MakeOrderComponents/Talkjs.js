@@ -440,6 +440,113 @@ const ChatBox = ({
           </div>
         </div>
 
+        {chatImage?.images?.length > 0 && (
+          <div className={`mt-3 ${style.confirmImage}`}>
+            {userChoiseImage ? (
+              <div className="d-flex flex-row mb-2 mt-2 align-items-center">
+                <div>
+                  <Box
+                    onClick={() => handleZoomFinalPattern(userChoiseImage)}
+                    className={`${style.imageChatStyle}`}
+                    component="img"
+                    src={userChoiseImage}
+                    style={{
+                      width: "200px",
+                      height: "100%",
+                      cursor: "pointer",
+                      objectFit: "cover",
+                    }}
+                    alt="uploaded"
+                  />
+                </div>
+                <div className="d-flex flex-column gap-3">
+                  <p className="VodeoDisSizing me-2">طرح مورد تایید</p>
+                  <p
+                    onClick={() => {
+                      const date = new Date();
+                      downloadImage(userChoiseImage, `${date.toISOString()}.png`);
+                    }}
+                    className={`me-2 text-center ${style.donsloadFinalUserStyle} NormalTextSizing`}
+                  >
+                    دانلود طرح
+                  </p>
+                </div>
+              </div>
+            ) : (
+              <div className={`d-flex flex-column mb-2 text-center mt-2 `}>
+                {ConvertedImage?.allImages?.length === 0 ? (
+                  <div
+                    className={style.downloadButtonStyle}
+                    onClick={() => setFinalPaternModal(true)}
+                  >
+                    <Skeleton
+                      className="mt-3 mb-3"
+                      variant="rounded"
+                      style={{ width: "200px" }}
+                      height={130}
+                    />
+                    <div className={style.insideButtonDownload}>
+                      <ArrowDownwardIcon />
+                    </div>
+                  </div>
+                ) : (
+                  ConvertedImage?.allImages?.map((item, index) => (
+                    <div className="d-flex flex-row mb-2 mt-2" key={index}>
+                      <div>
+                        <Box
+                          onClick={() => handleZoomFinalPattern(item)}
+                          className={`${style.imageChatStyle}`}
+                          component="img"
+                          src={item}
+                          style={{
+                            width: "100px",
+                            height: "100%",
+                            cursor: "pointer",
+                            objectFit: "cover",
+                          }}
+                          alt="uploaded"
+                        />
+                      </div>
+                      <div className="d-flex flex-column justify-content-center">
+                        <div className="me-2">
+                          <p className="smallest">
+                            آیا طرح نهایی مورد تایید شماست؟
+                          </p>
+                        </div>
+                        <div className={`d-flex flex-row gap-2 mt-1 me-1`}>
+                          <button
+                            disabled={loadingFinalPatConfirm}
+                            onClick={() => handleUserChoice(index)}
+                            style={{
+                              cursor: "pointer",
+                              backgroundColor: loadingFinalPatConfirm
+                                ? "#5F5F5F"
+                                : "",
+                            }}
+                            className={`${style.confirmFirstButton} smallest`}
+                          >
+                            بله، مورد تایید است
+                          </button>
+                          <button
+                            className={`${style.confirmSecondButton} smallest`}
+                            style={{ cursor: "pointer" }}
+                            onClick={() => {
+                              const date = new Date();
+                              downloadImage(item, `${date.toISOString()}.png`);
+                            }}
+                          >
+                            دانلود طرح
+                          </button>
+                        </div>
+                      </div>
+                    </div>
+                  ))
+                )}
+              </div>
+            )}
+          </div>
+        )}
+
       
 
         {/* Image Sending Area */}
