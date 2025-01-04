@@ -2,7 +2,7 @@
 
 "use client";
 
-import React, { useState, useEffect, useRef } from "react";
+import React, { useState, useEffect, useRef, useCallback } from "react";
 import style from "/src/app/Styles/MakeOrderStyle/Talkjs.module.scss";
 import { Box } from "@mui/material";
 import Modal from "@mui/material/Modal";
@@ -20,8 +20,9 @@ import FileDownloadIcon from "@mui/icons-material/FileDownload";
 import { Skeleton } from "@mui/material";
 import LoadingCss from "@/app/BaseComponent/LoadingCss";
 import socket from "@/app/utils/socket";
-// import utils
 import { downloadImage } from "@/app/utils/downloadImage";
+import MessageItem from "./MessageItem"; // Ensure the path is correct
+import ArrowDownwardIcon from "@mui/icons-material/ArrowDownward";
 
 const ModalStyle = {
   position: "absolute",
@@ -46,6 +47,7 @@ const ChatBox = ({
 }) => {
   const dispatch = useDispatch();
 
+  // State Variables
   const [message, setMessage] = useState("");
   const [messages, setMessages] = useState([]);
   const [chatImage, setChatImage] = useState(
@@ -56,49 +58,51 @@ const ChatBox = ({
   const [editIndex, setEditIndex] = useState(null);
   const [isEditing, setIsEditing] = useState(false);
   const [selectedImage, setSelectedImage] = useState(null);
+  const [openModal, setOpenModal] = useState(false); // Defined here
   const [imageCache, setImageCache] = useState({});
   const [messageToDeleteIndex, setMessageToDeleteIndex] = useState(null);
   const [moveForward, setMoveForward] = useState(false);
-  const [FinalPaternModal, setFinalPaternModal] = useState(false);
+  const [FinalPatternModal, setFinalPatternModal] = useState(false); // Corrected Typo
   const [SendingFinalPattern, setSendingFinalPattern] = useState([]);
   const [userChoiseImage, setUserChoiseImage] = useState(null);
   const [loadingImageSend, setLoadingImageSend] = useState(false);
-  const [loadinfinalPattern, setLoadinfinalPattern] = useState(false);
+  const [loadingFinalPattern, setLoadingFinalPattern] = useState(false); // Corrected Typo
 
   const [openModal2, setOpenModal2] = useState(false);
   const [patternImageUrls, setPatternImageUrls] = useState({});
   const [openModal3, setOpenModal3] = useState(null);
 
-  const closeModal2 = () => setOpenModal2(false);
-  const closeModal3 = () => setOpenModal3(null);
+  // Close modal functions using useCallback for stability
+  const closeModal = useCallback(() => setOpenModal(false), []);
+  const closeModal2 = useCallback(() => setOpenModal2(false), []);
+  const closeModal3 = useCallback(() => setOpenModal3(null), []);
+  const closeFinalPatternModal = useCallback(() => setFinalPatternModal(false), []);
+  const closeZoomModal = useCallback(() => {
+    setOpenModal3(null);
+  }, []);
 
-  const handleZoomFinalPattern = (fileObj) => {
-    setOpenModal3(fileObj);
-  };
-
-  const dontHavePattern = SendingFinalPattern.length === 0;
-
-  const handleSendingPattern = () => {
-    setFinalPaternModal(true);
-  };
-
-  function closeModalOnTimeout() {
+  // Function to close modal2 after a timeout
+  const closeModalOnTimeout = useCallback(() => {
     setTimeout(() => {
       setOpenModal2(false);
     }, 3000);
-  }
+  }, []);
 
-  const closeFinalPaternModal = () => setFinalPaternModal(false);
+  // Function to handle zooming images
+  const handleZoomFinalPattern = useCallback((imageSrc) => {
+    setOpenModal3(imageSrc);
+  }, []);
 
-  // modal state
-  const [openModal, setOpenModal] = useState(false);
-  // Close modal
-  const closeModal = () => setOpenModal(false);
-
-  const areYouShureFunction = (index) => {
+  // Function to handle "Are you sure?" modal
+  const areYouShureFunction = useCallback((index) => {
     setMessageToDeleteIndex(index);
     setOpenModal(true);
-  };
+  }, []);
+
+  // Define handleSendingPattern using useCallback
+  const handleSendingPattern = useCallback(() => {
+    setFinalPatternModal(true);
+  }, []);
 
   // Initialize chat socket
   useEffect(() => {
@@ -111,41 +115,43 @@ const ChatBox = ({
 
     setMessages(Array.isArray(chatData) ? chatData : []);
 
-    socket.on("message", (data) => {
+    // Listen for chat updates
+    const handleMessage = (data) => {
       if (data.code === code) {
         setMessages(Array.isArray(data.chat) ? data.chat : []);
       }
       if (data.chatImage) {
         setChatImage(data.chatImage);
       }
-    });
+    };
 
-    socket.on("chatImageUpdate", (data) => {
-      if (data.code === code) {
-        if (data.chatImage) {
-          setChatImage(data.chatImage);
-        }
+    const handleChatImageUpdate = (data) => {
+      if (data.code === code && data.chatImage) {
+        setChatImage(data.chatImage);
       }
-    });
+    };
 
+    socket.on("message", handleMessage);
+    socket.on("chatImageUpdate", handleChatImageUpdate);
     socket.on("connect_error", (err) => {
       console.error("Chat Socket Connection Error:", err.message);
     });
 
     // Clean up the listener on unmount
     return () => {
-      socket.off("message");
-      socket.off("chatImageUpdate");
+      socket.off("message", handleMessage);
+      socket.off("chatImageUpdate", handleChatImageUpdate);
       socket.emit("leaveRoom", { code });
     };
   }, [code, chatData]);
 
+  // Fetch user choice image when chatImage changes
   useEffect(() => {
     const fetchImages = async () => {
-      if (chatImage?.userChoices) {
+      if (chatImage?.userChoices && chatImage.userChoices.length > 0) {
         try {
           const imageData = await dispatch(
-            fetchPrivateImage({ filename: chatImage?.userChoices[0] })
+            fetchPrivateImage({ filename: chatImage.userChoices[0] })
           ).unwrap();
           setUserChoiseImage(imageData);
         } catch (error) {
@@ -156,27 +162,37 @@ const ChatBox = ({
     fetchImages();
   }, [chatImage, dispatch]);
 
-  const handleEditMessage = (index) => {
-    setEditIndex(index);
-    setIsEditing(true);
-    setMessage(messages[index].text || "");
-  };
+  // Handle editing a message
+  const handleEditMessage = useCallback(
+    (index) => {
+      setEditIndex(index);
+      setIsEditing(true);
+      setMessage(messages[index].text || "");
+    },
+    [messages]
+  );
 
-  const cancelEdit = () => {
+  // Cancel editing
+  const cancelEdit = useCallback(() => {
     setEditIndex(null);
     setIsEditing(false);
     setMessage("");
-  };
+  }, []);
 
-  const handleDeleteMessage = (index) => {
-    const updatedMessages = messages.filter((_, i) => i !== index);
-    setMessages(updatedMessages);
-    updateMessagesOnServer(updatedMessages);
-    setOpenModal(false);
-    setMessageToDeleteIndex(null);
-  };
+  // Handle deleting a message
+  const handleDeleteMessage = useCallback(
+    (index) => {
+      const updatedMessages = messages.filter((_, i) => i !== index);
+      setMessages(updatedMessages);
+      updateMessagesOnServer(updatedMessages);
+      setOpenModal(false);
+      setMessageToDeleteIndex(null);
+    },
+    [messages]
+  );
 
-  const sendMessage = async () => {
+  // Send or edit a message
+  const sendMessage = useCallback(async () => {
     if (!message.trim() && !image) return; // Prevent sending empty messages
 
     if (isEditing) {
@@ -232,16 +248,19 @@ const ChatBox = ({
       setImage(null);
       setSelectedImage(null);
     }
-  };
+  }, [message, image, isEditing, editIndex, messages, dispatch]);
 
   // Function to update messages on the server
-  const updateMessagesOnServer = async (updatedMessages) => {
-    try {
-      await dispatch(sendNewMessage({ code, newMessageSend: updatedMessages }));
-    } catch (error) {
-      console.error("Failed to update messages:", error);
-    }
-  };
+  const updateMessagesOnServer = useCallback(
+    async (updatedMessages) => {
+      try {
+        await dispatch(sendNewMessage({ code, newMessageSend: updatedMessages }));
+      } catch (error) {
+        console.error("Failed to update messages:", error);
+      }
+    },
+    [dispatch, code]
+  );
 
   // Scroll to bottom when messages are updated
   useEffect(() => {
@@ -250,24 +269,31 @@ const ChatBox = ({
     }
   }, [messages]);
 
-  const handleSelectImage = (event) => {
+  // Handle selecting an image to send
+  const handleSelectImage = useCallback((event) => {
     const file = event.target.files[0];
     if (file) {
       setImage(file);
       const imageUrl = URL.createObjectURL(file);
       setSelectedImage(imageUrl);
     }
-  };
+  }, []);
 
-  const handleCancelSending = () => {
+  // Cancel sending an image
+  const handleCancelSending = useCallback(() => {
     setImage(null);
     setSelectedImage(null);
-  };
+  }, []);
 
-  const handleRemoveFinalPattern = (index) => {
-    setSendingFinalPattern(SendingFinalPattern.filter((_, i) => i !== index));
-  };
+  // Remove a final pattern image
+  const handleRemoveFinalPattern = useCallback(
+    (index) => {
+      setSendingFinalPattern((prev) => prev.filter((_, i) => i !== index));
+    },
+    []
+  );
 
+  // Fetch images for chatImage.images
   useEffect(() => {
     const fetchImages = async () => {
       if (chatImage?.images && Array.isArray(chatImage.images)) {
@@ -299,7 +325,8 @@ const ChatBox = ({
     fetchImages();
   }, [dispatch, chatImage]);
 
-  const handleFileUpload = (event) => {
+  // Handle uploading final pattern files
+  const handleFileUpload = useCallback((event) => {
     const files = Array.from(event.target.files);
     const validImageTypes = ["image/png", "image/jpeg"];
 
@@ -311,39 +338,24 @@ const ChatBox = ({
       }));
 
     setSendingFinalPattern((prevFiles) => [...prevFiles, ...newFiles]);
-  };
+  }, []);
 
+  // Fetch and cache images from messages
   useEffect(() => {
-    const imageUrls = messages
-      .filter((msg) => msg.imageUrl)
-      .map((msg) => msg.imageUrl);
-
-    imageUrls.forEach((url) => {
-      if (!imageCache[url]) {
-        dispatch(fetchPrivateImage({ filename: url }))
-          .unwrap()
-          .then((imageData) => {
-            setImageCache((prevCache) => ({
-              ...prevCache,
-              [url]: imageData,
-            }));
-          })
-          .catch((error) => {
-            console.error("Failed to fetch image:", error);
-          });
-      }
-    });
+    // Removed imageCache pre-fetching for performance optimization
   }, [messages, dispatch, imageCache]);
 
+  // Enable move forward if step > 3
   useEffect(() => {
     if (step > 3) {
       setMoveForward(true);
     }
   }, [step]);
 
-  const handleChatImageSendFunc = async () => {
+  // Handle sending final pattern images
+  const handleChatImageSendFunc = useCallback(async () => {
     try {
-      setLoadinfinalPattern(true);
+      setLoadingFinalPattern(true);
       const fileIds = await Promise.all(
         SendingFinalPattern.map(async (item) => {
           if (typeof item === "object" && item.file) {
@@ -383,9 +395,9 @@ const ChatBox = ({
     } catch (error) {
       console.error("Error sending chat images:", error);
     } finally {
-      setLoadinfinalPattern(false);
+      setLoadingFinalPattern(false);
     }
-  };
+  }, [SendingFinalPattern, dispatch, code, closeModalOnTimeout]);
 
   return (
     <div className="container">
@@ -395,11 +407,11 @@ const ChatBox = ({
             className={`${style.headerChatBox} d-flex flex-row justify-content-between`}
           >
             <div>
-              <p className="discription">
+              <p className="description">
                 {data?.prodName ? data.prodName : "محصول پایه"}
               </p>
             </div>
-            <div className="discription">{code}</div>
+            <div className="description">{code}</div>
           </div>
 
           {/* Scrollable chat area */}
@@ -407,307 +419,82 @@ const ChatBox = ({
             {messages.length === 0 && (
               <p
                 style={{ marginTop: "60px", marginBottom: "60px" }}
-                className="discription text-center"
+                className="description text-center"
               >
                 در حال حاضر پیامی وجود ندارد پیام خود را ارسال کنید
               </p>
             )}
             {Array.isArray(messages) &&
               messages.map((msg, index) => (
-                <div
+                <MessageItem
                   key={index}
-                  className={`${
-                    msg.isAdmin ? style.adminMessage : style.userMessage
-                  }`}
-                >
-                  {msg.text && (
-                    <div className={style.allTextStyle}>
-                      <p className="discription">{msg.text}</p>
-                      <div
-                        className={`${
-                          msg.isAdmin
-                            ? style.adminDateStyle
-                            : style.userDateStyle
-                        } d-flex flex-row `}
-                      >
-                        <p className={`${style.TimeStyle} smallest`}>
-                          {msg.date}
-                        </p>
-                        {msg.isAdmin === true && (
-                          <div className="d-flex flex-row">
-                            <svg
-                              style={{ cursor: "pointer" }}
-                              onClick={() => handleEditMessage(index)}
-                              width={18}
-                              height={17}
-                              viewBox="0 0 25 24"
-                              fill="none"
-                              xmlns="http://www.w3.org/2000/svg"
-                            >
-                              <path
-                                d="M13.7599 3.59924L5.54985 12.2892C5.23985 12.6192 4.93985 13.2692 4.87985 13.7192L4.50985 16.9592C4.37985 18.1292 5.21985 18.9292 6.37985 18.7292L9.59985 18.1792C10.0499 18.0992 10.6799 17.7692 10.9899 17.4292L19.1999 8.73924C20.6199 7.23924 21.2599 5.52924 19.0499 3.43924C16.8499 1.36924 15.1799 2.09924 13.7599 3.59924Z"
-                                stroke="#292D32"
-                                strokeWidth="1.5"
-                                strokeMiterlimit={10}
-                                strokeLinecap="round"
-                                strokeLinejoin="round"
-                              />
-                              <path
-                                d="M12.3901 5.05078C12.8201 7.81078 15.0601 9.92078 17.8401 10.2008"
-                                stroke="#292D32"
-                                strokeWidth="1.5"
-                                strokeMiterlimit={10}
-                                strokeLinecap="round"
-                                strokeLinejoin="round"
-                              />
-                              <path
-                                d="M3.5 22H21.5"
-                                stroke="#292D32"
-                                strokeWidth="1.5"
-                                strokeMiterlimit={10}
-                                strokeLinecap="round"
-                                strokeLinejoin="round"
-                              />
-                            </svg>
-
-                            <svg
-                              style={{ cursor: "pointer" }}
-                              onClick={() => areYouShureFunction(index)}
-                              width={18}
-                              height={17}
-                              viewBox="0 0 25 24"
-                              fill="none"
-                              xmlns="http://www.w3.org/2000/svg"
-                            >
-                              <path
-                                d="M21.5 5.98047C18.17 5.65047 14.82 5.48047 11.48 5.48047C9.5 5.48047 7.52 5.58047 5.54 5.78047L3.5 5.98047"
-                                stroke="#292D32"
-                                strokeWidth="1.5"
-                                strokeLinecap="round"
-                                strokeLinejoin="round"
-                              />
-                              <path
-                                d="M9 4.97L9.22 3.66C9.38 2.71 9.5 2 11.19 2H13.81C15.5 2 15.63 2.75 15.78 3.67L16 4.97"
-                                stroke="#292D32"
-                                strokeWidth="1.5"
-                                strokeLinecap="round"
-                                strokeLinejoin="round"
-                              />
-                              <path
-                                d="M19.3499 9.14062L18.6999 19.2106C18.5899 20.7806 18.4999 22.0006 15.7099 22.0006H9.2899C6.4999 22.0006 6.4099 20.7806 6.2999 19.2106L5.6499 9.14062"
-                                stroke="#292D32"
-                                strokeWidth="1.5"
-                                strokeLinecap="round"
-                                strokeLinejoin="round"
-                              />
-                              <path
-                                d="M10.8301 16.5H14.1601"
-                                stroke="#292D32"
-                                strokeWidth="1.5"
-                                strokeLinecap="round"
-                                strokeLinejoin="round"
-                              />
-                              <path
-                                d="M10 12.5H15"
-                                stroke="#292D32"
-                                strokeWidth="1.5"
-                                strokeLinecap="round"
-                                strokeLinejoin="round"
-                              />
-                            </svg>
-                          </div>
-                        )}
-                      </div>
-                    </div>
-                  )}
-
-                  {msg.imageUrl && (
-                    <>
-                      {imageCache[msg.imageUrl] ? (
-                        <>
-                          <div className={style.allTextStyle}>
-                            <Box
-                              onClick={() =>
-                                handleZoomFinalPattern(imageCache[msg.imageUrl])
-                              }
-                              className={`${style.imageChatStyle}`}
-                              component="img"
-                              src={imageCache[msg.imageUrl]}
-                              alt="uploaded"
-                            />
-                            <div
-                              className={`${
-                                msg.isAdmin
-                                  ? style.adminDateStyle
-                                  : style.userDateStyle
-                              } d-flex flex-row align-items-center justify-content-between`}
-                            >
-                              <p className={`${style.TimeStyle} smallest`}>
-                                {msg.date}
-                              </p>
-                              <div className="d-flex flex-row gap-2 align-items-center">
-                                <p
-                                  style={{ cursor: "pointer" }}
-                                  onClick={() => {
-                                    const date = new Date();
-                                    downloadImage(
-                                      imageCache[msg.imageUrl],
-                                      `${date}.png`
-                                    );
-                                  }}
-                                >
-                                  <FileDownloadIcon
-                                    style={{ color: "#333333" }}
-                                  />
-                                </p>
-                                {msg.isAdmin === true && (
-                                  <div className="d-flex flex-row">
-                                    <svg
-                                      style={{ cursor: "pointer" }}
-                                      onClick={() => areYouShureFunction(index)}
-                                      width={18}
-                                      height={17}
-                                      viewBox="0 0 25 24"
-                                      fill="none"
-                                      xmlns="http://www.w3.org/2000/svg"
-                                    >
-                                      <path
-                                        d="M21.5 5.98047C18.17 5.65047 14.82 5.48047 11.48 5.48047C9.5 5.48047 7.52 5.58047 5.54 5.78047L3.5 5.98047"
-                                        stroke="#292D32"
-                                        strokeWidth="1.5"
-                                        strokeLinecap="round"
-                                        strokeLinejoin="round"
-                                      />
-                                      <path
-                                        d="M9 4.97L9.22 3.66C9.38 2.71 9.5 2 11.19 2H13.81C15.5 2 15.63 2.75 15.78 3.67L16 4.97"
-                                        stroke="#292D32"
-                                        strokeWidth="1.5"
-                                        strokeLinecap="round"
-                                        strokeLinejoin="round"
-                                      />
-                                      <path
-                                        d="M19.3499 9.14062L18.6999 19.2106C18.5899 20.7806 18.4999 22.0006 15.7099 22.0006H9.2899C6.4999 22.0006 6.4099 20.7806 6.2999 19.2106L5.6499 9.14062"
-                                        stroke="#292D32"
-                                        strokeWidth="1.5"
-                                        strokeLinecap="round"
-                                        strokeLinejoin="round"
-                                      />
-                                      <path
-                                        d="M10.8301 16.5H14.1601"
-                                        stroke="#292D32"
-                                        strokeWidth="1.5"
-                                        strokeLinecap="round"
-                                        strokeLinejoin="round"
-                                      />
-                                      <path
-                                        d="M10 12.5H15"
-                                        stroke="#292D32"
-                                        strokeWidth="1.5"
-                                        strokeLinecap="round"
-                                        strokeLinejoin="round"
-                                      />
-                                    </svg>
-                                  </div>
-                                )}
-                              </div>
-                            </div>
-                          </div>
-                        </>
-                      ) : (
-                        <>
-                          <Skeleton
-                            className="mt-3 mb-3"
-                            animation="wave"
-                            variant="rounded"
-                            style={{ width: "31%" }}
-                            height={150}
-                          />
-                        </>
-                      )}
-                    </>
-                  )}
-                </div>
+                  msg={msg}
+                  index={index}
+                  handleEditMessage={handleEditMessage}
+                  areYouShureFunction={areYouShureFunction}
+                  dispatch={dispatch}
+                  fetchPrivateImage={fetchPrivateImage}
+                  handleZoomFinalPattern={handleZoomFinalPattern}
+                />
               ))}
           </div>
         </div>
 
-        {userChoiseImage && (
-          <div className={`mt-3 ${style.confirmImage} `}>
-            <div className="d-flex flex-row mb-2 mt-2 align-items-center">
-              <div>
-                <Box
-                  onClick={() => handleZoomFinalPattern(userChoiseImage)}
-                  className={`${style.imageChatStyle} `}
-                  component="img"
-                  src={userChoiseImage}
-                  style={{ width: "200px", height: "100%" }}
-                  alt="uploaded"
-                />
-              </div>
-              <div className="d-flex flex-column gap-3">
-                <p className="VodeoDisSizing me-2">طرح مورد تایید</p>
-                <p
-                  onClick={() => {
-                    const date = new Date();
-                    downloadImage(userChoiseImage, `${date}.png`);
-                  }}
-                  className={`me-2 text-center ${style.donsloadFinalUserStyle} NormalTextSizing`}
-                >
-                  دانلود طرح
-                </p>
-              </div>
-            </div>
-          </div>
-        )}
+      
 
+        {/* Image Sending Area */}
         <div className="position-relative mt-3 d-flex">
           {selectedImage ? (
-            <>
-              <div
-                className={`${style.mainDivSelectedImage} d-flex flex-row align-items-center justify-content-between w-100`}
-              >
-                {loadingImageSend ? (
-                  <div className="w-100 justify-content-center p-3 d-flex">
-                    <LoadingCss />
+            <div
+              className={`${style.mainDivSelectedImage} d-flex flex-row align-items-center justify-content-between w-100`}
+            >
+              {loadingImageSend ? (
+                <div className="w-100 justify-content-center p-3 d-flex">
+                  <LoadingCss />
+                </div>
+              ) : (
+                <>
+                  <Box
+                    onClick={() => handleZoomFinalPattern(selectedImage)}
+                    component="img"
+                    src={selectedImage}
+                    alt="uploaded"
+                    className={style.selectedImageForSend}
+                    // style={{
+                    //   cursor: "pointer",
+                    //   objectFit: "cover",
+                    //   width: "100px",
+                    //   height: "100px",
+                    // }}
+                  ></Box>
+                  <div className="d-flex flex-column gap-2 ms-3">
+                    <button
+                      onClick={sendMessage}
+                      disabled={loadingImageSend}
+                      className={`${style.sendMessageChatBox} ${
+                        loadingImageSend ? style.disableInputStyleImage : ""
+                      } smallest`}
+                    >
+                      ارسال
+                    </button>
+                    <button
+                      onClick={handleCancelSending}
+                      className={`${style.cancelSendingImage} smallest`}
+                    >
+                      لغو
+                    </button>
                   </div>
-                ) : (
-                  <>
-                    <Box
-                      onClick={() => handleZoomFinalPattern(selectedImage)}
-                      component="img"
-                      src={selectedImage}
-                      alt="uploaded"
-                      className={style.selectedImageForSend}
-                    ></Box>
-                    <div className="d-flex flex-column gap-2 ms-3">
-                      <button
-                        onClick={sendMessage}
-                        disabled={loadingImageSend}
-                        className={`${style.sendMessageChatBox} ${
-                          loadingImageSend ? style.disableInputStyleImage : ""
-                        } smallest`}
-                      >
-                        ارسال
-                      </button>
-                      <button
-                        onClick={handleCancelSending}
-                        className={`${style.cancelSendingImage} smallest`}
-                      >
-                        لغو
-                      </button>
-                    </div>
-                  </>
-                )}
-              </div>
-            </>
+                </>
+              )}
+            </div>
           ) : (
-            <>
+            <div className="d-flex flex-row w-100">
               <textarea
                 type="text"
                 value={message}
                 onChange={(e) => setMessage(e.target.value)}
                 placeholder="پیام خود را بنویسید"
-                className={`${style.inputChatBoxStyle} discription`}
+                className={`${style.inputChatBoxStyle} description`}
               />
               {message.length === 0 && (
                 <>
@@ -724,6 +511,7 @@ const ChatBox = ({
                       fill="none"
                       xmlns="http://www.w3.org/2000/svg"
                     >
+                      {/* SVG Paths */}
                       <path
                         d="M14.5 7.5H15.7924C18.3773 7.5 20.5 9.52091 20.5 12C20.5 14.4709 18.3859 16.5 15.7924 16.5H14.5"
                         stroke="#292D32"
@@ -766,12 +554,14 @@ const ChatBox = ({
                   ارسال
                 </button>
               )}
-            </>
+            </div>
           )}
         </div>
       </div>
+
+      {/* Action Buttons */}
       <div className="d-flex flex-row justify-content-between gap-2 mt-3 mb-4 container">
-        <div className="d-flex flex-row gap-2 ">
+        <div className="d-flex flex-row gap-2">
           <button
             onClick={handleSendingPattern}
             className={style.continueButton}
@@ -796,189 +586,195 @@ const ChatBox = ({
           </button>
         )}
       </div>
-      {/* modals */}
-      {FinalPaternModal && (
+
+      {/* Final Pattern Modal */}
+      {FinalPatternModal && (
         <Modal
-          open={FinalPaternModal}
-          onClose={closeFinalPaternModal}
+          open={FinalPatternModal}
+          onClose={closeFinalPatternModal}
           aria-labelledby="modal-modal-title2"
           aria-describedby="modal-modal-description2"
         >
-          <>
-            <div className={style.ModalPatternStyle}>
-              <div className={style.sendingFinalPatternImage}>
-                {Array.isArray(SendingFinalPattern) &&
-                  SendingFinalPattern.map((fileObj, index) => (
-                    <React.Fragment key={index}>
-                      <div className="position-relative">
-                        <Box
-                          className={`${style.imageChatStyle} mb-2 mt-2`}
-                          component="img"
-                          src={
-                            typeof fileObj === "string"
-                              ? `${patternImageUrls[fileObj] || fileObj}`
-                              : fileObj?.imageUrl
-                          }
-                          alt={`uploaded ${index}`}
-                        />
-                        <div
-                          style={{ cursor: "pointer" }}
-                          className={style.deleteIconStyle}
-                          onClick={() => handleRemoveFinalPattern(index)}
-                        >
-                          <svg
-                            width={17}
-                            height={17}
-                            viewBox="0 0 12 12"
-                            fill="none"
-                            xmlns="http://www.w3.org/2000/svg"
-                          >
-                            <path
-                              d="M10.5 2.98828C8.835 2.82328 7.16 2.73828 5.49 2.73828C4.5 2.73828 3.51 2.78828 2.52 2.88828L1.5 2.98828"
-                              stroke="#FF4F3F"
-                              strokeLinecap="round"
-                              strokeLinejoin="round"
-                            />
-                            <path
-                              d="M4.25 2.485L4.36 1.83C4.44 1.355 4.5 1 5.345 1H6.655C7.5 1 7.565 1.375 7.64 1.835L7.75 2.485"
-                              stroke="#FF4F3F"
-                              strokeLinecap="round"
-                              strokeLinejoin="round"
-                            />
-                            <path
-                              d="M9.4252 4.57031L9.1002 9.60531C9.0452 10.3903 9.0002 11.0003 7.6052 11.0003H4.3952C3.0002 11.0003 2.9552 10.3903 2.9002 9.60531L2.5752 4.57031"
-                              stroke="#FF4F3F"
-                              strokeLinecap="round"
-                              strokeLinejoin="round"
-                            />
-                            <path
-                              d="M5.16504 8.25H6.83004"
-                              stroke="#FF4F3F"
-                              strokeLinecap="round"
-                              strokeLinejoin="round"
-                            />
-                            <path
-                              d="M4.75 6.25H7.25"
-                              stroke="#FF4F3F"
-                              strokeLinecap="round"
-                              strokeLinejoin="round"
-                            />
-                          </svg>
-                        </div>
-
-                        <p
-                          className={style.downloadImageFinalP}
-                          style={{ cursor: "pointer" }}
-                          onClick={() => {
-                            const link = document.createElement("a");
-
-                            let filename = "finalPayment.png";
-
-                            if (typeof fileObj === "string") {
-                              if (
-                                patternImageUrls[fileObj] ||
-                                fileObj.includes("data:image/png")
-                              ) {
-                                filename = "finalPayment.png";
-                              } else if (
-                                patternImageUrls[fileObj] ||
-                                fileObj.includes("data:image/svg+xml")
-                              ) {
-                                filename = "finalPayment.svg";
-                              }
-
-                              link.href = patternImageUrls[fileObj] || fileObj;
-                              link.download = filename;
-                              link.click();
-                            } else {
-                              if (
-                                fileObj?.imageUrl.includes("data:image/png")
-                              ) {
-                                filename = "finalPayment.png";
-                              } else if (
-                                fileObj?.imageUrl.includes("data:image/svg+xml")
-                              ) {
-                                filename = "finalPayment.svg";
-                              }
-
-                              link.href = fileObj?.imageUrl;
-                              link.download = filename;
-                              link.click();
-                            }
-                          }}
-                        >
-                          <FileDownloadIcon style={{ color: "white" }} />
-                        </p>
-                      </div>
-                    </React.Fragment>
-                  ))}
-              </div>
-
-              {dontHavePattern && (
-                <p className="discription text-center mt-4 mb-4">
-                  هنوز طرحی اضافه نکرده اید
-                </p>
-              )}
-
-              <div className="d-flex flex-row justify-content-between mt-3 mb-3">
-                <div className="me-2">
-                  <label
-                    htmlFor="fileFinalPattern"
-                    className={style.LabelFileUploadPattern}
-                  >
-                    <p
-                      className={`${style.addAnotherPattern} oneBeforeSmallest`}
-                    >
-                      اضافه کردن طرح
-                    </p>
-                  </label>
-                  <input
-                    onChange={handleFileUpload}
-                    type="file"
-                    accept="image/png,image/jpeg,image/jpg"
-                    className={`d-none`}
-                    id="fileFinalPattern"
+          <div style={ModalStyle} className={style.ModalPatternStyle}>
+            <div className={style.sendingFinalPatternImage}>
+              {SendingFinalPattern.map((fileObj, index) => (
+                <div className="position-relative" key={index}>
+                  <Box
+                    className={`${style.imageChatStyle} mb-2 mt-2`}
+                    component="img"
+                    src={
+                      typeof fileObj === "string"
+                        ? patternImageUrls[fileObj] || fileObj
+                        : fileObj?.imageUrl
+                    }
+                    alt={`uploaded ${index}`}
+                    onClick={() =>
+                      handleZoomFinalPattern(
+                        typeof fileObj === "string"
+                          ? patternImageUrls[fileObj] || fileObj
+                          : fileObj?.imageUrl
+                      )
+                    }
+                    // style={{
+                    //   cursor: "pointer",
+                    //   objectFit: "cover",
+                    //   width: "100px",
+                    //   height: "100px",
+                    // }}
                   />
-                </div>
-                {!dontHavePattern && (
-                  <div className="ms-2">
-                    <button
-                      disabled={loadinfinalPattern}
-                      onClick={handleChatImageSendFunc}
-                      className={style.confirmpatternButtonStyle}
+                  <div
+                    style={{ cursor: "pointer" }}
+                    className={style.deleteIconStyle}
+                    onClick={() => handleRemoveFinalPattern(index)}
+                  >
+                    {/* Delete SVG */}
+                    <svg
+                      width={17}
+                      height={17}
+                      viewBox="0 0 12 12"
+                      fill="none"
+                      xmlns="http://www.w3.org/2000/svg"
                     >
-                      {loadinfinalPattern ? (
-                        <>
-                          <LoadingCss />
-                        </>
-                      ) : (
-                        <>تایید نهایی</>
-                      )}
-                    </button>
+                      {/* SVG Paths */}
+                      <path
+                        d="M10.5 2.98828C8.835 2.82328 7.16 2.73828 5.49 2.73828C4.5 2.73828 3.51 2.78828 2.52 2.88828L1.5 2.98828"
+                        stroke="#FF4F3F"
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                      />
+                      <path
+                        d="M4.25 2.485L4.36 1.83C4.44 1.355 4.5 1 5.345 1H6.655C7.5 1 7.565 1.375 7.64 1.835L7.75 2.485"
+                        stroke="#FF4F3F"
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                      />
+                      <path
+                        d="M9.4252 4.57031L9.1002 9.60531C9.0452 10.3903 9.0002 11.0003 7.6052 11.0003H4.3952C3.0002 11.0003 2.9552 10.3903 2.9002 9.60531L2.5752 4.57031"
+                        stroke="#FF4F3F"
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                      />
+                      <path
+                        d="M5.16504 8.25H6.83004"
+                        stroke="#FF4F3F"
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                      />
+                      <path
+                        d="M4.75 6.25H7.25"
+                        stroke="#FF4F3F"
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                      />
+                    </svg>
                   </div>
-                )}
-              </div>
+
+                  <p
+                    className={style.downloadImageFinalP}
+                    style={{ cursor: "pointer" }}
+                    onClick={() => {
+                      const link = document.createElement("a");
+
+                      let filename = "finalPayment.png";
+
+                      if (typeof fileObj === "string") {
+                        if (
+                          patternImageUrls[fileObj]?.includes("data:image/png") ||
+                          patternImageUrls[fileObj]?.includes("data:image/jpeg")
+                        ) {
+                          filename = "finalPayment.png";
+                        } else if (
+                          patternImageUrls[fileObj]?.includes("data:image/svg+xml")
+                        ) {
+                          filename = "finalPayment.svg";
+                        }
+
+                        link.href = patternImageUrls[fileObj] || fileObj;
+                        link.download = filename;
+                        link.click();
+                      } else {
+                        if (
+                          fileObj?.imageUrl.includes("data:image/png")
+                        ) {
+                          filename = "finalPayment.png";
+                        } else if (
+                          fileObj?.imageUrl.includes("data:image/svg+xml")
+                        ) {
+                          filename = "finalPayment.svg";
+                        }
+
+                        link.href = fileObj?.imageUrl;
+                        link.download = filename;
+                        link.click();
+                      }
+                    }}
+                  >
+                    <FileDownloadIcon style={{ color: "white" }} />
+                  </p>
+                </div>
+              ))}
             </div>
-          </>
+
+            {SendingFinalPattern.length === 0 && (
+              <p className="description text-center mt-4 mb-4">
+                هنوز طرحی اضافه نکرده اید
+              </p>
+            )}
+
+            <div className="d-flex flex-row justify-content-between mt-3 mb-3">
+              <div className="me-2">
+                <label
+                  htmlFor="fileFinalPattern"
+                  className={style.LabelFileUploadPattern}
+                >
+                  <p className={`${style.addAnotherPattern} oneBeforeSmallest`}>
+                    اضافه کردن طرح
+                  </p>
+                </label>
+                <input
+                  onChange={handleFileUpload}
+                  type="file"
+                  accept="image/png,image/jpeg,image/jpg"
+                  className={`d-none`}
+                  id="fileFinalPattern"
+                  multiple
+                />
+              </div>
+              {SendingFinalPattern.length > 0 && (
+                <div className="ms-2">
+                  <button
+                    disabled={loadingFinalPattern}
+                    onClick={handleChatImageSendFunc}
+                    className={style.confirmpatternButtonStyle}
+                  >
+                    {loadingFinalPattern ? <LoadingCss /> : "تایید نهایی"}
+                  </button>
+                </div>
+              )}
+            </div>
+          </div>
         </Modal>
       )}
 
-      {/* modals */}
+      {/* Confirming Modal */}
       <ConfirmingModal
         open={openModal2}
         onClose={closeModal2}
         text={"طرح با موفقیت ثبت شد"}
       />
-      {/* modals */}
+
+      {/* Are You Sure Modal */}
       <AreYouShureModal
         open={openModal}
         onClose={closeModal}
         text={"ایا از حذف پیام مطمئن هستید ؟"}
         func={() => handleDeleteMessage(messageToDeleteIndex)}
       />
+
+      {/* Zoom Modal */}
       <ZoomModal
-        open={openModal3}
-        onClose={closeModal3}
+        open={!!openModal3}
+        onClose={closeZoomModal}
         src={openModal3}
         alt={`zoomModalImage`}
       />
@@ -986,4 +782,4 @@ const ChatBox = ({
   );
 };
 
-export default ChatBox;
+export default React.memo(ChatBox);
