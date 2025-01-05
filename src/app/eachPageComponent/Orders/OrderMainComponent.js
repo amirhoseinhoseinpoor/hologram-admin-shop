@@ -478,6 +478,8 @@ export default function OrderMainComponent({ toggleShow }) {
                         handleStatusChange={handleStatusChange}
                         mainArray={filteredOrders}
                         userMainData={usersData}
+                        setUpdateData={setUpdateData}
+                        updateData={updateData}
                       />
                       {/* Pagination Component */}
                       <Pagination

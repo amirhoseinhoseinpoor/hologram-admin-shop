@@ -49,6 +49,7 @@ export default function MakeOrder({ seeOrder, setActiveKey, toggleShow , setUpda
   const [step, setStep] = useState(1);
 
   useEffect(() => {
+    
     setStep(seeOrder.step);
   }, [seeOrder]);
 
@@ -58,7 +59,6 @@ export default function MakeOrder({ seeOrder, setActiveKey, toggleShow , setUpda
 
   // Function to go to the next step
   const handleNextStep = () => {    
-    setUpdateData(true);
     setStep((prevStep) => prevStep + 1);
   };
 
