@@ -16,6 +16,10 @@
   cursor: not-allowed !important;  
 }  
 
+.responsiveSelectWidth{
+  width: 100%;
+}
+
 .stepContent {
   background-color: white;
   height: 100%;
@@ -266,6 +270,8 @@
   .effectMainDivStyle {
     grid-template-columns: repeat(2, 1fr);
   }
+ 
+  
 }
 
 
@@ -323,4 +329,7 @@
   .continueButton {
     padding: 6px 30px !important;
   }
+  // .responsiveSelectWidth{
+  //   width: 50%;
+  // }
 }

@@ -34,17 +34,19 @@ export default function SteponeComponent({
   const [zoomModal, setZoomModal] = useState(false);
 
   const handleCloseZoomModal = () => setZoomModal(false);
-  
 
   // const [inputFields, setInputFields] = useState([{ title: "", price: "" }]);
   // const [disablenextStep, setDisableNextStep] = useState(true);
   const [statusTraking, setStatusTraking] = useState(false);
   const [moveForward, setMoveForward] = useState(false);
   const [factorType, setFactorType] = useState("");
+  const [paymentType, setPatmentType] = useState("");
   const [logo, setLogo] = useState(null);
   const [finalFactor, setFinalFactor] = useState(null);
   const [bothFactor, setBothFactor] = useState(null);
   const [loading, setLoading] = useState(false);
+
+  console.log(paymentType);
 
   const [formData, setFormData] = useState({
     feature: "",
@@ -132,6 +134,10 @@ export default function SteponeComponent({
 
   const handleImageTypeChange = (event) => {
     setFactorType(event.target.value);
+  };
+
+  const handlePaymentTypeChange = (event) => {
+    setPatmentType(event.target.value);
   };
 
   const handleSizeChange = (size) => {
@@ -287,8 +293,6 @@ export default function SteponeComponent({
       }
 
       setLoading(false);
-
-      // // Optionally, you can update the state if needed later
       // setInformation(updatedInformation);
     } catch (error) {
       console.error("Error uploading file:", error);
@@ -572,10 +576,63 @@ export default function SteponeComponent({
       <hr />
 
       <div
-        className={`${style.responsiveBottomMainDiv} d-flex flex-row justify-content-between`}
+        className={`${style.responsiveBottomMainDiv} d-flex flex-row gap-3 justify-content-between`}
       >
-        <div>
-          <p className="NormalTextSizing mb-1 me-1">نوع فاکتور</p>
+        <div className={`d-flex flex-row gap-2 align-items-center mt-2 mb-2 ${style.responsiveSelectWidth}`}>
+          <p
+            style={{ whiteSpace: "nowrap" }}
+            className="NormalTextSizing mb-1 me-1"
+          >
+            نوع پیش پرداخت :
+          </p>
+          <select
+            // value={paymentType}
+            // onChange={handlePaymentTypeChange}
+            className={`form-select mb-2`}
+            style={{ boxShadow: "unset" }}
+          >
+            <option disabled value="">
+              انتخاب کنید
+            </option>
+            <option value="dargah">درگاه پرداخت</option>
+            <option value="fish">اپلود فیش</option>
+            <option value="check">چک</option>
+          </select>
+        </div>
+
+        <div className={`d-flex flex-row gap-2 align-items-center mt-2 mb-2 ${style.responsiveSelectWidth}`}>
+          <p
+            style={{ whiteSpace: "nowrap" }}
+            className="NormalTextSizing mb-1 me-1"
+          >
+            نوع پرداخت :
+          </p>
+          <select
+            // value={paymentType}
+            // onChange={handlePaymentTypeChange}
+            className={`form-select mb-2 `}
+            style={{ boxShadow: "unset" }}
+          >
+            <option disabled value="">
+              انتخاب کنید
+            </option>
+            <option value="dargah">درگاه پرداخت</option>
+            <option value="fish">اپلود فیش</option>
+            <option value="check">چک</option>
+          </select>
+        </div>
+      </div>
+
+      <div
+        className={`${style.responsiveBottomMainDiv} d-flex flex-row justify-content-between `}
+      >
+        <div className="d-flex flex-row gap-2 align-items-center mb-2">
+          <p
+            style={{ whiteSpace: "nowrap" }}
+            className="NormalTextSizing mb-1 me-1"
+          >
+            نوع فاکتور:
+          </p>
           <select
             id="factorType"
             value={factorType}
@@ -583,7 +640,9 @@ export default function SteponeComponent({
             className="form-select mb-2"
             style={{ boxShadow: "unset" }}
           >
-            <option value="">انتخاب کنید</option>
+            <option disabled value="">
+              انتخاب کنید
+            </option>
             <option value="firstOption">پیش فاکتور و فاکتور نهایی</option>
             <option value="secondOption">یک فاکتور برای جفتش</option>
           </select>
@@ -945,7 +1004,9 @@ export default function SteponeComponent({
           type="button"
           onClick={handleDisabelInput}
           disabled={loading}
-          className={`${style.continueButton} mt-3 mb-2 ${loading ? style.disabledButtonLoading : ''}`}
+          className={`${style.continueButton} mt-3 mb-2 ${
+            loading ? style.disabledButtonLoading : ""
+          }`}
         >
           {loading ? <LoadingCss /> : <>تایید</>}
         </button>
