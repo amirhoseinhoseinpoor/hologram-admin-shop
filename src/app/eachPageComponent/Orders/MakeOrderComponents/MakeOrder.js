@@ -45,11 +45,15 @@ const StepSixComponent = dynamic(() => import("./StepSixComponent"), {
 
 const StepSeven = dynamic(() => import("./StepSevenComponent"));
 
-export default function MakeOrder({ seeOrder, setActiveKey, toggleShow , setUpdateData }) {
+export default function MakeOrder({
+  seeOrder,
+  setActiveKey,
+  toggleShow,
+  setUpdateData,
+}) {
   const [step, setStep] = useState(1);
 
   useEffect(() => {
-    
     setStep(seeOrder.step);
   }, [seeOrder]);
 
@@ -58,7 +62,7 @@ export default function MakeOrder({ seeOrder, setActiveKey, toggleShow , setUpda
   const [disabelInputStep4, setDisabelInputStep4] = useState(false);
 
   // Function to go to the next step
-  const handleNextStep = () => {    
+  const handleNextStep = () => {
     setStep((prevStep) => prevStep + 1);
   };
 
@@ -116,6 +120,9 @@ export default function MakeOrder({ seeOrder, setActiveKey, toggleShow , setUpda
         return (
           <div className={style.stepContent}>
             <StepFiveComponent
+              data={seeOrder.delivery}
+              code={seeOrder.code}
+              step={seeOrder.step}
               handleNextStep={handleNextStep}
               handlePreviousStep={handlePreviousStep}
               setDisabelInputStep4={setDisabelInputStep4}
@@ -126,6 +133,7 @@ export default function MakeOrder({ seeOrder, setActiveKey, toggleShow , setUpda
       case 5:
         return (
           <StepSixComponent
+            finalFactor={seeOrder.payment}
             handleNextStep={handleNextStep}
             handlePreviousStep={handlePreviousStep}
           />
@@ -144,7 +152,7 @@ export default function MakeOrder({ seeOrder, setActiveKey, toggleShow , setUpda
         </div>
         <div
           onClick={() => setActiveKey("seeTable")}
-          style={{cursor : "pointer"}}
+          style={{ cursor: "pointer" }}
           className="NormalTextSizing text-decoration-underline textHeaderStyle d-flex align-items-center"
         >
           بازگشت به سفارشات
