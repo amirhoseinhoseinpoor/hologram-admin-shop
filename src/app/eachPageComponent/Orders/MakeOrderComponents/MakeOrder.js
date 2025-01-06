@@ -52,26 +52,35 @@ export default function MakeOrder({
   setUpdateData,
 }) {
   const [step, setStep] = useState(1);
+  const [shouldSetStep, setShouldSetStep] = useState(true);
+
+  console.log(seeOrder);
+  
 
   useEffect(() => {
-    setStep(seeOrder.step);
+    if (seeOrder && shouldSetStep) {
+      setStep(seeOrder.step);
+      setShouldSetStep(true);
+    }
   }, [seeOrder]);
 
   const [disabelInput, setDisabelInput] = useState(false);
   const [disabelInputStep2, setDisabelInputStep2] = useState(false);
   const [disabelInputStep4, setDisabelInputStep4] = useState(false);
 
-  // Function to go to the next step
   const handleNextStep = () => {
+    setShouldSetStep(false);
+    setUpdateData(true)
     setStep((prevStep) => prevStep + 1);
   };
 
-  // Function to go to the previous step
   const handlePreviousStep = () => {
+    setShouldSetStep(false);
+    setUpdateData(true)
     setStep((prevStep) => (prevStep > 1 ? prevStep - 1 : prevStep));
   };
 
-  // Function to render the content based on the current step
+
   const renderStepContent = () => {
     switch (step) {
       case 1:
@@ -159,14 +168,6 @@ export default function MakeOrder({
         </div>
         <ProfileComponent colorGet={"#191919"} />
       </HeadermakeOrder>
-      {/* <div className="d-flex justify-content-end mb-4 mt-2 ms-3">
-        <p
-          onClick={() => setActiveKey("seeTable")}
-          className={`discription ${style.seeOrderButtonStyle}`}
-        >
-          بازگشت به سفارشات
-        </p>
-      </div> */}
 
       <ProcessTracker currentStep={step} />
       {renderStepContent()}

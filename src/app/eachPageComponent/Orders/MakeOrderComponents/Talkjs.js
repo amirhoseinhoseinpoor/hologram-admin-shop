@@ -21,7 +21,7 @@ import { Skeleton } from "@mui/material";
 import LoadingCss from "@/app/BaseComponent/LoadingCss";
 import socket from "@/app/utils/socket";
 import { downloadImage } from "@/app/utils/downloadImage";
-import MessageItem from "./MessageItem"; 
+import MessageItem from "./MessageItem";
 import ArrowDownwardIcon from "@mui/icons-material/ArrowDownward";
 
 const ModalStyle = {
@@ -617,8 +617,7 @@ const ChatBox = ({
           <button
             type="button"
             onClick={() => {
-              handleNextStep()
-              setUpdateData(true);
+              handleNextStep();
             }}
             className={`${style.continueButton}`}
           >
