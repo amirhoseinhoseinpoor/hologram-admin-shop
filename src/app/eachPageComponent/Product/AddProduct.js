@@ -36,22 +36,28 @@ const DivAdjustColorDivs = styled.div`
     color: #404040;
     margin: 0;
   }
+`;
+
+const DivAdjustGrodimageMedia = styled.div`
+  display: grid;
+  grid-template-columns: repeat(2 , 1fr);
+  grid-gap: 20px;
+  width: 100%;
+
   @media (max-width: 768px) {
     grid-template-columns: repeat(1, 1fr);
   }
 `;
 
-const BOX = styled(Box)`
-  max-width: 200px;
-  max-height: 200px;
-  border-radius: 4px;
+const ButtonAddSection = styled.button`
+  width: fit-content;
 `;
 
-const BorderInputBox = styled.div`
-  border: 2px solid rgb(26, 32, 53);
-  padding: 15px;
-  margin-bottom: 20px;
-  border-radius: 8px;
+const BOX = styled(Box)`
+  max-width: 350px;
+  width: 100%;
+  max-height: 200px;
+  border-radius: 4px;
 `;
 
 const SelectWidth = styled.select`
@@ -108,6 +114,13 @@ const AddSectionForm = styled.div`
   border-radius: 8px;
 `;
 
+const BorderInputBox = styled.div`
+  border: 2px solid #ccc;
+  padding: 15px;
+  margin-bottom: 20px;
+  border-radius: 8px;
+`;
+
 export default function AddHonors() {
   const dispatch = useDispatch();
 
@@ -128,6 +141,7 @@ export default function AddHonors() {
   const [usedNavIds, setUsedNavIds] = useState([]);
 
   const [activeTab, setActiveTab] = useState("discrib");
+  const [loadingConfirmModal, setLoadingConfirmModal] = useState(false);
 
   // Define top-level navigation titles to exclude
   const excludedTopLevelTitles = [
@@ -506,11 +520,14 @@ export default function AddHonors() {
         media: uploadedMedia, // Use uploaded media with IDs
       };
 
+      console.log(productData);
+
       // Dispatch the final product submission
       const dataConfirmComing = await dispatch(
         productpot(productData)
       ).unwrap();
       if (dataConfirmComing) {
+        setLoadingConfirmModal(true);
         setOpenModal2(true);
         closeModalOnTimeout();
         // Reset form if needed
@@ -519,16 +536,15 @@ export default function AddHonors() {
         setTitle("");
         setSubtitle("");
         setSubtitleCompelete("");
-        setDynamicSections([
-          { sectionName: "رنگ", type: "image", items: [{ name: "", src: "" }] },
-          { sectionName: "سایز", type: "text", items: [{ name: "" }] },
-        ]);
+        setDynamicSections([]);
         setImgData([{ src: "", type: "1", poster: "" }]);
         setMedia([{ title: "", description: "", src: "", poster: "" }]);
       }
     } catch (error) {
       console.error("Error creating product:", error);
       setOpenModal3(true);
+    } finally {
+      setLoadingConfirmModal(false);
     }
   };
 
@@ -560,8 +576,8 @@ export default function AddHonors() {
             <option value="" disabled>
               انتخاب کنید
             </option>
-            {availableItems.map((item) => (
-              <option key={item.id} value={item.id}>
+            {availableItems.map((item, index) => (
+              <option key={index} value={item.id}>
                 {item.title}
               </option>
             ))}
@@ -645,8 +661,11 @@ export default function AddHonors() {
             <AddSectionForm>
               <h5>اضافه کردن بخش جدید</h5>
               <div className="d-flex flex-column gap-3">
-                <div className="d-flex flex-column">
-                  <label htmlFor="newSectionName" className="mb-1">
+                <div className="d-flex flex-row gap-2 mt-3 align-items-center">
+                  <label
+                    htmlFor="newSectionName"
+                    style={{ whiteSpace: "nowrap" }}
+                  >
                     نام بخش:
                   </label>
                   <input
@@ -659,8 +678,11 @@ export default function AddHonors() {
                     required
                   />
                 </div>
-                <div className="d-flex flex-column">
-                  <label htmlFor="newSectionType" className="mb-1">
+                <div className="d-flex flex-row gap-2 mt-3 align-items-center">
+                  <label
+                    htmlFor="newSectionType"
+                    style={{ whiteSpace: "nowrap" }}
+                  >
                     نوع بخش:
                   </label>
                   <select
@@ -674,13 +696,15 @@ export default function AddHonors() {
                     <option value="image">تصویر</option>
                   </select>
                 </div>
-                <button
-                  className="bg-success text-white px-3 py-2 rounded"
-                  type="button"
-                  onClick={handleAddSectionForm}
-                >
-                  اضافه کردن بخش
-                </button>
+                <div className="d-flex justify-content-end">
+                  <ButtonAddSection
+                    className="bg-success text-white px-2 py-1 rounded"
+                    type="button"
+                    onClick={handleAddSectionForm}
+                  >
+                    اضافه کردن بخش
+                  </ButtonAddSection>
+                </div>
               </div>
             </AddSectionForm>
 
@@ -724,78 +748,102 @@ export default function AddHonors() {
                       key={itemIndex}
                     >
                       <div className="d-flex flex-row align-items-center gap-2">
-                        <input
-                          type="text"
-                          placeholder="نام آیتم"
-                          value={item.name}
-                          onChange={(e) =>
-                            handleItemNameChange(e, sectionIndex, itemIndex)
-                          }
-                          className="flex-grow-1 form-control"
-                          required
-                        />
-                        {section.type === "image" && (
-                          <>
-                            {!item.src && (
-                              <label
-                                className="labelInsteadOfInput"
-                                htmlFor={`section-${sectionIndex}-item-${itemIndex}`}
-                              >
-                                <div className="d-flex flex-column text-center p-1">
-                                  <div>
-                                    <svg
-                                      width={21}
-                                      height={21}
-                                      viewBox="0 0 18 18"
-                                      fill="none"
-                                      xmlns="http://www.w3.org/2000/svg"
-                                    >
-                                      <path
-                                        d="M2.25 11.25C2.25 13.3713 2.25 14.432 2.909 15.091C3.568 15.75 4.629 15.75 6.75 15.75H11.25C13.3713 15.75 14.432 15.75 15.091 15.091C15.75 14.432 15.75 13.3713 15.75 11.25"
-                                        stroke="#404040"
-                                        strokeLinecap="round"
-                                        strokeLinejoin="round"
-                                      />
-                                      <path
-                                        d="M9 12V2.25M9 2.25L12 5.53125M9 2.25L6 5.53125"
-                                        stroke="#404040"
-                                        strokeLinecap="round"
-                                        strokeLinejoin="round"
-                                      />
-                                    </svg>
-                                  </div>
-
-                                  <p
-                                    className={`colorTheInputFile discription`}
-                                  >
-                                    بارگذاری فایل .png یا .jpg
-                                  </p>
-                                  <p
-                                    className={`colorTheInputFile discription`}
-                                  >
-                                    حداکثر تا 5 مگابایت
-                                  </p>
-                                </div>
-                              </label>
-                            )}
+                        <div className="d-flex flex-column">
+                          <div className="d-flex flex-row align-items-center gap-2">
+                            <label
+                              htmlFor="ItemInsideName"
+                              style={{ whiteSpace: "nowrap" }}
+                            >
+                              نام ایتم :
+                            </label>
                             <input
-                              type="file"
-                              className="d-none"
-                              id={`section-${sectionIndex}-item-${itemIndex}`}
-                              accept={`${process.env.NEXT_PUBLIC_INPUT_IMAGE_FORMAT}`}
+                              type="text"
+                              id="ItemInsideName"
+                              placeholder="نام آیتم"
+                              value={item.name}
                               onChange={(e) =>
-                                handleSectionFileChange(
-                                  e,
-                                  sectionIndex,
-                                  itemIndex
-                                )
+                                handleItemNameChange(e, sectionIndex, itemIndex)
                               }
-                              required={section.type === "image"}
+                              className="flex-grow-1 form-control"
+                              required
                             />
-                          </>
-                        )}
+                          </div>
+                          <div>
+                            {section.type === "image" && (
+                              <div className="mt-3">
+                                {!item.src && (
+                                  <label
+                                    className="labelInsteadOfInput"
+                                    htmlFor={`section-${sectionIndex}-item-${itemIndex}`}
+                                  >
+                                    <div className="d-flex flex-column text-center p-1">
+                                      <div>
+                                        <svg
+                                          width={21}
+                                          height={21}
+                                          viewBox="0 0 18 18"
+                                          fill="none"
+                                          xmlns="http://www.w3.org/2000/svg"
+                                        >
+                                          <path
+                                            d="M2.25 11.25C2.25 13.3713 2.25 14.432 2.909 15.091C3.568 15.75 4.629 15.75 6.75 15.75H11.25C13.3713 15.75 14.432 15.75 15.091 15.091C15.75 14.432 15.75 13.3713 15.75 11.25"
+                                            stroke="#404040"
+                                            strokeLinecap="round"
+                                            strokeLinejoin="round"
+                                          />
+                                          <path
+                                            d="M9 12V2.25M9 2.25L12 5.53125M9 2.25L6 5.53125"
+                                            stroke="#404040"
+                                            strokeLinecap="round"
+                                            strokeLinejoin="round"
+                                          />
+                                        </svg>
+                                      </div>
+
+                                      <p
+                                        className={`colorTheInputFile discription`}
+                                      >
+                                        بارگذاری فایل .png یا .jpg
+                                      </p>
+                                      <p
+                                        className={`colorTheInputFile discription`}
+                                      >
+                                        حداکثر تا 5 مگابایت
+                                      </p>
+                                    </div>
+                                  </label>
+                                )}
+                                <input
+                                  type="file"
+                                  className="d-none"
+                                  id={`section-${sectionIndex}-item-${itemIndex}`}
+                                  accept={`${process.env.NEXT_PUBLIC_INPUT_IMAGE_FORMAT}`}
+                                  onChange={(e) =>
+                                    handleSectionFileChange(
+                                      e,
+                                      sectionIndex,
+                                      itemIndex
+                                    )
+                                  }
+                                  required={section.type === "image"}
+                                />
+
+                                {section.type === "image" && item.src && (
+                                  <div className="d-flex flex-column">
+                                    <BOX
+                                      component="img"
+                                      src={URL.createObjectURL(item.src)}
+                                      alt="ItemImage"
+                                    />
+                                  </div>
+                                )}
+                              </div>
+                            )}
+                          </div>
+                        </div>
+
                         <button
-                          className="bg-danger text-white px-2 py-2 rounded"
+                          className="bg-danger text-white px-2 py-1 rounded"
                           type="button"
                           onClick={() =>
                             handleRemoveItem(sectionIndex, itemIndex)
@@ -804,26 +852,18 @@ export default function AddHonors() {
                           حذف
                         </button>
                       </div>
-
-                      {section.type === "image" && item.src && (
-                        <div className="d-flex flex-column">
-                          <BOX
-                            component="img"
-                            src={URL.createObjectURL(item.src)}
-                            alt="ItemImage"
-                          />
-                        </div>
-                      )}
                     </div>
                   ))}
                 </DivAdjustColorDivs>
-                <button
-                  className="bg-success text-white px-3 py-2 rounded"
-                  type="button"
-                  onClick={() => handleAddItem(sectionIndex)}
-                >
-                  اضافه کردن آیتم
-                </button>
+                <div className="d-flex justify-content-end">
+                  <ButtonAddSection
+                    className="bg-success text-white px2 py-1 rounded mt-2"
+                    type="button"
+                    onClick={() => handleAddItem(sectionIndex)}
+                  >
+                    اضافه کردن آیتم
+                  </ButtonAddSection>
+                </div>
               </BorderInputBox>
             ))}
           </div>
@@ -842,78 +882,6 @@ export default function AddHonors() {
                     className="d-flex flex-row gap-2 flex-wrap mt-2 align-items-center"
                     key={index}
                   >
-                    <div className="d-flex flex-column">
-                      <span className="mb-1 NormalTextSizing">عکس یا فیلم</span>
-                      {item?.src === "" ? (
-                        <>
-                          <label
-                            className="labelInsteadOfInput"
-                            htmlFor={`ImageVideoForProduct-${index}`}
-                          >
-                            <div className="d-flex flex-column text-center p-1">
-                              <div>
-                                <svg
-                                  width={21}
-                                  height={21}
-                                  viewBox="0 0 18 18"
-                                  fill="none"
-                                  xmlns="http://www.w3.org/2000/svg"
-                                >
-                                  <path
-                                    d="M2.25 11.25C2.25 13.3713 2.25 14.432 2.909 15.091C3.568 15.75 4.62868 15.75 6.75 15.75H11.25C13.3713 15.75 14.432 15.75 15.091 15.091C15.75 14.432 15.75 13.3713 15.75 11.25"
-                                    stroke="#404040"
-                                    strokeLinecap="round"
-                                    strokeLinejoin="round"
-                                  />
-                                  <path
-                                    d="M9 12V2.25M9 2.25L12 5.53125M9 2.25L6 5.53125"
-                                    stroke="#404040"
-                                    strokeLinecap="round"
-                                    strokeLinejoin="round"
-                                  />
-                                </svg>
-                              </div>
-                              <p className={`colorTheInputFile discription`}>
-                                بارگذاری فایل .png یا .jpg
-                              </p>
-                              <p className={`colorTheInputFile discription`}>
-                                یا فیلم mp4
-                              </p>
-                            </div>
-                          </label>
-                          <input
-                            type="file"
-                            className="d-none"
-                            id={`ImageVideoForProduct-${index}`}
-                            accept={`${process.env.NEXT_PUBLIC_INPUT_IMAGE_AND_VIDEO_FORMAT}`}
-                            onChange={(e) => handleImgDataChange(e, index)}
-                            required
-                          />
-                        </>
-                      ) : (
-                        <>
-                          <div
-                            className="d-flex flex-column"
-                            style={{ width: "fit-content" }}
-                          >
-                            {item.type === "2" ? (
-                              <BOX
-                                component="video"
-                                src={URL.createObjectURL(item.src)}
-                                controls
-                              />
-                            ) : (
-                              <BOX
-                                component="img"
-                                src={URL.createObjectURL(item.src)}
-                                alt="ProductImage"
-                              />
-                            )}
-                          </div>
-                        </>
-                      )}
-                    </div>
-
                     <select
                       value={item.type}
                       onChange={(e) =>
@@ -926,22 +894,21 @@ export default function AddHonors() {
                         )
                       }
                       required
-                      className="form-select"
+                      className="form-select mt-2 mb-1 w-50"
                     >
                       <option value={1}>عکس :</option>
                       <option value={2}>فیلم :</option>
                     </select>
-
-                    {item.type === "2" && (
-                      <div className="d-flex flex-column">
+                    <DivAdjustGrodimageMedia >
+                      <div className="d-flex flex-column w-100">
                         <span className="mb-1 NormalTextSizing">
-                          پوستر فیلم :
+                          عکس یا فیلم
                         </span>
-                        {item?.poster === "" ? (
+                        {item?.src === "" ? (
                           <>
                             <label
                               className="labelInsteadOfInput"
-                              htmlFor={`posterFilm-${index}`}
+                              htmlFor={`ImageVideoForProduct-${index}`}
                             >
                               <div className="d-flex flex-column text-center p-1">
                                 <div>
@@ -970,16 +937,16 @@ export default function AddHonors() {
                                   بارگذاری فایل .png یا .jpg
                                 </p>
                                 <p className={`colorTheInputFile discription`}>
-                                  حداکثر تا 5 مگابایت
+                                  یا فیلم mp4
                                 </p>
                               </div>
                             </label>
                             <input
                               type="file"
                               className="d-none"
-                              id={`posterFilm-${index}`}
-                              accept={`${process.env.NEXT_PUBLIC_INPUT_IMAGE_FORMAT}`}
-                              onChange={(e) => handlePosterChange(e, index)}
+                              id={`ImageVideoForProduct-${index}`}
+                              accept={`${process.env.NEXT_PUBLIC_INPUT_IMAGE_AND_VIDEO_FORMAT}`}
+                              onChange={(e) => handleImgDataChange(e, index)}
                               required
                             />
                           </>
@@ -989,18 +956,102 @@ export default function AddHonors() {
                               className="d-flex flex-column"
                               style={{ width: "fit-content" }}
                             >
-                              <BOX
-                                component="img"
-                                src={URL.createObjectURL(item.poster)}
-                                alt="PosterImage"
-                              />
+                              {item.type === "2" ? (
+                                <BOX
+                                  component="video"
+                                  src={URL.createObjectURL(item.src)}
+                                  controls
+                                />
+                              ) : (
+                                <BOX
+                                  component="img"
+                                  src={URL.createObjectURL(item.src)}
+                                  alt="ProductImage"
+                                />
+                              )}
                             </div>
                           </>
                         )}
                       </div>
-                    )}
+
+                      {item.type === "2" && (
+                        <div className="d-flex flex-column w-100">
+                          <span className="mb-1 NormalTextSizing">
+                            پوستر فیلم :
+                          </span>
+                          {item?.poster === "" ? (
+                            <>
+                              <label
+                                className="labelInsteadOfInput"
+                                htmlFor={`posterFilm-${index}`}
+                              >
+                                <div className="d-flex flex-column text-center p-1">
+                                  <div>
+                                    <svg
+                                      width={21}
+                                      height={21}
+                                      viewBox="0 0 18 18"
+                                      fill="none"
+                                      xmlns="http://www.w3.org/2000/svg"
+                                    >
+                                      <path
+                                        d="M2.25 11.25C2.25 13.3713 2.25 14.432 2.909 15.091C3.568 15.75 4.62868 15.75 6.75 15.75H11.25C13.3713 15.75 14.432 15.75 15.091 15.091C15.75 14.432 15.75 13.3713 15.75 11.25"
+                                        stroke="#404040"
+                                        strokeLinecap="round"
+                                        strokeLinejoin="round"
+                                      />
+                                      <path
+                                        d="M9 12V2.25M9 2.25L12 5.53125M9 2.25L6 5.53125"
+                                        stroke="#404040"
+                                        strokeLinecap="round"
+                                        strokeLinejoin="round"
+                                      />
+                                    </svg>
+                                  </div>
+                                  <p
+                                    className={`colorTheInputFile discription`}
+                                  >
+                                    بارگذاری فایل .png یا .jpg
+                                  </p>
+                                  <p
+                                    className={`colorTheInputFile discription`}
+                                  >
+                                    حداکثر تا 5 مگابایت
+                                  </p>
+                                </div>
+                              </label>
+                              <input
+                                type="file"
+                                className="d-none"
+                                id={`posterFilm-${index}`}
+                                accept={`${process.env.NEXT_PUBLIC_INPUT_IMAGE_FORMAT}`}
+                                onChange={(e) => handlePosterChange(e, index)}
+                                required
+                              />
+                            </>
+                          ) : (
+                            <>
+                              <div
+                                className="d-flex flex-column"
+                                style={{ width: "fit-content" }}
+                              >
+                                <BOX
+                                  component="img"
+                                  src={URL.createObjectURL(item.poster)}
+                                  alt="PosterImage"
+                                />
+                              </div>
+                            </>
+                          )}
+                        </div>
+                      )}
+                    </DivAdjustGrodimageMedia>
+
+             
+                    
+
                     <button
-                      className="bg-danger text-white px-3 py-2 rounded"
+                      className="bg-danger text-white px-2 py-1 rounded w-100 mt-2"
                       type="button"
                       onClick={() => handleRemoveImgData(index)}
                     >
@@ -1009,13 +1060,15 @@ export default function AddHonors() {
                   </div>
                 ))}
               </DivAdjustColorDivs>
-              <button
-                className="mt-2 bg-success text-white px-3 py-2 rounded"
-                type="button"
-                onClick={handleAddImgData}
-              >
-                اضافه کردن عکس / فیلم
-              </button>
+              <div className="d-flex justify-content-end mt-3">
+                <ButtonAddSection
+                  className="mt-2 bg-success text-white px-2 py-1 rounded"
+                  type="button"
+                  onClick={handleAddImgData}
+                >
+                  اضافه کردن عکس / فیلم
+                </ButtonAddSection>
+              </div>
             </BorderInputBox>
           </div>
         )}
@@ -1214,8 +1267,9 @@ export default function AddHonors() {
                         )}
                       </div>
                     </DivAdjustColorDivs>
+
                     <button
-                      className="bg-danger text-white px-3 py-2 rounded"
+                      className="bg-danger text-white px-2 py-1 rounded"
                       type="button"
                       onClick={() => handleRemoveMedia(index)}
                     >
@@ -1224,13 +1278,15 @@ export default function AddHonors() {
                   </div>
                 ))}
               </DivAdjustColorDivs>
-              <button
-                className="mt-2 bg-success text-white px-3 py-2 rounded"
-                type="button"
-                onClick={handleAddMedia}
-              >
-                اضافه کردن ویدیو
-              </button>
+              <div className="d-flex justify-content-end mt-3">
+                <ButtonAddSection
+                  className="mt-2 bg-success text-white px-2 py-1 rounded"
+                  type="button"
+                  onClick={handleAddMedia}
+                >
+                  اضافه کردن ویدیو
+                </ButtonAddSection>
+              </div>
             </BorderInputBox>
           </div>
         )}
@@ -1249,6 +1305,7 @@ export default function AddHonors() {
           onClose={closeModal}
           text={"ایا از اضافه کردن محصول مطمعن هستید"}
           func={handleSubmit}
+          loading={loadingConfirmModal}
         />
         <ConfirmModal
           open={openModal2}

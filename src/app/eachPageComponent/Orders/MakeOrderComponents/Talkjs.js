@@ -621,7 +621,7 @@ const ChatBox = ({
             }}
             className={`${style.continueButton}`}
           >
-            رد کردن
+           مرحله بعدی
           </button>
         )}
       </div>
