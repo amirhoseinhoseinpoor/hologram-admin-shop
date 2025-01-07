@@ -693,7 +693,7 @@ export default function EditHonors({
         color: uploadedColors,
         sizes,
         imgData: uploadedImgData,
-        dynamicSections: uploadedSections,
+        sections: uploadedSections,
       };
 
       // Create the final product object
@@ -871,7 +871,7 @@ export default function EditHonors({
                   onChange={(e) => setNewSectionName(e.target.value)}
                   placeholder="نام بخش"
                   className="form-control"
-                  required
+                  
                 />
               </div>
               <div className="d-flex flex-row gap-2 mt-3 align-items-center">
