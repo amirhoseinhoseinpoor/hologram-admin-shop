@@ -185,8 +185,6 @@ export default function EditHonors({
   const [title, setTitle] = useState("");
   const [subtitle, setSubtitle] = useState("");
   const [subtitleCompelete, setSubtitleCompelete] = useState("");
-  const [colors, setColors] = useState([{ name: "", src: "" }]);
-  const [sizes, setSizes] = useState([""]);
   const [imgData, setImgData] = useState([{ src: "", type: "1", poster: "" }]);
   const [media, setMedia] = useState([
     { title: "", description: "", src: "", poster: "" },
@@ -197,6 +195,7 @@ export default function EditHonors({
 
   const [activeTab, setActiveTab] = useState("discrib");
   const [loadingConfirmModal, setLoadingConfirmModal] = useState(false);
+  const [disableConfirm, setDisableConfirm] = useState(true);
 
   // Modal States
   const [openModal, setOpenModal] = useState(false);
@@ -282,8 +281,6 @@ export default function EditHonors({
       setTitle(editedHonor.info.title || "");
       setSubtitle(editedHonor.info.subtitle || "");
       setSubtitleCompelete(editedHonor.info.subtitleCompelete || "");
-      setColors(editedHonor.info.color || [{ name: "", src: "" }]);
-      setSizes(editedHonor.info.sizes || [""]);
       setImgData(
         editedHonor.info.imgData || [{ src: "", type: "1", poster: "" }]
       );
@@ -349,26 +346,33 @@ export default function EditHonors({
     }
   };
 
-  // Handlers to Add/Remove Colors, Sizes, Images, Media
-  const handleAddColor = () => {
-    setColors([...colors, { name: "", src: "" }]);
-  };
+  useEffect(() => {
+    const isFilled =
+      name.trim() !== "" &&
+      title.trim() !== "" &&
+      subtitle.trim() !== "" &&
+      subtitleCompelete.trim() !== "" &&
+      dynamicSections.length > 0 &&
+      imgData.some((img) => img.src !== "") &&
+      media.some(
+        (item) =>
+          item.title.trim() !== "" &&
+          item.description.trim() !== "" &&
+          item.src !== "" &&
+          item.poster !== ""
+      );
 
-  const handleRemoveColor = (index) => {
-    if (colors.length > 1) {
-      setColors(colors.filter((_, i) => i !== index));
-    }
-  };
-
-  const handleAddSize = () => {
-    setSizes([...sizes, ""]);
-  };
-
-  const handleRemoveSize = (index) => {
-    if (sizes.length > 1) {
-      setSizes(sizes.filter((_, i) => i !== index));
-    }
-  };
+    // Update the disableConfirm state based on the check
+    setDisableConfirm(!isFilled);
+  }, [
+    name,
+    title,
+    subtitle,
+    subtitleCompelete,
+    dynamicSections,
+    imgData,
+    media,
+  ]);
 
   useEffect(() => {
     return () => {
@@ -631,25 +635,6 @@ export default function EditHonors({
         })
       );
 
-      // Upload colors
-      const uploadedColors = await Promise.all(
-        colors.map(async (item) => {
-          if (typeof item.src === "object" && item.src instanceof Blob) {
-            const tag = name;
-            const type = 1;
-            const isPublic = true;
-            const file = item.src;
-
-            const fileId = await dispatch(
-              uploadFile({ file, tag, type, isPublic })
-            ).unwrap();
-
-            return { ...item, src: fileId };
-          }
-          return item;
-        })
-      );
-
       // Upload media
       const uploadedMedia = await Promise.all(
         media.map(async (item) => {
@@ -690,8 +675,7 @@ export default function EditHonors({
         title,
         subtitle,
         subtitleCompelete,
-        color: uploadedColors,
-        sizes,
+
         imgData: uploadedImgData,
         sections: uploadedSections,
       };
@@ -710,9 +694,8 @@ export default function EditHonors({
       ).unwrap();
 
       if (dataConfirmComing) {
-         setOpenModal2(true);
-         closeModalOnTimeout();
-        
+        setOpenModal2(true);
+        closeModalOnTimeout();
       }
     } catch (error) {
       console.error("Error editing product:", error);
@@ -768,7 +751,6 @@ export default function EditHonors({
             setSelectedNavId(e.target.value);
             setName(selectedItem ? selectedItem.title : "");
           }}
-          required
         >
           <option value="" disabled>
             انتخاب کنید
@@ -796,7 +778,6 @@ export default function EditHonors({
           value={title}
           onChange={(e) => setTitle(e.target.value)}
           className="w-100 form-control"
-          required
         />
       </div>
 
@@ -815,7 +796,6 @@ export default function EditHonors({
           value={subtitle}
           onChange={(e) => setSubtitle(e.target.value)}
           className="w-100 form-control"
-          required
         />
       </div>
 
@@ -834,7 +814,6 @@ export default function EditHonors({
           value={subtitleCompelete}
           onChange={(e) => setSubtitleCompelete(e.target.value)}
           className="w-100 form-control"
-          required
         />
       </div>
 
@@ -871,7 +850,6 @@ export default function EditHonors({
                   onChange={(e) => setNewSectionName(e.target.value)}
                   placeholder="نام بخش"
                   className="form-control"
-                  
                 />
               </div>
               <div className="d-flex flex-row gap-2 mt-3 align-items-center">
@@ -886,7 +864,6 @@ export default function EditHonors({
                   value={newSectionType}
                   onChange={(e) => setNewSectionType(e.target.value)}
                   className="form-select"
-                  required
                 >
                   <option value="text">متن</option>
                   <option value="image">تصویر</option>
@@ -920,7 +897,6 @@ export default function EditHonors({
                     placeholder="نام بخش"
                     value={section.sectionName}
                     onChange={(e) => handleSectionNameChange(e, sectionIndex)}
-                    required
                     className="form-control"
                   />
                 </div>
@@ -960,7 +936,6 @@ export default function EditHonors({
                               handleItemNameChange(e, sectionIndex, itemIndex)
                             }
                             className="flex-grow-1 form-control"
-                            required
                           />
                         </div>
                         <div>
@@ -1020,7 +995,6 @@ export default function EditHonors({
                                     itemIndex
                                   )
                                 }
-                                required={section.type === "image"}
                               />
 
                               {section.type === "image" && item.src && (
@@ -1092,7 +1066,6 @@ export default function EditHonors({
                         )
                       )
                     }
-                    required
                     className="form-select mt-2 mb-1 w-50"
                   >
                     <option value="1">عکس :</option>
@@ -1147,7 +1120,6 @@ export default function EditHonors({
                               (e) =>
                                 handleFileChange(e, index, setImgData, imgData) // Corrected state parameter
                             }
-                            required
                           />
                         </>
                       ) : (
@@ -1230,7 +1202,6 @@ export default function EditHonors({
                                   imgData // Corrected state parameter
                                 )
                               }
-                              required
                             />
                           </>
                         ) : (
@@ -1299,7 +1270,6 @@ export default function EditHonors({
                           )
                         )
                       }
-                      required
                       className="form-control"
                     />
 
@@ -1317,7 +1287,6 @@ export default function EditHonors({
                           )
                         )
                       }
-                      required
                       className="form-control"
                     />
                   </div>
@@ -1371,7 +1340,6 @@ export default function EditHonors({
                             onChange={(e) =>
                               handleFileChange(e, index, setMedia, media)
                             }
-                            required
                           />
                         </>
                       ) : (
@@ -1442,7 +1410,6 @@ export default function EditHonors({
                             onChange={(e) =>
                               handleFileChangePoster(e, index, setMedia, media)
                             }
-                            required
                           />
                         </>
                       ) : (
@@ -1489,7 +1456,15 @@ export default function EditHonors({
       {/* Action Buttons */}
       <BUTTONSSTYLE className="d-flex flex-row justify-content-between container">
         <div className="d-flex flex-row mt-3 mb-3 gap-3">
-          <button type="submit" className="confirmButtonStyle">
+          <button
+            type="submit"
+            className="confirmButtonStyle"
+            disabled={disableConfirm}
+            style={{
+              backgroundColor: disableConfirm ? "lightgray" : "#43A047",
+              cursor: disableConfirm ? "not-allowed" : "pointer",
+            }}
+          >
             ویرایش محصول
           </button>
           <button
