@@ -155,7 +155,7 @@ const AddSectionForm = styled.div`
 `;
 
 const BorderInputBox = styled.div`
-  border: 2px solid #28a745;
+  border: 2px solid #ccc;
   padding: 15px;
   margin-bottom: 20px;
   border-radius: 8px;
@@ -172,6 +172,7 @@ export default function EditHonors({
   editedHonor,
   handleCancelEdit,
   setEditedHonor,
+  setDataUpdated,
 }) {
   const dispatch = useDispatch();
 
@@ -268,7 +269,7 @@ export default function EditHonors({
     const filteredItems = allHeaderItems.filter(
       (item) =>
         !usedNavIds.includes(item.id.toString()) ||
-        item.id.toString() === editedHonor.navId.toString()
+        item?.id?.toString() === editedHonor?.navId?.toString()
     );
     setAvailableItems(filteredItems);
     setSelectedNavId(editedHonor?.navId?.toString() || "");
@@ -291,7 +292,7 @@ export default function EditHonors({
           { title: "", description: "", src: "", poster: "" },
         ]
       );
-      setDynamicSections(editedHonor.info.dynamicSections || []);
+      setDynamicSections(editedHonor.info.sections || []);
     }
   }, [editedHonor]);
 
@@ -527,14 +528,15 @@ export default function EditHonors({
   function closeModalOnTimeout() {
     setTimeout(() => {
       setOpenModal2(false);
+      handleCancelEdit();
     }, 3000);
   }
 
   // Handle Delete Product
   const handleDelete = async (e) => {
     e.preventDefault();
-    setOpenModal4(false);
     try {
+      setLoadingConfirmModal(true);
       const deleteProduct = await dispatch(
         deleted({ code: editedHonor.code, name: editedHonor.name })
       ).unwrap();
@@ -542,19 +544,22 @@ export default function EditHonors({
       if (deleteProduct.message === "Success") {
         setOpenModal2(true);
         closeModalOnTimeout();
-        handleCancelEdit(); // Optionally reset the edit state
       } else {
         setOpenModal3(true);
       }
     } catch (error) {
       console.error("Error deleting product:", error);
       setOpenModal3(true);
+    } finally {
+      setLoadingConfirmModal(false);
+      setDataUpdated(true);
     }
   };
 
   // Handle Final Form Submission
   const handleSubmit = async () => {
     try {
+      setLoadingConfirmModal(true);
       // Upload dynamic sections
       const uploadedSections = await Promise.all(
         dynamicSections.map(async (section) => {
@@ -705,15 +710,16 @@ export default function EditHonors({
       ).unwrap();
 
       if (dataConfirmComing) {
-        setLoadingConfirmModal(true);
-        setOpenModal2(true);
-        closeModalOnTimeout();
+         setOpenModal2(true);
+         closeModalOnTimeout();
+        
       }
     } catch (error) {
       console.error("Error editing product:", error);
       setOpenModal3(true);
     } finally {
       setLoadingConfirmModal(false);
+      setDataUpdated(true);
     }
   };
 
@@ -1518,6 +1524,7 @@ export default function EditHonors({
         onClose={closeModal4}
         text={"ایا از حذف محصول مطمعن هستید"}
         func={handleDelete}
+        loading={loadingConfirmModal}
       />
       <ConfirmModal
         open={openModal2}

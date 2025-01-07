@@ -206,9 +206,15 @@ export default function HonorsMainComponent({ toggleShow }) {
   const normalizeString = (str) => str.replace(/\s+/g, "").toLowerCase();
 
   const fetchData = async (page) => {
-    const dataResponse = await dispatch(list({ page, limit: 10 })).unwrap();
-    setTotalPages(dataResponse?.pageCount);
-    setCurrentPage(dataResponse?.page);
+    try {
+      const dataResponse = await dispatch(list({ page, limit: 10 })).unwrap();
+      setTotalPages(dataResponse?.pageCount);
+      setCurrentPage(dataResponse?.page);
+    } catch (error) {
+      console.error(error);
+    }finally {
+      setDataUpdated(false);
+    }
   };
 
   useEffect(() => {
@@ -292,8 +298,12 @@ export default function HonorsMainComponent({ toggleShow }) {
           )}
           {activekey === "addUser" && !editedHonor && (
             <>
-              <div  style={{ cursor: "pointer" }} onClick={() => setActiveKey("editUserPage")} className="text-decoration-underline NormalTextSizing textHeaderStyle d-flex align-items-center">
-              مدیریت محصولات
+              <div
+                style={{ cursor: "pointer" }}
+                onClick={() => setActiveKey("editUserPage")}
+                className="text-decoration-underline NormalTextSizing textHeaderStyle d-flex align-items-center"
+              >
+                مدیریت محصولات
               </div>
             </>
           )}
@@ -532,7 +542,7 @@ export default function HonorsMainComponent({ toggleShow }) {
 
       {activekey === "addUser" && !editedHonor && (
         <>
-          <AddProduct />
+          <AddProduct setDataUpdated={setDataUpdated} setActiveKey={setActiveKey}/>
         </>
       )}
       {editedHonor && (
@@ -541,6 +551,7 @@ export default function HonorsMainComponent({ toggleShow }) {
             editedHonor={editedHonor}
             handleCancelEdit={handleCancelEdit}
             setEditedHonor={setEditedHonor}
+            setDataUpdated={setDataUpdated}
           />
         </>
       )}

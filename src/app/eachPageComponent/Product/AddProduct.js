@@ -40,7 +40,7 @@ const DivAdjustColorDivs = styled.div`
 
 const DivAdjustGrodimageMedia = styled.div`
   display: grid;
-  grid-template-columns: repeat(2 , 1fr);
+  grid-template-columns: repeat(2, 1fr);
   grid-gap: 20px;
   width: 100%;
 
@@ -121,7 +121,7 @@ const BorderInputBox = styled.div`
   border-radius: 8px;
 `;
 
-export default function AddHonors() {
+export default function AddHonors({setDataUpdated , setActiveKey}) {
   const dispatch = useDispatch();
 
   // State Variables
@@ -142,6 +142,7 @@ export default function AddHonors() {
 
   const [activeTab, setActiveTab] = useState("discrib");
   const [loadingConfirmModal, setLoadingConfirmModal] = useState(false);
+  const [disableConfirm, setDisableConfirm] = useState(true);
 
   // Define top-level navigation titles to exclude
   const excludedTopLevelTitles = [
@@ -237,6 +238,34 @@ export default function AddHonors() {
   // Handle Adding a New Section with Type Selection via HTML Form
   const [newSectionName, setNewSectionName] = useState("");
   const [newSectionType, setNewSectionType] = useState("text");
+
+  useEffect(() => {
+    const isFilled =
+      name.trim() !== "" &&
+      title.trim() !== "" &&
+      subtitle.trim() !== "" &&
+      subtitleCompelete.trim() !== "" &&
+      dynamicSections.length > 0 &&
+      imgData.some((img) => img.src !== "") &&
+      media.some(
+        (item) =>
+          item.title.trim() !== "" &&
+          item.description.trim() !== "" &&
+          item.src !== "" && 
+          item.poster !== ""
+      );
+
+    // Update the disableConfirm state based on the check
+    setDisableConfirm(!isFilled);
+  }, [
+    name,
+    title,
+    subtitle,
+    subtitleCompelete,
+    dynamicSections,
+    imgData,
+    media,
+  ]);
 
   const handleAddSectionForm = (e) => {
     e.preventDefault();
@@ -391,12 +420,14 @@ export default function AddHonors() {
   function closeModalOnTimeout() {
     setTimeout(() => {
       setOpenModal2(false);
+      setActiveKey("editUserPage")
     }, 3000);
   }
 
   // Handle Final Form Submission
   const handleSubmit = async () => {
     try {
+      setLoadingConfirmModal(true);
       // Upload dynamic sections
       const uploadedSections = await Promise.all(
         dynamicSections.map(async (section) => {
@@ -527,7 +558,6 @@ export default function AddHonors() {
         productpot(productData)
       ).unwrap();
       if (dataConfirmComing) {
-        setLoadingConfirmModal(true);
         setOpenModal2(true);
         closeModalOnTimeout();
         // Reset form if needed
@@ -545,6 +575,8 @@ export default function AddHonors() {
       setOpenModal3(true);
     } finally {
       setLoadingConfirmModal(false);
+      setDataUpdated(true)
+     
     }
   };
 
@@ -899,7 +931,7 @@ export default function AddHonors() {
                       <option value={1}>عکس :</option>
                       <option value={2}>فیلم :</option>
                     </select>
-                    <DivAdjustGrodimageMedia >
+                    <DivAdjustGrodimageMedia>
                       <div className="d-flex flex-column w-100">
                         <span className="mb-1 NormalTextSizing">
                           عکس یا فیلم
@@ -1046,9 +1078,6 @@ export default function AddHonors() {
                         </div>
                       )}
                     </DivAdjustGrodimageMedia>
-
-             
-                    
 
                     <button
                       className="bg-danger text-white px-2 py-1 rounded w-100 mt-2"
@@ -1294,7 +1323,12 @@ export default function AddHonors() {
         {/* Submit Button */}
         <button
           type="submit"
-          className="mt-3 mb-3 bg-success text-white px-4 py-2 rounded"
+          className="mt-3 mb-3 text-white px-4 py-2 rounded"
+          disabled={disableConfirm}
+          style={{
+            backgroundColor: disableConfirm ? "lightgray" : "#43A047",
+            cursor: disableConfirm ? "not-allowed" : "pointer",
+          }}
         >
           اضافه کردن محصول
         </button>
