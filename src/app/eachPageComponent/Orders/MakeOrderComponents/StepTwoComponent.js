@@ -455,7 +455,7 @@ export default function StepTwoComponent({
                       className={style.SeeLastStepButton}
                       onClick={handlePreviousStep}
                     >
-                      مشاهده مراحل قبلی
+                       مراحله قبلی
                     </button>
                   </div>
                   {moveForward && (
@@ -464,7 +464,7 @@ export default function StepTwoComponent({
                       onClick={handleNextStep}
                       className={`${style.continueButton} mt-3`}
                     >
-                      رد کردن
+                     مرحله بعدی
                     </button>
                   )}
                 </div>
