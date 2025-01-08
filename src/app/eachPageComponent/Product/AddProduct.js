@@ -14,13 +14,15 @@ import styled from "styled-components";
 import AreYouShureModal from "@/app/BaseComponent/AreYouSureModal";
 import ConfirmModal from "@/app/BaseComponent/ConfirmingModal";
 import { Box } from "@mui/material";
+import { BorderBottom } from "@mui/icons-material";
 
 // Styled Components
 const DivAdjustColorDivs = styled.div`
   display: grid;
   grid-template-columns: ${(props) => props.columns || "1fr"};
-  grid-gap: 20px;
+  grid-gap: 18px;
   width: 100%;
+  padding: 15px;
   .labelInsteadOfInput {
     border: 1px solid #c0c0c0;
     border-radius: 4px;
@@ -109,19 +111,59 @@ const NavTabs = styled(Tabs)`
 
 const AddSectionForm = styled.div`
   border: 2px solid #ccc;
-  padding: 15px;
   margin-bottom: 20px;
   border-radius: 8px;
 `;
 
 const BorderInputBox = styled.div`
   border: 2px solid #ccc;
-  padding: 15px;
   margin-bottom: 20px;
   border-radius: 8px;
 `;
 
-export default function AddHonors({setDataUpdated , setActiveKey}) {
+const ResponsiveDivFileds = styled.div`
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  grid-gap: 20px;
+  width: 100%;
+  .labelInsteadOfInput {
+    border: 1px solid #c0c0c0;
+    border-radius: 4px;
+    padding: 10px;
+    width: 100%;
+    height: 77%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    cursor: pointer;
+  }
+  .colorTheInputFile {
+    color: #404040;
+    margin: 0;
+  }
+  @media (max-width: 768px) {
+    grid-template-columns: repeat(1, 1fr);
+  }
+`;
+
+const ButtonCancelOrder = styled.button`
+  border: 1px solid #e91e63 !important;
+  color: #e91e63 !important;
+`;
+
+const HeaderEachSection = styled.div`
+  background-color: rgb(225, 223, 223);
+  border-bottom: 2px solid #ccc;
+  padding: 10px;
+  border-radius: 4px;
+  width: 100%;
+`;
+
+const InsideAddSectionForm = styled.div`
+  padding: 13px;
+`;
+
+export default function AddHonors({ setDataUpdated, setActiveKey }) {
   const dispatch = useDispatch();
 
   // State Variables
@@ -134,6 +176,10 @@ export default function AddHonors({setDataUpdated , setActiveKey}) {
   const [imgData, setImgData] = useState([{ src: "", type: "1", poster: "" }]);
   const [media, setMedia] = useState([
     { title: "", description: "", src: "", poster: "" },
+  ]);
+
+  const [filedOrder, setFiledOrder] = useState([
+    { type: "text", name: "", dropDownOP: [""] },
   ]);
 
   const [headerCome, setHeaderCome] = useState([]);
@@ -251,8 +297,14 @@ export default function AddHonors({setDataUpdated , setActiveKey}) {
         (item) =>
           item.title.trim() !== "" &&
           item.description.trim() !== "" &&
-          item.src !== "" && 
+          item.src !== "" &&
           item.poster !== ""
+      ) &&
+      filedOrder.some(
+        (item) =>
+          item.name.trim() !== "" &&
+          item.type.trim() !== "" &&
+          item?.dropDownOP?.length > 0
       );
 
     // Update the disableConfirm state based on the check
@@ -265,6 +317,7 @@ export default function AddHonors({setDataUpdated , setActiveKey}) {
     dynamicSections,
     imgData,
     media,
+    filedOrder,
   ]);
 
   const handleAddSectionForm = (e) => {
@@ -406,8 +459,19 @@ export default function AddHonors({setDataUpdated , setActiveKey}) {
     setMedia([...media, { title: "", description: "", src: "", poster: "" }]);
   };
 
+  const handleAddFileds = () => {
+    setFiledOrder([
+      ...filedOrder,
+      { type: "text", name: "", dropDownOP: [""] },
+    ]);
+  };
+
   const handleRemoveMedia = (index) => {
     setMedia(media.filter((_, i) => i !== index));
+  };
+
+  const handleRemoveFileds = (index) => {
+    setFiledOrder(filedOrder.filter((_, i) => i !== index));
   };
 
   // Handle Form Submission with Confirmation Modal
@@ -420,9 +484,23 @@ export default function AddHonors({setDataUpdated , setActiveKey}) {
   function closeModalOnTimeout() {
     setTimeout(() => {
       setOpenModal2(false);
-      setActiveKey("editUserPage")
+      setActiveKey("editUserPage");
     }, 3000);
   }
+
+  // Handler to Add a New Dropdown Option
+  const handleAddDropDownOption = (fieldIndex) => {
+    const updatedFiledOrder = [...filedOrder];
+    updatedFiledOrder[fieldIndex].dropDownOP.push("");
+    setFiledOrder(updatedFiledOrder);
+  };
+
+  // Handler to Remove a Dropdown Option
+  const handleRemoveDropDownOption = (fieldIndex, optionIndex) => {
+    const updatedFiledOrder = [...filedOrder];
+    updatedFiledOrder[fieldIndex].dropDownOP.splice(optionIndex, 1);
+    setFiledOrder(updatedFiledOrder);
+  };
 
   // Handle Final Form Submission
   const handleSubmit = async () => {
@@ -548,10 +626,11 @@ export default function AddHonors({setDataUpdated , setActiveKey}) {
         name,
         navId: selectedNavId,
         info,
-        media: uploadedMedia, // Use uploaded media with IDs
+        media: uploadedMedia,
+        filedOrder,
       };
 
-      console.log(productData);
+      // console.log(productData);
 
       // Dispatch the final product submission
       const dataConfirmComing = await dispatch(
@@ -569,14 +648,14 @@ export default function AddHonors({setDataUpdated , setActiveKey}) {
         setDynamicSections([]);
         setImgData([{ src: "", type: "1", poster: "" }]);
         setMedia([{ title: "", description: "", src: "", poster: "" }]);
+        setFiledOrder([{ type: "", name: "", dropDownOP: "" }]);
       }
     } catch (error) {
       console.error("Error creating product:", error);
       setOpenModal3(true);
     } finally {
       setLoadingConfirmModal(false);
-      setDataUpdated(true)
-     
+      setDataUpdated(true);
     }
   };
 
@@ -684,6 +763,7 @@ export default function AddHonors({setDataUpdated , setActiveKey}) {
           <Tab eventKey="discrib" title={<>مشخصه محصول</>}></Tab>
           <Tab eventKey="info" title={<>تصویر / فیلم</>}></Tab>
           <Tab eventKey="media" title={<>افکت ها</>}></Tab>
+          <Tab eventKey="fileds" title={<>فیلد سفارش</>}></Tab>
         </NavTabs>
 
         {/* Discrib Tab Content */}
@@ -691,11 +771,14 @@ export default function AddHonors({setDataUpdated , setActiveKey}) {
           <div>
             {/* Add Section Form */}
             <AddSectionForm>
-              <h5>اضافه کردن بخش جدید</h5>
-              <div className="d-flex flex-column gap-3">
+              <HeaderEachSection className="NormalTextSizing">
+                اضافه کردن بخش جدید
+              </HeaderEachSection>
+              <InsideAddSectionForm className="d-flex flex-column gap-3">
                 <div className="d-flex flex-row gap-2 mt-3 align-items-center">
                   <label
                     htmlFor="newSectionName"
+                    className="NormalTextSizing"
                     style={{ whiteSpace: "nowrap" }}
                   >
                     نام بخش:
@@ -707,12 +790,12 @@ export default function AddHonors({setDataUpdated , setActiveKey}) {
                     onChange={(e) => setNewSectionName(e.target.value)}
                     placeholder="نام بخش"
                     className="form-control"
-                    required
                   />
                 </div>
                 <div className="d-flex flex-row gap-2 mt-3 align-items-center">
                   <label
                     htmlFor="newSectionType"
+                    className="NormalTextSizing"
                     style={{ whiteSpace: "nowrap" }}
                   >
                     نوع بخش:
@@ -737,39 +820,49 @@ export default function AddHonors({setDataUpdated , setActiveKey}) {
                     اضافه کردن بخش
                   </ButtonAddSection>
                 </div>
-              </div>
+              </InsideAddSectionForm>
             </AddSectionForm>
 
             {/* Dynamic Sections */}
             {dynamicSections.map((section, sectionIndex) => (
               <BorderInputBox className="mt-2" key={sectionIndex}>
                 <div className="d-flex flex-row justify-content-between align-items-center mb-3">
-                  <div className="d-flex flex-row align-items-center gap-2">
-                    <label
-                      htmlFor={`sectionName-${sectionIndex}`}
-                      style={{ whiteSpace: "nowrap" }}
-                    >
-                      نام بخش:
-                    </label>
-                    <input
-                      type="text"
-                      id={`sectionName-${sectionIndex}`}
-                      placeholder="نام بخش"
-                      value={section.sectionName}
-                      onChange={(e) => handleSectionNameChange(e, sectionIndex)}
-                      required
-                      className="form-control"
-                    />
-                  </div>
-                  {dynamicSections.length > 1 && (
-                    <button
-                      className="bg-danger text-white px-2 py-1 rounded"
-                      type="button"
-                      onClick={() => handleRemoveSection(sectionIndex)}
-                    >
-                      حذف بخش
-                    </button>
-                  )}
+                  <HeaderEachSection className="d-flex flex-row align-items-center gap-2">
+                    <div className="d-flex flex-row align-items-center justify-content-between w-100">
+                      <div className="d-flex flex-row align-items-center gap-2">
+                        <label
+                          htmlFor={`sectionName-${sectionIndex}`}
+                          className="NormalTextSizing"
+                          style={{ whiteSpace: "nowrap" }}
+                        >
+                          نام بخش:
+                        </label>
+                        <input
+                          type="text"
+                          id={`sectionName-${sectionIndex}`}
+                          placeholder="نام بخش"
+                          value={section.sectionName}
+                          onChange={(e) =>
+                            handleSectionNameChange(e, sectionIndex)
+                          }
+                          required
+                          className="form-control "
+                        />
+                      </div>
+
+                      {dynamicSections.length > 1 && (
+                        <div>
+                          <ButtonCancelOrder
+                            className="px-2 py-1 rounded"
+                            type="button"
+                            onClick={() => handleRemoveSection(sectionIndex)}
+                          >
+                            حذف بخش
+                          </ButtonCancelOrder>
+                        </div>
+                      )}
+                    </div>
+                  </HeaderEachSection>
                 </div>
 
                 <DivAdjustColorDivs columns="repeat(2, 1fr)">
@@ -779,8 +872,8 @@ export default function AddHonors({setDataUpdated , setActiveKey}) {
                       className="d-flex flex-column gap-2 mb-3"
                       key={itemIndex}
                     >
-                      <div className="d-flex flex-row align-items-center gap-2">
-                        <div className="d-flex flex-column">
+                      <div className="d-flex flex-column align-items-center gap-2">
+                        <div className="d-flex flex-column w-100">
                           <div className="d-flex flex-row align-items-center gap-2">
                             <label
                               htmlFor="ItemInsideName"
@@ -799,6 +892,16 @@ export default function AddHonors({setDataUpdated , setActiveKey}) {
                               className="flex-grow-1 form-control"
                               required
                             />
+                            <ButtonCancelOrder
+                              className=" px-2 py-1 rounded"
+                              style={{ width: "fit-content" }}
+                              type="button"
+                              onClick={() =>
+                                handleRemoveItem(sectionIndex, itemIndex)
+                              }
+                            >
+                              حذف
+                            </ButtonCancelOrder>
                           </div>
                           <div>
                             {section.type === "image" && (
@@ -873,21 +976,11 @@ export default function AddHonors({setDataUpdated , setActiveKey}) {
                             )}
                           </div>
                         </div>
-
-                        <button
-                          className="bg-danger text-white px-2 py-1 rounded"
-                          type="button"
-                          onClick={() =>
-                            handleRemoveItem(sectionIndex, itemIndex)
-                          }
-                        >
-                          حذف
-                        </button>
                       </div>
                     </div>
                   ))}
                 </DivAdjustColorDivs>
-                <div className="d-flex justify-content-end">
+                <div className="d-flex justify-content-end mb-3 ms-3">
                   <ButtonAddSection
                     className="bg-success text-white px2 py-1 rounded mt-2"
                     type="button"
@@ -906,12 +999,14 @@ export default function AddHonors({setDataUpdated , setActiveKey}) {
           <div>
             {/* Image and Video Section */}
             <BorderInputBox className="mt-3">
-              <label>عکس ها و فیلم های محصول :</label>
+              <HeaderEachSection className="NormalTextSizing">
+                عکس ها و فیلم های محصول :
+              </HeaderEachSection>
               <DivAdjustColorDivs columns="repeat(1, 1fr)">
                 {imgData.map((item, index) => (
                   <div
                     style={{ height: "fit-content" }}
-                    className="d-flex flex-row gap-2 flex-wrap mt-2 align-items-center"
+                    className="d-flex flex-row gap-2 flex-wrap mt-2 align-items-center justify-content-between"
                     key={index}
                   >
                     <select
@@ -931,6 +1026,14 @@ export default function AddHonors({setDataUpdated , setActiveKey}) {
                       <option value={1}>عکس :</option>
                       <option value={2}>فیلم :</option>
                     </select>
+                    <ButtonCancelOrder
+                      className="px-2 py-1 rounded"
+                      style={{ width: "fit-content" }}
+                      type="button"
+                      onClick={() => handleRemoveImgData(index)}
+                    >
+                      حذف
+                    </ButtonCancelOrder>
                     <DivAdjustGrodimageMedia>
                       <div className="d-flex flex-column w-100">
                         <span className="mb-1 NormalTextSizing">
@@ -1078,20 +1181,12 @@ export default function AddHonors({setDataUpdated , setActiveKey}) {
                         </div>
                       )}
                     </DivAdjustGrodimageMedia>
-
-                    <button
-                      className="bg-danger text-white px-2 py-1 rounded w-100 mt-2"
-                      type="button"
-                      onClick={() => handleRemoveImgData(index)}
-                    >
-                      حذف
-                    </button>
                   </div>
                 ))}
               </DivAdjustColorDivs>
               <div className="d-flex justify-content-end mt-3">
                 <ButtonAddSection
-                  className="mt-2 bg-success text-white px-2 py-1 rounded"
+                  className="mt-2 mb-3 ms-3 bg-success text-white px-2 py-1 rounded"
                   type="button"
                   onClick={handleAddImgData}
                 >
@@ -1107,7 +1202,7 @@ export default function AddHonors({setDataUpdated , setActiveKey}) {
           <div>
             {/* Media Section */}
             <BorderInputBox>
-              <label>فیلم ها:</label>
+              <HeaderEachSection>فیلم ها:</HeaderEachSection>
               <DivAdjustColorDivs
                 style={{ width: "100%" }}
                 columns="repeat(1, 1fr)"
@@ -1149,6 +1244,14 @@ export default function AddHonors({setDataUpdated , setActiveKey}) {
                         required
                         className="form-control"
                       />
+                      <ButtonCancelOrder
+                        className="px-2 py-1 rounded"
+                        style={{ width: "fit-content" }}
+                        type="button"
+                        onClick={() => handleRemoveMedia(index)}
+                      >
+                        حذف
+                      </ButtonCancelOrder>
                     </div>
                     <DivAdjustColorDivs
                       className="mt-2 mb-2"
@@ -1296,20 +1399,12 @@ export default function AddHonors({setDataUpdated , setActiveKey}) {
                         )}
                       </div>
                     </DivAdjustColorDivs>
-
-                    <button
-                      className="bg-danger text-white px-2 py-1 rounded"
-                      type="button"
-                      onClick={() => handleRemoveMedia(index)}
-                    >
-                      حذف
-                    </button>
                   </div>
                 ))}
               </DivAdjustColorDivs>
               <div className="d-flex justify-content-end mt-3">
                 <ButtonAddSection
-                  className="mt-2 bg-success text-white px-2 py-1 rounded"
+                  className="mt-2 mb-2 ms-2 bg-success text-white px-2 py-1 rounded"
                   type="button"
                   onClick={handleAddMedia}
                 >
@@ -1320,18 +1415,160 @@ export default function AddHonors({setDataUpdated , setActiveKey}) {
           </div>
         )}
 
+        {activeTab === "fileds" && (
+          <div>
+            <BorderInputBox>
+              <HeaderEachSection>فیلد ها:</HeaderEachSection>
+              <DivAdjustColorDivs
+                style={{ width: "100%" }}
+                columns="repeat(1, 1fr)"
+              >
+                {filedOrder.map((item, index) => (
+                  <div className="mt-2 d-flex flex-column gap-3" key={index}>
+                    <div className="d-flex  flex-row align-items-center gap-3">
+                      <select
+                        value={item.type}
+                        onChange={(e) =>
+                          setFiledOrder(
+                            filedOrder.map((f, iIdx) =>
+                              iIdx === index
+                                ? {
+                                    ...f,
+                                    type: e.target.value,
+                                    dropDownOP: [""],
+                                  }
+                                : f
+                            )
+                          )
+                        }
+                        required
+                        className="form-select mt-2 mb-1 w-50"
+                      >
+                        <option value="text">متن :</option>
+                        <option value="dropDown">دراپ دون :</option>
+                      </select>
+                      <input
+                        style={{ width: "45%" }}
+                        type="text"
+                        placeholder="عنوان فیلد"
+                        value={item.name}
+                        onChange={(e) =>
+                          setFiledOrder(
+                            filedOrder.map((f, iIdx) =>
+                              iIdx === index
+                                ? { ...f, name: e.target.value }
+                                : f
+                            )
+                          )
+                        }
+                        required
+                        className="form-control"
+                      />
+                      <ButtonCancelOrder
+                        className=" px-2 py-1 rounded"
+                        type="button"
+                        style={{ width: "fit-content" }}
+                        onClick={() => handleRemoveFileds(index)}
+                      >
+                        حذف
+                      </ButtonCancelOrder>
+                    </div>
+
+                    {item.type === "dropDown" && (
+                      <div className="d-flex flex-column gap-2 mt-2">
+                        <label
+                          htmlFor={`dropDownOP-${index}`}
+                          className="form-label"
+                          style={{ whiteSpace: "nowrap" }}
+                        >
+                          گزینه‌های دراپ دون:
+                        </label>
+
+                        <ResponsiveDivFileds
+                          className="mt-2 mb-2"
+                          columns="repeat(2, 1fr)"
+                        >
+                          {item.dropDownOP.map((option, optIndex) => (
+                            <div
+                              className="d-flex flex-row align-items-center gap-2 mb-2"
+                              key={optIndex}
+                            >
+                              <input
+                                type="text"
+                                placeholder={`گزینه ${optIndex + 1}`}
+                                value={option}
+                                onChange={(e) => {
+                                  const updatedFiledOrder = [...filedOrder];
+                                  updatedFiledOrder[index].dropDownOP[
+                                    optIndex
+                                  ] = e.target.value;
+                                  setFiledOrder(updatedFiledOrder);
+                                }}
+                                required
+                                className="form-control"
+                              />
+                              {item.dropDownOP.length > 1 && (
+                                <ButtonCancelOrder
+                                  type="button"
+                                  className=" px-2 py-1 rounded"
+                                  onClick={() =>
+                                    handleRemoveDropDownOption(index, optIndex)
+                                  }
+                                >
+                                  حذف
+                                </ButtonCancelOrder>
+                              )}
+                            </div>
+                          ))}
+                        </ResponsiveDivFileds>
+                        <button
+                          type="button"
+                          className="NormalTextSizing"
+                          style={{ backgroundColor: "#43A047" , width : "fit-content" }}
+                          onClick={() => handleAddDropDownOption(index)}
+                        >
+                          اضافه کردن گزینه
+                        </button>
+                      </div>
+                    )}
+                  </div>
+                ))}
+              </DivAdjustColorDivs>
+
+              <div className="d-flex justify-content-end mt-3">
+                <ButtonAddSection
+                  className="mt-2 mb-3 ms-3 bg-success text-white px-2 py-1 rounded"
+                  type="button"
+                  onClick={handleAddFileds}
+                >
+                  اضافه کردن فیلد
+                </ButtonAddSection>
+              </div>
+            </BorderInputBox>
+          </div>
+        )}
+
         {/* Submit Button */}
-        <button
-          type="submit"
-          className="mt-3 mb-3 text-white px-4 py-2 rounded"
-          disabled={disableConfirm}
-          style={{
-            backgroundColor: disableConfirm ? "lightgray" : "#43A047",
-            cursor: disableConfirm ? "not-allowed" : "pointer",
-          }}
-        >
-          اضافه کردن محصول
-        </button>
+        <div className="d-flex flex-row align-items-center justify-content-between">
+          <button
+            type="submit"
+            className="mt-3 mb-3 text-white px-4 py-2 rounded"
+            disabled={disableConfirm}
+            style={{
+              backgroundColor: disableConfirm ? "lightgray" : "#43A047",
+              cursor: disableConfirm ? "not-allowed" : "pointer",
+            }}
+          >
+            اضافه کردن محصول
+          </button>
+          <ButtonCancelOrder
+            type="button"
+            className="mt-3 mb-3 text-white px-3 py-2 rounded"
+            onClick={() => setActiveKey("editUserPage")}
+          >
+            انصراف
+          </ButtonCancelOrder>
+        </div>
 
         {/* Confirmation Modals */}
         <AreYouShureModal
