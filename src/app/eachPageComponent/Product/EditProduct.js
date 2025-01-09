@@ -67,8 +67,9 @@ const BOX = styled(Box)`
 const DivAdjustColorDivs = styled.div`
   display: grid;
   grid-template-columns: ${(props) => props.columns || "1fr"};
-  grid-gap: 20px;
+  grid-gap: 18px;
   width: 100%;
+  padding: 15px;
   .labelInsteadOfInput {
     border: 1px solid #c0c0c0;
     border-radius: 4px;
@@ -85,7 +86,7 @@ const DivAdjustColorDivs = styled.div`
     margin: 0;
   }
   @media (max-width: 768px) {
-    grid-template-columns: repeat(1, 1fr);
+    grid-template-columns: ${(props) => props.recolumns || ""};
   }
 `;
 
@@ -149,23 +150,66 @@ const NavTabs = styled(Tabs)`
 
 const AddSectionForm = styled.div`
   border: 2px solid #ccc;
-  padding: 15px;
   margin-bottom: 20px;
   border-radius: 8px;
 `;
 
 const BorderInputBox = styled.div`
   border: 2px solid #ccc;
-  padding: 15px;
   margin-bottom: 20px;
   border-radius: 8px;
 `;
 
 const DynamicSectionBox = styled.div`
   border: 2px solid #ccc;
-  padding: 15px;
   margin-bottom: 20px;
   border-radius: 8px;
+`;
+
+const ButtonAddSection = styled.button`
+  width: fit-content;
+`;
+
+const ResponsiveDivFileds = styled.div`
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  grid-gap: 20px;
+  width: 100%;
+  .labelInsteadOfInput {
+    border: 1px solid #c0c0c0;
+    border-radius: 4px;
+    padding: 10px;
+    width: 100%;
+    height: 77%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    cursor: pointer;
+  }
+  .colorTheInputFile {
+    color: #404040;
+    margin: 0;
+  }
+  @media (max-width: 768px) {
+    grid-template-columns: repeat(1, 1fr);
+  }
+`;
+
+const ButtonCancelOrder = styled.button`
+  border: 1px solid #e91e63 !important;
+  color: #e91e63 !important;
+`;
+
+const HeaderEachSection = styled.div`
+  background-color: rgb(225, 223, 223);
+  border-bottom: 2px solid #ccc;
+  padding: 10px;
+  border-radius: 4px;
+  width: 100%;
+`;
+
+const InsideAddSectionForm = styled.div`
+  padding: 13px;
 `;
 
 export default function EditHonors({
@@ -174,6 +218,8 @@ export default function EditHonors({
   setEditedHonor,
   setDataUpdated,
 }) {
+  console.log(editedHonor);
+
   const dispatch = useDispatch();
 
   // State Variables
@@ -189,6 +235,11 @@ export default function EditHonors({
   const [media, setMedia] = useState([
     { title: "", description: "", src: "", poster: "" },
   ]);
+
+  const [filedOrder, setFiledOrder] = useState([
+    { type: "text", name: "", dropDownOP: [""] },
+  ]);
+
   const [dynamicSections, setDynamicSections] = useState([]);
 
   const [headerCome, setHeaderCome] = useState([]);
@@ -290,6 +341,11 @@ export default function EditHonors({
         ]
       );
       setDynamicSections(editedHonor.info.sections || []);
+      setFiledOrder(
+        editedHonor?.filedOrder || [
+          { type: "text", name: "", dropDownOP: [""] },
+        ]
+      );
     }
   }, [editedHonor]);
 
@@ -360,6 +416,12 @@ export default function EditHonors({
           item.description.trim() !== "" &&
           item.src !== "" &&
           item.poster !== ""
+      ) &&
+      filedOrder.some(
+        (item) =>
+          item.name.trim() !== "" &&
+          item.type.trim() !== "" &&
+          item?.dropDownOP?.length > 0
       );
 
     // Update the disableConfirm state based on the check
@@ -372,6 +434,7 @@ export default function EditHonors({
     dynamicSections,
     imgData,
     media,
+    filedOrder,
   ]);
 
   useEffect(() => {
@@ -411,8 +474,19 @@ export default function EditHonors({
     setMedia([...media, { title: "", description: "", src: "", poster: "" }]);
   };
 
+  const handleAddFileds = () => {
+    setFiledOrder([
+      ...filedOrder,
+      { type: "text", name: "", dropDownOP: [""] },
+    ]);
+  };
+
   const handleRemoveMedia = (index) => {
     setMedia(media.filter((_, i) => i !== index));
+  };
+
+  const handleRemoveFileds = (index) => {
+    setFiledOrder(filedOrder.filter((_, i) => i !== index));
   };
 
   // Handle Adding a New Dynamic Section
@@ -535,6 +609,20 @@ export default function EditHonors({
       handleCancelEdit();
     }, 3000);
   }
+
+  // Handler to Add a New Dropdown Option
+  const handleAddDropDownOption = (fieldIndex) => {
+    const updatedFiledOrder = [...filedOrder];
+    updatedFiledOrder[fieldIndex].dropDownOP.push("");
+    setFiledOrder(updatedFiledOrder);
+  };
+
+  // Handler to Remove a Dropdown Option
+  const handleRemoveDropDownOption = (fieldIndex, optionIndex) => {
+    const updatedFiledOrder = [...filedOrder];
+    updatedFiledOrder[fieldIndex].dropDownOP.splice(optionIndex, 1);
+    setFiledOrder(updatedFiledOrder);
+  };
 
   // Handle Delete Product
   const handleDelete = async (e) => {
@@ -675,7 +763,6 @@ export default function EditHonors({
         title,
         subtitle,
         subtitleCompelete,
-
         imgData: uploadedImgData,
         sections: uploadedSections,
       };
@@ -686,7 +773,10 @@ export default function EditHonors({
         navId: selectedNavId,
         info,
         media: uploadedMedia,
+        filedOrder,
       };
+
+      console.log(productData);
 
       // Dispatch the final product submission
       const dataConfirmComing = await dispatch(
@@ -827,6 +917,7 @@ export default function EditHonors({
         <Tab eventKey="discrib" title={<>مشخصه محصول</>}></Tab>
         <Tab eventKey="info" title={<>تصویر / فیلم</>}></Tab>
         <Tab eventKey="media" title={<>افکت ها</>}></Tab>
+        <Tab eventKey="fileds" title={<>فیلد سفارش</>}></Tab>
       </NavTabs>
 
       {/* Discrib Tab Content */}
@@ -834,11 +925,12 @@ export default function EditHonors({
         <div>
           {/* Add Section Form */}
           <AddSectionForm>
-            <h5>اضافه کردن بخش جدید</h5>
-            <div className="d-flex flex-column gap-3">
+            <HeaderEachSection>اضافه کردن بخش جدید</HeaderEachSection>
+            <InsideAddSectionForm className="d-flex flex-column gap-3">
               <div className="d-flex flex-row gap-2 mt-3 align-items-center">
                 <label
                   htmlFor="newSectionName"
+                  className="NormalTextSizing"
                   style={{ whiteSpace: "nowrap" }}
                 >
                   نام بخش:
@@ -849,7 +941,7 @@ export default function EditHonors({
                   value={newSectionName}
                   onChange={(e) => setNewSectionName(e.target.value)}
                   placeholder="نام بخش"
-                  className="form-control"
+                  className="form-control NormalTextSizing"
                 />
               </div>
               <div className="d-flex flex-row gap-2 mt-3 align-items-center">
@@ -877,41 +969,50 @@ export default function EditHonors({
                   اضافه کردن بخش
                 </BUTTONADDSECTIONSTYLE>
               </div>
-            </div>
+            </InsideAddSectionForm>
           </AddSectionForm>
 
           {/* Dynamic Sections */}
           {dynamicSections.map((section, sectionIndex) => (
             <DynamicSectionBox className="mt-2" key={sectionIndex}>
               <div className="d-flex flex-row justify-content-between align-items-center mb-3">
-                <div className="d-flex flex-row align-items-center gap-2">
-                  <label
-                    htmlFor={`sectionName-${sectionIndex}`}
-                    style={{ whiteSpace: "nowrap" }}
-                  >
-                    نام بخش:
-                  </label>
-                  <input
-                    type="text"
-                    id={`sectionName-${sectionIndex}`}
-                    placeholder="نام بخش"
-                    value={section.sectionName}
-                    onChange={(e) => handleSectionNameChange(e, sectionIndex)}
-                    className="form-control"
-                  />
-                </div>
-                {dynamicSections.length > 1 && (
-                  <button
-                    className="bg-danger text-white px-2 py-1 rounded"
-                    type="button"
-                    onClick={() => handleRemoveSection(sectionIndex)}
-                  >
-                    حذف بخش
-                  </button>
-                )}
+                <HeaderEachSection className="d-flex flex-row align-items-center gap-2">
+                  <div className="d-flex flex-row align-items-center justify-content-between w-100">
+                    <div className="d-flex flex-row align-items-center gap-2">
+                      <label
+                        htmlFor={`sectionName-${sectionIndex}`}
+                        style={{ whiteSpace: "nowrap" }}
+                      >
+                        نام بخش:
+                      </label>
+                      <input
+                        type="text"
+                        id={`sectionName-${sectionIndex}`}
+                        placeholder="نام بخش"
+                        value={section.sectionName}
+                        onChange={(e) =>
+                          handleSectionNameChange(e, sectionIndex)
+                        }
+                        className="form-control"
+                      />
+                    </div>
+                    {dynamicSections.length > 1 && (
+                      <ButtonCancelOrder
+                        className=" px-2 py-1 rounded"
+                        type="button"
+                        onClick={() => handleRemoveSection(sectionIndex)}
+                      >
+                        حذف بخش
+                      </ButtonCancelOrder>
+                    )}
+                  </div>
+                </HeaderEachSection>
               </div>
 
-              <DivAdjustColorDivs columns="repeat(2, 1fr)">
+              <DivAdjustColorDivs
+                columns="repeat(2, 1fr)"
+                recolumns="repeat(1, 1fr)"
+              >
                 {section.items.map((item, itemIndex) => (
                   <div
                     style={{ height: "fit-content" }}
@@ -919,7 +1020,7 @@ export default function EditHonors({
                     key={itemIndex}
                   >
                     <div className="d-flex flex-row align-items-center gap-2">
-                      <div className="d-flex flex-column">
+                      <div className="d-flex flex-column w-100">
                         <div className="d-flex flex-row align-items-center gap-2">
                           <label
                             htmlFor={`ItemInsideName-${sectionIndex}-${itemIndex}`}
@@ -937,6 +1038,15 @@ export default function EditHonors({
                             }
                             className="flex-grow-1 form-control"
                           />
+                          <ButtonCancelOrder
+                            className="px-2 py-1 rounded"
+                            type="button"
+                            onClick={() =>
+                              handleRemoveItem(sectionIndex, itemIndex)
+                            }
+                          >
+                            حذف
+                          </ButtonCancelOrder>
                         </div>
                         <div>
                           {section.type === "image" && (
@@ -998,7 +1108,7 @@ export default function EditHonors({
                               />
 
                               {section.type === "image" && item.src && (
-                                <div className="d-flex flex-column">
+                                <div className="d-flex flex-column align-items-center">
                                   <BOX
                                     component="img"
                                     src={
@@ -1014,21 +1124,11 @@ export default function EditHonors({
                           )}
                         </div>
                       </div>
-
-                      <button
-                        className="bg-danger text-white px-2 py-1 rounded"
-                        type="button"
-                        onClick={() =>
-                          handleRemoveItem(sectionIndex, itemIndex)
-                        }
-                      >
-                        حذف
-                      </button>
                     </div>
                   </div>
                 ))}
               </DivAdjustColorDivs>
-              <div className="d-flex justify-content-end">
+              <div className="d-flex justify-content-end mb-3 ms-3">
                 <BUTTONADDSECTIONSTYLE
                   type="button"
                   onClick={() => handleAddItem(sectionIndex)}
@@ -1042,17 +1142,18 @@ export default function EditHonors({
       )}
 
       {/* Info Tab Content */}
-      {/* Info Tab Content */}
       {activeTab === "info" && (
         <div>
           {/* Image and Video Section */}
           <BorderInputBox className="mt-3">
-            <label>عکس ها و فیلم های محصول :</label>
+            <HeaderEachSection className="NormalTextSizing">
+              عکس ها و فیلم های محصول :
+            </HeaderEachSection>
             <DivAdjustColorDivs columns="repeat(1, 1fr)">
               {imgData.map((item, index) => (
                 <div
                   style={{ height: "fit-content" }}
-                  className="d-flex flex-row gap-2 flex-wrap mt-2 align-items-center"
+                  className="d-flex flex-row gap-2 flex-wrap mt-2 align-items-center justify-content-between"
                   key={index}
                 >
                   <select
@@ -1066,11 +1167,20 @@ export default function EditHonors({
                         )
                       )
                     }
+                    required
                     className="form-select mt-2 mb-1 w-50"
                   >
                     <option value="1">عکس :</option>
                     <option value="2">فیلم :</option>
                   </select>
+                  <ButtonCancelOrder
+                    className="px-2 py-1 rounded"
+                    style={{ width: "fit-content" }}
+                    type="button"
+                    onClick={() => handleRemoveImgData(index)}
+                  >
+                    حذف
+                  </ButtonCancelOrder>
                   <DivAdjustGrodimageMedia>
                     <div className="d-flex flex-column w-100">
                       <span className="mb-1 NormalTextSizing">عکس یا فیلم</span>
@@ -1225,19 +1335,15 @@ export default function EditHonors({
                       </div>
                     )}
                   </DivAdjustGrodimageMedia>
-
-                  <button
-                    className="bg-danger text-white px-2 py-1 rounded w-100 mt-2"
-                    type="button"
-                    onClick={() => handleRemoveImgData(index)}
-                  >
-                    حذف
-                  </button>
                 </div>
               ))}
             </DivAdjustColorDivs>
             <div className="d-flex justify-content-end mt-3">
-              <BUTTONADDSECTIONSTYLE type="button" onClick={handleAddImgData}>
+              <BUTTONADDSECTIONSTYLE
+                type="button"
+                className="mt-2 mb-3 ms-3"
+                onClick={handleAddImgData}
+              >
                 اضافه کردن عکس / فیلم
               </BUTTONADDSECTIONSTYLE>
             </div>
@@ -1250,7 +1356,7 @@ export default function EditHonors({
         <div>
           {/* Media Section */}
           <BorderInputBox>
-            <label>فیلم ها:</label>
+            <HeaderEachSection>فیلم ها:</HeaderEachSection>
             <DivAdjustColorDivs
               style={{ width: "100%" }}
               columns="repeat(1, 1fr)"
@@ -1259,7 +1365,7 @@ export default function EditHonors({
                 <div className="mt-2 d-flex flex-column gap-3" key={index}>
                   <div className="d-flex flex-row align-items-center gap-3 flex-wrap">
                     <input
-                      style={{ width: "45%" }}
+                      style={{ width: "43%" }}
                       type="text"
                       placeholder="عنوان فیلم"
                       value={item.title}
@@ -1274,7 +1380,7 @@ export default function EditHonors({
                     />
 
                     <input
-                      style={{ width: "45%" }}
+                      style={{ width: "43%" }}
                       type="text"
                       placeholder="توضیحات"
                       value={item.description}
@@ -1289,6 +1395,13 @@ export default function EditHonors({
                       }
                       className="form-control"
                     />
+                    <ButtonCancelOrder
+                      className="px-2 py-1 rounded"
+                      type="button"
+                      onClick={() => handleRemoveMedia(index)}
+                    >
+                      حذف
+                    </ButtonCancelOrder>
                   </div>
 
                   <DivAdjustGrodimageMedia
@@ -1433,21 +1546,151 @@ export default function EditHonors({
                       )}
                     </div>
                   </DivAdjustGrodimageMedia>
-
-                  <button
-                    className="bg-danger text-white px-2 py-1 rounded"
-                    type="button"
-                    onClick={() => handleRemoveMedia(index)}
-                  >
-                    حذف
-                  </button>
                 </div>
               ))}
             </DivAdjustColorDivs>
             <div className="d-flex justify-content-end mt-3">
-              <BUTTONADDSECTIONSTYLE type="button" onClick={handleAddMedia}>
+              <BUTTONADDSECTIONSTYLE
+                type="button"
+                className="mt-2 mb-3 ms-3"
+                onClick={handleAddMedia}
+              >
                 اضافه کردن ویدیو
               </BUTTONADDSECTIONSTYLE>
+            </div>
+          </BorderInputBox>
+        </div>
+      )}
+
+      {/* filed Tab Content */}
+      {activeTab === "fileds" && (
+        <div>
+          <BorderInputBox>
+            <HeaderEachSection>فیلد ها:</HeaderEachSection>
+            <DivAdjustColorDivs
+              style={{ width: "100%" }}
+              columns="repeat(1, 1fr)"
+            >
+              {filedOrder.map((item, index) => (
+                <div className="mt-2 d-flex flex-column gap-3" key={index}>
+                  <div className="d-flex  flex-row align-items-center gap-3">
+                    <select
+                      value={item.type}
+                      onChange={(e) =>
+                        setFiledOrder(
+                          filedOrder.map((f, iIdx) =>
+                            iIdx === index
+                              ? {
+                                  ...f,
+                                  type: e.target.value,
+                                  dropDownOP: [""],
+                                }
+                              : f
+                          )
+                        )
+                      }
+                      required
+                      className="form-select mt-2 mb-1 w-50"
+                    >
+                      <option value="text">متن :</option>
+                      <option value="dropDown">دراپ دون :</option>
+                    </select>
+                    <input
+                      style={{ width: "45%" }}
+                      type="text"
+                      placeholder="عنوان فیلد"
+                      value={item.name}
+                      onChange={(e) =>
+                        setFiledOrder(
+                          filedOrder.map((f, iIdx) =>
+                            iIdx === index ? { ...f, name: e.target.value } : f
+                          )
+                        )
+                      }
+                      required
+                      className="form-control"
+                    />
+                    <ButtonCancelOrder
+                      className=" px-2 py-1 rounded"
+                      type="button"
+                      style={{ width: "fit-content" }}
+                      onClick={() => handleRemoveFileds(index)}
+                    >
+                      حذف
+                    </ButtonCancelOrder>
+                  </div>
+
+                  {item.type === "dropDown" && (
+                    <div className="d-flex flex-column gap-2 mt-2">
+                      <label
+                        htmlFor={`dropDownOP-${index}`}
+                        className="form-label"
+                        style={{ whiteSpace: "nowrap" }}
+                      >
+                        گزینه‌های دراپ دون:
+                      </label>
+
+                      <ResponsiveDivFileds
+                        className="mt-2 mb-2"
+                        columns="repeat(2, 1fr)"
+                      >
+                        {item.dropDownOP.map((option, optIndex) => (
+                          <div
+                            className="d-flex flex-row align-items-center gap-2 mb-2"
+                            key={optIndex}
+                          >
+                            <input
+                              type="text"
+                              placeholder={`گزینه ${optIndex + 1}`}
+                              value={option}
+                              onChange={(e) => {
+                                const updatedFiledOrder = [...filedOrder];
+                                updatedFiledOrder[index].dropDownOP[optIndex] =
+                                  e.target.value;
+                                setFiledOrder(updatedFiledOrder);
+                              }}
+                              required
+                              className="form-control"
+                            />
+                            {item.dropDownOP.length > 1 && (
+                              <ButtonCancelOrder
+                                type="button"
+                                className=" px-2 py-1 rounded"
+                                onClick={() =>
+                                  handleRemoveDropDownOption(index, optIndex)
+                                }
+                              >
+                                حذف
+                              </ButtonCancelOrder>
+                            )}
+                          </div>
+                        ))}
+                      </ResponsiveDivFileds>
+                      <button
+                        type="button"
+                        className="NormalTextSizing"
+                        style={{
+                          backgroundColor: "#43A047",
+                          width: "fit-content",
+                        }}
+                        onClick={() => handleAddDropDownOption(index)}
+                      >
+                        اضافه کردن گزینه
+                      </button>
+                    </div>
+                  )}
+                </div>
+              ))}
+            </DivAdjustColorDivs>
+
+            <div className="d-flex justify-content-end mt-3">
+              <ButtonAddSection
+                className="mt-2 mb-3 ms-3 bg-success text-white px-2 py-1 rounded"
+                type="button"
+                onClick={handleAddFileds}
+              >
+                اضافه کردن فیلد
+              </ButtonAddSection>
             </div>
           </BorderInputBox>
         </div>
@@ -1476,13 +1719,13 @@ export default function EditHonors({
           </button>
         </div>
         <div>
-          <button
+          <ButtonCancelOrder
             className="mt-2 mb-2 deleteButtonStyle"
             type="button"
             onClick={areYouShureFunction2}
           >
             حذف محصول
-          </button>
+          </ButtonCancelOrder>
         </div>
       </BUTTONSSTYLE>
 

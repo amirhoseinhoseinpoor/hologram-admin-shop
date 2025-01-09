@@ -38,6 +38,9 @@ const DivAdjustColorDivs = styled.div`
     color: #404040;
     margin: 0;
   }
+  @media(max-width : 768px) {
+    grid-template-columns: ${(props) => props.recolumns || ""};
+  }
 `;
 
 const DivAdjustGrodimageMedia = styled.div`
@@ -630,8 +633,6 @@ export default function AddHonors({ setDataUpdated, setActiveKey }) {
         filedOrder,
       };
 
-      // console.log(productData);
-
       // Dispatch the final product submission
       const dataConfirmComing = await dispatch(
         productpot(productData)
@@ -865,7 +866,7 @@ export default function AddHonors({ setDataUpdated, setActiveKey }) {
                   </HeaderEachSection>
                 </div>
 
-                <DivAdjustColorDivs columns="repeat(2, 1fr)">
+                <DivAdjustColorDivs columns="repeat(2, 1fr)" recolumns="repeat(1, 1fr)">
                   {section.items.map((item, itemIndex) => (
                     <div
                       style={{ height: "fit-content" }}
@@ -964,7 +965,7 @@ export default function AddHonors({ setDataUpdated, setActiveKey }) {
                                 />
 
                                 {section.type === "image" && item.src && (
-                                  <div className="d-flex flex-column">
+                                  <div className="d-flex flex-column align-items-center">
                                     <BOX
                                       component="img"
                                       src={URL.createObjectURL(item.src)}
@@ -1034,6 +1035,7 @@ export default function AddHonors({ setDataUpdated, setActiveKey }) {
                     >
                       حذف
                     </ButtonCancelOrder>
+                    
                     <DivAdjustGrodimageMedia>
                       <div className="d-flex flex-column w-100">
                         <span className="mb-1 NormalTextSizing">
@@ -1415,6 +1417,7 @@ export default function AddHonors({ setDataUpdated, setActiveKey }) {
           </div>
         )}
 
+        {/* filed Tab Content */}
         {activeTab === "fileds" && (
           <div>
             <BorderInputBox>
