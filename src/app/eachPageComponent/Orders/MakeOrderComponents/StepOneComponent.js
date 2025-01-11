@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import style from "../../../Styles/MakeOrderStyle/StepOneStyle.module.scss";
 import { Box } from "@mui/system";
 // import basecomponent
@@ -35,13 +35,16 @@ export default function SteponeComponent({
 
   const handleCloseZoomModal = () => setZoomModal(false);
 
+  console.log(data);
+
   // const [inputFields, setInputFields] = useState([{ title: "", price: "" }]);
-  // const [disablenextStep, setDisableNextStep] = useState(true);
+  const [disablenextStep, setDisableNextStep] = useState(true);
   const [statusTraking, setStatusTraking] = useState(false);
   const [moveForward, setMoveForward] = useState(false);
   const [factorType, setFactorType] = useState("");
   const [paymentType, setPatmentType] = useState("");
   const [logo, setLogo] = useState(null);
+  const [disableremoveproduct, setDisableremoveproduct] = useState(false);
   const [finalFactor, setFinalFactor] = useState(null);
   const [bothFactor, setBothFactor] = useState(null);
   const [loading, setLoading] = useState(false);
@@ -63,6 +66,11 @@ export default function SteponeComponent({
     prodName: "",
     prodCode: "",
   });
+
+  // Initialize dynamicForm as an object where each key is the product code
+  const [dynamicForm, setDynamicForm] = useState({});
+  const [prodFiled, setProdFiled] = useState([]);
+  const [hasDynamicFields, setHasDynamicFields] = useState(false);
 
   useEffect(() => {
     if (step > 1) {
@@ -104,15 +112,41 @@ export default function SteponeComponent({
   });
 
   useEffect(() => {
-    if (data) {
+    if (Array.isArray(data) && data) {
+      setDisableremoveproduct(true);
+
+      setProdFiled(
+        data.map((prod) => ({
+          code: prod.code,
+          name: prod.name,
+          filedOrder: prod.filedOrder.map((field) => ({
+            name: field.name,
+            type: field.type,
+            dropDownOP:
+              field.type === "dropDown" ? field.dropDownOP : undefined,
+          })),
+        }))
+      );
+
+      const initialDynamicForm = {};
+      data.forEach((prod) => {
+        initialDynamicForm[prod.code] = {};
+        prod.filedOrder.forEach((field) => {
+          initialDynamicForm[prod.code][field.name] = field.value || "";
+        });
+      });
+      setDynamicForm(initialDynamicForm);
+      setHasDynamicFields(true);
+      setStatusTraking(true);
+    } else if (typeof data === "object" && data !== null) {
       setFormData((prevFormData) => ({
         ...prevFormData,
         ...data,
       }));
       setSelectedSize(data.selectedSize || "");
       setSelectedShape(data.selectedShape || "");
+      setDisableremoveproduct(true);
       setSerialtype(data.serialtype || false);
-      // setDisabelInput(true);
       setStatusTraking(true);
     }
   }, [data]);
@@ -126,10 +160,20 @@ export default function SteponeComponent({
     }
   }, [reqComment]);
 
+  const handleInputDynamicChange = (code, event) => {
+    const { name, value } = event.target;
+    setDynamicForm((prev) => ({
+      ...prev,
+      [code]: {
+        ...prev[code],
+        [name]: value,
+      },
+    }));
+  };
+
   const handleDisabelInput = () => {
-    // setDisabelInput(true);
+    setDisabelInput(true);
     handleSubmit();
-    // handleNextStep();
   };
 
   const handleImageTypeChange = (event) => {
@@ -143,31 +187,27 @@ export default function SteponeComponent({
   const handleSizeChange = (size) => {
     setSelectedSize(size);
     setFormData({ ...formData, selectedSize: size });
-    // checkAllFieldsFilled();
   };
 
   const handleShapeChange = (shape) => {
     setSelectedShape(shape);
     setFormData({ ...formData, selectedShape: shape });
-    // checkAllFieldsFilled();
   };
 
   const handleRadioChange = (event) => {
-    setSerialtype(event.target.value === "true");
-    setFormData({ ...formData, serialtype: event.target.value === "true" });
-    // checkAllFieldsFilled();
+    const value = event.target.value === "true";
+    setSerialtype(value);
+    setFormData({ ...formData, serialtype: value });
   };
 
   const handleInputChange = (event) => {
     const { name, value } = event.target;
     setFormData({ ...formData, [name]: value });
-    // checkAllFieldsFilled();
   };
 
   const handleInfomationChange = (event) => {
     const { name, value } = event.target;
     setInformation({ ...information, [name]: value });
-    // checkAllFieldsFilled();
   };
 
   const handleLogoChange = (event) => {
@@ -199,31 +239,66 @@ export default function SteponeComponent({
 
   const handleDeleteLogo = () => {
     setLogo(null);
+    setInformation({ ...information, paymentImage: "" });
   };
 
   const handleDeleteFinalFactor = () => {
     setFinalFactor(null);
+    setInformation({ ...information, finalPayment: "" });
   };
   const handleDeleteBothFactor = () => {
     setBothFactor(null);
+    setInformation({ ...information, paymentImage: "", finalPayment: "" });
   };
 
-  // const checkAllFieldsFilled = () => {
-  //   const isFilled =
-  //   formData.selectedSize !== "" &&
-  //   formData.feature !== "" &&
-  //   formData.color !== "" &&
-  //   formData.stick !== "" &&
-  //   formData.howItWork !== "" &&
-  //   formData.chosenEffect !== "" &&
-  //   formData.selectedShape !== "";
+  const checkAllFieldsFilled = () => {
+    if (prodFiled.length > 0) {
+      const dynamicFilled = prodFiled.every((prod) =>
+        prod.filedOrder.every(
+          (field) =>
+            dynamicForm[prod.code] &&
+            dynamicForm[prod.code][field.name]?.trim() !== ""
+        )
+      );
+      setDisableNextStep(!dynamicFilled);
+    } else {
+      const isFilled =
+        formData.selectedSize.trim() !== "" &&
+        formData.feature.trim() !== "" &&
+        formData.color.trim() !== "" &&
+        formData.stick.trim() !== "" &&
+        formData.howItWork.trim() !== "" &&
+        formData.chosenEffect.trim() !== "" &&
+        formData.selectedShape.trim() !== "";
 
-  //   setDisableNextStep(!isFilled);
-  // };
+      setDisableNextStep(!isFilled);
+    }
+  };
+
+  useEffect(() => {
+    checkAllFieldsFilled();
+  }, [formData, dynamicForm, hasDynamicFields, prodFiled]);
+
+  const handleRemoveProduct = (index, code) => {
+    if (disableremoveproduct) return; // Prevent removal if disabled
+
+    const getCodeProduct = sessionStorage.getItem("PRODCODE");
+    const PGetCodeProduct = getCodeProduct ? getCodeProduct.split(",") : [];
+    if (PGetCodeProduct.length > 0) {
+      const updatedCodes = PGetCodeProduct.filter((item) => item !== code);
+      sessionStorage.setItem("PRODCODE", updatedCodes.join(","));
+    }
+
+    setProdFiled(prodFiled.filter((_, i) => i !== index));
+
+    setDynamicForm((prev) => {
+      const updated = { ...prev };
+      delete updated[code];
+      return updated;
+    });
+  };
 
   const handleSubmit = async () => {
-    // const updatedData = { request: { ...formData } };
-
     try {
       setLoading(true);
       let uploadFactor;
@@ -303,304 +378,367 @@ export default function SteponeComponent({
 
   return (
     <>
-      <div className={`${style.adjustPhoneSize} d-flex flex-row gap-4`}>
-        <div className={`${style.adjustWidthRight} d-flex flex-column `}>
-          <div className="d-flex flex-column">
-            <div className="d-flex flex-column">
-              <label htmlFor="feature" className="mt-1 mb-1 discription">
-                تعداد یا تیراژ
-              </label>
-              <input
-                type="text"
-                className={`${style.formInputNumber} form-control discription`}
-                // style={{ border: hasError ? "1.2px solid #FF4F3F" : "" }}
-                id="feature"
-                name="feature"
-                value={formData.feature}
-                // ref={passwordRef}
-                // onChange={(e) => setPassword(e.target.value)}
-                placeholder="حداقل 2000"
-                onChange={handleInputChange}
-                disabled={disabelInput}
-                required
-              />
-            </div>
-            <h3 className="mb-3 mt-3 discription">سایز</h3>
-            <div style={{ display: "flex", gap: "4px" }}>
-              <div
-                className={style.SizezInput}
-                style={{
-                  border: selectedSize === "2:4" ? "1.5px solid #404756" : "",
-                  borderRadius: "5px",
-                  cursor: "pointer",
-                }}
-                onClick={
-                  disabelInput ? undefined : () => handleSizeChange("2:4")
-                }
-              >
-                2:4
+      {prodFiled.length > 0 ? (
+        <div>
+          {prodFiled.map((inProd, index) => (
+            <div key={inProd.code}>
+              {/* Product Header */}
+              <div className="d-flex flex-row align-items-center justify-content-between">
+                <p className="VodeoDisSizing mb-2 mt-2 ">{inProd.name}</p>
+                <button
+                  type="button"
+                  disabled={disableremoveproduct}
+                  onClick={() => handleRemoveProduct(index, inProd.code)}
+                  className={`${style.ButtonRemoveProduct}`}
+                >
+                  حذف
+                </button>
               </div>
-              <div
-                className={style.SizezInput}
-                style={{
-                  border: selectedSize === "2:5" ? "1.5px solid #404756" : "",
-                  borderRadius: "5px",
-                  cursor: "pointer",
-                }}
-                onClick={
-                  disabelInput ? undefined : () => handleSizeChange("2:5")
-                }
-              >
-                2:5
+
+              {/* Dynamic Fields */}
+              <div className={`${style.stepOneDynamicInput}`}>
+                {inProd.filedOrder.map((item, idx) => (
+                  <div key={idx}>
+                    {item.type === "text" && (
+                      <div className="d-flex flex-column mt-1 mb-1">
+                        <label
+                          htmlFor={`text-${inProd.code}-${idx}`}
+                          className="mt-1 mb-1 description d-flex flex-row gap-2 align-items-center"
+                        >
+                          <span className="NormalTextSizing">{item.name}</span>
+                          <span
+                            className={`${style.redStarStyle} NormalTextSizing`}
+                          >
+                            *
+                          </span>
+                        </label>
+                        <input
+                          type="text"
+                          className={`${style.formInputNumber} form-control description`}
+                          id={`text-${inProd.code}-${idx}`}
+                          name={item.name}
+                          value={dynamicForm[inProd.code]?.[item.name] || ""}
+                          onChange={(e) =>
+                            handleInputDynamicChange(inProd.code, e)
+                          }
+                          disabled={disabelInput}
+                          required
+                        />
+                      </div>
+                    )}
+                    {item.type === "dropDown" && (
+                      <div className="d-flex flex-column mt-1 mb-1">
+                        <label
+                          htmlFor={`dropDown-${inProd.code}-${idx}`}
+                          className="mt-1 mb-1 description d-flex flex-row gap-2 align-items-center"
+                        >
+                          <span className="NormalTextSizing">{item.name}</span>
+                          <span
+                            className={`${style.redStarStyle} NormalTextSizing`}
+                          >
+                            *
+                          </span>
+                        </label>
+                        <select
+                          id={`dropDown-${inProd.code}-${idx}`}
+                          name={item.name}
+                          value={dynamicForm[inProd.code]?.[item.name] || ""}
+                          onChange={(e) =>
+                            handleInputDynamicChange(inProd.code, e)
+                          }
+                          disabled={disabelInput}
+                          required
+                          className={`${style.formInputNumber} form-control description`}
+                        >
+                          <option value="" disabled>
+                            انتخاب کنید
+                          </option>
+                          {item?.dropDownOP?.map((POP, popIdx) => (
+                            <option key={popIdx} value={POP}>
+                              {POP}
+                            </option>
+                          ))}
+                        </select>
+                      </div>
+                    )}
+                  </div>
+                ))}
               </div>
-              <div
-                className={style.SizezInput}
-                style={{
-                  border: selectedSize === "3:5" ? "1.5px solid #404756" : "",
-                  borderRadius: "5px",
-                  cursor: "pointer",
-                }}
-                onClick={
-                  disabelInput ? undefined : () => handleSizeChange("3:5")
-                }
-              >
-                3:5
-              </div>
-              <div
-                className={style.SizezInput}
-                style={{
-                  border: selectedSize === "3:11" ? "1.5px solid #404756" : "",
-                  borderRadius: "5px",
-                  cursor: "pointer",
-                }}
-                onClick={
-                  disabelInput ? undefined : () => handleSizeChange("3:11")
-                }
-              >
-                3:11
-              </div>
             </div>
-            <div className="d-flex flex-column">
-              <label htmlFor="color" className="mt-3 mb-1 discription">
-                رنگ
-              </label>
-              <input
-                type="text"
-                className={`${style.formInputNumber} form-control discription`}
-                id="color"
-                name="color"
-                value={formData.color}
-                onChange={handleInputChange}
-                disabled={disabelInput}
-                required
-              />
-            </div>
-            <div className="d-flex flex-column">
-              <label htmlFor="stick" className="mt-2 mb-2 discription">
-                قالب برچسب
-              </label>
-              <input
-                type="text"
-                className={`${style.formInputNumber} form-control discription`}
-                id="stick"
-                name="stick"
-                value={formData.stick}
-                onChange={handleInputChange}
-                disabled={disabelInput}
-              />
-            </div>
-            <div className="d-flex flex-column">
-              <label htmlFor="howItWork" className="mt-2 mb-2 discription">
-                نوع اثرگذاری
-              </label>
-              <input
-                type="text"
-                className={`${style.formInputNumber} form-control discription`}
-                id="howItWork"
-                name="howItWork"
-                value={formData.howItWork}
-                onChange={handleInputChange}
-                disabled={disabelInput}
-              />
-            </div>
-          </div>
+          ))}
         </div>
-        <div className={`${style.adjustWithLeft} d-flex flex-column`}>
-          <div className="d-flex flex-column">
-            <label htmlFor="chosenEffect" className="mt-1 mb-1 discription">
-              افکت مورد نظر
-            </label>
-            <input
-              type="text"
-              className={`${style.formInputNumber} form-control discription`}
-              id="chosenEffect"
-              name="chosenEffect"
-              value={formData.chosenEffect}
-              disabled={disabelInput}
-              onChange={handleInputChange}
-            />
-          </div>
-
-          <h3 className="mb-3 mt-3 discription">شکل هولوگرام</h3>
-          <div className="d-flex flex-row gap-1">
-            <div
-              className={style.SizezInputFirst}
-              style={{
-                border: selectedShape === "مربع" ? "1.5px solid #404756" : "",
-                borderRadius: "5px",
-                cursor: "pointer",
-              }}
-              onClick={
-                disabelInput ? undefined : () => handleShapeChange("مربع")
-              }
-            >
-              مربع
-            </div>
-            <div
-              className={style.SizezInputSecond}
-              style={{
-                border: selectedShape === "دایره" ? "1.5px solid #404756" : "",
-                borderRadius: "5px",
-                cursor: "pointer",
-              }}
-              onClick={
-                disabelInput ? undefined : () => handleShapeChange("دایره")
-              }
-            >
-              دایره
-            </div>
-            <div
-              className={style.SizezInputThird}
-              style={{
-                border: selectedShape === "مستطیل" ? "1.5px solid #404756" : "",
-                borderRadius: "5px",
-                cursor: "pointer",
-              }}
-              onClick={
-                disabelInput ? undefined : () => handleShapeChange("مستطیل")
-              }
-            >
-              مستطیل
-            </div>
-            <div
-              className={style.SizezInputForth}
-              style={{
-                border: selectedShape === "بیضی" ? "1.5px solid #404756" : "",
-                borderRadius: "5px",
-                cursor: "pointer",
-              }}
-              onClick={
-                disabelInput ? undefined : () => handleShapeChange("بیضی")
-              }
-            >
-              بیضی
-            </div>
-          </div>
-
-          <div className="d-flex flex-column">
-            <label htmlFor="useCase" className="mt-3 mb-1 discription">
-              موارد مصرف
-            </label>
-            <input
-              type="text"
-              className={`${style.formInputNumber} form-control discription`}
-              id="useCase"
-              name="useCase"
-              value={formData.useCase}
-              disabled={disabelInput}
-              onChange={handleInputChange}
-            />
-            <p className={`${style.discriptionStyle} discription`}>
-              سطحی که قرار است روی ان چسبیده شود (پلاستیک . کاغذ)
-            </p>
-          </div>
-          <div className="d-flex flex-row gap-1  mt-2 mb-2">
-            <input
-              name="serial"
-              id="withOutSerial"
-              type="radio"
-              onChange={handleRadioChange}
-              value="false"
-              checked={serialtype === false}
-              disabled={disabelInput}
-            />
-            <label htmlFor="withOutSerial" className="ms-2">
-              بدون سریال
-            </label>
-            <input
-              name="serial"
-              id="withSerial"
-              type="radio"
-              onChange={handleRadioChange}
-              value="true"
-              checked={serialtype === true}
-              disabled={disabelInput}
-            />
-            <label htmlFor="withSerial">باسریال</label>
-          </div>
-          <div className="mt-1 mb-1">
-            {serialtype && (
+      ) : (
+        <>
+          {/* Static Fields Rendering */}
+          <div className={`${style.adjustPhoneSize} d-flex flex-row gap-4`}>
+            <div className={`${style.adjustWidthRight} d-flex flex-column `}>
               <div className="d-flex flex-column">
-                <label htmlFor="serial" className=" mb-1 discription">
-                  نوع سریال
+                <div className="d-flex flex-column">
+                  <label
+                    htmlFor="feature"
+                    className="mt-1 mb-1 description d-flex flex-row gap-2 align-items-center"
+                  >
+                    <span>تعداد یا تیراژ</span>
+                    <span className={style.redStarStyle}>*</span>
+                  </label>
+                  <input
+                    type="text"
+                    className={`${style.formInputNumber} form-control description`}
+                    id="feature"
+                    name="feature"
+                    value={formData.feature}
+                    placeholder="حداقل 2000"
+                    onChange={handleInputChange}
+                    disabled={disabelInput}
+                    required
+                  />
+                </div>
+                <h3 className="mb-3 mt-3 description d-flex flex-row gap-2 align-items-center">
+                  <span>سایز</span>
+                  <span className={style.redStarStyle}>*</span>
+                </h3>
+                <div style={{ display: "flex", gap: "4px" }}>
+                  {["2:4", "2:5", "3:5", "3:11"].map((size) => (
+                    <div
+                      key={size}
+                      className={style.SizezInput}
+                      style={{
+                        border:
+                          selectedSize === size ? "1.5px solid #404756" : "",
+                        borderRadius: "5px",
+                        cursor: "pointer",
+                      }}
+                      onClick={
+                        disabelInput ? undefined : () => handleSizeChange(size)
+                      }
+                    >
+                      {size}
+                    </div>
+                  ))}
+                </div>
+                <div className="d-flex flex-column">
+                  <label
+                    htmlFor="color"
+                    className="mt-3 mb-1 description d-flex flex-row gap-2 align-items-center"
+                  >
+                    <span>رنگ</span>
+                    <span className={style.redStarStyle}>*</span>
+                  </label>
+                  <input
+                    type="text"
+                    className={`${style.formInputNumber} form-control description`}
+                    id="color"
+                    name="color"
+                    value={formData.color}
+                    onChange={handleInputChange}
+                    disabled={disabelInput}
+                    required
+                  />
+                </div>
+                <div className="d-flex flex-column">
+                  <label
+                    htmlFor="stick"
+                    className="mt-2 mb-2 description d-flex flex-row gap-2 align-items-center"
+                  >
+                    <span>قالب برچسب</span>
+                    <span className={style.redStarStyle}>*</span>
+                  </label>
+                  <input
+                    type="text"
+                    className={`${style.formInputNumber} form-control description`}
+                    id="stick"
+                    name="stick"
+                    value={formData.stick}
+                    onChange={handleInputChange}
+                    disabled={disabelInput}
+                    required
+                  />
+                </div>
+                <div className="d-flex flex-column">
+                  <label
+                    htmlFor="howItWork"
+                    className="mt-2 mb-2 description d-flex flex-row gap-2 align-items-center"
+                  >
+                    <span>نوع اثرگذاری</span>
+                    <span className={style.redStarStyle}>*</span>
+                  </label>
+                  <input
+                    type="text"
+                    className={`${style.formInputNumber} form-control description`}
+                    id="howItWork"
+                    name="howItWork"
+                    value={formData.howItWork}
+                    onChange={handleInputChange}
+                    disabled={disabelInput}
+                    required
+                  />
+                </div>
+              </div>
+            </div>
+            <div className={`${style.adjustWithLeft} d-flex flex-column`}>
+              <div className="d-flex flex-column">
+                <label
+                  htmlFor="chosenEffect"
+                  className="mt-1 mb-1 description d-flex flex-row gap-2 align-items-center"
+                >
+                  <span>افکت مورد نظر</span>
+                  <span className={style.redStarStyle}>*</span>
                 </label>
                 <input
                   type="text"
-                  className={`${style.formInputNumber} form-control discription`}
-                  id="serial"
-                  name="serial"
-                  value={formData.serial}
-                  onChange={handleInputChange}
+                  className={`${style.formInputNumber} form-control description`}
+                  id="chosenEffect"
+                  name="chosenEffect"
+                  value={formData.chosenEffect}
                   disabled={disabelInput}
+                  onChange={handleInputChange}
+                  required
                 />
               </div>
-            )}
-          </div>
-          <div className="d-flex flex-column">
-            <label htmlFor="information" className=" mb-1 discription">
-              توضیحات
-            </label>
-            <textarea
-              className={`${style.formInputNumber} form-control discription`}
-              id="information"
-              name="information"
-              value={formData.information}
-              style={{ maxHeight: "200px" }}
-              onChange={handleInputChange}
-              disabled={disabelInput}
-            />
-          </div>
-        </div>
-      </div>
 
+              <h3 className="mb-3 mt-3 description d-flex flex-row gap-2 align-items-center">
+                <span>شکل هولوگرام</span>
+                <span className={style.redStarStyle}>*</span>
+              </h3>
+              <div className="d-flex flex-row gap-1">
+                {[
+                  {
+                    label: "مربع",
+                    value: "مربع",
+                    className: style.SizezInputFirst,
+                  },
+                  {
+                    label: "دایره",
+                    value: "دایره",
+                    className: style.SizezInputSecond,
+                  },
+                  {
+                    label: "مستطیل",
+                    value: "مستطیل",
+                    className: style.SizezInputThird,
+                  },
+                  {
+                    label: "بیضی",
+                    value: "بیضی",
+                    className: style.SizezInputForth,
+                  },
+                ].map((shape) => (
+                  <div
+                    key={shape.value}
+                    className={shape.className}
+                    style={{
+                      border:
+                        selectedShape === shape.value
+                          ? "1.5px solid #404756"
+                          : "",
+                      borderRadius: "5px",
+                      cursor: "pointer",
+                    }}
+                    onClick={
+                      disabelInput
+                        ? undefined
+                        : () => handleShapeChange(shape.value)
+                    }
+                  >
+                    {shape.label}
+                  </div>
+                ))}
+              </div>
+
+              <div className="d-flex flex-column">
+                <label
+                  htmlFor="useCase"
+                  className="mt-3 mb-1 description d-flex flex-row gap-2 align-items-center"
+                >
+                  <span>موارد مصرف</span>
+                  <span className={style.redStarStyle}>*</span>
+                </label>
+                <input
+                  type="text"
+                  className={`${style.formInputNumber} form-control description`}
+                  id="useCase"
+                  name="useCase"
+                  value={formData.useCase}
+                  disabled={disabelInput}
+                  onChange={handleInputChange}
+                  required
+                />
+                <p className={`${style.discriptionStyle} description`}>
+                  سطحی که قرار است روی ان چسبیده شود (پلاستیک . کاغذ)
+                </p>
+              </div>
+              <div className="d-flex flex-row gap-1  mt-2 mb-2">
+                <input
+                  name="serial"
+                  id="withOutSerial"
+                  type="radio"
+                  onChange={handleRadioChange}
+                  value="false"
+                  checked={serialtype === false}
+                  disabled={disabelInput}
+                />
+                <label htmlFor="withOutSerial" className="ms-2">
+                  بدون سریال
+                </label>
+                <input
+                  name="serial"
+                  id="withSerial"
+                  type="radio"
+                  onChange={handleRadioChange}
+                  value="true"
+                  checked={serialtype === true}
+                  disabled={disabelInput}
+                />
+                <label htmlFor="withSerial">باسریال</label>
+              </div>
+              <div className="mt-1 mb-1">
+                {serialtype && (
+                  <div className="d-flex flex-column">
+                    <label htmlFor="serial" className=" mb-1 description">
+                      نوع سریال
+                    </label>
+                    <input
+                      type="text"
+                      className={`${style.formInputNumber} form-control description`}
+                      id="serial"
+                      name="serial"
+                      value={formData.serial}
+                      onChange={handleInputChange}
+                      disabled={disabelInput}
+                      required
+                    />
+                  </div>
+                )}
+              </div>
+              <div className="d-flex flex-column">
+                <label htmlFor="information" className=" mb-1 description">
+                  توضیحات
+                </label>
+                <textarea
+                  className={`${style.formInputNumber} form-control description`}
+                  id="information"
+                  name="information"
+                  value={formData.information}
+                  style={{ maxHeight: "200px" }}
+                  onChange={handleInputChange}
+                  disabled={disabelInput}
+                  required
+                />
+              </div>
+            </div>
+          </div>
+        </>
+      )}
       <hr />
 
       <div
         className={`${style.responsiveBottomMainDiv} d-flex flex-row gap-3 justify-content-between`}
       >
-        <div className={`d-flex flex-row gap-2 align-items-center mt-2 mb-2 ${style.responsiveSelectWidth}`}>
-          <p
-            style={{ whiteSpace: "nowrap" }}
-            className="NormalTextSizing mb-1 me-1"
-          >
-            نوع پیش پرداخت :
-          </p>
-          <select
-            // value={paymentType}
-            // onChange={handlePaymentTypeChange}
-            className={`form-select mb-2`}
-            style={{ boxShadow: "unset" }}
-          >
-            <option disabled value="">
-              انتخاب کنید
-            </option>
-            <option value="dargah">درگاه پرداخت</option>
-            <option value="fish">اپلود فیش</option>
-            <option value="check">چک</option>
-          </select>
-        </div>
+        
 
-        <div className={`d-flex flex-row gap-2 align-items-center mt-2 mb-2 ${style.responsiveSelectWidth}`}>
+        <div
+          className={`d-flex flex-row gap-2 align-items-center mt-2 mb-2 ${style.responsiveSelectWidth}`}
+        >
           <p
             style={{ whiteSpace: "nowrap" }}
             className="NormalTextSizing mb-1 me-1"
@@ -608,8 +746,8 @@ export default function SteponeComponent({
             نوع پرداخت :
           </p>
           <select
-            // value={paymentType}
-            // onChange={handlePaymentTypeChange}
+            value={paymentType}
+            onChange={handlePaymentTypeChange}
             className={`form-select mb-2 `}
             style={{ boxShadow: "unset" }}
           >
@@ -653,7 +791,7 @@ export default function SteponeComponent({
             مدارک مورد نیاز برای اپلود
           </label>
           <textarea
-            className={`${style.formInputNumber} ${style.textAreaDocument} form-control discription`}
+            className={`${style.formInputNumber} ${style.textAreaDocument} form-control description`}
             cols="40"
             value={information.docInfo}
             rows="2"
@@ -754,10 +892,10 @@ export default function SteponeComponent({
                           />
                         </svg>
                       </div>
-                      <p className={`${style.colorTheInputFile} discription`}>
+                      <p className={`${style.colorTheInputFile} description`}>
                         بارگذاری فایل .png یا .jpg
                       </p>
-                      <p className={`${style.colorTheInputFile} discription`}>
+                      <p className={`${style.colorTheInputFile} description`}>
                         حداکثر تا 5 مگابایت
                       </p>
                     </div>
@@ -866,10 +1004,10 @@ export default function SteponeComponent({
                           />
                         </svg>
                       </div>
-                      <p className={`${style.colorTheInputFile} discription`}>
+                      <p className={`${style.colorTheInputFile} description`}>
                         بارگذاری فایل .png یا .jpg
                       </p>
-                      <p className={`${style.colorTheInputFile} discription`}>
+                      <p className={`${style.colorTheInputFile} description`}>
                         حداکثر تا 5 مگابایت
                       </p>
                     </div>
@@ -979,10 +1117,10 @@ export default function SteponeComponent({
                       />
                     </svg>
                   </div>
-                  <p className={`${style.colorTheInputFile} discription`}>
+                  <p className={`${style.colorTheInputFile} description`}>
                     بارگذاری فایل .png یا .jpg
                   </p>
-                  <p className={`${style.colorTheInputFile} discription`}>
+                  <p className={`${style.colorTheInputFile} description`}>
                     حداکثر تا 5 مگابایت
                   </p>
                 </div>
@@ -1003,7 +1141,11 @@ export default function SteponeComponent({
         <button
           type="button"
           onClick={handleDisabelInput}
-          disabled={loading}
+          disabled={loading || disablenextStep}
+          style={{
+            cursor: loading || disablenextStep ? "not-allowed" : "pointer",
+            backgroundColor: loading || disablenextStep ? "#868686" : undefined,
+          }}
           className={`${style.continueButton} mt-3 mb-2 ${
             loading ? style.disabledButtonLoading : ""
           }`}
@@ -1016,7 +1158,7 @@ export default function SteponeComponent({
             onClick={handleNextStep}
             className={`${style.continueButton} mt-3 mb-2`}
           >
-           مرحله بعدی
+            مرحله بعدی
           </button>
         )}
       </div>
