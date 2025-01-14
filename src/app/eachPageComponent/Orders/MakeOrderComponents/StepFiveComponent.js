@@ -304,7 +304,7 @@ export default function StepFiveComponent({
   }, [value]);
 
   return (
-    <>
+    <div>
       <div>
         <p className="NormalTextSizing mb-3">
           بعد از آماده سازی و تولید، دوست دارید بسته خود را چگونه تحویل بگیرید.{" "}
@@ -898,7 +898,7 @@ export default function StepFiveComponent({
               onClick={handleNextStep}
               className={`${style.continueButton}`}
             >
-             مرحله بعدی
+             رسید نهایی
             </button>
           )}
         </div>
@@ -1199,6 +1199,6 @@ export default function StepFiveComponent({
           </button>
         </Modal.Body>
       </Modal>
-    </>
+    </div>
   );
 }

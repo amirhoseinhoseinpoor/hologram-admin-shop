@@ -31,6 +31,7 @@ export default function StepTwoComponent({
   step,
   setStep,
   code,
+  setNavStep
 }) {
   const hasData = Object.keys(dataDocument).length > 0;
 
@@ -159,6 +160,7 @@ export default function StepTwoComponent({
       const increseingStep = await dispatch(increaseStep({ code, step: 3 }));
       if (increseingStep.payload.message == "Success") {
         setStep(3);
+        setNavStep(3);
       }
       setLoading(false);
     } catch (error) {
@@ -477,7 +479,7 @@ export default function StepTwoComponent({
                       onClick={handleNextStep}
                       className={`${style.continueButton} mt-3`}
                     >
-                      مرحله بعدی
+                      طراحی سفارش
                     </button>
                   )}
                 </div>

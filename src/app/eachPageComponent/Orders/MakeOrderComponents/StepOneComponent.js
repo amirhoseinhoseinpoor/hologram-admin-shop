@@ -25,6 +25,7 @@ export default function SteponeComponent({
   payment,
   setDisabelInput,
   disabelInput,
+  setNavStep,
 }) {
   const dispatch = useDispatch();
   const [selectedSize, setSelectedSize] = useState("");
@@ -363,6 +364,7 @@ export default function SteponeComponent({
         );
 
         if (increaseStepOrder.payload.message == "Success") {
+          setNavStep(2);
           setStep(2);
         }
       }
@@ -1158,7 +1160,7 @@ export default function SteponeComponent({
             onClick={handleNextStep}
             className={`${style.continueButton} mt-3 mb-2`}
           >
-            مرحله بعدی
+           بارگذاری مدارک
           </button>
         )}
       </div>
