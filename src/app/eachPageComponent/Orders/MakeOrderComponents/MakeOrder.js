@@ -4,8 +4,9 @@ import dynamic from "next/dynamic";
 import React, { useEffect, useState } from "react";
 import style from "../../../Styles/MakeOrderStyle/MakeOrder.module.scss";
 import ProcessTracker from "../ProcessTracker";
-import PusherChat from "./Talkjs";
 import styled from "styled-components";
+import Image from "next/image";
+import { Modal, Box } from "@mui/material";
 // import base component
 import NavBarToggleBurgerButton from "@/app/BaseComponent/NavBarToggleBurgerButton";
 import ProfileComponent from "@/app/BaseComponent/ProfileComponent";
@@ -21,7 +22,6 @@ const HeadermakeOrder = styled.div`
   }
 
   @media (max-width: 980px) {
-    /* background-color: rgb(26, 32, 53) !important; */
     .textHeaderStyle {
       /* color: white !important; */
     }
@@ -44,6 +44,9 @@ const StepSixComponent = dynamic(() => import("./StepSixComponent"), {
 });
 
 const StepSeven = dynamic(() => import("./StepSevenComponent"));
+const PusherChat = dynamic(() => import("./Talkjs"), {
+  ssr: false,
+});
 
 export default function MakeOrder({
   seeOrder,
@@ -53,9 +56,11 @@ export default function MakeOrder({
 }) {
   const [step, setStep] = useState(1);
   const [navStep, setNavStep] = useState(step || "");
+  const [disabelInput, setDisabelInput] = useState(false);
+  const [disabelInputStep2, setDisabelInputStep2] = useState(false);
+  const [disabelInputStep4, setDisabelInputStep4] = useState(false);
   const [shouldSetStep, setShouldSetStep] = useState(true);
-
-  console.log(seeOrder);
+  const [chatOpen, setChatOpen] = useState(false);
 
   useEffect(() => {
     if (seeOrder && shouldSetStep) {
@@ -65,20 +70,30 @@ export default function MakeOrder({
     }
   }, [seeOrder]);
 
-  const [disabelInput, setDisabelInput] = useState(false);
-  const [disabelInputStep2, setDisabelInputStep2] = useState(false);
-  const [disabelInputStep4, setDisabelInputStep4] = useState(false);
-
   const handleNextStep = () => {
     setShouldSetStep(false);
     setUpdateData(true);
     setStep((prevStep) => prevStep + 1);
   };
 
+  const handleSetStep = (step) => {
+    setShouldSetStep(false);
+    setUpdateData(true);
+    setStep(step);
+  };
+
   const handlePreviousStep = () => {
     setShouldSetStep(false);
     setUpdateData(true);
     setStep((prevStep) => (prevStep > 1 ? prevStep - 1 : prevStep));
+  };
+
+  const handleOpenChat = () => {
+    setChatOpen(true);
+  };
+
+  const handleCloseChat = () => {
+    setChatOpen(false);
   };
 
   const renderStepContent = () => {
@@ -157,6 +172,11 @@ export default function MakeOrder({
         return null;
     }
   };
+
+  // Define the chat step number
+  const chatStep = 3;
+  const finalStep = 6;
+
   return (
     <section>
       <HeadermakeOrder className="d-flex flex-row mb-3 justify-content-between">
@@ -173,8 +193,58 @@ export default function MakeOrder({
         <ProfileComponent colorGet={"#191919"} />
       </HeadermakeOrder>
 
-      <ProcessTracker currentStep={step} setStep={setStep} navStep={navStep} />
+      <ProcessTracker currentStep={step} setStep={handleSetStep} navStep={navStep} />
       {renderStepContent()}
+      {step !== chatStep && step !== finalStep && seeOrder && (
+        <>
+          <div onClick={handleOpenChat} className="mt-2 d-flex justify-content-end container" style={{ cursor: "pointer" }}>
+            <Image
+              className={style.chatIContStyle}
+              src="/gif/icons8-chat.gif"
+              alt="Chat Icon"
+              width={50}
+              height={50}
+              priority
+            />
+          </div>
+          <Modal
+            open={chatOpen}
+            onClose={handleCloseChat}
+            aria-labelledby="chat-modal-title"
+            aria-describedby="chat-modal-description"
+          >
+            <Box
+              sx={{
+                position: "absolute",
+                top: "50%",
+                left: "50%",
+                transform: "translate(-50%, -50%)",
+                width: "80%",
+                height : "80%",
+                maxHeight : "fit-content",
+                borderRadius: "4px",
+                bgcolor: "background.paper",
+                boxShadow: 24,
+                padding : "10px",
+                overflow : "auto"
+              }}
+            >
+              <PusherChat
+                modalChat={true}
+                data={seeOrder.request}
+                chatData={seeOrder.chat}
+                code={seeOrder.code}
+                step={seeOrder.step}
+                setNavStep={setNavStep}
+                setUpdateData={setUpdateData}
+                handleNextStep={handleNextStep}
+                handlePreviousStep={handlePreviousStep}
+              />
+            </Box>
+          </Modal>
+        </>
+      )}
+
     </section>
   );
 }
