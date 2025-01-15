@@ -52,14 +52,15 @@ export default function MakeOrder({
   setUpdateData,
 }) {
   const [step, setStep] = useState(1);
+  const [navStep, setNavStep] = useState(step || "");
   const [shouldSetStep, setShouldSetStep] = useState(true);
 
   console.log(seeOrder);
-  
 
   useEffect(() => {
     if (seeOrder && shouldSetStep) {
       setStep(seeOrder.step);
+      setNavStep(seeOrder.step);
       setShouldSetStep(true);
     }
   }, [seeOrder]);
@@ -70,16 +71,15 @@ export default function MakeOrder({
 
   const handleNextStep = () => {
     setShouldSetStep(false);
-    setUpdateData(true)
+    setUpdateData(true);
     setStep((prevStep) => prevStep + 1);
   };
 
   const handlePreviousStep = () => {
     setShouldSetStep(false);
-    setUpdateData(true)
+    setUpdateData(true);
     setStep((prevStep) => (prevStep > 1 ? prevStep - 1 : prevStep));
   };
-
 
   const renderStepContent = () => {
     switch (step) {
@@ -94,6 +94,7 @@ export default function MakeOrder({
               code={seeOrder.code}
               setStep={setStep}
               handleNextStep={handleNextStep}
+              setNavStep={setNavStep}
               setDisabelInput={setDisabelInput}
               disabelInput={disabelInput}
             />
@@ -107,6 +108,7 @@ export default function MakeOrder({
             dataDocument={seeOrder.document}
             setStep={setStep}
             handleNextStep={handleNextStep}
+            setNavStep={setNavStep}
             handlePreviousStep={handlePreviousStep}
             setDisabelInputStep2={setDisabelInputStep2}
             disabelInputStep2={disabelInputStep2}
@@ -127,25 +129,27 @@ export default function MakeOrder({
         );
       case 4:
         return (
-          <div className={style.stepContent}>
-            <StepFiveComponent
-              data={seeOrder.delivery}
-              code={seeOrder.code}
-              step={seeOrder.step}
-              handleNextStep={handleNextStep}
-              handlePreviousStep={handlePreviousStep}
-              setDisabelInputStep4={setDisabelInputStep4}
-              disabelInputStep4={disabelInputStep4}
-            />
-          </div>
-        );
-      case 5:
-        return (
           <StepSixComponent
             finalFactor={seeOrder.payment}
             handleNextStep={handleNextStep}
             handlePreviousStep={handlePreviousStep}
           />
+        );
+      case 5:
+        return (
+          <div className="container">
+            <div className={`${style.stepContent}`}>
+              <StepFiveComponent
+                data={seeOrder.delivery}
+                code={seeOrder.code}
+                step={seeOrder.step}
+                handleNextStep={handleNextStep}
+                handlePreviousStep={handlePreviousStep}
+                setDisabelInputStep4={setDisabelInputStep4}
+                disabelInputStep4={disabelInputStep4}
+              />
+            </div>
+          </div>
         );
       case 6:
         return <StepSeven handleNextStep={handleNextStep} />;
@@ -169,7 +173,7 @@ export default function MakeOrder({
         <ProfileComponent colorGet={"#191919"} />
       </HeadermakeOrder>
 
-      <ProcessTracker currentStep={step} />
+      <ProcessTracker currentStep={step} setStep={setStep} navStep={navStep} />
       {renderStepContent()}
     </section>
   );

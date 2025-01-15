@@ -75,7 +75,7 @@ export default function StepSixComponent({
   return (
     <section>
       <div
-        className={`${style.makeTheResponsivePerfect} d-flex flex-row gap-3`}
+        className={`${style.makeTheResponsivePerfect} d-flex flex-row gap-3 container`}
       >
         <div
           className={`${style.SectionStyle} ${style.adjustTheRightWidht} mb-3 mt-2 `}

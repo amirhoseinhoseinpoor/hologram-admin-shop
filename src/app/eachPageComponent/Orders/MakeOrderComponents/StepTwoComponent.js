@@ -17,6 +17,8 @@ import FormControl from "@mui/material/FormControl";
 import FormLabel from "@mui/material/FormLabel";
 import { Box } from "@mui/material";
 import Alert from "@mui/material/Alert";
+import { downloadImage } from "@/app/utils/downloadImage";
+import ArrowDownwardIcon from "@mui/icons-material/ArrowDownward";
 
 import style from "../../../Styles/MakeOrderStyle/StepTwoStyle.module.scss";
 
@@ -29,6 +31,7 @@ export default function StepTwoComponent({
   step,
   setStep,
   code,
+  setNavStep
 }) {
   const hasData = Object.keys(dataDocument).length > 0;
 
@@ -154,13 +157,12 @@ export default function StepTwoComponent({
   const handleSubmit = async () => {
     setLoading(true);
     try {
-
       const increseingStep = await dispatch(increaseStep({ code, step: 3 }));
       if (increseingStep.payload.message == "Success") {
         setStep(3);
+        setNavStep(3);
       }
       setLoading(false);
-
     } catch (error) {
       setLoading(false);
     }
@@ -425,6 +427,18 @@ export default function StepTwoComponent({
                                 />
                               </svg>
                             </button>
+                            <button
+                              className={`${style.downloadButton}`}
+                              onClick={() => {
+                                const date = new Date();
+                                downloadImage(
+                                  fileObj?.file,
+                                  `${date.toISOString()}.png`
+                                );
+                              }}
+                            >
+                              <ArrowDownwardIcon style={{color : "#191919"}}/>
+                            </button>
                           </div>
 
                           <input
@@ -446,16 +460,17 @@ export default function StepTwoComponent({
                     <button
                       onClick={handleDisabelInput}
                       disabled={loading}
-                      className={`${style.continueButton}  ${loading ? style.disabledButtonLoading : ''}`}
+                      className={`${style.continueButton}  ${
+                        loading ? style.disabledButtonLoading : ""
+                      }`}
                     >
                       {loading ? <LoadingCss /> : <>تایید مدارک</>}
-                      
                     </button>
                     <button
                       className={style.SeeLastStepButton}
                       onClick={handlePreviousStep}
                     >
-                       مراحله قبلی
+                      مراحله قبلی
                     </button>
                   </div>
                   {moveForward && (
@@ -464,7 +479,7 @@ export default function StepTwoComponent({
                       onClick={handleNextStep}
                       className={`${style.continueButton} mt-3`}
                     >
-                     مرحله بعدی
+                      طراحی سفارش
                     </button>
                   )}
                 </div>
