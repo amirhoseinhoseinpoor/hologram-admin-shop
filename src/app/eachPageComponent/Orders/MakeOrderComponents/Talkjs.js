@@ -23,6 +23,8 @@ import socket from "@/app/utils/socket";
 import { downloadImage } from "@/app/utils/downloadImage";
 import MessageItem from "./MessageItem";
 import ArrowDownwardIcon from "@mui/icons-material/ArrowDownward";
+// import base compoenent
+import CustomCloseButton from "@/app/BaseComponent/CustomCloseButton";
 
 const ModalStyle = {
   position: "absolute",
@@ -30,8 +32,7 @@ const ModalStyle = {
   left: "50%",
   transform: "translate(-50%, -50%)",
   bgcolor: "background.paper",
-  border: "1.5px solid #000",
-  boxShadow: 24,
+  boxShadow: 40,
   p: 0,
 };
 
@@ -45,6 +46,7 @@ const ChatBox = ({
   chatFinalImage: initialChatImage,
   setUpdateData,
   modalChat,
+  handleCloseChat,
 }) => {
   const dispatch = useDispatch();
 
@@ -397,6 +399,7 @@ const ChatBox = ({
       console.error("Error sending chat images:", error);
     } finally {
       setLoadingFinalPattern(false);
+      closeFinalPatternModal();
     }
   }, [SendingFinalPattern, dispatch, code, closeModalOnTimeout]);
 
@@ -407,12 +410,31 @@ const ChatBox = ({
           <div
             className={`${style.headerChatBox} d-flex flex-row justify-content-between`}
           >
-            <div>
-              <p className="description">
-                {data?.prodName ? data.prodName : "محصول پایه"}
-              </p>
+            <div className="d-flex flex-row align-items-center gap-2">
+              {Array.isArray(data) ? (
+                data?.map((item, index) => (
+                  <div key={index}>
+                    <p className="discription">
+                      {item?.name ? item?.name : "محصول پایه"}
+                    </p>
+                  </div>
+                ))
+              ) : (
+                <>
+                  <p className="description">محصول پایه</p>
+                </>
+              )}
             </div>
             <div className="description">{code}</div>
+
+            {modalChat && (
+              <div>
+                <CustomCloseButton
+                  color={"#e91e63"}
+                  onClick={handleCloseChat}
+                />
+              </div>
+            )}
           </div>
 
           {/* Scrollable chat area */}
@@ -629,7 +651,7 @@ const ChatBox = ({
                 }}
                 className={`${style.continueButton}`}
               >
-                مرحله بعدی
+                مرحله بعد
               </button>
             )}
           </div>
@@ -645,6 +667,19 @@ const ChatBox = ({
           aria-describedby="modal-modal-description2"
         >
           <div style={ModalStyle} className={style.ModalPatternStyle}>
+            <div
+              className={`${style.FinalPatternHeaderStyleMainDiv} d-flex flex-row align-items-center justify-content-between`}
+            >
+              <div>
+                <p className="NormalTextSizing">طرح های نهایی</p>
+              </div>
+              <div>
+                <CustomCloseButton
+                  color={"#e91e63"}
+                  onClick={closeFinalPatternModal}
+                />
+              </div>
+            </div>
             <div className={style.sendingFinalPatternImage}>
               {SendingFinalPattern.map((fileObj, index) => (
                 <div className={style.newfinaiStyle} key={index}>
@@ -664,12 +699,6 @@ const ChatBox = ({
                           : fileObj?.imageUrl
                       )
                     }
-                    // style={{
-                    //   cursor: "pointer",
-                    //   objectFit: "cover",
-                    //   width: "100px",
-                    //   height: "100px",
-                    // }}
                   />
                   <div
                     style={{ cursor: "pointer" }}
@@ -798,7 +827,7 @@ const ChatBox = ({
                     onClick={handleChatImageSendFunc}
                     className={style.confirmpatternButtonStyle}
                   >
-                    {loadingFinalPattern ? <LoadingCss /> : "تایید نهایی"}
+                    {loadingFinalPattern ? <LoadingCss /> : "ارسال طرح"}
                   </button>
                 </div>
               )}

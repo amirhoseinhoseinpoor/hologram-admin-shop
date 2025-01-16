@@ -13,6 +13,12 @@
   padding: 15px;
 }
 
+.mianDiVNvaBarOrder{
+  background-color: white;
+  padding: 10px;
+  border-radius: 4px;
+}
+
 .seeOrderButtonStyle {
   cursor: pointer;
   border: 1px solid #dee2e6;
@@ -49,6 +55,13 @@
   margin: 6px 0;
   border: none;
   box-shadow: none;
+}
+
+.DivChatIconMainDiv{
+  position: fixed;
+  bottom: 15px;
+  left: 15px;
+  cursor: pointer;
 }
 
 .resetPaddingMui {
