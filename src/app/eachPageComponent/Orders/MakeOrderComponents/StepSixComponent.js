@@ -272,7 +272,7 @@ export default function StepSixComponent({
                 <span className="NormalTextSizing"> ریال </span>
               </div>
             </div>
-            <div className="d-flex flex-row  h-100  gap-2">
+            <div className="d-flex flex-column  h-100  gap-2">
               <button
                 className={style.SeeLastStepButton}
                 onClick={handlePreviousStep}
@@ -280,7 +280,7 @@ export default function StepSixComponent({
                 مرحله‌ی قبلی
               </button>
               <div className="d-flex justify-content-center">
-                {/* <a href={finalPaymentImage || ""} download></a> */}
+               
                 <button
                   type="button"
                   className={`${style.downloadFactor} d-flex fwlex-row gap-2`}

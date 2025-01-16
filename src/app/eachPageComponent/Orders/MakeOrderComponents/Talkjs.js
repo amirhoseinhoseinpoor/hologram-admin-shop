@@ -44,6 +44,7 @@ const ChatBox = ({
   data,
   chatFinalImage: initialChatImage,
   setUpdateData,
+  modalChat,
 }) => {
   const dispatch = useDispatch();
 
@@ -400,7 +401,7 @@ const ChatBox = ({
   }, [SendingFinalPattern, dispatch, code, closeModalOnTimeout]);
 
   return (
-    <div className="container">
+    <div className={!modalChat && "container"}>
       <div className={`${style.stepContent}`}>
         <div className={style.mainChatBox}>
           <div
@@ -415,7 +416,12 @@ const ChatBox = ({
           </div>
 
           {/* Scrollable chat area */}
-          <div className={`${style.chatContainer} container`} ref={chatBoxRef}>
+          <div
+            className={`${modalChat && style.chatContainerModal} ${
+              style.chatContainer
+            } container`}
+            ref={chatBoxRef}
+          >
             {messages.length === 0 && (
               <p
                 style={{ marginTop: "60px", marginBottom: "60px" }}
@@ -597,34 +603,38 @@ const ChatBox = ({
       </div>
 
       {/* Action Buttons */}
-      <div className="d-flex flex-row justify-content-between gap-2 mt-3 mb-4 container">
-        <div className="d-flex flex-row gap-2">
-          <button
-            onClick={handleSendingPattern}
-            className={style.continueButton}
-          >
-            ارسال طرح های نهایی
-          </button>
-          <button
-            className={style.SeeLastStepButton}
-            onClick={handlePreviousStep}
-          >
-            مرحله‌ی قبلی
-          </button>
-        </div>
+      {!modalChat && (
+        <>
+          <div className="d-flex flex-row justify-content-between gap-2 mt-3 mb-4 container">
+            <div className="d-flex flex-row gap-2">
+              <button
+                onClick={handleSendingPattern}
+                className={style.continueButton}
+              >
+                ارسال طرح های نهایی
+              </button>
+              <button
+                className={style.SeeLastStepButton}
+                onClick={handlePreviousStep}
+              >
+                مرحله‌ی قبلی
+              </button>
+            </div>
 
-        {moveForward && (
-          <button
-            type="button"
-            onClick={() => {
-              handleNextStep();
-            }}
-            className={`${style.continueButton}`}
-          >
-           مرحله بعدی
-          </button>
-        )}
-      </div>
+            {moveForward && (
+              <button
+                type="button"
+                onClick={() => {
+                  handleNextStep();
+                }}
+                className={`${style.continueButton}`}
+              >
+                مرحله بعدی
+              </button>
+            )}
+          </div>
+        </>
+      )}
 
       {/* Final Pattern Modal */}
       {FinalPatternModal && (
