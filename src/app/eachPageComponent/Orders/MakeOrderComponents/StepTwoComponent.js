@@ -31,7 +31,7 @@ export default function StepTwoComponent({
   step,
   setStep,
   code,
-  setNavStep
+  setNavStep,
 }) {
   const hasData = Object.keys(dataDocument).length > 0;
 
@@ -437,7 +437,7 @@ export default function StepTwoComponent({
                                 );
                               }}
                             >
-                              <ArrowDownwardIcon style={{color : "#191919"}}/>
+                              <ArrowDownwardIcon style={{ color: "#191919" }} />
                             </button>
                           </div>
 
@@ -479,7 +479,7 @@ export default function StepTwoComponent({
                       onClick={handleNextStep}
                       className={`${style.continueButton} mt-3`}
                     >
-                      طراحی سفارش
+                      مرحله بعد
                     </button>
                   )}
                 </div>

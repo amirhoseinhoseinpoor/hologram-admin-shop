@@ -4,8 +4,8 @@ export default function CustomCloseButton({ onClick , background , border , colo
       <button type="button" onClick={onClick} style={{ background: background || "none", border: border || "none" }}>
         <svg
           xmlns="http://www.w3.org/2000/svg"
-          width="26"
-          height="26"
+          width="27"
+          height="27"
           fill={color || "white"}
           viewBox="0 0 25 25"
         >
