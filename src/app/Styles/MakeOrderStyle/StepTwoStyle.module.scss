@@ -130,6 +130,61 @@
   border-radius: 4px;
 }
 
+.imageTitleForDocument{
+  position: absolute;
+  top: 7px;
+  left: 7px;
+  background-color: #e1f1ff;
+  border: 1px solid #5695f6;
+  color: #5695f6;
+  padding: 0px 5px;
+  border-radius: 4px;
+}
+.pendingStatusStyle{
+  position: absolute;
+  top: 7px;
+  left: 7px;
+  background-color: #f3802c;
+  color: white;
+  padding: 0px 5px;
+  border-radius: 4px;
+}
+.rejectStatusStyle{
+  position: absolute;
+  top: 7px;
+  left: 7px;
+  background-color: var.$redColor;
+  color: white;
+  padding: 0px 5px;
+  border-radius: 4px;
+}
+
+.confirmStatusStyle{
+  position: absolute;
+  top: 7px;
+  left: 7px;
+  background-color: #e1f1ff;
+  border: 1px solid #5695f6;
+  color: #5695f6;
+  padding: 0px 5px;
+  border-radius: 4px;
+}
+
+
+
+.confirmButtonDoc{
+  color:white !important;
+  background-color: #5695f6 !important;
+  border-radius: 4px;
+  padding: 4px 11px !important;
+}
+.rejectButtonDoc{
+  color: var.$redColor !important;
+  background-color: white !important;
+  border: 1px solid var.$redColor !important;
+  padding: 4px 11px !important;
+}
+
 .downloadButton{
   position: absolute;
   bottom: 0px;

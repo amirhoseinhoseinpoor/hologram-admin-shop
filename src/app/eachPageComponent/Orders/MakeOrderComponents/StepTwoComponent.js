@@ -4,11 +4,10 @@ import React, { useState, useEffect } from "react";
 // improt redux
 import { useDispatch } from "react-redux";
 import { fetchPrivateImage } from "@/app/Store/thunks";
-import { increaseStep } from "@/app/Store/thunks";
+import { increaseStep, sendingSecondStep } from "@/app/Store/thunks";
 // import base component
 import ZoomModal from "@/app/BaseComponent/ZoomModal";
 import LoadingCss from "@/app/BaseComponent/LoadingCss";
-import ErrorModal from "@/app/BaseComponent/ErrorModal";
 
 import Radio from "@mui/material/Radio";
 import RadioGroup from "@mui/material/RadioGroup";
@@ -32,30 +31,48 @@ export default function StepTwoComponent({
   setStep,
   code,
   setNavStep,
+  setUpdateData,
 }) {
   const hasData = Object.keys(dataDocument).length > 0;
 
   const dispatch = useDispatch();
   const [value, setValue] = useState("خصوصی");
-  const [uploadedFiles, setUploadedFiles] = useState([]);
+  const [uploadedFiles, setUploadedFiles] = useState(dataDocument.preparedData);
+
+  console.log(uploadedFiles);
+  
   const [logo, setLogo] = useState(null);
-  // const [isButtonDisabled, setIsButtonDisabled] = useState(false);
   const [moveForward, setMoveForward] = useState(false);
 
   const [selectedImage, setSelectedImage] = useState(null);
   const [isZoomModalOpen, setIsZoomModalOpen] = useState(false);
   const [loading, setLoading] = useState(false);
-
-  const [openModal3, setOpenModal3] = useState(false);
-  const closeModal3 = () => setOpenModal3(false);
+  const [loadingDocConfirm, setLoadingDocConfirm] = useState([]);
+  const [loadingDocReject, setLoadingDocReject] = useState([]);
+  const [imageUrls, setImageUrls] = useState({});
 
   const handleCloseZoomModal = () => {
     setIsZoomModalOpen(false);
     setSelectedImage(null);
   };
 
-  const handleImageClick = (imageSrc) => {
-    setSelectedImage(imageSrc);
+  useEffect(() => {
+    if (dataDocument.preparedData.length > 0) {
+      setUploadedFiles(dataDocument.preparedData);
+    }
+  }, [dataDocument.preparedData]);
+
+  const handleImageClick = async (index, filename) => {
+    try {
+      const result = await dispatch(fetchPrivateImage({ filename })).unwrap();
+      setImageUrls((prev) => ({ ...prev, [index]: result }));
+    } catch (error) {
+      console.error("Error fetching image:", error);
+    }
+  };
+
+  const handleZoomModal = (index) => {
+    setSelectedImage(imageUrls[index]);
     setIsZoomModalOpen(true);
   };
 
@@ -76,31 +93,6 @@ export default function StepTwoComponent({
       setMoveForward(true);
     }
   }, [step]);
-
-  // Fetch image URLs for uploaded files only once on dataDocument change
-  useEffect(() => {
-    const fetchFileUrls = async () => {
-      const updatedFiles = await Promise.all(
-        dataDocument.preparedData.map(async (item) => {
-          let updatedItem = { ...item };
-          try {
-            const result = await dispatch(
-              fetchPrivateImage({ filename: item.file })
-            ).unwrap();
-            updatedItem.file = result; // Update file URL
-          } catch (error) {
-            console.error("Error fetching image:", error);
-          }
-          return updatedItem;
-        })
-      );
-      setUploadedFiles(updatedFiles); // Update state only once
-    };
-
-    if (dataDocument.preparedData && dataDocument.preparedData.length > 0) {
-      fetchFileUrls();
-    }
-  }, [dispatch, dataDocument.preparedData]);
 
   useEffect(() => {
     setValue(dataDocument.value || "");
@@ -135,10 +127,6 @@ export default function StepTwoComponent({
     setLogo(null);
   };
 
-  const handleDeleteImage = (index) => {
-    setUploadedFiles((prevFiles) => prevFiles.filter((_, i) => i !== index));
-  };
-
   const handleTitleChange = (index, event) => {
     const newTitle = event.target.value;
     setUploadedFiles((prevFiles) => {
@@ -151,7 +139,6 @@ export default function StepTwoComponent({
   const handleDisabelInput = () => {
     setDisabelInputStep2(true);
     handleSubmit();
-    // handleNextStep();
   };
 
   const handleSubmit = async () => {
@@ -165,6 +152,78 @@ export default function StepTwoComponent({
       setLoading(false);
     } catch (error) {
       setLoading(false);
+    }
+  };
+
+  const confirmDocument = async (index, NewStatus) => {
+    try {
+      if (NewStatus === 2) {
+        setLoadingDocConfirm((prev) => {
+          const newLoadingState = [...prev];
+          newLoadingState[index] = true;
+          return newLoadingState;
+        });
+      } else if (NewStatus === 3) {
+        setLoadingDocReject((prev) => {
+          const newLoadingState = [...prev];
+          newLoadingState[index] = true;
+          return newLoadingState;
+        });
+      }
+
+      dataDocument.preparedData[index].status = NewStatus;
+
+      // Dispatch the updated dataDocument
+      const finalDataDispatch = await dispatch(
+        sendingSecondStep({ code, sendingFinalData: dataDocument })
+      ).unwrap();
+
+      if (finalDataDispatch.statusCode === 200) {
+        // Handle success
+      }
+    } catch (error) {
+      console.error("Error confirming document:", error);
+    } finally {
+      if (NewStatus === 2) {
+        setLoadingDocConfirm((prev) => {
+          const newLoadingState = [...prev];
+          newLoadingState[index] = false;
+          return newLoadingState;
+        });
+      } else if (NewStatus === 3) {
+        setLoadingDocReject((prev) => {
+          const newLoadingState = [...prev];
+          newLoadingState[index] = false;
+          return newLoadingState;
+        });
+      }
+      setUpdateData(true);
+    }
+  };
+
+  const getDocStatus = (status) => {
+    switch (status) {
+      case 1:
+        return "درحال برسی";
+      case 2:
+        return "تایید شده";
+      case 3:
+        return "رد شده";
+      default:
+        return "Unknown Status";
+    }
+  };
+
+  const getStatusClass = (status) => {
+    switch (status) {
+      case 1:
+        return style.pendingStatusStyle;
+      case 2:
+        return style.confirmStatusStyle;
+      case 3:
+        return style.rejectStatusStyle;
+      default:
+        return style.rejectStatusStyle;
     }
   };
 
@@ -192,7 +251,7 @@ export default function StepTwoComponent({
               <div className={style.stepContent}>
                 <div className="d-flex flex-row gap-4">
                   <div
-                    className={`${style.makeTheFormResponsive} d-flex flex-row gap-5 mt-3`}
+                    className={`${style.makeTheFormResponsive} d-flex flex-column gap-5 mt-3`}
                   >
                     <div className="d-flex flex-column">
                       <div className="d-flex flex-row gap-2 align-items-center">
@@ -210,49 +269,6 @@ export default function StepTwoComponent({
                               alt="UserLogo"
                               className={style.LogoReplaceStyle}
                             />
-                            <button
-                              onClick={handleDeleteLogo}
-                              className={style.deleteButton}
-                            >
-                              <svg
-                                width={17}
-                                height={17}
-                                viewBox="0 0 12 12"
-                                fill="none"
-                                xmlns="http://www.w3.org/2000/svg"
-                              >
-                                <path
-                                  d="M10.5 2.98828C8.835 2.82328 7.16 2.73828 5.49 2.73828C4.5 2.73828 3.51 2.78828 2.52 2.88828L1.5 2.98828"
-                                  stroke="#FF4F3F"
-                                  strokeLinecap="round"
-                                  strokeLinejoin="round"
-                                />
-                                <path
-                                  d="M4.25 2.485L4.36 1.83C4.44 1.355 4.5 1 5.345 1H6.655C7.5 1 7.565 1.375 7.64 1.835L7.75 2.485"
-                                  stroke="#FF4F3F"
-                                  strokeLinecap="round"
-                                  strokeLinejoin="round"
-                                />
-                                <path
-                                  d="M9.4252 4.57031L9.1002 9.60531C9.0452 10.3903 9.0002 11.0003 7.6052 11.0003H4.3952C3.0002 11.0003 2.9552 10.3903 2.9002 9.60531L2.5752 4.57031"
-                                  stroke="#FF4F3F"
-                                  strokeLinecap="round"
-                                  strokeLinejoin="round"
-                                />
-                                <path
-                                  d="M5.16504 8.25H6.83004"
-                                  stroke="#FF4F3F"
-                                  strokeLinecap="round"
-                                  strokeLinejoin="round"
-                                />
-                                <path
-                                  d="M4.75 6.25H7.25"
-                                  stroke="#FF4F3F"
-                                  strokeLinecap="round"
-                                  strokeLinejoin="round"
-                                />
-                              </svg>
-                            </button>
                           </div>
                         ) : (
                           <>
@@ -377,68 +393,62 @@ export default function StepTwoComponent({
                           className={`${style.imagesContainerForDoucument}`}
                         >
                           <div className="position-relative">
-                            <Box
-                              onClick={() => handleImageClick(fileObj.file)}
-                              component="img"
-                              src={fileObj.file}
-                              alt={`uploaded ${index}`}
-                              className={style.uploadedImage}
-                            />
-                            <button
-                              onClick={() => handleDeleteImage(index)}
-                              className={style.deleteButton}
+                            {imageUrls[index] ? (
+                              <>
+                                <Box
+                                  onClick={() =>
+                                    handleZoomModal(index)
+                                  }
+                                  component="img"
+                                  src={imageUrls[index]}
+                                  alt={`uploaded ${index}`}
+                                  className={style.uploadedImage}
+                                />
+                                <button
+                                  className={`${style.downloadButton}`}
+                                  onClick={() => {
+                                    const date = new Date();
+                                    downloadImage(
+                                      imageUrls[index],
+                                      `${date.toISOString()}.png`
+                                    );
+                                  }}
+                                >
+                                  <ArrowDownwardIcon
+                                    style={{ color: "#191919" }}
+                                  />
+                                </button>
+                              </>
+                            ) : (
+                              <>
+                                <div
+                                  onClick={() =>
+                                    handleImageClick(index, fileObj.file)
+                                  }
+                                  style={{
+                                    width: "210px",
+                                    height: "160px",
+                                    display: "flex",
+                                    alignItems: "center",
+                                    justifyContent: "center",
+                                    cursor: "pointer",
+                                    backgroundColor: "#e0e0e0",
+                                    borderRadius: "8px",
+                                    marginBottom: "10px",
+                                  }}
+                                >
+                                  <ArrowDownwardIcon />
+                                </div>
+                              </>
+                            )}
+
+                            <div
+                              className={`${getStatusClass(fileObj?.status)}`}
                             >
-                              <svg
-                                width={17}
-                                height={17}
-                                viewBox="0 0 12 12"
-                                fill="none"
-                                xmlns="http://www.w3.org/2000/svg"
-                              >
-                                <path
-                                  d="M10.5 2.98828C8.835 2.82328 7.16 2.73828 5.49 2.73828C4.5 2.73828 3.51 2.78828 2.52 2.88828L1.5 2.98828"
-                                  stroke="#FF4F3F"
-                                  strokeLinecap="round"
-                                  strokeLinejoin="round"
-                                />
-                                <path
-                                  d="M4.25 2.485L4.36 1.83C4.44 1.355 4.5 1 5.345 1H6.655C7.5 1 7.565 1.375 7.64 1.835L7.75 2.485"
-                                  stroke="#FF4F3F"
-                                  strokeLinecap="round"
-                                  strokeLinejoin="round"
-                                />
-                                <path
-                                  d="M9.4252 4.57031L9.1002 9.60531C9.0452 10.3903 9.0002 11.0003 7.6052 11.0003H4.3952C3.0002 11.0003 2.9552 10.3903 2.9002 9.60531L2.5752 4.57031"
-                                  stroke="#FF4F3F"
-                                  strokeLinecap="round"
-                                  strokeLinejoin="round"
-                                />
-                                <path
-                                  d="M5.16504 8.25H6.83004"
-                                  stroke="#FF4F3F"
-                                  strokeLinecap="round"
-                                  strokeLinejoin="round"
-                                />
-                                <path
-                                  d="M4.75 6.25H7.25"
-                                  stroke="#FF4F3F"
-                                  strokeLinecap="round"
-                                  strokeLinejoin="round"
-                                />
-                              </svg>
-                            </button>
-                            <button
-                              className={`${style.downloadButton}`}
-                              onClick={() => {
-                                const date = new Date();
-                                downloadImage(
-                                  fileObj?.file,
-                                  `${date.toISOString()}.png`
-                                );
-                              }}
-                            >
-                              <ArrowDownwardIcon style={{ color: "#191919" }} />
-                            </button>
+                              <p className="NormalTextSizing">
+                                {getDocStatus(fileObj?.status)}
+                              </p>
+                            </div>
                           </div>
 
                           <input
@@ -449,6 +459,30 @@ export default function StepTwoComponent({
                             className={`${style.imageTitleInputForDocument} discription`}
                             disabled={disabelInputStep2}
                           />
+                          <div className="mt-2 d-flex flex-row justify-content-between">
+                            <button
+                              type="button"
+                              className={style.confirmButtonDoc}
+                              onClick={() => confirmDocument(index, 2)}
+                            >
+                              {loadingDocConfirm[index] ? (
+                                <LoadingCss />
+                              ) : (
+                                "تایید مدرک"
+                              )}
+                            </button>
+                            <button
+                              type="button"
+                              className={style.rejectButtonDoc}
+                              onClick={() => confirmDocument(index, 3)}
+                            >
+                              {loadingDocReject[index] ? (
+                                <LoadingCss />
+                              ) : (
+                                "رد مدرک"
+                              )}
+                            </button>
+                          </div>
                         </div>
                       ))}
                     </div>
