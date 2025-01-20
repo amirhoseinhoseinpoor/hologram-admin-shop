@@ -37,7 +37,7 @@ export default function StepTwoComponent({
 
   const dispatch = useDispatch();
   const [value, setValue] = useState("خصوصی");
-  const [uploadedFiles, setUploadedFiles] = useState(dataDocument.preparedData);
+  const [uploadedFiles, setUploadedFiles] = useState(dataDocument.preparedData || []);
 
   console.log(uploadedFiles);
   

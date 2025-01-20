@@ -321,7 +321,7 @@ export default function HonorsMainComponent({ toggleShow }) {
       {activekey === "addUser" && !editedHonor && (
         <>
           <div>
-            <AddVideo />
+            <AddVideo setActiveKey={setActiveKey}/>
           </div>
         </>
       )}
