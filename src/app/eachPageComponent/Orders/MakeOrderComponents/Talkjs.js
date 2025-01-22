@@ -23,6 +23,7 @@ import socket from "@/app/utils/socket";
 import { downloadImage } from "@/app/utils/downloadImage";
 import MessageItem from "./MessageItem";
 import ArrowDownwardIcon from "@mui/icons-material/ArrowDownward";
+import InsertDriveFileIcon from "@mui/icons-material/InsertDriveFile";
 // import base compoenent
 import CustomCloseButton from "@/app/BaseComponent/CustomCloseButton";
 
@@ -69,7 +70,8 @@ const ChatBox = ({
   const [SendingFinalPattern, setSendingFinalPattern] = useState([]);
   const [userChoiseImage, setUserChoiseImage] = useState(null);
   const [loadingImageSend, setLoadingImageSend] = useState(false);
-  const [loadingFinalPattern, setLoadingFinalPattern] = useState(false); // Corrected Typo
+  const [loadingFinalPattern, setLoadingFinalPattern] = useState(false);
+  const [dontShowPrevImage, setDontShowPrevImage] = useState(true);
 
   const [openModal2, setOpenModal2] = useState(false);
   const [patternImageUrls, setPatternImageUrls] = useState({});
@@ -234,7 +236,8 @@ const ChatBox = ({
             uploadFile({ file: image, tag, type, isPublic })
           ).unwrap();
 
-          newMessageObject.imageUrl = response; // filename returned from thunk
+          newMessageObject.imageUrl = response;
+          newMessageObject.type = image?.name.split(".").pop();
         } catch (error) {
           console.error("Image upload failed:", error);
           return;
@@ -280,6 +283,15 @@ const ChatBox = ({
     const file = event.target.files[0];
     if (file) {
       setImage(file);
+
+      const fileType = file?.name?.split(".").pop();
+
+      if (fileType == "png" || fileType == "jpeg") {
+        setDontShowPrevImage(false);
+      } else {
+        setDontShowPrevImage(true);
+      }
+
       const imageUrl = URL.createObjectURL(file);
       setSelectedImage(imageUrl);
     }
@@ -519,19 +531,27 @@ const ChatBox = ({
                 </div>
               ) : (
                 <>
-                  <Box
-                    onClick={() => handleZoomFinalPattern(selectedImage)}
-                    component="img"
-                    src={selectedImage}
-                    alt="uploaded"
-                    className={style.selectedImageForSend}
-                    // style={{
-                    //   cursor: "pointer",
-                    //   objectFit: "cover",
-                    //   width: "100px",
-                    //   height: "100px",
-                    // }}
-                  ></Box>
+                  {dontShowPrevImage ? (
+                    <>
+                      <InsertDriveFileIcon />
+                    </>
+                  ) : (
+                    <>
+                      <Box
+                        onClick={() => handleZoomFinalPattern(selectedImage)}
+                        component="img"
+                        src={selectedImage}
+                        alt="uploaded"
+                        className={style.selectedImageForSend}
+                        // style={{
+                        //   cursor: "pointer",
+                        //   objectFit: "cover",
+                        //   width: "100px",
+                        //   height: "100px",
+                        // }}
+                      ></Box>
+                    </>
+                  )}
                   <div className="d-flex flex-column gap-2 ms-3">
                     <button
                       onClick={sendMessage}
@@ -604,7 +624,7 @@ const ChatBox = ({
                     disabled={loadingImageSend}
                     type="file"
                     onChange={handleSelectImage}
-                    accept="image/*"
+                    accept="image/*,.zip,.pdf,.rar"
                     className={`d-none`}
                     id="fileInputChatBox"
                   />
@@ -814,7 +834,7 @@ const ChatBox = ({
                 <input
                   onChange={handleFileUpload}
                   type="file"
-                  accept="image/png,image/jpeg,image/jpg"
+                  accept="image/png,image/jpeg,image/jpg,.zip,.pdf,.rar"
                   className={`d-none`}
                   id="fileFinalPattern"
                   multiple

@@ -139,6 +139,7 @@ export default function MakeOrder({
             step={seeOrder.step}
             code={seeOrder.code}
             dataDocument={seeOrder.document}
+            setUpdateData={setUpdateData}
             setStep={setStep}
             handleNextStep={handleNextStep}
             setNavStep={setNavStep}
@@ -260,7 +261,6 @@ export default function MakeOrder({
                 left: "50%",
                 transform: "translate(-50%, -50%)",
                 width: "80%",
-                height: "80%",
                 maxHeight: "fit-content",
                 borderRadius: "4px",
                 bgcolor: "background.paper",
