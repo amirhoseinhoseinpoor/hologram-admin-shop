@@ -16,10 +16,15 @@ import FormControl from "@mui/material/FormControl";
 import FormLabel from "@mui/material/FormLabel";
 import { Box } from "@mui/material";
 import Alert from "@mui/material/Alert";
-import { downloadImage } from "@/app/utils/downloadImage";
+
 import ArrowDownwardIcon from "@mui/icons-material/ArrowDownward";
+import FolderZipIcon from "@mui/icons-material/FolderZip";
+import DoneIcon from "@mui/icons-material/Done";
+import PictureAsPdfIcon from "@mui/icons-material/PictureAsPdf";
 
 import style from "../../../Styles/MakeOrderStyle/StepTwoStyle.module.scss";
+
+import { downloadImage } from "@/app/utils/downloadImage";
 
 export default function StepTwoComponent({
   dataDocument,
@@ -37,10 +42,12 @@ export default function StepTwoComponent({
 
   const dispatch = useDispatch();
   const [value, setValue] = useState("خصوصی");
-  const [uploadedFiles, setUploadedFiles] = useState(dataDocument.preparedData || []);
+  const [uploadedFiles, setUploadedFiles] = useState(
+    dataDocument.preparedData || []
+  );
 
   console.log(uploadedFiles);
-  
+
   const [logo, setLogo] = useState(null);
   const [moveForward, setMoveForward] = useState(false);
 
@@ -57,7 +64,7 @@ export default function StepTwoComponent({
   };
 
   useEffect(() => {
-    if (dataDocument.preparedData.length > 0) {
+    if (dataDocument?.preparedData?.length > 0) {
       setUploadedFiles(dataDocument.preparedData);
     }
   }, [dataDocument.preparedData]);
@@ -108,7 +115,10 @@ export default function StepTwoComponent({
       .map((file) => ({
         imageUrl: URL.createObjectURL(file),
         file: file,
-        title: "", // Initialize empty title
+        title: "",
+        status: 1,
+        type: file?.name.split(".").pop(),
+        isFixed: false,
       }));
 
     setUploadedFiles((prevFiles) => [...prevFiles, ...newFiles]);
@@ -125,6 +135,10 @@ export default function StepTwoComponent({
 
   const handleDeleteLogo = () => {
     setLogo(null);
+  };
+
+  const handleDeleteImage = (index) => {
+    setUploadedFiles((prevFiles) => prevFiles.filter((_, i) => i !== index));
   };
 
   const handleTitleChange = (index, event) => {
@@ -393,52 +407,195 @@ export default function StepTwoComponent({
                           className={`${style.imagesContainerForDoucument}`}
                         >
                           <div className="position-relative">
-                            {imageUrls[index] ? (
+                            {fileObj.type === "zip" ||
+                            fileObj.type === "rar" ? (
                               <>
-                                <Box
-                                  onClick={() =>
-                                    handleZoomModal(index)
-                                  }
-                                  component="img"
-                                  src={imageUrls[index]}
-                                  alt={`uploaded ${index}`}
-                                  className={style.uploadedImage}
-                                />
-                                <button
-                                  className={`${style.downloadButton}`}
+                                <div
+                                  className={style.emptyBoxDonlowadDocument}
                                   onClick={() => {
-                                    const date = new Date();
-                                    downloadImage(
-                                      imageUrls[index],
-                                      `${date.toISOString()}.png`
-                                    );
+                                    if (imageUrls[index]) {
+                                      const date = new Date();
+                                      downloadImage(
+                                        imageUrls[index],
+                                        `${date.toISOString()}.${fileObj.type}`
+                                      );
+                                    } else {
+                                      handleImageClick(index, fileObj.file);
+                                    }
                                   }}
                                 >
-                                  <ArrowDownwardIcon
-                                    style={{ color: "#191919" }}
-                                  />
-                                </button>
+                                  {imageUrls[index] ? (
+                                    <>
+                                      <DoneIcon />
+                                      {fileObj?.status !== 2 && (
+                                        <button
+                                          onClick={(event) => {
+                                            event.stopPropagation();
+                                            handleDeleteImage(index);
+                                          }}
+                                          className={style.deleteButton}
+                                        >
+                                          <svg
+                                            width={17}
+                                            height={17}
+                                            viewBox="0 0 12 12"
+                                            fill="none"
+                                            xmlns="http://www.w3.org/2000/svg"
+                                          >
+                                            <path
+                                              d="M10.5 2.98828C8.835 2.82328 7.16 2.73828 5.49 2.73828C4.5 2.73828 3.51 2.78828 2.52 2.88828L1.5 2.98828"
+                                              stroke="#FF4F3F"
+                                              strokeLinecap="round"
+                                              strokeLinejoin="round"
+                                            />
+                                            <path
+                                              d="M4.25 2.485L4.36 1.83C4.44 1.355 4.5 1 5.345 1H6.655C7.5 1 7.565 1.375 7.64 1.835L7.75 2.485"
+                                              stroke="#FF4F3F"
+                                              strokeLinecap="round"
+                                              strokeLinejoin="round"
+                                            />
+                                            <path
+                                              d="M9.4252 4.57031L9.1002 9.60531C9.0452 10.3903 9.0002 11.0003 7.6052 11.0003H4.3952C3.0002 11.0003 2.9552 10.3903 2.9002 9.60531L2.5752 4.57031"
+                                              stroke="#FF4F3F"
+                                              strokeLinecap="round"
+                                              strokeLinejoin="round"
+                                            />
+                                            <path
+                                              d="M5.16504 8.25H6.83004"
+                                              stroke="#FF4F3F"
+                                              strokeLinecap="round"
+                                              strokeLinejoin="round"
+                                            />
+                                            <path
+                                              d="M4.75 6.25H7.25"
+                                              stroke="#FF4F3F"
+                                              strokeLinecap="round"
+                                              strokeLinejoin="round"
+                                            />
+                                          </svg>
+                                        </button>
+                                      )}
+                                    </>
+                                  ) : (
+                                    <>
+                                      <FolderZipIcon />
+                                    </>
+                                  )}
+                                </div>
+                              </>
+                            ) : fileObj?.type === "pdf" ? (
+                              <>
+                                <div
+                                  className={style.emptyBoxDonlowadDocument}
+                                  onClick={() => {
+                                    if (imageUrls[index]) {
+                                      const date = new Date();
+                                      downloadImage(
+                                        imageUrls[index],
+                                        `${date.toISOString()}.${fileObj.type}`
+                                      );
+                                    } else {
+                                      handleImageClick(index, fileObj.file);
+                                    }
+                                  }}
+                                >
+                                  {imageUrls[index] ? (
+                                    <>
+                                      <DoneIcon />
+                                      {fileObj?.status !== 2 && (
+                                        <button
+                                          onClick={(event) => {
+                                            event.stopPropagation();
+                                            handleDeleteImage(index);
+                                          }}
+                                          className={style.deleteButton}
+                                        >
+                                          <svg
+                                            width={17}
+                                            height={17}
+                                            viewBox="0 0 12 12"
+                                            fill="none"
+                                            xmlns="http://www.w3.org/2000/svg"
+                                          >
+                                            <path
+                                              d="M10.5 2.98828C8.835 2.82328 7.16 2.73828 5.49 2.73828C4.5 2.73828 3.51 2.78828 2.52 2.88828L1.5 2.98828"
+                                              stroke="#FF4F3F"
+                                              strokeLinecap="round"
+                                              strokeLinejoin="round"
+                                            />
+                                            <path
+                                              d="M4.25 2.485L4.36 1.83C4.44 1.355 4.5 1 5.345 1H6.655C7.5 1 7.565 1.375 7.64 1.835L7.75 2.485"
+                                              stroke="#FF4F3F"
+                                              strokeLinecap="round"
+                                              strokeLinejoin="round"
+                                            />
+                                            <path
+                                              d="M9.4252 4.57031L9.1002 9.60531C9.0452 10.3903 9.0002 11.0003 7.6052 11.0003H4.3952C3.0002 11.0003 2.9552 10.3903 2.9002 9.60531L2.5752 4.57031"
+                                              stroke="#FF4F3F"
+                                              strokeLinecap="round"
+                                              strokeLinejoin="round"
+                                            />
+                                            <path
+                                              d="M5.16504 8.25H6.83004"
+                                              stroke="#FF4F3F"
+                                              strokeLinecap="round"
+                                              strokeLinejoin="round"
+                                            />
+                                            <path
+                                              d="M4.75 6.25H7.25"
+                                              stroke="#FF4F3F"
+                                              strokeLinecap="round"
+                                              strokeLinejoin="round"
+                                            />
+                                          </svg>
+                                        </button>
+                                      )}
+                                    </>
+                                  ) : (
+                                    <>
+                                      <PictureAsPdfIcon />
+                                    </>
+                                  )}
+                                </div>
                               </>
                             ) : (
                               <>
-                                <div
-                                  onClick={() =>
-                                    handleImageClick(index, fileObj.file)
-                                  }
-                                  style={{
-                                    width: "210px",
-                                    height: "160px",
-                                    display: "flex",
-                                    alignItems: "center",
-                                    justifyContent: "center",
-                                    cursor: "pointer",
-                                    backgroundColor: "#e0e0e0",
-                                    borderRadius: "8px",
-                                    marginBottom: "10px",
-                                  }}
-                                >
-                                  <ArrowDownwardIcon />
-                                </div>
+                                {imageUrls[index] ? (
+                                  <>
+                                    <Box
+                                      onClick={() => handleZoomModal(index)}
+                                      component="img"
+                                      src={imageUrls[index]}
+                                      alt={`uploaded ${index}`}
+                                      className={style.uploadedImage}
+                                    />
+                                    <button
+                                      className={`${style.downloadButton}`}
+                                      onClick={() => {
+                                        const date = new Date();
+                                        downloadImage(
+                                          imageUrls[index],
+                                          `${date.toISOString()}.png`
+                                        );
+                                      }}
+                                    >
+                                      <ArrowDownwardIcon
+                                        style={{ color: "#191919" }}
+                                      />
+                                    </button>
+                                  </>
+                                ) : (
+                                  <>
+                                    <div
+                                      onClick={() =>
+                                        handleImageClick(index, fileObj.file)
+                                      }
+                                      className={style.emptyBoxDonlowadDocument}
+                                    >
+                                      <ArrowDownwardIcon />
+                                    </div>
+                                  </>
+                                )}
                               </>
                             )}
 
