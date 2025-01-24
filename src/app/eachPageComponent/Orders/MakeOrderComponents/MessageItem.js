@@ -41,6 +41,11 @@ const MessageItem = ({
     }
   }, [msg.imageUrl, dispatch, fetchPrivateImage, imageUrl]);
 
+  const isImageType = (type) => {
+    const normalizedType = type?.trim()?.toLowerCase();
+    return normalizedType === "png" || normalizedType === "jpeg" || normalizedType === "image/png" || normalizedType === "image/jpeg";
+  };
+
   const handleImageClick = () => {
     if (!isImageLoaded && !loadingImage) {
       loadImage();
@@ -218,7 +223,7 @@ const MessageItem = ({
             )}
           </div>
         </>
-      ) : (
+      ) : isImageType(msg?.type) && (
         <>
           <div className={style.allTextStyle}>
             {isImageLoaded ? (
@@ -329,115 +334,7 @@ const MessageItem = ({
         </>
       )}
 
-      {/* {msg.imageUrl && (
-        <div className={style.allTextStyle}>
-          {!isImageLoaded && !loadingImage ? (
-            <div
-              className={style.imagePlaceholder}
-              onClick={handleImageClick}
-              style={{
-                width: "150px",
-                height: "150px",
-                display: "flex",
-                alignItems: "center",
-                justifyContent: "center",
-                cursor: "pointer",
-                backgroundColor: "#e0e0e0",
-                borderRadius: "8px",
-              }}
-            >
-              <ArrowDownwardIcon />
-            </div>
-          ) : loadingImage ? (
-            <Skeleton
-              className="mt-3 mb-3"
-              animation="wave"
-              variant="rounded"
-              style={{ width: "150px", height: "150px" }}
-            />
-          ) : (
-            <Box
-              onClick={() => handleZoomFinalPattern(imageUrl)}
-              className={`${style.imageChatStyle}`}
-              component="img"
-              src={imageUrl}
-              alt="uploaded"
-              
-            />
-          )}
-
-          {isImageLoaded && (
-            <div
-              className={`${
-                msg.isAdmin ? style.adminDateStyle : style.userDateStyle
-              } d-flex flex-row align-items-center justify-content-between`}
-            >
-              <p className={`${style.TimeStyle} smallest`}>{msg.date}</p>
-              <div className="d-flex flex-row gap-2 align-items-center">
-                <p
-                  style={{ cursor: "pointer" }}
-                  onClick={() =>
-                    downloadImage(imageUrl, `${new Date().toISOString()}.png`)
-                  }
-                >
-                  <FileDownloadIcon style={{ color: "#333333" }} />
-                </p>
-                {msg.isAdmin && (
-                  <div className="d-flex flex-row">
-                   
-                    <svg
-                      style={{ cursor: "pointer" }}
-                      onClick={() => areYouShureFunction(index)}
-                      width={18}
-                      height={17}
-                      viewBox="0 0 25 24"
-                      fill="none"
-                      xmlns="http://www.w3.org/2000/svg"
-                    >
-                     
-                      <path
-                        d="M21.5 5.98047C18.17 5.65047 14.82 5.48047 11.48 5.48047C9.5 5.48047 7.52 5.58047 5.54 5.78047L3.5 5.98047"
-                        stroke="#292D32"
-                        strokeWidth="1.5"
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                      />
-                      <path
-                        d="M9 4.97L9.22 3.66C9.38 2.71 9.5 2 11.19 2H13.81C15.5 2 15.63 2.75 15.78 3.67L16 4.97"
-                        stroke="#292D32"
-                        strokeWidth="1.5"
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                      />
-                      <path
-                        d="M19.3499 9.14062L18.6999 19.2106C18.5899 20.7806 18.4999 22.0006 15.7099 22.0006H9.2899C6.4999 22.0006 6.4099 20.7806 6.2999 19.2106L5.6499 9.14062"
-                        stroke="#292D32"
-                        strokeWidth="1.5"
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                      />
-                      <path
-                        d="M10.8301 16.5H14.1601"
-                        stroke="#292D32"
-                        strokeWidth="1.5"
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                      />
-                      <path
-                        d="M10 12.5H15"
-                        stroke="#292D32"
-                        strokeWidth="1.5"
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                      />
-                    </svg>
-                  </div>
-                )}
-              </div>
-            </div>
-          )}
-        </div>
-      )} */}
+  
     </div>
   );
 };

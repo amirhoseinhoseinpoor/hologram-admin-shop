@@ -38,7 +38,7 @@ const DivAdjustColorDivs = styled.div`
     color: #404040;
     margin: 0;
   }
-  @media(max-width : 768px) {
+  @media (max-width: 768px) {
     grid-template-columns: ${(props) => props.recolumns || ""};
   }
 `;
@@ -773,7 +773,7 @@ export default function AddHonors({ setDataUpdated, setActiveKey }) {
             {/* Add Section Form */}
             <AddSectionForm>
               <HeaderEachSection className="NormalTextSizing">
-                اضافه کردن بخش جدید
+                مشخصه
               </HeaderEachSection>
               <InsideAddSectionForm className="d-flex flex-column gap-3">
                 <div className="d-flex flex-row gap-2 mt-3 align-items-center">
@@ -782,7 +782,7 @@ export default function AddHonors({ setDataUpdated, setActiveKey }) {
                     className="NormalTextSizing"
                     style={{ whiteSpace: "nowrap" }}
                   >
-                    نام بخش:
+                    نام مشخصه:
                   </label>
                   <input
                     type="text"
@@ -805,7 +805,7 @@ export default function AddHonors({ setDataUpdated, setActiveKey }) {
                     id="newSectionType"
                     value={newSectionType}
                     onChange={(e) => setNewSectionType(e.target.value)}
-                    className="form-select"
+                    className="w-50"
                     required
                   >
                     <option value="text">متن</option>
@@ -836,7 +836,7 @@ export default function AddHonors({ setDataUpdated, setActiveKey }) {
                           className="NormalTextSizing"
                           style={{ whiteSpace: "nowrap" }}
                         >
-                          نام بخش:
+                         لیست مشخصه ها:
                         </label>
                         <input
                           type="text"
@@ -866,7 +866,10 @@ export default function AddHonors({ setDataUpdated, setActiveKey }) {
                   </HeaderEachSection>
                 </div>
 
-                <DivAdjustColorDivs columns="repeat(2, 1fr)" recolumns="repeat(1, 1fr)">
+                <DivAdjustColorDivs
+                  columns="repeat(2, 1fr)"
+                  recolumns="repeat(1, 1fr)"
+                >
                   {section.items.map((item, itemIndex) => (
                     <div
                       style={{ height: "fit-content" }}
@@ -1035,7 +1038,7 @@ export default function AddHonors({ setDataUpdated, setActiveKey }) {
                     >
                       حذف
                     </ButtonCancelOrder>
-                    
+
                     <DivAdjustGrodimageMedia>
                       <div className="d-flex flex-column w-100">
                         <span className="mb-1 NormalTextSizing">
@@ -1527,7 +1530,10 @@ export default function AddHonors({ setDataUpdated, setActiveKey }) {
                         <button
                           type="button"
                           className="NormalTextSizing"
-                          style={{ backgroundColor: "#43A047" , width : "fit-content" }}
+                          style={{
+                            backgroundColor: "#43A047",
+                            width: "fit-content",
+                          }}
                           onClick={() => handleAddDropDownOption(index)}
                         >
                           اضافه کردن گزینه

@@ -925,7 +925,7 @@ export default function EditHonors({
         <div>
           {/* Add Section Form */}
           <AddSectionForm>
-            <HeaderEachSection>اضافه کردن بخش جدید</HeaderEachSection>
+            <HeaderEachSection className="NormalTextSizing">مشخصه</HeaderEachSection>
             <InsideAddSectionForm className="d-flex flex-column gap-3">
               <div className="d-flex flex-row gap-2 mt-3 align-items-center">
                 <label
@@ -933,7 +933,7 @@ export default function EditHonors({
                   className="NormalTextSizing"
                   style={{ whiteSpace: "nowrap" }}
                 >
-                  نام بخش:
+                  نام مشخصه:
                 </label>
                 <input
                   type="text"
@@ -955,7 +955,7 @@ export default function EditHonors({
                   id="newSectionType"
                   value={newSectionType}
                   onChange={(e) => setNewSectionType(e.target.value)}
-                  className="form-select"
+                  className="w-50"
                 >
                   <option value="text">متن</option>
                   <option value="image">تصویر</option>
@@ -983,7 +983,7 @@ export default function EditHonors({
                         htmlFor={`sectionName-${sectionIndex}`}
                         style={{ whiteSpace: "nowrap" }}
                       >
-                        نام بخش:
+                       لیست مشخصه ها:
                       </label>
                       <input
                         type="text"

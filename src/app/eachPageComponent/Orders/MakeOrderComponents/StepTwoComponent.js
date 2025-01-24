@@ -55,6 +55,8 @@ export default function StepTwoComponent({
   const [isZoomModalOpen, setIsZoomModalOpen] = useState(false);
   const [loading, setLoading] = useState(false);
   const [loadingDocConfirm, setLoadingDocConfirm] = useState([]);
+  console.log(loadingDocConfirm);
+
   const [loadingDocReject, setLoadingDocReject] = useState([]);
   const [imageUrls, setImageUrls] = useState({});
 
@@ -617,17 +619,24 @@ export default function StepTwoComponent({
                             disabled={disabelInputStep2}
                           />
                           <div className="mt-2 d-flex flex-row justify-content-between">
-                            <button
-                              type="button"
-                              className={style.confirmButtonDoc}
-                              onClick={() => confirmDocument(index, 2)}
-                            >
-                              {loadingDocConfirm[index] ? (
-                                <LoadingCss />
-                              ) : (
-                                "تایید مدرک"
+                            <div>
+                              {fileObj?.status !== 2 && (
+                                <>
+                                  <button
+                                    type="button"
+                                    className={style.confirmButtonDoc}
+                                    onClick={() => confirmDocument(index, 2)}
+                                  >
+                                    {loadingDocConfirm[index] ? (
+                                      <LoadingCss />
+                                    ) : (
+                                      "تایید مدرک"
+                                    )}
+                                  </button>
+                                </>
                               )}
-                            </button>
+                            </div>
+
                             <button
                               type="button"
                               className={style.rejectButtonDoc}
