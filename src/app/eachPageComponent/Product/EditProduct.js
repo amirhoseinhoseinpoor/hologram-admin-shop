@@ -18,28 +18,21 @@ import ErrorModal from "@/app/BaseComponent/ErrorModal";
 // Styled Components
 const BUTTONSSTYLE = styled.div`
   .cancelButtonStyle {
-    color: #48abf7;
-    background-color: rgba(72, 171, 247, 0.1);
-    border: none;
-    padding: 8px 16px;
-    border-radius: 4px;
-    cursor: pointer;
+    color: #e91e63;
+    background-color: unset;
+    border : 1px solid #e91e63;
+    padding-right : 10px;
+    padding-left : 10px;
   }
 
   .deleteButtonStyle {
     color: #ff4f3f !important;
     background-color: transparent;
-    border: none;
-    padding: 8px 16px;
-    cursor: pointer;
   }
   .confirmButtonStyle {
+    padding : 0 60px !important;
     color: white;
-    background-color: #1572e8;
-    border: none;
-    padding: 8px 16px;
-    border-radius: 4px;
-    cursor: pointer;
+    background-color: #43A047;
   }
 `;
 
@@ -1698,7 +1691,7 @@ export default function EditHonors({
 
       {/* Action Buttons */}
       <BUTTONSSTYLE className="d-flex flex-row justify-content-between container">
-        <div className="d-flex flex-row mt-3 mb-3 gap-3">
+        <div className="d-flex flex-row mt-3 mb-3 gap-3 justify-content-around w-100">
           <button
             type="submit"
             className="confirmButtonStyle"
@@ -1718,7 +1711,7 @@ export default function EditHonors({
             انصراف
           </button>
         </div>
-        <div>
+        {/* <div>
           <ButtonCancelOrder
             className="mt-2 mb-2 deleteButtonStyle"
             type="button"
@@ -1726,7 +1719,7 @@ export default function EditHonors({
           >
             حذف محصول
           </ButtonCancelOrder>
-        </div>
+        </div> */}
       </BUTTONSSTYLE>
 
       {/* Confirmation Modals */}
