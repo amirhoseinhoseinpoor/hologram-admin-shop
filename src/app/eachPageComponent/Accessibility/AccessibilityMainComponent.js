@@ -4,7 +4,12 @@ import NavBarToggleBurgerButton from "@/app/BaseComponent/NavBarToggleBurgerButt
 import styled from "styled-components";
 // import redux
 import { useDispatch, useSelector } from "react-redux";
-import { gettingAllRoles, deleteRole } from "@/app/Store/thunks";
+import {
+  gettingAllRoles,
+  deleteRole,
+  updatePermissionRole,
+  createPermissionRole,
+} from "@/app/Store/thunks";
 
 import { Modal, Box } from "@mui/material";
 import { Select, MenuItem, FormControl, InputLabel } from "@mui/material";
@@ -13,11 +18,13 @@ import MoreHorizIcon from "@mui/icons-material/MoreHoriz";
 import { NavDropdown } from "react-bootstrap";
 import DeleteIcon from "@mui/icons-material/Delete";
 import EditIcon from "@mui/icons-material/Edit";
-import AssignmentIcon from "@mui/icons-material/Assignment";
+
 // import base component
 import AreYouShureModal from "@/app/BaseComponent/AreYouSureModal";
 import ConfirmingModal from "@/app/BaseComponent/ConfirmingModal";
 import ErrorModal from "@/app/BaseComponent/ErrorModal";
+import CustomCloseButton from "@/app/BaseComponent/CustomCloseButton";
+import LoadingCss from "@/app/BaseComponent/LoadingCss";
 
 const HeadermakeOrder = styled.div`
   padding: 10px;
@@ -103,6 +110,15 @@ const AlignCenter = styled(Select)`
   }
 `;
 
+const HeaderModalShowAccessMainDiv = styled.div`
+  background-color: rgb(225, 223, 223);
+  border-top-right-radius: 10px;
+  border-top-left-radius: 10px;
+  .HeaderModalShowAccess {
+    padding: 10px;
+  }
+`;
+
 const modalStyle = {
   position: "absolute",
   top: "50%",
@@ -111,7 +127,6 @@ const modalStyle = {
   width: 400,
   bgcolor: "background.paper",
   boxShadow: 24,
-  p: 3,
   borderRadius: 2,
 };
 
@@ -129,27 +144,122 @@ const NavDropDown = styled(NavDropdown)`
   }
 `;
 
+const BUTTONSSTYLE = styled.div`
+  .cancelButtonStyle {
+    color: #e91e63;
+    background-color: unset;
+    border: 1px solid #e91e63;
+    padding-right: 10px;
+    padding-left: 10px;
+    border-radius: 4px;
+  }
+
+  .deleteButtonStyle {
+    color: #ff4f3f !important;
+    background-color: transparent;
+  }
+  .confirmButtonStyle {
+    padding: 4px 20px;
+    color: white;
+    background-color: #43a047;
+    border: none;
+    border-radius: 4px;
+  }
+`;
+
 export default function Accessibility({ toggleShow }) {
   const dispatch = useDispatch();
 
   const [rolesData, setRolesData] = useState(null);
   const [updateData, setUpdateData] = useState(false);
   const [dataForDelete, setDataForDelete] = useState(null);
+  const [selectedValues, setSelectedValues] = useState([]);
+  const [selectedValueCreateAccess, setSelectedValueCreateAccess] = useState(
+    []
+  );
+  const [nameCreateNewAccess, setNameCreateNewAccess] = useState("");
+
+  const handleNameCreateNewAccess = (event) => {
+    setNameCreateNewAccess(event.target.value);
+  };
+  const [storeRoleId, setStoreRoleId] = useState(null);
+  const [loadingUpdateAccess, setLoadingUpdateAccess] = useState(false);
 
   // modals state
   const [modalPermision, setModalPermision] = useState(null);
   const handleCloseModal = () => setModalPermision(null);
-
   const [errormodal, setErrormodal] = useState(false);
   const handleCloseErrorModal = () => setErrormodal(false);
-
   const [openModal, setOpenModal] = useState(false);
   const closeModal = () => setOpenModal(false);
-
   const [openModal2, setOpenModal2] = useState(false);
   const closeModal2 = () => setOpenModal2(false);
 
-  console.log(rolesData);
+  const [modalchangeAccess, setModalchangeAccess] = useState(null);
+
+  const handleclosemodalChangeAccess = () => {
+    setModalchangeAccess(null);
+    setSelectedValues([]);
+  };
+
+  const [modalCreateAccess, setModalCreateAccess] = useState(null);
+
+  const handleCloseModalCreateAccess = () => {
+    setModalCreateAccess(null);
+    setSelectedValueCreateAccess([]);
+  };
+
+  const handlechangeAccess = (index) => {
+    console.log(index);
+
+    const selectedRole = rolesData[--index];
+    console.log(selectedRole);
+
+    const permissions =
+      selectedRole?.permissions?.map((p) => p.permission.id) || [];
+    console.log(permissions);
+
+    setSelectedValues(permissions); // Preload selected values from the role's permissions
+    setModalchangeAccess(++index);
+  };
+
+  const handlechangeAccessCreate = () => {
+    // console.log(index);
+
+    // const selectedRole = rolesData[--index];
+    // console.log(selectedRole);
+
+    // const permissions =
+    //   selectedRole?.permissions?.map((p) => p.permission.id) || [];
+    // console.log(permissions);
+
+    // setSelectedValueCreateAccess(permissions);
+    setModalCreateAccess(true);
+  };
+
+  const handleChange = (event) => {
+    const value = Number(event.target.value);
+
+    if (event.target.checked) {
+      // Add to selectedValues if checked
+      setSelectedValues((prev) => [...prev, value]);
+    } else {
+      // Remove from selectedValues if unchecked
+      setSelectedValues((prev) => prev.filter((v) => v !== value));
+    }
+  };
+
+  const handleChangeCreateAccess = (event) => {
+    const value = Number(event.target.value);
+
+    if (event.target.checked) {
+      // Add to selectedValues if checked
+      setSelectedValueCreateAccess((prev) => [...prev, value]);
+    } else {
+      // Remove from selectedValues if unchecked
+      setSelectedValueCreateAccess((prev) => prev.filter((v) => v !== value));
+    }
+  };
 
   const areYouShureFunction = (itemID) => {
     setDataForDelete(itemID);
@@ -167,10 +277,11 @@ export default function Accessibility({ toggleShow }) {
 
   const handleDeleteRole = async () => {
     try {
-      const dataReturnAPI = await dispatch(deleteRole({id : dataForDelete})).unwrap();
+      const dataReturnAPI = await dispatch(
+        deleteRole({ id: dataForDelete })
+      ).unwrap();
       console.log(dataReturnAPI);
       if (dataReturnAPI) {
-
         setOpenModal2(true);
         setTimeout(() => {
           setOpenModal2(false);
@@ -180,6 +291,59 @@ export default function Accessibility({ toggleShow }) {
       console.log(error);
       setErrormodal(true);
     } finally {
+      setUpdateData(true);
+      setOpenModal(false);
+    }
+  };
+
+  const handleUpdatePermissionRole = async () => {
+    try {
+      setLoadingUpdateAccess(true);
+      const dataReturnAPI = await dispatch(
+        updatePermissionRole({
+          roleId: storeRoleId,
+          permissionIds: selectedValues,
+        })
+      ).unwrap();
+
+      if (dataReturnAPI) {
+        setOpenModal2(true);
+        setTimeout(() => {
+          setOpenModal2(false);
+        }, 3000);
+      }
+    } catch (error) {
+      console.log(error);
+      setErrormodal(true);
+    } finally {
+      setLoadingUpdateAccess(false);
+      handleclosemodalChangeAccess();
+      setUpdateData(true);
+      setOpenModal(false);
+    }
+  };
+
+  const handleCreateNewAccess = async () => {
+    try {
+      setLoadingUpdateAccess(true);
+      const dataReturnAPI = await dispatch(
+        createPermissionRole({
+          name: nameCreateNewAccess,
+          permissionIds: selectedValueCreateAccess,
+        })
+      ).unwrap();
+      console.log(dataReturnAPI);
+      if (dataReturnAPI) {
+        setOpenModal2(true);
+        setTimeout(() => {
+          setOpenModal2(false);
+        }, 3000);
+      }
+    } catch (error) {
+      console.error(error);
+      setErrormodal(true);
+    } finally {
+      setLoadingUpdateAccess(false);
       setUpdateData(true);
       setOpenModal(false);
     }
@@ -199,12 +363,103 @@ export default function Accessibility({ toggleShow }) {
         <SectionMain>
           <div className="d-flex justify-content-end headerBAckGroundColor">
             <button
+              onClick={() => {
+                handlechangeAccessCreate();
+              }}
               type="buttton"
               className="addRoleButtonStyle NormalTextSizing"
             >
               ساخت دسترسی
             </button>
+            <Modal
+              open={modalCreateAccess}
+              onClose={handleCloseModalCreateAccess}
+              aria-labelledby="modal-modal-title"
+              aria-describedby="modal-modal-description"
+            >
+              <Box sx={modalStyle}>
+                <HeaderModalShowAccessMainDiv className="d-flex flex-row justify-content-between align-items-center mb-2">
+                  <p className="NormalTextSizing HeaderModalShowAccess">
+                    ساخت دسترسی
+                  </p>
+                  <CustomCloseButton
+                    onClick={handleCloseModalCreateAccess}
+                    color={`#e91e63`}
+                  />
+                </HeaderModalShowAccessMainDiv>
+
+                <div className="d-flex flex-row gap-2 align-items-center">
+                  <label
+                    style={{ textWrap: "nowrap" }}
+                    className="NormalTextSizing me-2"
+                    htmlFor="CreateNewAccessName"
+                  >
+                    نام دسترسی
+                  </label>
+                  <input
+                    onChange={handleNameCreateNewAccess}
+                    value={nameCreateNewAccess}
+                    style={{
+                      border: "1px solid gray",
+                      borderRadius: "4px",
+                      padding: "5px",
+                    }}
+                    className="w-100 ms-2"
+                    type="text"
+                    id="CreateNewAccessName"
+                    minlength="4"
+                    required
+                  />
+                </div>
+
+                <div className="d-flex flex-column gap-2 justify-content-center align-items-center p-3">
+                  {[1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12].map((value) => (
+                    <label
+                      key={value}
+                      className="d-flex flex-row align-items-center gap-2"
+                    >
+                      <input
+                        type="checkbox"
+                        value={value}
+                        onChange={handleChangeCreateAccess}
+                      />
+                      <div>
+                        {value === 1 && "داشبورد"}
+                        {value === 2 && "محصولات"}
+                        {value === 3 && "سفارشات"}
+                        {value === 4 && "ساخت هدر"}
+                        {value === 5 && "مقالات"}
+                        {value === 6 && "افتخارات"}
+                        {value === 7 && "نمایشگاه ها"}
+                        {value === 8 && "بنر"}
+                        {value === 9 && "ویدیو"}
+                        {value === 10 && "کاربر سیستم"}
+                        {value === 11 && "کاربر سایت"}
+                        {value === 12 && "سطح دسترسی ها"}
+                      </div>
+                    </label>
+                  ))}
+                </div>
+                <BUTTONSSTYLE className="d-flex flex-row mt-3 mb-3 justify-content-around">
+                  <button
+                    className="NormalTextSizing confirmButtonStyle"
+                    type="button"
+                    onClick={handleCreateNewAccess}
+                  >
+                    {loadingUpdateAccess ? <LoadingCss /> : "ویرایش"}
+                  </button>
+                  <button
+                    className="NormalTextSizing cancelButtonStyle"
+                    type="button"
+                    onClick={handleCloseModalCreateAccess}
+                  >
+                    انصراف
+                  </button>
+                </BUTTONSSTYLE>
+              </Box>
+            </Modal>
           </div>
+
           <div>
             <StyledTable className="table table-striped">
               <thead className="text-center">
@@ -240,7 +495,16 @@ export default function Accessibility({ toggleShow }) {
                           aria-describedby="modal-modal-description"
                         >
                           <Box sx={modalStyle}>
-                            <div className="d-flex flex-column gap-2 justify-content-center align-items-center">
+                            <HeaderModalShowAccessMainDiv className="d-flex flex-row justify-content-between align-items-center">
+                              <p className="NormalTextSizing HeaderModalShowAccess">
+                                دسترسی ها
+                              </p>
+                              <CustomCloseButton
+                                onClick={handleCloseModal}
+                                color={`#e91e63`}
+                              />
+                            </HeaderModalShowAccessMainDiv>
+                            <div className="d-flex flex-column gap-2 justify-content-center align-items-center p-3">
                               {item?.permissions?.map((eachPer, index) => (
                                 <p key={index} className="NormalTextSizing">
                                   {eachPer?.permission?.name}
@@ -253,59 +517,81 @@ export default function Accessibility({ toggleShow }) {
                     </td>
 
                     <td>
-                      {/* <Modal
-                        open={openModals[item.code] || false}
-                        onClose={() => handleCloseModal(item.code)}
+                      <Modal
+                        open={modalchangeAccess === index || false}
+                        onClose={handleclosemodalChangeAccess}
                         aria-labelledby="modal-modal-title"
                         aria-describedby="modal-modal-description"
                       >
                         <Box sx={modalStyle}>
-                          <p className="mb-3 NormalTextSizing">وضعیت سفارش :</p>
-                          <FormControl
-                            variant="outlined"
-                            size="small"
-                            sx={{ minWidth: 100 }}
-                          >
-                            <InputLabel sx={{ fontFamily: "unset" }}>
-                              وضعیت
-                            </InputLabel>
-                            <AlignCenter
-                              sx={{
-                                fontFamily: "unset",
-                                padding: "0px",
-                              }}
-                              label="Status"
-                              value={
-                                selectedStatus[item.code] || item.status || ""
-                              }
-                              onChange={(e) => {
-                                const newStatus = e.target.value;
-                                setSelectedStatus((prevStatus) => ({
-                                  ...prevStatus,
-                                  [item.code]: newStatus, // Update status in state
-                                }));
-                                handleStatusChange(item.code, newStatus);
-                              }}
+                          <HeaderModalShowAccessMainDiv className="d-flex flex-row justify-content-between align-items-center">
+                            <p className="NormalTextSizing HeaderModalShowAccess">
+                              ویرایش
+                            </p>
+                            <p className="NormalTextSizing HeaderModalShowAccess">
+                              {item.name}
+                            </p>
+
+                            <CustomCloseButton
+                              onClick={handleclosemodalChangeAccess}
+                              color={`#e91e63`}
+                            />
+                          </HeaderModalShowAccessMainDiv>
+                          <div className="d-flex flex-column gap-2 justify-content-center align-items-center p-3">
+                            {/* {item?.permissions?.map((eachPer, index) => (
+                              <p key={index} className="NormalTextSizing">
+                                {eachPer?.permission?.name}
+                              </p>
+                            ))} */}
+
+                            {[1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12].map(
+                              (value) => (
+                                <label
+                                  key={value}
+                                  className="d-flex flex-row align-items-center gap-2"
+                                >
+                                  <input
+                                    type="checkbox"
+                                    value={value}
+                                    onChange={handleChange}
+                                    checked={selectedValues.includes(value)} // Prefill based on selected values
+                                  />
+                                  <div>
+                                    {value === 1 && "داشبورد"}
+                                    {value === 2 && "محصولات"}
+                                    {value === 3 && "سفارشات"}
+                                    {value === 4 && "ساخت هدر"}
+                                    {value === 5 && "مقالات"}
+                                    {value === 6 && "افتخارات"}
+                                    {value === 7 && "نمایشگاه ها"}
+                                    {value === 8 && "بنر"}
+                                    {value === 9 && "ویدیو"}
+                                    {value === 10 && "کاربر سیستم"}
+                                    {value === 11 && "کاربر سایت"}
+                                    {value === 12 && "سطح دسترسی ها"}
+                                  </div>
+                                </label>
+                              )
+                            )}
+                          </div>
+                          <BUTTONSSTYLE className="d-flex flex-row mt-3 mb-3 justify-content-around">
+                            <button
+                              className="NormalTextSizing confirmButtonStyle"
+                              type="button"
+                              onClick={handleUpdatePermissionRole}
                             >
-                              <MenuItem sx={{ fontFamily: "unset" }} value="1">
-                                درحال برسی
-                              </MenuItem>
-                              <MenuItem sx={{ fontFamily: "unset" }} value="2">
-                                درحال تولید
-                              </MenuItem>
-                              <MenuItem sx={{ fontFamily: "unset" }} value="3">
-                                درحال ارسال
-                              </MenuItem>
-                              <MenuItem sx={{ fontFamily: "unset" }} value="4">
-                                تحویل داده شده
-                              </MenuItem>
-                              <MenuItem sx={{ fontFamily: "unset" }} value="5">
-                                لغو شده
-                              </MenuItem>
-                            </AlignCenter>
-                          </FormControl>
+                              {loadingUpdateAccess ? <LoadingCss /> : "ویرایش"}
+                            </button>
+                            <button
+                              className="NormalTextSizing cancelButtonStyle"
+                              type="button"
+                              onClick={handleclosemodalChangeAccess}
+                            >
+                              انصراف
+                            </button>
+                          </BUTTONSSTYLE>
                         </Box>
-                      </Modal> */}
+                      </Modal>
 
                       <NavDropDown
                         title={
@@ -324,10 +610,10 @@ export default function Accessibility({ toggleShow }) {
                       >
                         <NavBarInsideDiv>
                           <div
-                            // onClick={() => {
-                            //   setActiveKey("seeOrder");
-                            //   setSeeOrder(item);
-                            // }}
+                            onClick={() => {
+                              handlechangeAccess(index);
+                              setStoreRoleId(item.id);
+                            }}
                             style={{
                               borderBottom: "1px solid black",
                               cursor: "pointer",

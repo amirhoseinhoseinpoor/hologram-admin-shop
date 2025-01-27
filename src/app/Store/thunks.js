@@ -90,6 +90,73 @@ export const gettingAllRoles = createAsyncThunk(
   }
 );
 
+export const createPermissionRole = createAsyncThunk(
+  "roles/updatePermissionRole",
+  async ({name , permissionIds}, thunkAPI) => {
+    const state = thunkAPI.getState();
+    const token = state.auth.token.token;
+
+    try {
+      const response = await axios.post(
+        `${process.env.NEXT_PUBLIC_BACK_END_SERVER}/roles`,
+        {
+          name,
+          permissionIds
+        },
+        {
+          headers: {
+            Authorization: token ? `Bearer ${token}` : "",
+          },
+        }
+      );
+      const data = response.data;
+      return data;
+    } catch (error) {
+      if (error.response && error.response.status === 400) {
+        return thunkAPI.rejectWithValue(error?.response);
+      } else {
+        return thunkAPI.rejectWithValue(
+          "مشکلی به وجود امده لطفا بعدا تلاش کنید"
+        );
+      }
+    }
+  }
+);
+
+
+export const updatePermissionRole = createAsyncThunk(
+  "roles/updatePermissionRole",
+  async ({roleId , permissionIds}, thunkAPI) => {
+    const state = thunkAPI.getState();
+    const token = state.auth.token.token;
+
+    try {
+      const response = await axios.patch(
+        `${process.env.NEXT_PUBLIC_BACK_END_SERVER}/roles/update-permissions`,
+        {
+          roleId,
+          permissionIds
+        },
+        {
+          headers: {
+            Authorization: token ? `Bearer ${token}` : "",
+          },
+        }
+      );
+      const data = response.data;
+      return data;
+    } catch (error) {
+      if (error.response && error.response.status === 400) {
+        return thunkAPI.rejectWithValue("error");
+      } else {
+        return thunkAPI.rejectWithValue(
+          "مشکلی به وجود امده لطفا بعدا تلاش کنید"
+        );
+      }
+    }
+  }
+);
+
 export const deleteRole = createAsyncThunk(
   "roles/deleteRole",
   async ({id}, thunkAPI) => {
