@@ -4,12 +4,13 @@ import { Modal, Button } from "react-bootstrap";
 import styled from "styled-components";
 // import redux
 import { useDispatch } from "react-redux";
-import { editUser, deleteUser } from "@/app/Store/thunks";
+import { editUser, deleteUser, gettingAllRoles } from "@/app/Store/thunks";
 // import base component
 import AreYouShureModal from "@/app/BaseComponent/AreYouSureModal";
 import { NavDropdown } from "react-bootstrap";
 import MoreHorizIcon from "@mui/icons-material/MoreHoriz";
 import EditIcon from "@mui/icons-material/Edit";
+import LoadingCss from "@/app/BaseComponent/LoadingCss";
 
 const NavDropDown = styled(NavDropdown)`
   .dropdown-menu {
@@ -30,8 +31,6 @@ const NavBarInsideDiv = styled.div`
   flex-direction: column;
   justify-content: space-between;
 `;
-
-
 
 const EditUserModal = styled(Modal)`
   .modal-dialog {
@@ -68,7 +67,6 @@ const EditUserModal = styled(Modal)`
   }
 `;
 
-
 const DeleteButtonStyle = styled.button`
   border: none;
   padding: 3px 5px !important;
@@ -81,13 +79,32 @@ const DeleteButtonStyle = styled.button`
   }
 `;
 
+const RoleDivGridStyle = styled.div`
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  grid-gap: 6px;
+  background-color: white;
+  padding: 10px;
+  border-radius: 4px;
+`;
+
 function EditUserBtnfunction({ data, setDataUpdated, setConfirmModal }) {
   const dispatch = useDispatch();
+
+  const [rolesData, setRolesData] = useState(null);
+  const [selectedValues, setSelectedValues] = useState([]);
+  const [loadingConfirmEdit, setLoadingConfirmEdit] = useState(false);
+  const [loadingDelete, setLoadingDelete] = useState(false);
+
+  const [updateData, setUpdateData] = useState(false);
+
   const [showEditModal, setShowEditModal] = useState(false);
   const [userData, setUserData] = useState({});
   const [factorType, setFactorType] = useState("");
   const [whereLogin, setWhereLogin] = useState("");
-  const [rolesChange, setrolesChange] = useState("");
+
+  console.log(selectedValues);
+
   const [deleteCode, setDeleteCode] = useState("");
 
   // modals state
@@ -98,10 +115,6 @@ function EditUserBtnfunction({ data, setDataUpdated, setConfirmModal }) {
     setWhereLogin(event.target.value);
   };
 
-  const handleRoleChange = (event) => {
-    setrolesChange(event.target.value);
-  };
-
   const handleActiveStateChange = (event) => {
     setFactorType(event.target.value);
   };
@@ -110,18 +123,9 @@ function EditUserBtnfunction({ data, setDataUpdated, setConfirmModal }) {
     setUserData(data || {});
     setFactorType(data?.active);
     setWhereLogin(data?.domain);
-    setrolesChange(data?.userRoles[0]?.role?.name || 3);
-  }, [data, showEditModal]);
 
-  useEffect(() => {
-    if (rolesChange == "admin") {
-      setrolesChange(2);
-    } else if (rolesChange == "master") {
-      setrolesChange(1);
-    } else if (rolesChange == "customer") {
-      setrolesChange(3);
-    }
-  }, [rolesChange]);
+    setSelectedValues(data?.userRoles?.map((item) => item.role.id) || [3]);
+  }, [data, showEditModal]);
 
   const handleEditModalClose = () => {
     setShowEditModal(false);
@@ -141,40 +145,76 @@ function EditUserBtnfunction({ data, setDataUpdated, setConfirmModal }) {
   };
 
   const handleDeleteUser = async () => {
-    const deleteUserApiCall = await dispatch(
-      deleteUser({ code: deleteCode })
-    ).unwrap();
+    try {
+      setLoadingDelete(true);
 
-    setOpenModal(false);
-    setDataUpdated(true);
-    if (deleteUserApiCall.statusCode == 200) {
-      setConfirmModal(true);
+      const deleteUserApiCall = await dispatch(
+        deleteUser({ code: deleteCode })
+      ).unwrap();
+
+      setOpenModal(false);
+      setDataUpdated(true);
+      if (deleteUserApiCall.statusCode == 200) {
+        setConfirmModal(true);
+      }
+    } catch (error) {
+      console.error("Error deleting user:", error);
+    } finally {
+      setLoadingDelete(false);
     }
   };
 
+
+
   const handleEditSubmit = async (event) => {
     event.preventDefault();
+    try {
+      setLoadingConfirmEdit(true);
+      const sendingEditUser = await dispatch(
+        editUser({
+          code: userData?.code,
+          firstName: userData.firstName,
+          lastName: userData.lastName,
+          username: userData.username,
+          active: factorType,
+          domain: whereLogin,
+          roleIds: selectedValues,
+        })
+      ).unwrap();
 
-    const sendingEditUser = await dispatch(
-      editUser({
-        code: userData?.code,
-        firstName: userData.firstName,
-        lastName: userData.lastName,
-        username: userData.username,
-        active: factorType,
-        domain: whereLogin,
-        roleIds: [rolesChange],
-      })
-    ).unwrap();
-
-    setDataUpdated(true);
-    console.log(sendingEditUser);
-    handleEditModalClose();
+      setDataUpdated(true);
+      console.log(sendingEditUser);
+      handleEditModalClose();
+    } catch (error) {
+      console.error("Error editing user:", error);
+    } finally {
+      setLoadingConfirmEdit(false);
+    }
   };
+
+  const handleChange = (event) => {
+    const value = Number(event.target.value);
+
+    if (event.target.checked) {
+      // Add to selectedValues if checked
+      setSelectedValues((prev) => [...prev, value]);
+    } else {
+      // Remove from selectedValues if unchecked
+      setSelectedValues((prev) => prev.filter((v) => v !== value));
+    }
+  };
+
+  useEffect(() => {
+    const GettingRoles = async () => {
+      const ReturnDataApi = await dispatch(gettingAllRoles()).unwrap();
+      setRolesData(ReturnDataApi);
+      setUpdateData(false);
+    };
+    GettingRoles();
+  }, [dispatch, updateData]);
 
   return (
     <>
-
       <NavDropDown
         title={
           <>
@@ -194,7 +234,6 @@ function EditUserBtnfunction({ data, setDataUpdated, setConfirmModal }) {
           <div
             onClick={handleEditModalShow}
             style={{
-              
               cursor: "pointer",
             }}
             className="d-flex flex-row gap-2 align-items-center pb-1"
@@ -202,14 +241,12 @@ function EditUserBtnfunction({ data, setDataUpdated, setConfirmModal }) {
             <div style={{ color: "#F3802C" }}>
               <EditIcon className="subitem" />
             </div>
-            <p className="NormalTextSizing text-end" >ویرایش</p>
+            <p className="NormalTextSizing text-end">ویرایش</p>
           </div>
-
-          
         </NavBarInsideDiv>
         <div className="d-flex justify-content-end"></div>
       </NavDropDown>
-      
+
       <EditUserModal show={showEditModal} onHide={handleEditModalClose}>
         <Modal.Header closeButton>
           <Modal.Title>ویرایش کاربر</Modal.Title>
@@ -293,7 +330,8 @@ function EditUserBtnfunction({ data, setDataUpdated, setConfirmModal }) {
                 <option value="2">ادمین و سایت</option>
               </select>
             </div>
-            <div className="form-group">
+
+            {/* <div className="form-group">
               <label className="mb-1 me-1" htmlFor="rolesChange">
                 دسترسی
               </label>
@@ -309,10 +347,29 @@ function EditUserBtnfunction({ data, setDataUpdated, setConfirmModal }) {
                 <option value="2">ادمین</option>
                 <option value="3">مشتری</option>
               </select>
+            </div> */}
+            <div className="form-group">
+              <label className="mb-1 me-1">سطح دسترسی</label>
+              <RoleDivGridStyle className="mt-2">
+                {rolesData?.map((item, index) => (
+                  <label
+                    key={index}
+                    className="d-flex flex-row align-items-center gap-2"
+                  >
+                    <input
+                      type="checkbox"
+                      value={item.id}
+                      onChange={handleChange}
+                      checked={selectedValues.includes(item.id)}
+                    />
+                    <div>{item.name}</div>
+                  </label>
+                ))}
+              </RoleDivGridStyle>
             </div>
             <div className="d-flex flex-row justify-content-between">
               <Button variant="primary" type="submit">
-                ذخیره
+                {loadingConfirmEdit ? <LoadingCss /> : "ذخیره"}
               </Button>
               <DeleteButtonStyle
                 type="button"
@@ -320,7 +377,7 @@ function EditUserBtnfunction({ data, setDataUpdated, setConfirmModal }) {
                   areYouShureFunction(e, { code: userData?.code })
                 }
               >
-                حذف اکانت
+                {loadingDelete ? <LoadingCss /> : "حذف اکانت"}
               </DeleteButtonStyle>
             </div>
           </form>

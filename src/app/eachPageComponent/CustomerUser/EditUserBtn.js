@@ -98,7 +98,6 @@ function EditUserBtnfunction({ data, setDataUpdated, setConfirmModal }) {
   const [userData, setUserData] = useState({});
   const [factorType, setFactorType] = useState("");
   const [whereLogin, setWhereLogin] = useState("");
-  const [rolesChange, setrolesChange] = useState("");
   const [deleteCode, setDeleteCode] = useState("");
 
   // modals state
@@ -121,18 +120,9 @@ function EditUserBtnfunction({ data, setDataUpdated, setConfirmModal }) {
     setUserData(data || {});
     setFactorType(data?.active);
     setWhereLogin(data?.domain);
-    setrolesChange(data?.userRoles[0]?.role?.name || 3);
   }, [data, showEditModal]);
 
-  useEffect(() => {
-    if (rolesChange == "admin") {
-      setrolesChange(2);
-    } else if (rolesChange == "master") {
-      setrolesChange(1);
-    } else if (rolesChange == "customer") {
-      setrolesChange(3);
-    }
-  }, [rolesChange]);
+
 
   const handleEditModalClose = () => {
     setShowEditModal(false);
@@ -174,7 +164,6 @@ function EditUserBtnfunction({ data, setDataUpdated, setConfirmModal }) {
         username: userData.username,
         active: factorType,
         domain: whereLogin,
-        roleIds: [rolesChange],
       })
     ).unwrap();
 
@@ -266,7 +255,7 @@ function EditUserBtnfunction({ data, setDataUpdated, setConfirmModal }) {
                 id="age"
                 className="form-control"
                 placeholder="شماره همراه"
-                name="age"
+                name="username"
                 value={userData.username || ""}
                 onChange={handleInputChange}
                 required

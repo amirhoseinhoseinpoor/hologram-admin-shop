@@ -2,10 +2,12 @@
 import React, { useState, useEffect } from "react";
 import { Modal, Button } from "react-bootstrap";
 import styled from "styled-components";
+// import base component
+import LoadingCss from "@/app/BaseComponent/LoadingCss";
 
 // import redux
 import { useDispatch } from "react-redux";
-import { addUser, getuser } from "@/app/Store/thunks";
+import { addUser, getuser, gettingAllRoles } from "@/app/Store/thunks";
 
 const AddUserModal = styled(Modal)`
   .modal-dialog {
@@ -48,7 +50,15 @@ const AddUserBtnstyle = styled(Button)`
   text-align: center;
   cursor: pointer;
   border-radius: 4px;
-  background-image : linear-gradient(195deg, #66BB6A 0%, #43A047 100%);
+  background-image: linear-gradient(195deg, #66bb6a 0%, #43a047 100%);
+`;
+const RoleDivGridStyle = styled.div`
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  grid-gap: 6px;
+  background-color: white;
+  padding: 10px;
+  border-radius: 4px;
 `;
 
 export default function AddUserBtn({
@@ -58,17 +68,27 @@ export default function AddUserBtn({
 }) {
   const dispatch = useDispatch();
 
+  const [rolesData, setRolesData] = useState(null);
+
+  const [updateData, setUpdateData] = useState(false);
+  const [selectedValues, setSelectedValues] = useState([]);
+  console.log(selectedValues);
+  
+  const [loadingAddUser, setLoadingAddUser] = useState(false);
+
   const [newUserData, setNewUserData] = useState({
     firstName: "",
     lastName: "",
     username: "",
     password: "",
     domain: "",
-    roleId: "",
+    roleId: [],
   });
-  const [showAddModal, setShowAddModal] = useState(false);
 
-  // const [dataCome , setDataCome] = useState([]);
+  console.log(newUserData);
+  
+
+  const [showAddModal, setShowAddModal] = useState(false);
 
   const handleInputChange = (event) => {
     const { name, value } = event.target;
@@ -81,19 +101,14 @@ export default function AddUserBtn({
 
   const handleAddModalClose = () => setShowAddModal(false);
   const handleAddModalShow = () => setShowAddModal(true);
-
-  // useEffect(() => {
-  //   const fetchData = async () => {
-  //     const dataComeAPI = await dispatch(getuser()).unwrap();
-  //     setDataCome(dataComeAPI);
-  //   }
-  //   fetchData();
-
-  // }, [dispatch]);
+  
 
   const handleAddUser = async (event) => {
     event.preventDefault();
     try {
+      setLoadingAddUser(true);
+     
+
       const gettingResponseAPI = await dispatch(addUser(newUserData)).unwrap();
 
       if (gettingResponseAPI) {
@@ -106,9 +121,43 @@ export default function AddUserBtn({
       handleAddModalClose();
     } catch (error) {
       console.error("Error adding user:", error);
+    } finally {
+      setLoadingAddUser(false);
     }
   };
 
+  useEffect(() => {
+    const GettingRoles = async () => {
+      const ReturnDataApi = await dispatch(gettingAllRoles()).unwrap();
+      setRolesData(ReturnDataApi);
+      setUpdateData(false);
+    };
+    GettingRoles();
+  }, [dispatch, updateData]);
+
+  const handleChange = (event) => {  
+    const value = Number(event.target.value);  
+  
+    if (event.target.checked) {  
+      // Add to selectedValues if checked  
+      setSelectedValues((prev) => [...prev, value]);  
+      
+      // Update newUserData with the new roleId  
+      setNewUserData((prevUserData) => ({  
+        ...prevUserData,  
+        roleId: [...prevUserData.roleId, value],  
+      }));  
+    } else {  
+      // Remove from selectedValues if unchecked  
+      setSelectedValues((prev) => prev.filter((v) => v !== value));  
+      
+      // Update newUserData to remove the unchecked roleId  
+      setNewUserData((prevUserData) => ({  
+        ...prevUserData,  
+        roleId: prevUserData.roleId.filter((id) => id !== value),  
+      }));  
+    }  
+  };  
   return (
     <section>
       <AddUserBtnstyle
@@ -236,9 +285,9 @@ export default function AddUserBtn({
               </select>
             </div>
 
-            <div className="form-group">
+            {/* <div className="form-group">
               <label className="mb-1 me-1" htmlFor="roleId">
-                نوع کاربر
+                سطح دسترسی
               </label>
               <select
                 id="roleId"
@@ -248,13 +297,31 @@ export default function AddUserBtn({
                 onChange={handleInputChange}
                 required
               >
-                <option value="" disabled>
-                  انتخاب کنید
-                </option>
-                <option value="1">مدیر</option>
-                <option value="2">ادمین</option>
-                <option value="3">مشتری</option>
+                {rolesData?.map((item, index) => (
+                  <>
+                    <option value="1">{item.name}</option>
+                  </>
+                ))}
               </select>
+            </div> */}
+
+            <div className="form-group">
+              <label className="mb-1 me-1">سطح دسترسی</label>
+              <RoleDivGridStyle className="mt-2">
+                {rolesData?.map((item, index) => (
+                  <label
+                    key={index}
+                    className="d-flex flex-row align-items-center gap-2"
+                  >
+                    <input
+                      type="checkbox"
+                      value={item.id}
+                      onChange={handleChange}
+                    />
+                    <div>{item.name}</div>
+                  </label>
+                ))}
+              </RoleDivGridStyle>
             </div>
           </form>
         </Modal.Body>
@@ -263,7 +330,13 @@ export default function AddUserBtn({
             لغو
           </Button>
           <Button variant="primary" onClick={handleAddUser}>
-            اضافه کردن
+            {loadingAddUser ? (
+              <>
+                <LoadingCss />
+              </>
+            ) : (
+              <>اضافه کردن</>
+            )}
           </Button>
         </Modal.Footer>
       </AddUserModal>

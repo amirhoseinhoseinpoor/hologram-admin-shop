@@ -209,7 +209,7 @@ export const addUser = createAsyncThunk(
           username,
           password,
           domain,
-          roleIds: [parseInt(roleId)],
+          ...(roleId && roleId.length > 0 && { roleIds: roleId }),
         },
         {
           headers: {
