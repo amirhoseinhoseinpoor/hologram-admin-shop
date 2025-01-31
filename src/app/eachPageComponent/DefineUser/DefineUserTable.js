@@ -21,7 +21,7 @@ const HeadermakeOrder = styled.div`
   color: white;
   background-color: rgb(225, 223, 223);
   border-radius: 4px;
-  margin : 7px 15px;
+  margin: 7px 15px;
   .textHeaderStyle {
     color: black;
   }
@@ -140,6 +140,7 @@ export default function DefineUser({ toggleShow }) {
   // filter states
   const [searchTerm, setSearchTerm] = useState("");
   const [filteredUsers, setFilteredUsers] = useState(null);
+  console.log(filteredUsers);
 
   // loading
   const [trackLoading, setTrackLoading] = useState(false);
@@ -273,10 +274,11 @@ export default function DefineUser({ toggleShow }) {
                         <td>{item.active ? "فعال" : "غیرفعال"}</td>
                         <td>{item.domain === 1 ? "سایت" : "سایت و ادمین"}</td>
                         <td>
-                          {item.userRoles[0]?.role?.name === "admin" && "ادمین"}
-                          {item.userRoles[0]?.role?.name === "master" && "مدیر"}
-                          {item.userRoles[0]?.role?.name === "customer" &&
-                            "مشتری"}
+                          <div className="d-flex flex-row gap-2 justify-content-center">
+                            {item.userRoles?.map((item, index) => (
+                              <div key={index}>{item.role.name}</div>
+                            ))}
+                          </div>
                         </td>
                         <td>
                           <div className="d-flex flex-row justify-content-center">

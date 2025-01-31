@@ -20,6 +20,7 @@ const authinitialState = {
   code: null,
   email: null,
   gender: null,
+  permissions: null,
   signUpSattus: null,
   loading: false,
   error: null,
@@ -34,6 +35,7 @@ const authSlice = createSlice({
       state.lastName = action.payload.lastName;
       state.email = action.payload.email;
       state.gender = action.payload.gender;
+      state.permissions = action.payload.permissions;
     },
     resetToken: (state) => {
       state.token = null;
@@ -56,6 +58,7 @@ const authSlice = createSlice({
         state.phoneNumber = action.payload.phoneNumber;
         state.code = action.payload.code;
         state.gender = action.payload.gender;
+        state.permissions = action.payload.permissions;
         state.email = action.payload.email;
       })
       .addCase(login.rejected, (state, action) => {
@@ -85,6 +88,7 @@ export const phoneNumber = (state) => state.auth.phoneNumber;
 export const code = (state) => state.auth.code;
 export const email = (state) => state.auth.email;
 export const gender = (state) => state.auth.gender;
+export const permissions = (state) => state.auth.permissions;
 export const { resetToken } = authSlice.actions;
 export const { setUserData } = authSlice.actions;
 export const signUpSattus = (state) => state.auth.signUpSattus;
@@ -119,19 +123,19 @@ const productSlice = createSlice({
       .addCase(list.rejected, (state, action) => {
         state.loading = false;
         state.error = action.error.message;
-      })
-      // .addCase(uploadFile.pending, (state) => {
-      //   state.loading = true;
-      //   state.error = null;
-      // })
-      // .addCase(uploadFile.fulfilled, (state, action) => {
-      //   state.loading = false;
-      //   state.uploadedFiles[action.meta.arg.name] = action.payload;
-      // })
-      // .addCase(uploadFile.rejected, (state, action) => {
-      //   state.loading = false;
-      //   state.error = action.error.message;
-      // });
+      });
+    // .addCase(uploadFile.pending, (state) => {
+    //   state.loading = true;
+    //   state.error = null;
+    // })
+    // .addCase(uploadFile.fulfilled, (state, action) => {
+    //   state.loading = false;
+    //   state.uploadedFiles[action.meta.arg.name] = action.payload;
+    // })
+    // .addCase(uploadFile.rejected, (state, action) => {
+    //   state.loading = false;
+    //   state.error = action.error.message;
+    // });
   },
 });
 

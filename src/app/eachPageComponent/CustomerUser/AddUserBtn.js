@@ -67,7 +67,6 @@ export default function AddUserBtn({
     username: "",
     password: "",
     domain: "1",
-    roleId: "3",
   });
   
   const [showAddModal, setShowAddModal] = useState(false);
