@@ -106,7 +106,7 @@ const NavTabs = styled(Tabs)`
   display: flex;
   flex-direction: row;
   border-bottom: none;
-  gap: 14px;
+  gap: 10px;
   width: 100%;
 
   .nav-item {
@@ -120,7 +120,7 @@ const NavTabs = styled(Tabs)`
     border-radius: 10px !important;
     color: #191919;
     width: 100%;
-    padding: 6px 11px;
+    padding: 5px 11px;
     position: relative;
     cursor: pointer;
   }
@@ -918,7 +918,17 @@ export default function EditHonors({
         <div>
           {/* Add Section Form */}
           <AddSectionForm>
-            <HeaderEachSection className="NormalTextSizing">مشخصه</HeaderEachSection>
+            <HeaderEachSection className="NormalTextSizing d-flex flex-row align-items-center justify-content-between">
+              <p>مشخصه</p>
+              <div className="d-flex justify-content-end">
+                <BUTTONADDSECTIONSTYLE
+                  type="button"
+                  onClick={handleAddSectionForm}
+                >
+                  اضافه کردن بخش
+                </BUTTONADDSECTIONSTYLE>
+              </div>
+            </HeaderEachSection>
             <InsideAddSectionForm className="d-flex flex-column gap-3">
               <div className="d-flex flex-row gap-2 mt-3 align-items-center">
                 <label
@@ -954,14 +964,7 @@ export default function EditHonors({
                   <option value="image">تصویر</option>
                 </select>
               </div>
-              <div className="d-flex justify-content-end">
-                <BUTTONADDSECTIONSTYLE
-                  type="button"
-                  onClick={handleAddSectionForm}
-                >
-                  اضافه کردن بخش
-                </BUTTONADDSECTIONSTYLE>
-              </div>
+              
             </InsideAddSectionForm>
           </AddSectionForm>
 
