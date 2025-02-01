@@ -285,35 +285,34 @@ export default function EditHonors({
     fetchData();
   }, [dispatch]);
 
-  // Flatten Header Items Excluding Specified Top-Level Titles
   useEffect(() => {
-    // Function to recursively flatten header items, excluding specified top-level titles
-    const flattenHeader = (items, isTopLevel = true) => {
+    const flattenHeader = (items, parentPath = '', isTopLevel = true) => {
       let flatList = [];
       items.forEach((item) => {
-        if (isTopLevel && excludedTopLevelTitles.includes(item.title)) {
-          // Skip adding this top-level item but process its subItems
-          if (item.subItems && item.subItems.length > 0) {
-            flatList = flatList.concat(flattenHeader(item.subItems, false));
+        if (isTopLevel) {
+          // Process subItems with full path but skip parent-level entry
+          if (item.subItems?.length) {
+            flatList = flatList.concat(flattenHeader(item.subItems, item.title, false));
           }
         } else {
-          // Add the current item
-          flatList.push({ id: item.id, title: item.title });
-          // Process subItems if any
-          if (item.subItems && item.subItems.length > 0) {
-            flatList = flatList.concat(flattenHeader(item.subItems, false));
+          const currentPath = parentPath ? `${parentPath} / ${item.title}` : item.title;
+          // Only add final leaf nodes with full hierarchy
+          if (item.subItems?.length) {
+            flatList = flatList.concat(flattenHeader(item.subItems, currentPath, false));
+          } else {
+            flatList.push({ id: item.id, title: currentPath });
           }
         }
       });
       return flatList;
     };
-
+  
     const allHeaderItems = flattenHeader(headerCome);
     const filteredItems = allHeaderItems.filter(
-      (item) =>
-        !usedNavIds.includes(item.id.toString()) ||
-        item?.id?.toString() === editedHonor?.navId?.toString()
+      (item) => !usedNavIds.includes(item.id.toString()) || 
+      item.id.toString() === editedHonor?.navId?.toString()
     );
+    
     setAvailableItems(filteredItems);
     setSelectedNavId(editedHonor?.navId?.toString() || "");
   }, [headerCome, usedNavIds, editedHonor.navId]);

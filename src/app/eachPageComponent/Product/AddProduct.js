@@ -23,6 +23,15 @@ const DivAdjustColorDivs = styled.div`
   /* grid-gap: 18px; */
   width: 100%;
   /* padding: 15px; */
+  .dropDownSpecoficStyle {
+    border: 1.5px solid #c0c0c0;
+    border-radius: 4px;
+  }
+  .dropDownSpecoficStyleHeader{
+    border-bottom: 1.5px solid #c0c0c0;
+    border-radius: 4px;
+    padding: 10px;
+  }
   .labelInsteadOfInput {
     border: 1px solid #c0c0c0;
     border-radius: 4px;
@@ -37,6 +46,11 @@ const DivAdjustColorDivs = styled.div`
   .colorTheInputFile {
     color: #404040;
     margin: 0;
+  }
+  .divBorderFileds {
+    border: 1.5px solid #c0c0c0;
+    padding: 10px;
+    border-radius: 4px;
   }
   @media (max-width: 768px) {
     grid-template-columns: ${(props) => props.recolumns || ""};
@@ -235,14 +249,7 @@ export default function AddHonors({ setDataUpdated, setActiveKey }) {
   const [loadingConfirmModal, setLoadingConfirmModal] = useState(false);
   const [disableConfirm, setDisableConfirm] = useState(true);
 
-  // Define top-level navigation titles to exclude
-  const excludedTopLevelTitles = [
-    "خانه",
-    "محصولات",
-    "مقالات",
-    "تماس با ما",
-    "درباره‌ی ما",
-  ];
+
 
   // Modal States
   const [openModal, setOpenModal] = useState(false);
@@ -277,39 +284,37 @@ export default function AddHonors({ setDataUpdated, setActiveKey }) {
 
     fetchData();
   }, [dispatch]);
-
-  // Flatten Header Items Excluding Specified Top-Level Titles
+  
   useEffect(() => {
-    // Function to recursively flatten header items, excluding specified top-level titles
-    const flattenHeader = (items, isTopLevel = true) => {
+    const flattenHeader = (items, parentPath = '', isTopLevel = true) => {
       let flatList = [];
       items.forEach((item) => {
-        if (isTopLevel && excludedTopLevelTitles.includes(item.title)) {
-          // Skip adding this top-level item but process its subItems
-          if (item.subItems && item.subItems.length > 0) {
-            flatList = flatList.concat(flattenHeader(item.subItems, false));
+        if (isTopLevel) {
+          // Process subItems with full path but skip parent-level entry
+          if (item.subItems?.length) {
+            flatList = flatList.concat(flattenHeader(item.subItems, item.title, false));
           }
         } else {
-          // Add the current item
-          flatList.push({ id: item.id, title: item.title });
-          // Process subItems if any
-          if (item.subItems && item.subItems.length > 0) {
-            flatList = flatList.concat(flattenHeader(item.subItems, false));
+          const currentPath = parentPath ? `${parentPath} / ${item.title}` : item.title;
+          // Only add final leaf nodes with full hierarchy
+          if (item.subItems?.length) {
+            flatList = flatList.concat(flattenHeader(item.subItems, currentPath, false));
+          } else {
+            flatList.push({ id: item.id, title: currentPath });
           }
         }
       });
       return flatList;
     };
-
+  
     const allHeaderItems = flattenHeader(headerCome);
     const filteredItems = allHeaderItems.filter(
-      (item) =>
-        !usedNavIds.includes(item.id.toString()) ||
-        item.id.toString() === selectedNavId.toString()
+      (item) => !usedNavIds.includes(item.id.toString()) || 
+      item.id.toString() === selectedNavId.toString()
     );
     setAvailableItems(filteredItems);
   }, [headerCome, usedNavIds, selectedNavId]);
-
+  
   // Handle File Changes for Dynamic Sections (Image-Based)
   const handleSectionFileChange = (e, sectionIndex, itemIndex) => {
     const file = e.target.files[0];
@@ -1098,7 +1103,7 @@ export default function AddHonors({ setDataUpdated, setActiveKey }) {
                     className="d-flex flex-row gap-2 flex-wrap mt-2 align-items-center justify-content-between"
                     key={index}
                   >
-                    <DivAdjustGrodimageMedia>
+                    <DivAdjustGrodimageMedia className="mb-2 me-2 ms-2">
                       <DivHeaderInfoMedia className="d-flex justify-content-between">
                         <select
                           value={item.type}
@@ -1112,7 +1117,6 @@ export default function AddHonors({ setDataUpdated, setActiveKey }) {
                             )
                           }
                           required
-                          className="mt-2 mb-1 "
                         >
                           <option value={1}>عکس</option>
                           <option value={2}>فیلم</option>
@@ -1335,7 +1339,10 @@ export default function AddHonors({ setDataUpdated, setActiveKey }) {
 
                       <div className="p-3">
                         <div className="d-flex flex-row gap-3">
-                          <DivAdjustColorDivs columns="repeat(1, 1fr)" className="w-50">
+                          <DivAdjustColorDivs
+                            columns="repeat(1, 1fr)"
+                            className="w-50"
+                          >
                             <div className="d-flex flex-column">
                               <span className="NormalTextSizing">فیلم :</span>
                               {item?.src === "" ? (
@@ -1557,13 +1564,30 @@ export default function AddHonors({ setDataUpdated, setActiveKey }) {
         {activeTab === "fileds" && (
           <div>
             <BorderInputBox>
-              <HeaderEachSection>فیلد ها:</HeaderEachSection>
+              <HeaderEachSection className="NormalTextSizing d-flex flex-row align-items-center justify-content-between">
+                <p>فیلد ها:</p>
+
+                <div className="d-flex justify-content-end">
+                  <ButtonAddSection
+                    className="ms-2 bg-success text-white px-2 py-1 rounded"
+                    type="button"
+                    onClick={handleAddFileds}
+                  >
+                    اضافه کردن
+                  </ButtonAddSection>
+                </div>
+              </HeaderEachSection>
+
               <DivAdjustColorDivs
+                className="p-2"
                 style={{ width: "100%" }}
                 columns="repeat(1, 1fr)"
               >
                 {filedOrder.map((item, index) => (
-                  <div className="mt-2 d-flex flex-column gap-3" key={index}>
+                  <div
+                    className="mt-2 d-flex flex-column gap-3 divBorderFileds"
+                    key={index}
+                  >
                     <div className="d-flex  flex-row align-items-center gap-3">
                       <select
                         value={item.type}
@@ -1581,10 +1605,10 @@ export default function AddHonors({ setDataUpdated, setActiveKey }) {
                           )
                         }
                         required
-                        className="form-select mt-2 mb-1 w-50"
+                        className="mt-2 mb-1 w-50"
                       >
-                        <option value="text">متن :</option>
-                        <option value="dropDown">دراپ دون :</option>
+                        <option value="text">متن</option>
+                        <option value="dropDown">دراپ دون</option>
                       </select>
                       <input
                         style={{ width: "45%" }}
@@ -1614,17 +1638,30 @@ export default function AddHonors({ setDataUpdated, setActiveKey }) {
                     </div>
 
                     {item.type === "dropDown" && (
-                      <div className="d-flex flex-column gap-2 mt-2">
-                        <label
-                          htmlFor={`dropDownOP-${index}`}
-                          className="form-label"
-                          style={{ whiteSpace: "nowrap" }}
-                        >
-                          گزینه‌های دراپ دون:
-                        </label>
+                      <div className="d-flex flex-column dropDownSpecoficStyle gap-2">
+                        <div className="d-flex flex-row align-items-center justify-content-between dropDownSpecoficStyleHeader">
+                          <label
+                            htmlFor={`dropDownOP-${index}`}
+                            className="form-label NormalTextSizing"
+                            style={{ whiteSpace: "nowrap" }}
+                          >
+                            گزینه‌های دراپ دون:
+                          </label>
+                          <button
+                            type="button"
+                            className="NormalTextSizing"
+                            style={{
+                              backgroundColor: "#43A047",
+                              width: "fit-content",
+                            }}
+                            onClick={() => handleAddDropDownOption(index)}
+                          >
+                            اضافه کردن گزینه
+                          </button>
+                        </div>
 
                         <ResponsiveDivFileds
-                          className="mt-2 mb-2"
+                          className="mt-2 mb-2 p-2"
                           columns="repeat(2, 1fr)"
                         >
                           {item.dropDownOP.map((option, optIndex) => (
@@ -1660,32 +1697,11 @@ export default function AddHonors({ setDataUpdated, setActiveKey }) {
                             </div>
                           ))}
                         </ResponsiveDivFileds>
-                        <button
-                          type="button"
-                          className="NormalTextSizing"
-                          style={{
-                            backgroundColor: "#43A047",
-                            width: "fit-content",
-                          }}
-                          onClick={() => handleAddDropDownOption(index)}
-                        >
-                          اضافه کردن گزینه
-                        </button>
                       </div>
                     )}
                   </div>
                 ))}
               </DivAdjustColorDivs>
-
-              <div className="d-flex justify-content-end mt-3">
-                <ButtonAddSection
-                  className="mt-2 mb-3 ms-3 bg-success text-white px-2 py-1 rounded"
-                  type="button"
-                  onClick={handleAddFileds}
-                >
-                  اضافه کردن فیلد
-                </ButtonAddSection>
-              </div>
             </BorderInputBox>
           </div>
         )}
