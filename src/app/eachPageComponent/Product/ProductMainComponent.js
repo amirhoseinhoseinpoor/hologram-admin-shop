@@ -78,27 +78,6 @@ const SearchInputMainDiv = styled.div`
   }
 `;
 
-// const TableContainer = styled.div`
-//   margin-top: 20px;
-// `;
-
-// const StyledTable = styled.table`
-//   width: 100%;
-//   border-collapse: collapse;
-//   margin-top: 20px;
-//   th,
-//   td {
-//     border: 1px solid #ddd;
-//     padding: 8px;
-//     text-align: center;
-//     vertical-align: middle;
-//   }
-//   th {
-//     background-color: #f2f2f2;
-//     font-weight: bold;
-//   }
-// `;
-
 const FixTablePlace = styled.div`
   position: relative;
   margin-top: 60px;
