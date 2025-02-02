@@ -853,7 +853,7 @@ export default function AddHonors({ setDataUpdated, setActiveKey }) {
                     className="form-control w-100"
                   />
                 </div>
-                {/* <div className="d-flex flex-row gap-2 mt-3 align-items-center">
+                <div className="d-flex flex-row gap-2 mt-3 align-items-center">
                   <label
                     htmlFor="newSectionType"
                     className="NormalTextSizing"
@@ -871,8 +871,8 @@ export default function AddHonors({ setDataUpdated, setActiveKey }) {
                     <option value="text">متن</option>
                     <option value="image">تصویر</option>
                   </select>
-                </div> */}
-                <div>
+                </div>
+                {/* <div>
                   <ButtonAddSection
                     className="bg-success text-white px-2 py-1 rounded"
                     type="button"
@@ -901,7 +901,7 @@ export default function AddHonors({ setDataUpdated, setActiveKey }) {
                       </div>
                     </Box>
                   </Modal>
-                </div>
+                </div> */}
               </InsideAddSectionForm>
             </AddSectionForm>
 
@@ -1096,6 +1096,7 @@ export default function AddHonors({ setDataUpdated, setActiveKey }) {
                   </ButtonAddSection>
                 </div>
               </HeaderEachSection>
+
               <DivAdjustColorDivs columns="repeat(2, 1fr)">
                 {imgData.map((item, index) => (
                   <div
