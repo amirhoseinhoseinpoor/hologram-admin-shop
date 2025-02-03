@@ -167,6 +167,13 @@ const BUTTONSSTYLE = styled.div`
   }
 `;
 
+const SeeAccessTableStyle = styled.p`
+ border-top: 1px solid gray;
+ width: 100%;
+ text-align:center;
+ padding-top: 3px;
+`;
+
 export default function Accessibility({ toggleShow }) {
   const dispatch = useDispatch();
 
@@ -506,9 +513,9 @@ export default function Accessibility({ toggleShow }) {
                             </HeaderModalShowAccessMainDiv>
                             <div className="d-flex flex-column gap-2 justify-content-center align-items-center p-3">
                               {item?.permissions?.map((eachPer, index) => (
-                                <p key={index} className="NormalTextSizing">
+                                <SeeAccessTableStyle key={index} className="NormalTextSizing">
                                   {eachPer?.permission?.name}
-                                </p>
+                                </SeeAccessTableStyle>
                               ))}
                             </div>
                           </Box>

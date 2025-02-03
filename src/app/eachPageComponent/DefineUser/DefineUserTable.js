@@ -145,6 +145,13 @@ const SelectFilter = styled.select`
   cursor: pointer;
 `;
 
+const SeeAccessTableStyle = styled.p`
+ border-top: 1px solid gray;
+ width: 100%;
+ text-align:center;
+ padding-top: 3px;
+`;
+
 const modalStyle = {
   position: "absolute",
   top: "50%",
@@ -336,9 +343,9 @@ export default function DefineUser({ toggleShow }) {
                                     {eachPer?.permission?.name}
                                   </p>
                                 ))} */}
-                                <div className="d-flex flex-row gap-2 justify-content-center">
+                                <div className="d-flex flex-column gap-2 justify-content-center align-items-center w-100">
                                   {item.userRoles?.map((item, index) => (
-                                    <div key={index}>{item.role.name}</div>
+                                    <SeeAccessTableStyle key={index} className="NormalTextSizing">{item.role.name}</SeeAccessTableStyle>
                                   ))}
                                 </div>
                               </div>
