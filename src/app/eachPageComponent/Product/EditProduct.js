@@ -14,6 +14,8 @@ import Tabs from "react-bootstrap/Tabs";
 import AreYouShureModal from "@/app/BaseComponent/AreYouSureModal";
 import ConfirmModal from "@/app/BaseComponent/ConfirmingModal";
 import ErrorModal from "@/app/BaseComponent/ErrorModal";
+// import utiles
+import { fixTitleSize } from "@/app/utils/fixTitleSize";
 
 // Styled Components
 const BUTTONSSTYLE = styled.div`
@@ -57,6 +59,12 @@ const BOX = styled(Box)`
   border-radius: 4px;
 `;
 
+const BoxFirstSection = styled(Box)`
+  max-height: 120px;
+  border-radius: 4px;
+  height: 100%;
+`;
+
 const DivAdjustColorDivs = styled.div`
   display: grid;
   grid-template-columns: ${(props) => props.columns || "1fr"};
@@ -69,8 +77,12 @@ const DivAdjustColorDivs = styled.div`
   }
   .dropDownSpecoficStyleHeader {
     border-bottom: 1.5px solid #c0c0c0;
+    background-color: rgb(225, 223, 223);
     border-radius: 4px;
-    padding: 10px;
+    padding: 8px;
+  }
+  .BGhead {
+    background-color: rgb(225, 223, 223);
   }
   .labelInsteadOfInput {
     border: 1px solid #c0c0c0;
@@ -90,6 +102,10 @@ const DivAdjustColorDivs = styled.div`
   .divBorderFileds {
     border: 1.5px solid #c0c0c0;
     padding: 10px;
+    border-radius: 4px;
+  }
+  .BoxFiledFirstTab {
+    border: 1.5px solid #c0c0c0;
     border-radius: 4px;
   }
   @media (max-width: 768px) {
@@ -113,6 +129,17 @@ const DivAdjustGrodimageMedia = styled.div`
 
 const SelectWidth = styled.select`
   width: 50%;
+
+  border: none;
+  border-radius: 4px;
+  padding: 3px 6px;
+  &:focus {
+    outline: none;
+  }
+
+  &:focus-visible {
+    outline: none;
+  }
 
   @media (max-width: 768px) {
     width: 75%;
@@ -255,6 +282,19 @@ const InsideAddSectionForm = styled.div`
   padding: 13px;
 `;
 
+const SelectStyle = styled.select`
+  border: none;
+  border-radius: 4px;
+  padding: 3px 6px;
+  &:focus {
+    outline: none;
+  }
+
+  &:focus-visible {
+    outline: none;
+  }
+`;
+
 export default function EditHonors({
   editedHonor,
   handleCancelEdit,
@@ -304,15 +344,6 @@ export default function EditHonors({
 
   const [objectUrls, setObjectUrls] = useState({});
   const [posterObjectUrls, setPosterObjectUrls] = useState({});
-
-  // Define top-level navigation titles to exclude
-  const excludedTopLevelTitles = [
-    "خانه",
-    "محصولات",
-    "مقالات",
-    "تماس با ما",
-    "درباره‌ی ما",
-  ];
 
   // Fetch Header and Product Data on Mount
   useEffect(() => {
@@ -982,7 +1013,7 @@ export default function EditHonors({
           {/* Add Section Form */}
           <AddSectionForm>
             <HeaderEachSection className="NormalTextSizing d-flex flex-row align-items-center justify-content-between">
-              <p>مشخصه</p>
+              <p className="NormalTextSizing">مشخصه</p>
               <div className="d-flex justify-content-end">
                 <BUTTONADDSECTIONSTYLE
                   type="button"
@@ -992,40 +1023,123 @@ export default function EditHonors({
                 </BUTTONADDSECTIONSTYLE>
               </div>
             </HeaderEachSection>
-            <InsideAddSectionForm className="d-flex flex-column gap-3">
-              <div className="d-flex flex-row gap-2 mt-3 align-items-center">
-                <label
-                  htmlFor="newSectionName"
-                  className="NormalTextSizing"
-                  style={{ whiteSpace: "nowrap" }}
-                >
-                  نام مشخصه:
-                </label>
-                <input
-                  type="text"
-                  id="newSectionName"
-                  value={newSectionName}
-                  onChange={(e) => setNewSectionName(e.target.value)}
-                  placeholder="نام بخش"
-                  className="form-control NormalTextSizing"
-                />
+            <InsideAddSectionForm className="d-flex flex-row gap-3">
+              <div className="w-50">
+                <div className="d-flex flex-column gap-1">
+                  <label
+                    htmlFor="newSectionName"
+                    className="NormalTextSizing"
+                    style={{ whiteSpace: "nowrap" }}
+                  >
+                    نام مشخصه:
+                  </label>
+                  <input
+                    type="text"
+                    id="newSectionName"
+                    value={newSectionName}
+                    onChange={(e) => setNewSectionName(e.target.value)}
+                    placeholder="نام مشخصه"
+                    className="form-control w-100"
+                  />
+                </div>
+                <div className="d-flex flex-column gap-1 mt-3">
+                  <label
+                    htmlFor="newSectionType"
+                    className="NormalTextSizing"
+                    style={{ whiteSpace: "nowrap" }}
+                  >
+                    نوع بخش:
+                  </label>
+                  <SelectStyle
+                    id="newSectionType"
+                    value={newSectionType}
+                    onChange={(e) => setNewSectionType(e.target.value)}
+                    className="w-100"
+                    required
+                  >
+                    <option value="text">متن</option>
+                    <option value="image">تصویر</option>
+                  </SelectStyle>
+                </div>
+                {/* <div>
+                              <ButtonAddSection
+                                className="bg-success text-white px-2 py-1 rounded"
+                                type="button"
+                                onClick={() => setModalthings(true)}
+                              >
+                                تعریف مقدار مشخصه
+                              </ButtonAddSection>
+                              <Modal
+                                open={modalthings}
+                                onClose={handleCloseModalThings}
+                                aria-labelledby="modal-modal-title"
+                                aria-describedby="modal-modal-description"
+                              >
+                                <Box sx={modalStyle}>
+                                  <HeaderModalShowAccessMainDiv className="d-flex flex-row justify-content-between align-items-center">
+                                    <p className="NormalTextSizing HeaderModalShowAccess">
+                                      دسترسی ها
+                                    </p>
+                                    <CustomCloseButton
+                                      onClick={handleCloseModalThings}
+                                      color={`#e91e63`}
+                                    />
+                                  </HeaderModalShowAccessMainDiv>
+                                  <div className="d-flex flex-column gap-2 justify-content-center align-items-center p-3">
+                                    <p>awpidierf</p>
+                                  </div>
+                                </Box>
+                              </Modal>
+                            </div> */}
               </div>
-              <div className="d-flex flex-row gap-2 mt-3 align-items-center">
-                <label
-                  htmlFor="newSectionType"
-                  style={{ whiteSpace: "nowrap" }}
-                >
-                  نوع بخش:
-                </label>
-                <select
-                  id="newSectionType"
-                  value={newSectionType}
-                  onChange={(e) => setNewSectionType(e.target.value)}
-                  className="w-50"
-                >
-                  <option value="text">متن</option>
-                  <option value="image">تصویر</option>
-                </select>
+
+              <div
+                className="d-flex flex-row gap-2 w-50 overflow-x-auto"
+                style={{ maxWidth: "100%" }}
+              >
+                {dynamicSections.map((section, sectionIndex) => (
+                  <div className="d-flex flex-row gap-2" key={sectionIndex}>
+                    <div className="d-flex flex-column gap-1">
+                      <div>
+                        <div className="mt-3">
+                          {section.type === "image" &&
+                          URL &&
+                          section?.items[0]?.src ? (
+                            <div className="d-flex flex-column align-items-center">
+                              <BoxFirstSection
+                                component="img"
+                                src={
+                                  section?.items[0]?.src instanceof Blob
+                                    ? URL.createObjectURL(
+                                        section?.items[0]?.src
+                                      )
+                                    : `${process.env.NEXT_PUBLIC_BACK_END_SERVER}/system/download/${section?.items[0]?.src}`
+                                }
+                                alt="ItemImage"
+                              />
+                            </div>
+                          ) : (
+                            <>
+                              <div className="d-flex flex-column align-items-center">
+                                <BoxFirstSection
+                                  component="img"
+                                  src="/HomeImages/360_F_470299797_UD0eoVMMSUbHCcNJCdv2t8B2g1GVqYgs.jpg"
+                                  alt="ItemImage"
+                                />
+                              </div>
+                            </>
+                          )}
+                        </div>
+                      </div>
+                      <p className="text-center NormalTextSizing">
+                        {fixTitleSize({
+                          text: section.sectionName,
+                          length: 7,
+                        })}
+                      </p>
+                    </div>
+                  </div>
+                ))}
               </div>
             </InsideAddSectionForm>
           </AddSectionForm>
@@ -1068,43 +1182,48 @@ export default function EditHonors({
               </div>
 
               <DivAdjustColorDivs
+                className="container gap-3"
                 columns="repeat(2, 1fr)"
                 recolumns="repeat(1, 1fr)"
               >
                 {section.items.map((item, itemIndex) => (
                   <div
                     style={{ height: "fit-content" }}
-                    className="d-flex flex-column gap-2 mb-3"
+                    className="d-flex flex-column gap-2 mb-3 BoxFiledFirstTab"
                     key={itemIndex}
                   >
-                    <div className="d-flex flex-row align-items-center gap-2">
-                      <div className="d-flex flex-column w-100">
-                        <div className="d-flex flex-row align-items-center gap-2">
+                    <div className="d-flex flex-column gap-2">
+                      <div className="dropDownSpecoficStyleHeader BGhead d-flex justify-content-end">
+                        <ButtonCancelOrder
+                          className=" px-2 py-1 rounded"
+                          style={{ width: "fit-content" }}
+                          type="button"
+                          onClick={() =>
+                            handleRemoveItem(sectionIndex, itemIndex)
+                          }
+                        >
+                          حذف
+                        </ButtonCancelOrder>
+                      </div>
+                      <div className="d-flex flex-column w-100 p-2">
+                        <div className="d-flex flex-column">
                           <label
-                            htmlFor={`ItemInsideName-${sectionIndex}-${itemIndex}`}
+                            htmlFor="ItemInsideName"
                             style={{ whiteSpace: "nowrap" }}
                           >
                             نام ایتم :
                           </label>
                           <input
                             type="text"
-                            id={`ItemInsideName-${sectionIndex}-${itemIndex}`}
+                            id="ItemInsideName"
                             placeholder="نام آیتم"
                             value={item.name}
                             onChange={(e) =>
                               handleItemNameChange(e, sectionIndex, itemIndex)
                             }
                             className="flex-grow-1 form-control"
+                            required
                           />
-                          <ButtonCancelOrder
-                            className="px-2 py-1 rounded"
-                            type="button"
-                            onClick={() =>
-                              handleRemoveItem(sectionIndex, itemIndex)
-                            }
-                          >
-                            حذف
-                          </ButtonCancelOrder>
                         </div>
                         <div>
                           {section.type === "image" && (
@@ -1163,12 +1282,14 @@ export default function EditHonors({
                                     itemIndex
                                   )
                                 }
+                                required={section.type === "image"}
                               />
 
                               {section.type === "image" && item.src && (
                                 <div className="d-flex flex-column align-items-center">
                                   <BOX
                                     component="img"
+                                    
                                     src={
                                       item.src instanceof Blob
                                         ? URL.createObjectURL(item.src)
@@ -1188,6 +1309,7 @@ export default function EditHonors({
               </DivAdjustColorDivs>
               <div className="d-flex justify-content-end mb-3 ms-3">
                 <BUTTONADDSECTIONSTYLE
+                  className="bg-success text-white px2 py-1 rounded mt-2"
                   type="button"
                   onClick={() => handleAddItem(sectionIndex)}
                 >
@@ -1205,7 +1327,7 @@ export default function EditHonors({
           {/* Image and Video Section */}
           <BorderInputBox className="mt-3">
             <HeaderEachSection className="NormalTextSizing d-flex flex-row align-items-center justify-content-between">
-              <p>عکس ها و فیلم های محصول :</p>
+              <p className="NormalTextSizing">عکس و ویدیو محصول</p>
               <div className="d-flex justify-content-end ">
                 <ButtonAddSection
                   className=" ms-3 bg-success text-white px-2 py-1 rounded"
@@ -1226,7 +1348,7 @@ export default function EditHonors({
                 >
                   <DivAdjustGrodimageMedia className="mb-2 me-2 ms-2">
                     <DivHeaderInfoMedia className="d-flex justify-content-between">
-                      <select
+                      <SelectStyle
                         value={item.type}
                         onChange={(e) =>
                           setImgData(
@@ -1241,7 +1363,7 @@ export default function EditHonors({
                       >
                         <option value={1}>عکس</option>
                         <option value={2}>فیلم</option>
-                      </select>
+                      </SelectStyle>
                       <ButtonCancelOrder
                         className="px-2 py-1 rounded"
                         style={{ width: "fit-content" }}
@@ -1255,7 +1377,8 @@ export default function EditHonors({
                     <div className="p-2">
                       <div className="d-flex flex-column w-100">
                         <span className="mb-1 NormalTextSizing">
-                          عکس یا فیلم
+                          {item?.type == 1 && <>عکس</>}
+                          {item?.type == 2 && <>فیلم</>}
                         </span>
                         {item?.src === "" ? (
                           <>
@@ -1441,7 +1564,7 @@ export default function EditHonors({
           {/* Media Section */}
           <BorderInputBox>
             <HeaderEachSection className="NormalTextSizing d-flex flex-row align-items-center justify-content-between">
-              <p>فیلم ها:</p>
+              <p className="NormalTextSizing">فیلم ها:</p>
               <div className="d-flex justify-content-end">
                 <ButtonAddSection
                   className="ms-2 bg-success text-white px-2 py-1 rounded"
@@ -1460,7 +1583,12 @@ export default function EditHonors({
               {media.map((item, index) => (
                 <>
                   <MediaDivMainGrid className="mt-2" key={index}>
-                    <DivHeaderInfoMedia className="d-flex justify-content-end">
+                    <DivHeaderInfoMedia className="d-flex justify-content-between align-items-center">
+                      <div>
+                        <p className="NormalTextSizing">
+                          ویدیو شماره {index + 1}
+                        </p>
+                      </div>
                       <ButtonCancelOrder
                         className="px-2 py-1 rounded"
                         style={{ width: "fit-content" }}
@@ -1643,7 +1771,7 @@ export default function EditHonors({
                           </div>
                         </DivAdjustColorDivs>
 
-                        <div className="d-flex flex-row align-items-center gap-3 flex-wrap w-50">
+                        <div className="d-flex flex-column align-items-center gap-2 flex-wrap w-50">
                           <div className="d-flex flex-column gap-1 w-100">
                             <label
                               htmlFor="OnvanFilm"
@@ -1677,8 +1805,8 @@ export default function EditHonors({
                             >
                               توضیحات
                             </label>
-                            <input
-                              // style={{ width: "45%" }}
+                            <textarea
+                              style={{ height: "120px" }}
                               type="text"
                               placeholder="توضیحات"
                               value={item.description}
@@ -1708,149 +1836,146 @@ export default function EditHonors({
 
       {/* filed Tab Content */}
       {activeTab === "fileds" && (
-          <div>
-            <BorderInputBox>
-              <HeaderEachSection className="NormalTextSizing d-flex flex-row align-items-center justify-content-between">
-                <p>فیلد ها:</p>
+        <div>
+          <BorderInputBox>
+            <HeaderEachSection className="NormalTextSizing d-flex flex-row align-items-center justify-content-between">
+              <p>فیلد ها:</p>
 
-                <div className="d-flex justify-content-end">
-                  <ButtonAddSection
-                    className="ms-2 bg-success text-white px-2 py-1 rounded"
-                    type="button"
-                    onClick={handleAddFileds}
-                  >
-                    اضافه کردن
-                  </ButtonAddSection>
-                </div>
-              </HeaderEachSection>
+              <div className="d-flex justify-content-end">
+                <ButtonAddSection
+                  className="ms-2 bg-success text-white px-2 py-1 rounded"
+                  type="button"
+                  onClick={handleAddFileds}
+                >
+                  اضافه کردن
+                </ButtonAddSection>
+              </div>
+            </HeaderEachSection>
 
-              <DivAdjustColorDivs
-                className="p-2"
-                style={{ width: "100%" }}
-                columns="repeat(1, 1fr)"
-              >
-                {filedOrder.map((item, index) => (
-                  <div
-                    className="mt-2 d-flex flex-column gap-3 divBorderFileds"
-                    key={index}
-                  >
-                    <div className="d-flex  flex-row align-items-center gap-3">
-                      <select
-                        value={item.type}
-                        onChange={(e) =>
-                          setFiledOrder(
-                            filedOrder.map((f, iIdx) =>
-                              iIdx === index
-                                ? {
-                                    ...f,
-                                    type: e.target.value,
-                                    dropDownOP: [""],
-                                  }
-                                : f
-                            )
+            <DivAdjustColorDivs
+              className="p-2"
+              style={{ width: "100%" }}
+              columns="repeat(1, 1fr)"
+            >
+              {filedOrder.map((item, index) => (
+                <div
+                  className="mt-2 d-flex flex-column gap-3 divBorderFileds"
+                  key={index}
+                >
+                  <div className="d-flex  flex-row align-items-center gap-3">
+                    <SelectStyle
+                      value={item.type}
+                      onChange={(e) =>
+                        setFiledOrder(
+                          filedOrder.map((f, iIdx) =>
+                            iIdx === index
+                              ? {
+                                  ...f,
+                                  type: e.target.value,
+                                  dropDownOP: [""],
+                                }
+                              : f
                           )
-                        }
-                        required
-                        className="mt-2 mb-1 w-50"
-                      >
-                        <option value="text">متن</option>
-                        <option value="dropDown">دراپ دون</option>
-                      </select>
-                      <input
-                        style={{ width: "45%" }}
-                        type="text"
-                        placeholder="عنوان فیلد"
-                        value={item.name}
-                        onChange={(e) =>
-                          setFiledOrder(
-                            filedOrder.map((f, iIdx) =>
-                              iIdx === index
-                                ? { ...f, name: e.target.value }
-                                : f
-                            )
+                        )
+                      }
+                      required
+                      className="mt-2 mb-1 w-50"
+                    >
+                      <option value="text">متن</option>
+                      <option value="dropDown">دراپ دون</option>
+                    </SelectStyle>
+                    <input
+                      style={{ width: "45%" }}
+                      type="text"
+                      placeholder="عنوان فیلد"
+                      value={item.name}
+                      onChange={(e) =>
+                        setFiledOrder(
+                          filedOrder.map((f, iIdx) =>
+                            iIdx === index ? { ...f, name: e.target.value } : f
                           )
-                        }
-                        required
-                        className="form-control"
-                      />
-                      <ButtonCancelOrder
-                        className=" px-2 py-1 rounded"
-                        type="button"
-                        style={{ width: "fit-content" }}
-                        onClick={() => handleRemoveFileds(index)}
-                      >
-                        حذف
-                      </ButtonCancelOrder>
-                    </div>
-
-                    {item.type === "dropDown" && (
-                      <div className="d-flex flex-column dropDownSpecoficStyle gap-2">
-                        <div className="d-flex flex-row align-items-center justify-content-between dropDownSpecoficStyleHeader">
-                          <label
-                            htmlFor={`dropDownOP-${index}`}
-                            className="form-label NormalTextSizing"
-                            style={{ whiteSpace: "nowrap" }}
-                          >
-                            گزینه‌های دراپ دون:
-                          </label>
-                          <button
-                            type="button"
-                            className="NormalTextSizing"
-                            style={{
-                              backgroundColor: "#43A047",
-                              width: "fit-content",
-                            }}
-                            onClick={() => handleAddDropDownOption(index)}
-                          >
-                            اضافه کردن گزینه
-                          </button>
-                        </div>
-
-                        <ResponsiveDivFileds
-                          className="mt-2 mb-2 p-2"
-                          columns="repeat(2, 1fr)"
-                        >
-                          {item.dropDownOP.map((option, optIndex) => (
-                            <div
-                              className="d-flex flex-row align-items-center gap-2 mb-2"
-                              key={optIndex}
-                            >
-                              <input
-                                type="text"
-                                placeholder={`گزینه ${optIndex + 1}`}
-                                value={option}
-                                onChange={(e) => {
-                                  const updatedFiledOrder = [...filedOrder];
-                                  updatedFiledOrder[index].dropDownOP[
-                                    optIndex
-                                  ] = e.target.value;
-                                  setFiledOrder(updatedFiledOrder);
-                                }}
-                                required
-                                className="form-control"
-                              />
-                              {item.dropDownOP.length > 1 && (
-                                <ButtonCancelOrder
-                                  type="button"
-                                  className=" px-2 py-1 rounded"
-                                  onClick={() =>
-                                    handleRemoveDropDownOption(index, optIndex)
-                                  }
-                                >
-                                  حذف
-                                </ButtonCancelOrder>
-                              )}
-                            </div>
-                          ))}
-                        </ResponsiveDivFileds>
-                      </div>
-                    )}
+                        )
+                      }
+                      required
+                      className="form-control"
+                    />
+                    <ButtonCancelOrder
+                      className=" px-2 py-1 rounded"
+                      type="button"
+                      style={{ width: "fit-content" }}
+                      onClick={() => handleRemoveFileds(index)}
+                    >
+                      حذف
+                    </ButtonCancelOrder>
                   </div>
-                ))}
-              </DivAdjustColorDivs>
-            </BorderInputBox>
-          </div>
-        )}
+
+                  {item.type === "dropDown" && (
+                    <div className="d-flex flex-column dropDownSpecoficStyle gap-2">
+                      <div className="d-flex flex-row align-items-center justify-content-between dropDownSpecoficStyleHeader">
+                        <label
+                          htmlFor={`dropDownOP-${index}`}
+                          className="form-label NormalTextSizing"
+                          style={{ whiteSpace: "nowrap" }}
+                        >
+                          گزینه‌های دراپ دون:
+                        </label>
+                        <button
+                          type="button"
+                          className="NormalTextSizing"
+                          style={{
+                            backgroundColor: "#43A047",
+                            width: "fit-content",
+                          }}
+                          onClick={() => handleAddDropDownOption(index)}
+                        >
+                          اضافه کردن گزینه
+                        </button>
+                      </div>
+
+                      <ResponsiveDivFileds
+                        className="mt-2 mb-2 p-2"
+                        columns="repeat(2, 1fr)"
+                      >
+                        {item.dropDownOP.map((option, optIndex) => (
+                          <div
+                            className="d-flex flex-row align-items-center gap-2 mb-2"
+                            key={optIndex}
+                          >
+                            <input
+                              type="text"
+                              placeholder={`گزینه ${optIndex + 1}`}
+                              value={option}
+                              onChange={(e) => {
+                                const updatedFiledOrder = [...filedOrder];
+                                updatedFiledOrder[index].dropDownOP[optIndex] =
+                                  e.target.value;
+                                setFiledOrder(updatedFiledOrder);
+                              }}
+                              required
+                              className="form-control"
+                            />
+                            {item.dropDownOP.length > 1 && (
+                              <ButtonCancelOrder
+                                type="button"
+                                className=" px-2 py-1 rounded"
+                                onClick={() =>
+                                  handleRemoveDropDownOption(index, optIndex)
+                                }
+                              >
+                                حذف
+                              </ButtonCancelOrder>
+                            )}
+                          </div>
+                        ))}
+                      </ResponsiveDivFileds>
+                    </div>
+                  )}
+                </div>
+              ))}
+            </DivAdjustColorDivs>
+          </BorderInputBox>
+        </div>
+      )}
 
       {/* Action Buttons */}
       <BUTTONSSTYLE className="d-flex flex-row justify-content-between container">

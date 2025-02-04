@@ -15,6 +15,7 @@ import AreYouShureModal from "@/app/BaseComponent/AreYouSureModal";
 import ConfirmModal from "@/app/BaseComponent/ConfirmingModal";
 import { Modal, Box } from "@mui/material";
 import CustomCloseButton from "@/app/BaseComponent/CustomCloseButton";
+import { fixTitleSize } from "@/app/utils/fixTitleSize";
 
 // Styled Components
 const DivAdjustColorDivs = styled.div`
@@ -27,10 +28,14 @@ const DivAdjustColorDivs = styled.div`
     border: 1.5px solid #c0c0c0;
     border-radius: 4px;
   }
-  .dropDownSpecoficStyleHeader{
+  .dropDownSpecoficStyleHeader {
     border-bottom: 1.5px solid #c0c0c0;
     border-radius: 4px;
-    padding: 10px;
+    padding: 8px;
+    background-color: rgb(225, 223, 223);
+  }
+  .BGhead{
+    background-color:rgb(225, 223, 223);
   }
   .labelInsteadOfInput {
     border: 1px solid #c0c0c0;
@@ -50,6 +55,10 @@ const DivAdjustColorDivs = styled.div`
   .divBorderFileds {
     border: 1.5px solid #c0c0c0;
     padding: 10px;
+    border-radius: 4px;
+  }
+  .BoxFiledFirstTab {
+    border: 1.5px solid #c0c0c0;
     border-radius: 4px;
   }
   @media (max-width: 768px) {
@@ -82,8 +91,27 @@ const BOX = styled(Box)`
   border-radius: 4px;
 `;
 
+const BoxFirstSection = styled(Box)`
+  /* max-width: 120px; */
+  max-height: 120px;
+  border-radius: 4px;
+  /* width: 100%; */
+  height: 100%;
+`;
+
 const SelectWidth = styled.select`
   width: 50%;
+
+  border: none;
+  border-radius: 4px;
+  padding: 3px 6px;
+  &:focus {
+    outline: none;
+  }
+
+  &:focus-visible {
+    outline: none;
+  }
 
   @media (max-width: 768px) {
     width: 75%;
@@ -222,6 +250,19 @@ const modalStyle = {
   borderRadius: 2,
 };
 
+const SelectStyle = styled.select`
+  border: none;
+  border-radius: 4px;
+  padding: 3px 6px;
+  &:focus {
+    outline: none;
+  }
+
+  &:focus-visible {
+    outline: none;
+  }
+`;
+
 export default function AddHonors({ setDataUpdated, setActiveKey }) {
   const dispatch = useDispatch();
 
@@ -232,6 +273,8 @@ export default function AddHonors({ setDataUpdated, setActiveKey }) {
   const [subtitle, setSubtitle] = useState("");
   const [subtitleCompelete, setSubtitleCompelete] = useState("");
   const [dynamicSections, setDynamicSections] = useState([]);
+  console.log(dynamicSections);
+
   const [imgData, setImgData] = useState([{ src: "", type: "1", poster: "" }]);
   const [media, setMedia] = useState([
     { title: "", description: "", src: "", poster: "" },
@@ -248,8 +291,6 @@ export default function AddHonors({ setDataUpdated, setActiveKey }) {
   const [activeTab, setActiveTab] = useState("discrib");
   const [loadingConfirmModal, setLoadingConfirmModal] = useState(false);
   const [disableConfirm, setDisableConfirm] = useState(true);
-
-
 
   // Modal States
   const [openModal, setOpenModal] = useState(false);
@@ -284,21 +325,27 @@ export default function AddHonors({ setDataUpdated, setActiveKey }) {
 
     fetchData();
   }, [dispatch]);
-  
+
   useEffect(() => {
-    const flattenHeader = (items, parentPath = '', isTopLevel = true) => {
+    const flattenHeader = (items, parentPath = "", isTopLevel = true) => {
       let flatList = [];
       items.forEach((item) => {
         if (isTopLevel) {
           // Process subItems with full path but skip parent-level entry
           if (item.subItems?.length) {
-            flatList = flatList.concat(flattenHeader(item.subItems, item.title, false));
+            flatList = flatList.concat(
+              flattenHeader(item.subItems, item.title, false)
+            );
           }
         } else {
-          const currentPath = parentPath ? `${parentPath} / ${item.title}` : item.title;
+          const currentPath = parentPath
+            ? `${parentPath} / ${item.title}`
+            : item.title;
           // Only add final leaf nodes with full hierarchy
           if (item.subItems?.length) {
-            flatList = flatList.concat(flattenHeader(item.subItems, currentPath, false));
+            flatList = flatList.concat(
+              flattenHeader(item.subItems, currentPath, false)
+            );
           } else {
             flatList.push({ id: item.id, title: currentPath });
           }
@@ -306,15 +353,16 @@ export default function AddHonors({ setDataUpdated, setActiveKey }) {
       });
       return flatList;
     };
-  
+
     const allHeaderItems = flattenHeader(headerCome);
     const filteredItems = allHeaderItems.filter(
-      (item) => !usedNavIds.includes(item.id.toString()) || 
-      item.id.toString() === selectedNavId.toString()
+      (item) =>
+        !usedNavIds.includes(item.id.toString()) ||
+        item.id.toString() === selectedNavId.toString()
     );
     setAvailableItems(filteredItems);
   }, [headerCome, usedNavIds, selectedNavId]);
-  
+
   // Handle File Changes for Dynamic Sections (Image-Based)
   const handleSectionFileChange = (e, sectionIndex, itemIndex) => {
     const file = e.target.files[0];
@@ -824,7 +872,7 @@ export default function AddHonors({ setDataUpdated, setActiveKey }) {
             {/* Add Section Form */}
             <AddSectionForm>
               <HeaderEachSection className="NormalTextSizing d-flex flex-row align-items-center justify-content-between">
-                <p>مشخصه</p>
+                <p className="NormalTextSizing">مشخصه</p>
                 <div className="d-flex justify-content-end">
                   <ButtonAddSection
                     className="bg-success text-white px-2 py-1 rounded"
@@ -835,44 +883,45 @@ export default function AddHonors({ setDataUpdated, setActiveKey }) {
                   </ButtonAddSection>
                 </div>
               </HeaderEachSection>
-              <InsideAddSectionForm className="d-flex flex-column gap-3">
-                <div className="d-flex flex-column gap-1">
-                  <label
-                    htmlFor="newSectionName"
-                    className="NormalTextSizing"
-                    style={{ whiteSpace: "nowrap" }}
-                  >
-                    نام مشخصه:
-                  </label>
-                  <input
-                    type="text"
-                    id="newSectionName"
-                    value={newSectionName}
-                    onChange={(e) => setNewSectionName(e.target.value)}
-                    placeholder="نام بخش"
-                    className="form-control w-100"
-                  />
-                </div>
-                <div className="d-flex flex-row gap-2 mt-3 align-items-center">
-                  <label
-                    htmlFor="newSectionType"
-                    className="NormalTextSizing"
-                    style={{ whiteSpace: "nowrap" }}
-                  >
-                    نوع بخش:
-                  </label>
-                  <select
-                    id="newSectionType"
-                    value={newSectionType}
-                    onChange={(e) => setNewSectionType(e.target.value)}
-                    className="w-50"
-                    required
-                  >
-                    <option value="text">متن</option>
-                    <option value="image">تصویر</option>
-                  </select>
-                </div>
-                {/* <div>
+              <InsideAddSectionForm className="d-flex flex-row gap-3">
+                <div className="w-50">
+                  <div className="d-flex flex-column gap-1">
+                    <label
+                      htmlFor="newSectionName"
+                      className="NormalTextSizing"
+                      style={{ whiteSpace: "nowrap" }}
+                    >
+                      نام مشخصه:
+                    </label>
+                    <input
+                      type="text"
+                      id="newSectionName"
+                      value={newSectionName}
+                      onChange={(e) => setNewSectionName(e.target.value)}
+                      placeholder="نام مشخصه"
+                      className="form-control w-100"
+                    />
+                  </div>
+                  <div className="d-flex flex-column gap-1 mt-3">
+                    <label
+                      htmlFor="newSectionType"
+                      className="NormalTextSizing"
+                      style={{ whiteSpace: "nowrap" }}
+                    >
+                      نوع بخش:
+                    </label>
+                    <SelectStyle
+                      id="newSectionType"
+                      value={newSectionType}
+                      onChange={(e) => setNewSectionType(e.target.value)}
+                      className="w-100"
+                      required
+                    >
+                      <option value="text">متن</option>
+                      <option value="image">تصویر</option>
+                    </SelectStyle>
+                  </div>
+                  {/* <div>
                   <ButtonAddSection
                     className="bg-success text-white px-2 py-1 rounded"
                     type="button"
@@ -902,6 +951,52 @@ export default function AddHonors({ setDataUpdated, setActiveKey }) {
                     </Box>
                   </Modal>
                 </div> */}
+                </div>
+
+                <div
+                  className="d-flex flex-row gap-2 w-50 overflow-x-auto"
+                  style={{ maxWidth: "100%" }}
+                >
+                  {dynamicSections.map((section, sectionIndex) => (
+                    <div className="d-flex flex-row gap-2" key={sectionIndex}>
+                      <div className="d-flex flex-column gap-1">
+                        <div>
+                          <div className="mt-3">
+                            {section.type === "image" &&
+                            URL &&
+                            section?.items[0]?.src ? (
+                              <div className="d-flex flex-column align-items-center">
+                                <BoxFirstSection
+                                  component="img"
+                                  src={URL?.createObjectURL(
+                                    section?.items[0]?.src
+                                  )}
+                                  alt="ItemImage"
+                                />
+                              </div>
+                            ) : (
+                              <>
+                                <div className="d-flex flex-column align-items-center">
+                                  <BoxFirstSection
+                                    component="img"
+                                    src="/HomeImages/360_F_470299797_UD0eoVMMSUbHCcNJCdv2t8B2g1GVqYgs.jpg"
+                                    alt="ItemImage"
+                                  />
+                                </div>
+                              </>
+                            )}
+                          </div>
+                        </div>
+                        <p className="text-center NormalTextSizing">
+                          {fixTitleSize({
+                            text: section.sectionName,
+                            length: 7,
+                          })}
+                        </p>
+                      </div>
+                    </div>
+                  ))}
+                </div>
               </InsideAddSectionForm>
             </AddSectionForm>
 
@@ -948,18 +1043,31 @@ export default function AddHonors({ setDataUpdated, setActiveKey }) {
                 </div>
 
                 <DivAdjustColorDivs
+                  className="container gap-3"
                   columns="repeat(2, 1fr)"
                   recolumns="repeat(1, 1fr)"
                 >
                   {section.items.map((item, itemIndex) => (
                     <div
                       style={{ height: "fit-content" }}
-                      className="d-flex flex-column gap-2 mb-3"
+                      className="d-flex flex-column gap-2 mb-3 BoxFiledFirstTab"
                       key={itemIndex}
                     >
-                      <div className="d-flex flex-column align-items-center gap-2">
-                        <div className="d-flex flex-column w-100">
-                          <div className="d-flex flex-row align-items-center gap-2">
+                      <div className="d-flex flex-column gap-2">
+                        <div className="dropDownSpecoficStyleHeader BGhead d-flex justify-content-end">
+                          <ButtonCancelOrder
+                            className=" px-2 py-1 rounded"
+                            style={{ width: "fit-content" }}
+                            type="button"
+                            onClick={() =>
+                              handleRemoveItem(sectionIndex, itemIndex)
+                            }
+                          >
+                            حذف
+                          </ButtonCancelOrder>
+                        </div>
+                        <div className="d-flex flex-column w-100 p-2">
+                          <div className="d-flex flex-column">
                             <label
                               htmlFor="ItemInsideName"
                               style={{ whiteSpace: "nowrap" }}
@@ -977,16 +1085,6 @@ export default function AddHonors({ setDataUpdated, setActiveKey }) {
                               className="flex-grow-1 form-control"
                               required
                             />
-                            <ButtonCancelOrder
-                              className=" px-2 py-1 rounded"
-                              style={{ width: "fit-content" }}
-                              type="button"
-                              onClick={() =>
-                                handleRemoveItem(sectionIndex, itemIndex)
-                              }
-                            >
-                              حذف
-                            </ButtonCancelOrder>
                           </div>
                           <div>
                             {section.type === "image" && (
@@ -1085,7 +1183,7 @@ export default function AddHonors({ setDataUpdated, setActiveKey }) {
             {/* Image and Video Section */}
             <BorderInputBox className="mt-3">
               <HeaderEachSection className="NormalTextSizing d-flex flex-row align-items-center justify-content-between">
-                <p>عکس ها و فیلم های محصول :</p>
+                <p className="NormalTextSizing">عکس و ویدیو محصول</p>
                 <div className="d-flex justify-content-end ">
                   <ButtonAddSection
                     className=" ms-3 bg-success text-white px-2 py-1 rounded"
@@ -1106,7 +1204,7 @@ export default function AddHonors({ setDataUpdated, setActiveKey }) {
                   >
                     <DivAdjustGrodimageMedia className="mb-2 me-2 ms-2">
                       <DivHeaderInfoMedia className="d-flex justify-content-between">
-                        <select
+                        <SelectStyle
                           value={item.type}
                           onChange={(e) =>
                             setImgData(
@@ -1121,7 +1219,7 @@ export default function AddHonors({ setDataUpdated, setActiveKey }) {
                         >
                           <option value={1}>عکس</option>
                           <option value={2}>فیلم</option>
-                        </select>
+                        </SelectStyle>
                         <ButtonCancelOrder
                           className="px-2 py-1 rounded"
                           style={{ width: "fit-content" }}
@@ -1135,7 +1233,8 @@ export default function AddHonors({ setDataUpdated, setActiveKey }) {
                       <div className="p-2">
                         <div className="d-flex flex-column w-100">
                           <span className="mb-1 NormalTextSizing">
-                            عکس یا فیلم
+                            {item?.type == 1 && <>عکس</>}
+                            {item?.type == 2 && <>فیلم</>}
                           </span>
                           {item?.src === "" ? (
                             <>
@@ -1308,7 +1407,7 @@ export default function AddHonors({ setDataUpdated, setActiveKey }) {
             {/* Media Section */}
             <BorderInputBox>
               <HeaderEachSection className="NormalTextSizing d-flex flex-row align-items-center justify-content-between">
-                <p>فیلم ها:</p>
+                <p className="NormalTextSizing">فیلم ها</p>
                 <div className="d-flex justify-content-end">
                   <ButtonAddSection
                     className="ms-2 bg-success text-white px-2 py-1 rounded"
@@ -1325,9 +1424,14 @@ export default function AddHonors({ setDataUpdated, setActiveKey }) {
                 columns="repeat(1, 1fr)"
               >
                 {media.map((item, index) => (
-                  <>
-                    <MediaDivMainGrid className="mt-2" key={index}>
-                      <DivHeaderInfoMedia className="d-flex justify-content-end">
+                  <React.Fragment key={index}>
+                    <MediaDivMainGrid className="mt-2">
+                      <DivHeaderInfoMedia className="d-flex justify-content-between align-items-center">
+                        <div>
+                          <p className="NormalTextSizing">
+                            ویدیو شماره {index + 1}
+                          </p>
+                        </div>
                         <ButtonCancelOrder
                           className="px-2 py-1 rounded"
                           style={{ width: "fit-content" }}
@@ -1498,7 +1602,7 @@ export default function AddHonors({ setDataUpdated, setActiveKey }) {
                             </div>
                           </DivAdjustColorDivs>
 
-                          <div className="d-flex flex-row align-items-center gap-3 flex-wrap w-50">
+                          <div className="d-flex flex-column align-items-center gap-2 flex-wrap w-50">
                             <div className="d-flex flex-column gap-1 w-100">
                               <label
                                 htmlFor="OnvanFilm"
@@ -1532,8 +1636,8 @@ export default function AddHonors({ setDataUpdated, setActiveKey }) {
                               >
                                 توضیحات
                               </label>
-                              <input
-                                // style={{ width: "45%" }}
+                              <textarea
+                                style={{ height: "120px" }}
                                 type="text"
                                 placeholder="توضیحات"
                                 value={item.description}
@@ -1554,7 +1658,7 @@ export default function AddHonors({ setDataUpdated, setActiveKey }) {
                         </div>
                       </div>
                     </MediaDivMainGrid>
-                  </>
+                  </React.Fragment>
                 ))}
               </DivAdjustColorDivs>
             </BorderInputBox>
@@ -1590,7 +1694,7 @@ export default function AddHonors({ setDataUpdated, setActiveKey }) {
                     key={index}
                   >
                     <div className="d-flex  flex-row align-items-center gap-3">
-                      <select
+                      <SelectStyle
                         value={item.type}
                         onChange={(e) =>
                           setFiledOrder(
@@ -1610,7 +1714,7 @@ export default function AddHonors({ setDataUpdated, setActiveKey }) {
                       >
                         <option value="text">متن</option>
                         <option value="dropDown">دراپ دون</option>
-                      </select>
+                      </SelectStyle>
                       <input
                         style={{ width: "45%" }}
                         type="text"
