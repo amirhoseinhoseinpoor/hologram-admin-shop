@@ -1425,6 +1425,37 @@ export const chatImageSend = createAsyncThunk(
   }
 );
 
+export const updateFirstStep = createAsyncThunk(
+  "order/updateFirstStep",
+  async ({ code, dataToSend }, thunkAPI) => {
+    const state = thunkAPI.getState();
+    const token = state.auth.token.token;
+    try {
+      const response = await axios.post(
+        `${process.env.NEXT_PUBLIC_BACK_END_SERVER}/order/edit/request/${code}`,
+        dataToSend,
+        {
+          headers: {
+            Authorization: token ? `Bearer ${token}` : "",
+          },
+        }
+      );
+
+      const data = response.data;
+
+      return data;
+    } catch (error) {
+      if (error.response && error.response.status === 400) {
+        return thunkAPI.rejectWithValue("ارور سمت من");
+      } else {
+        return thunkAPI.rejectWithValue(
+          "مشکلی به وجود امده لطفا بعدا تلاش کنید"
+        );
+      }
+    }
+  }
+);
+
 export const requestAdminCommnet = createAsyncThunk(
   "order/requestAdminCommnet",
   async ({ code, reqComment }, thunkAPI) => {

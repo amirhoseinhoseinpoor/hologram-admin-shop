@@ -13,6 +13,7 @@ import {
   increaseStep,
   fetchPrivateImage,
   paymentStepData,
+  updateFirstStep,
 } from "@/app/Store/thunks";
 
 export default function SteponeComponent({
@@ -36,8 +37,6 @@ export default function SteponeComponent({
 
   const handleCloseZoomModal = () => setZoomModal(false);
 
-  console.log(data);
-
   // const [inputFields, setInputFields] = useState([{ title: "", price: "" }]);
   const [disablenextStep, setDisableNextStep] = useState(true);
   const [statusTraking, setStatusTraking] = useState(false);
@@ -49,8 +48,6 @@ export default function SteponeComponent({
   const [finalFactor, setFinalFactor] = useState(null);
   const [bothFactor, setBothFactor] = useState(null);
   const [loading, setLoading] = useState(false);
-
-  console.log(paymentType);
 
   const [formData, setFormData] = useState({
     feature: "",
@@ -299,6 +296,65 @@ export default function SteponeComponent({
     });
   };
 
+  const handleDropdownChange = (code, event) => {
+    const { name, value } = event.target;
+
+    // If "Other" is selected, make sure to update both the dropdown value and clear the custom value
+    if (value === "other") {
+      setDynamicForm((prev) => ({
+        ...prev,
+        [code]: {
+          ...prev[code],
+          [name]: value, // Set dropdown value to "other"
+          [`${name}_custom`]: "", // Clear the custom value
+        },
+      }));
+    } else {
+      // If not "Other", update the value normally
+      setDynamicForm((prev) => ({
+        ...prev,
+        [code]: {
+          ...prev[code],
+          [name]: value,
+        },
+      }));
+    }
+  };
+
+  const handleInputChangeForOther = (code, event) => {
+    const { name, value } = event.target;
+
+    // When typing in the "Other" field, store the custom value separately
+    setDynamicForm((prev) => ({
+      ...prev,
+      [code]: {
+        ...prev[code],
+        [`${name}_custom`]: value, // Store the custom value in a separate field
+      },
+    }));
+  };
+
+  useEffect(() => {
+    if (data) {
+      if (Array.isArray(data)) {
+        // Populate dynamicForm with existing dynamic field values
+        const initialDynamicForm = {};
+        data.forEach((prod) => {
+          initialDynamicForm[prod.code] = {};
+          prod.filedOrder.forEach((field) => {
+            initialDynamicForm[prod.code][field.name] = field.value;
+  
+            // If the field is "Other", also prefill the custom value
+            if (field.value === "other") {
+              initialDynamicForm[prod.code][`${field.name}_custom`] = field.dropVal || "";
+            }
+          });
+        });
+        setDynamicForm(initialDynamicForm);
+      }
+    }
+  }, [data]);
+
   const handleSubmit = async () => {
     try {
       setLoading(true);
@@ -346,6 +402,30 @@ export default function SteponeComponent({
         };
       }
 
+      let dataToSend = {};
+  
+      if (hasDynamicFields && prodFiled.length > 0) {
+        // Construct products data with name, code, and dynamic fields including type and options
+        const productsData = prodFiled.map((prod) => ({
+          name: prod.name,
+          code: prod.code,
+          filedOrder: prod.filedOrder.map((field) => ({
+            name: field.name,
+            type: field.type,
+            dropDownOP: field.type === "dropDown" ? field.dropDownOP : undefined,
+            value: dynamicForm[prod.code]?.[field.name] || "",
+            dropVal: dynamicForm[prod.code]?.[`${field.name}_custom`] || "", // Include the custom value
+          })),
+        }));
+  
+        dataToSend = { request: productsData };
+      } else {
+        // Only static form data
+        dataToSend = { request: { ...formData } };
+      }
+  
+      const resultAction = await dispatch(updateFirstStep({code , dataToSend}));
+
       // Send updatedInformation with the second API call
       const uploadDocumentUser = await dispatch(
         requestAdminCommnet({ code, reqComment: updatedInformation })
@@ -356,6 +436,7 @@ export default function SteponeComponent({
       );
 
       if (
+        resultAction.payload.message == "Success" &&
         uploadDocumentUser.payload.message == "Success" &&
         uploadPaymentLastStep.payload.message == "Success"
       ) {
@@ -441,26 +522,54 @@ export default function SteponeComponent({
                             *
                           </span>
                         </label>
-                        <select
-                          id={`dropDown-${inProd.code}-${idx}`}
-                          name={item.name}
-                          value={dynamicForm[inProd.code]?.[item.name] || ""}
-                          onChange={(e) =>
-                            handleInputDynamicChange(inProd.code, e)
-                          }
-                          disabled={disabelInput}
-                          required
-                          className={`${style.formInputNumber} form-control description`}
-                        >
-                          <option value="" disabled>
-                            انتخاب کنید
-                          </option>
-                          {item?.dropDownOP?.map((POP, popIdx) => (
-                            <option key={popIdx} value={POP}>
-                              {POP}
+
+                        <div className="dropdown-wrapper">
+                          <select
+                            id={`dropDown-${inProd.code}-${idx}`}
+                            name={item.name}
+                            value={dynamicForm[inProd.code]?.[item.name] || ""}
+                            onChange={(e) =>
+                              handleDropdownChange(inProd.code, e)
+                            }
+                            disabled={disabelInput}
+                            required
+                            className={`${style.formInputNumber} form-control description`}
+                          >
+                            <option value="" disabled>
+                              انتخاب کنید
                             </option>
-                          ))}
-                        </select>
+                            {item?.dropDownOP?.map((POP, popIdx) => (
+                              <option key={popIdx} value={POP}>
+                                {POP}
+                              </option>
+                            ))}
+                            <option value="other">غیره</option>
+                          </select>
+
+                          {/* Input Field shown when "Other" is selected */}
+                          {dynamicForm[inProd.code]?.[item.name] ===
+                            "other" && (
+                            <input
+                              type="text"
+                              name={item.name}
+                              value={
+                                dynamicForm[inProd.code]?.[item.name] ===
+                                "other"
+                                  ? dynamicForm[inProd.code]?.[
+                                      `${item.name}_custom`
+                                    ] || ""
+                                  : ""
+                              }
+                              onChange={(e) =>
+                                handleInputChangeForOther(inProd.code, e)
+                              }
+                              className={`${style.formInputNumber} form-control description mt-2`}
+                              placeholder={`${item.name} خود را وارد کنید`}
+                              disabled={disabelInput}
+                              required
+                            />
+                          )}
+                        </div>
                       </div>
                     )}
                   </div>
