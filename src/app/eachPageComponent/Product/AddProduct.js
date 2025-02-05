@@ -34,8 +34,8 @@ const DivAdjustColorDivs = styled.div`
     padding: 8px;
     background-color: rgb(225, 223, 223);
   }
-  .BGhead{
-    background-color:rgb(225, 223, 223);
+  .BGhead {
+    background-color: rgb(225, 223, 223);
   }
   .labelInsteadOfInput {
     border: 1px solid #c0c0c0;
@@ -281,7 +281,7 @@ export default function AddHonors({ setDataUpdated, setActiveKey }) {
   ]);
 
   const [filedOrder, setFiledOrder] = useState([
-    { type: "text", name: "", dropDownOP: [""] },
+    { type: "text", name: "", dropDownOP: [] },
   ]);
 
   const [headerCome, setHeaderCome] = useState([]);
@@ -593,7 +593,10 @@ export default function AddHonors({ setDataUpdated, setActiveKey }) {
   // Handler to Add a New Dropdown Option
   const handleAddDropDownOption = (fieldIndex) => {
     const updatedFiledOrder = [...filedOrder];
-    updatedFiledOrder[fieldIndex].dropDownOP.push("");
+    updatedFiledOrder[fieldIndex].dropDownOP.push({
+      text: "",
+      isChecked: false,
+    });
     setFiledOrder(updatedFiledOrder);
   };
 
@@ -1143,7 +1146,7 @@ export default function AddHonors({ setDataUpdated, setActiveKey }) {
                                       itemIndex
                                     )
                                   }
-                                  required={section.type === "image"}
+                                  
                                 />
 
                                 {section.type === "image" && item.src && (
@@ -1703,7 +1706,10 @@ export default function AddHonors({ setDataUpdated, setActiveKey }) {
                                 ? {
                                     ...f,
                                     type: e.target.value,
-                                    dropDownOP: [""],
+                                    dropDownOP:
+                                      e.target.value === "dropDown"
+                                        ? [{ text: "", isChecked: false }]
+                                        : [],
                                   }
                                 : f
                             )
@@ -1777,17 +1783,33 @@ export default function AddHonors({ setDataUpdated, setActiveKey }) {
                               <input
                                 type="text"
                                 placeholder={`گزینه ${optIndex + 1}`}
-                                value={option}
+                                value={option.text}
                                 onChange={(e) => {
                                   const updatedFiledOrder = [...filedOrder];
                                   updatedFiledOrder[index].dropDownOP[
                                     optIndex
-                                  ] = e.target.value;
+                                  ].text = e.target.value;
                                   setFiledOrder(updatedFiledOrder);
                                 }}
                                 required
                                 className="form-control"
                               />
+
+                              <input
+                                type="checkbox"
+                                checked={option.isChecked}
+                                onChange={() => {
+                                  const updatedFiledOrder = [...filedOrder];
+                                  updatedFiledOrder[index].dropDownOP[
+                                    optIndex
+                                  ].isChecked =
+                                    !updatedFiledOrder[index].dropDownOP[
+                                      optIndex
+                                    ].isChecked;
+                                  setFiledOrder(updatedFiledOrder);
+                                }}
+                              />
+
                               {item.dropDownOP.length > 1 && (
                                 <ButtonCancelOrder
                                   type="button"

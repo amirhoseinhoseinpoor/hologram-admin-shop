@@ -320,7 +320,7 @@ export default function EditHonors({
   ]);
 
   const [filedOrder, setFiledOrder] = useState([
-    { type: "text", name: "", dropDownOP: [""] },
+    { type: "text", name: "", dropDownOP: [{ text: "", isChecked: false }] },
   ]);
 
   const [dynamicSections, setDynamicSections] = useState([]);
@@ -696,7 +696,7 @@ export default function EditHonors({
       if (index === fieldIndex) {
         return {
           ...field,
-          dropDownOP: [...field.dropDownOP, ""], // Create a new array with the new element
+          dropDownOP: [...field.dropDownOP, { text: "", isChecked: false }], // Adding a new option with initial empty text
         };
       }
       return field;
@@ -706,8 +706,51 @@ export default function EditHonors({
 
   // Handler to Remove a Dropdown Option
   const handleRemoveDropDownOption = (fieldIndex, optionIndex) => {
-    const updatedFiledOrder = [...filedOrder];
-    updatedFiledOrder[fieldIndex].dropDownOP.splice(optionIndex, 1);
+    const updatedFiledOrder = filedOrder.map((field, index) => {
+      if (index === fieldIndex) {
+        return {
+          ...field,
+          dropDownOP: field.dropDownOP.filter((_, i) => i !== optionIndex), // Filter out the selected option
+        };
+      }
+      return field;
+    });
+    setFiledOrder(updatedFiledOrder);
+  };
+
+  const handleToggleDropDownOption = (fieldIndex, optIndex) => {
+    const updatedFiledOrder = filedOrder.map((field, index) => {
+      if (index === fieldIndex) {
+        return {
+          ...field,
+          dropDownOP: field.dropDownOP.map((option, optIdx) => {
+            if (optIdx === optIndex) {
+              return { ...option, isChecked: !option.isChecked }; // Toggle the isChecked property
+            }
+            return option;
+          }),
+        };
+      }
+      return field;
+    });
+    setFiledOrder(updatedFiledOrder);
+  };
+
+  const handleDropDownOptionTextChange = (fieldIndex, optIndex, text) => {
+    const updatedFiledOrder = filedOrder.map((field, index) => {
+      if (index === fieldIndex) {
+        return {
+          ...field,
+          dropDownOP: field.dropDownOP.map((option, optIdx) => {
+            if (optIdx === optIndex) {
+              return { ...option, text }; // Update text for the option
+            }
+            return option;
+          }),
+        };
+      }
+      return field;
+    });
     setFiledOrder(updatedFiledOrder);
   };
 
@@ -1282,14 +1325,13 @@ export default function EditHonors({
                                     itemIndex
                                   )
                                 }
-                                required={section.type === "image"}
+                                
                               />
 
                               {section.type === "image" && item.src && (
                                 <div className="d-flex flex-column align-items-center">
                                   <BOX
                                     component="img"
-                                    
                                     src={
                                       item.src instanceof Blob
                                         ? URL.createObjectURL(item.src)
@@ -1422,7 +1464,15 @@ export default function EditHonors({
                               className="d-none"
                               id={`ImageVideoForProduct-${index}`}
                               accept={`${process.env.NEXT_PUBLIC_INPUT_IMAGE_AND_VIDEO_FORMAT}`}
-                              onChange={(e) => handleImgDataChange(e, index)}
+                              onChange={
+                                (e) =>
+                                  handleFileChange(
+                                    e,
+                                    index,
+                                    setImgData,
+                                    imgData
+                                  ) // Corrected state parameter
+                              }
                               required
                             />
                           </>
@@ -1519,7 +1569,14 @@ export default function EditHonors({
                                 className="d-none"
                                 id={`posterFilm-${index}`}
                                 accept={`${process.env.NEXT_PUBLIC_INPUT_IMAGE_FORMAT}`}
-                                onChange={(e) => handlePosterChange(e, index)}
+                                onChange={(e) =>
+                                  handleFileChangePoster(
+                                    e,
+                                    index,
+                                    setImgData,
+                                    imgData
+                                  )
+                                }
                                 required
                               />
                             </>
@@ -1862,7 +1919,8 @@ export default function EditHonors({
                   className="mt-2 d-flex flex-column gap-3 divBorderFileds"
                   key={index}
                 >
-                  <div className="d-flex  flex-row align-items-center gap-3">
+                  <div className="d-flex flex-row align-items-center gap-3">
+                    {/* Dropdown Type */}
                     <SelectStyle
                       value={item.type}
                       onChange={(e) =>
@@ -1872,8 +1930,8 @@ export default function EditHonors({
                               ? {
                                   ...f,
                                   type: e.target.value,
-                                  dropDownOP: [""],
-                                }
+                                  dropDownOP: [{ text: "", isChecked: false }],
+                                } // Reset dropdown options
                               : f
                           )
                         )
@@ -1900,7 +1958,7 @@ export default function EditHonors({
                       className="form-control"
                     />
                     <ButtonCancelOrder
-                      className=" px-2 py-1 rounded"
+                      className="px-2 py-1 rounded"
                       type="button"
                       style={{ width: "fit-content" }}
                       onClick={() => handleRemoveFileds(index)}
@@ -1909,6 +1967,7 @@ export default function EditHonors({
                     </ButtonCancelOrder>
                   </div>
 
+                  {/* Dropdown Options */}
                   {item.type === "dropDown" && (
                     <div className="d-flex flex-column dropDownSpecoficStyle gap-2">
                       <div className="d-flex flex-row align-items-center justify-content-between dropDownSpecoficStyleHeader">
@@ -1944,20 +2003,30 @@ export default function EditHonors({
                             <input
                               type="text"
                               placeholder={`گزینه ${optIndex + 1}`}
-                              value={option}
-                              onChange={(e) => {
-                                const updatedFiledOrder = [...filedOrder];
-                                updatedFiledOrder[index].dropDownOP[optIndex] =
-                                  e.target.value;
-                                setFiledOrder(updatedFiledOrder);
-                              }}
+                              value={option.text}
+                              onChange={(e) =>
+                                handleDropDownOptionTextChange(
+                                  index,
+                                  optIndex,
+                                  e.target.value
+                                )
+                              }
                               required
                               className="form-control"
+                            />
+
+                            {/* Checkbox for the option */}
+                            <input
+                              type="checkbox"
+                              checked={option.isChecked}
+                              onChange={() =>
+                                handleToggleDropDownOption(index, optIndex)
+                              }
                             />
                             {item.dropDownOP.length > 1 && (
                               <ButtonCancelOrder
                                 type="button"
-                                className=" px-2 py-1 rounded"
+                                className="px-2 py-1 rounded"
                                 onClick={() =>
                                   handleRemoveDropDownOption(index, optIndex)
                                 }
