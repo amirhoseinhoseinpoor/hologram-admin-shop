@@ -46,7 +46,6 @@ export default function StepTwoComponent({
     dataDocument.preparedData || []
   );
 
-  console.log(uploadedFiles);
 
   const [logo, setLogo] = useState(null);
   const [moveForward, setMoveForward] = useState(false);
