@@ -78,6 +78,9 @@ export default function SteponeComponent({
   const [prodFiled, setProdFiled] = useState([]);
   const [hasDynamicFields, setHasDynamicFields] = useState(false);
 
+  console.log(dynamicForm);
+  console.log(prodFiled);
+
   useEffect(() => {
     if (step > 1) {
       setMoveForward(true);
@@ -127,8 +130,6 @@ export default function SteponeComponent({
     finalPayment: "",
   });
 
-  console.log(information);
-
   useEffect(() => {
     if (Array.isArray(data) && data) {
       setDisableremoveproduct(true);
@@ -140,6 +141,8 @@ export default function SteponeComponent({
           filedOrder: prod.filedOrder.map((field) => ({
             name: field.name,
             type: field.type,
+            value: field.value,
+            dropVal: field.dropVal,
             dropDownOP:
               field.type === "dropDown" ? field.dropDownOP : undefined,
           })),
@@ -151,9 +154,11 @@ export default function SteponeComponent({
         initialDynamicForm[prod.code] = {};
         prod.filedOrder.forEach((field) => {
           initialDynamicForm[prod.code][field.name] = field.value || "";
+          initialDynamicForm[prod.code][field.name] = field.dropVal || "";
         });
       });
-      setDynamicForm(initialDynamicForm);
+
+      // setDynamicForm(initialDynamicForm);
       setHasDynamicFields(true);
       setStatusTraking(true);
     } else if (typeof data === "object" && data !== null) {
@@ -343,25 +348,35 @@ export default function SteponeComponent({
   const handleDropdownChange = (code, event) => {
     const { name, value } = event.target;
 
-    // If "Other" is selected, make sure to update both the dropdown value and clear the custom value
-    if (value === "other") {
-      setDynamicForm((prev) => ({
-        ...prev,
-        [code]: {
-          ...prev[code],
-          [name]: value, // Set dropdown value to "other"
-          [`${name}_custom`]: "", // Clear the custom value
-        },
-      }));
-    } else {
-      // If not "Other", update the value normally
-      setDynamicForm((prev) => ({
-        ...prev,
-        [code]: {
-          ...prev[code],
-          [name]: value,
-        },
-      }));
+    // Ensure inProd is used in the right scope inside the map loop
+    const selectedProduct = prodFiled.find((prod) => prod.code === code);
+    if (selectedProduct) {
+      const selectedOption = selectedProduct.filedOrder.find(
+        (field) =>
+          field.name === name &&
+          field.dropDownOP.some((op) => op.text === value)
+      );
+
+      // If the option has isChecked = true, show the related input field
+      if (selectedOption && selectedOption.isChecked) {
+        setDynamicForm((prev) => ({
+          ...prev,
+          [code]: {
+            ...prev[code],
+            [name]: value,
+            [`${name}_custom`]: "", // Clear any previous custom value (if needed)
+          },
+        }));
+      } else {
+        // Update dynamicForm with the selected value
+        setDynamicForm((prev) => ({
+          ...prev,
+          [code]: {
+            ...prev[code],
+            [name]: value,
+          },
+        }));
+      }
     }
   };
 
@@ -381,21 +396,26 @@ export default function SteponeComponent({
   useEffect(() => {
     if (data) {
       if (Array.isArray(data)) {
-        // Populate dynamicForm with existing dynamic field values
         const initialDynamicForm = {};
+  
+        // Iterate through the products
         data.forEach((prod) => {
-          initialDynamicForm[prod.code] = {};
+          initialDynamicForm[prod.code] = {}; // Initialize the product code in dynamicForm
+  
+          // Iterate through each field of the product
           prod.filedOrder.forEach((field) => {
-            initialDynamicForm[prod.code][field.name] = field.value;
-
-            // If the field is "Other", also prefill the custom value
-            if (field.value === "other") {
-              initialDynamicForm[prod.code][`${field.name}_custom`] =
-                field.dropVal || "";
+            initialDynamicForm[prod.code][field.name] = field.value || "";  // Prefill field value
+  
+            // Check for 'Other' fields (dropVal) and prefill the '_custom' field if necessary
+            if (field.dropVal) {
+              initialDynamicForm[prod.code][`${field.name}_custom`] = field.dropVal;  // Prefill custom value if available
+            } else {
+              initialDynamicForm[prod.code][`${field.name}_custom`] = "";  // Empty custom if 'Other' isn't selected
             }
           });
         });
-        setDynamicForm(initialDynamicForm);
+  
+        setDynamicForm(initialDynamicForm);  // Set the prefilled dynamic form
       }
     }
   }, [data]);
@@ -407,7 +427,7 @@ export default function SteponeComponent({
       let updatedInformation;
       let uploadFinalFactor;
       let updatedFinalFactor;
-
+  
       if (information?.paymentImage) {
         uploadFactor = await dispatch(
           uploadFile({
@@ -417,7 +437,7 @@ export default function SteponeComponent({
             isPublic: false,
           })
         ).unwrap();
-
+  
         updatedInformation = {
           paymentImage: uploadFactor,
           docInfo: information.docInfo,
@@ -439,7 +459,7 @@ export default function SteponeComponent({
             isPublic: false,
           })
         ).unwrap();
-
+  
         updatedFinalFactor = {
           finalPayment: uploadFinalFactor,
           finalPaymentType: information.finalPaymentType,
@@ -450,9 +470,9 @@ export default function SteponeComponent({
           finalPaymentType: reqComment?.finalPaymentType,
         };
       }
-
+  
       let dataToSend = {};
-
+  
       if (hasDynamicFields && prodFiled.length > 0) {
         // Construct products data with name, code, and dynamic fields including type and options
         const productsData = prodFiled.map((prod) => ({
@@ -463,30 +483,31 @@ export default function SteponeComponent({
             type: field.type,
             dropDownOP:
               field.type === "dropDown" ? field.dropDownOP : undefined,
-            value: dynamicForm[prod.code]?.[field.name] || "",
-            dropVal: dynamicForm[prod.code]?.[`${field.name}_custom`] || "", // Include the custom value
+            value: dynamicForm[prod.code]?.[field.name] || "",  // Keep default value if available
+            dropVal:
+              dynamicForm[prod.code]?.[`${field.name}_custom`] || "", // Send the custom value if filled
           })),
         }));
-
+  
         dataToSend = { request: productsData };
       } else {
         // Only static form data
         dataToSend = { request: { ...formData } };
       }
-
+  
       const resultAction = await dispatch(
         updateFirstStep({ code, dataToSend })
       );
-
+  
       // Send updatedInformation with the second API call
       const uploadDocumentUser = await dispatch(
         requestAdminCommnet({ code, reqComment: updatedInformation })
       );
-
+  
       const uploadPaymentLastStep = await dispatch(
         paymentStepData({ code, payment: updatedFinalFactor })
       );
-
+  
       if (
         resultAction.payload.message == "Success" &&
         uploadDocumentUser.payload.message == "Success" &&
@@ -495,21 +516,21 @@ export default function SteponeComponent({
         const increaseStepOrder = await dispatch(
           increaseStep({ code, step: 2 })
         );
-
+  
         if (increaseStepOrder.payload.message == "Success") {
           setNavStep(2);
           setStep(2);
         }
       }
-
+  
       setLoading(false);
-      // setInformation(updatedInformation);
     } catch (error) {
       console.error("Error uploading file:", error);
       setOpenModal3(true);
       setLoading(false);
     }
   };
+  
 
   return (
     <>
@@ -591,26 +612,31 @@ export default function SteponeComponent({
                               انتخاب کنید
                             </option>
                             {item?.dropDownOP?.map((POP, popIdx) => (
-                              <option key={popIdx} value={POP}>
-                                {POP}
+                              <option
+                                key={popIdx}
+                                value={POP.text}
+                                isCheckedData={POP.isChecked}
+                              >
+                                {POP.text}
                               </option>
                             ))}
-                            <option value="other">غیره</option>
                           </select>
 
-                          {/* Input Field shown when "Other" is selected */}
-                          {dynamicForm[inProd.code]?.[item.name] ===
-                            "other" && (
+                          {/* Only show the input when the selected option has isChecked = true */}
+                          {item?.dropDownOP?.some(
+                            (op) =>
+                              op.isChecked &&
+                              dynamicForm[inProd.code]?.[item.name] === op.text
+                          ) && (
                             <input
                               type="text"
                               name={item.name}
                               value={
-                                dynamicForm[inProd.code]?.[item.name] ===
-                                "other"
-                                  ? dynamicForm[inProd.code]?.[
-                                      `${item.name}_custom`
-                                    ] || ""
-                                  : ""
+                                dynamicForm[inProd.code]?.[
+                                  `${item.name}_custom`
+                                ] ||
+                                item?.dropVal ||
+                                ""
                               }
                               onChange={(e) =>
                                 handleInputChangeForOther(inProd.code, e)
