@@ -2004,6 +2004,7 @@ export default function EditHonors({
                               type="text"
                               placeholder={`گزینه ${optIndex + 1}`}
                               value={option.text}
+                              style={{width: '60%'}}
                               onChange={(e) =>
                                 handleDropDownOptionTextChange(
                                   index,
@@ -2023,6 +2024,7 @@ export default function EditHonors({
                                 handleToggleDropDownOption(index, optIndex)
                               }
                             />
+                            مقدار دلخواه
                             {item.dropDownOP.length > 1 && (
                               <ButtonCancelOrder
                                 type="button"

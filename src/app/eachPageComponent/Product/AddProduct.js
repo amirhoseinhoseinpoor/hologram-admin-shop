@@ -966,8 +966,8 @@ export default function AddHonors({ setDataUpdated, setActiveKey }) {
                         <div>
                           <div className="mt-3">
                             {section.type === "image" &&
-                            URL &&
-                            section?.items[0]?.src ? (
+                              URL &&
+                              section?.items[0]?.src ? (
                               <div className="d-flex flex-column align-items-center">
                                 <BoxFirstSection
                                   component="img"
@@ -1146,7 +1146,7 @@ export default function AddHonors({ setDataUpdated, setActiveKey }) {
                                       itemIndex
                                     )
                                   }
-                                  
+
                                 />
 
                                 {section.type === "image" && item.src && (
@@ -1578,9 +1578,9 @@ export default function AddHonors({ setDataUpdated, setActiveKey }) {
                                         media.map((m, iIdx) =>
                                           iIdx === index
                                             ? {
-                                                ...m,
-                                                poster: e.target.files[0],
-                                              }
+                                              ...m,
+                                              poster: e.target.files[0],
+                                            }
                                             : m
                                         )
                                       )
@@ -1704,13 +1704,13 @@ export default function AddHonors({ setDataUpdated, setActiveKey }) {
                             filedOrder.map((f, iIdx) =>
                               iIdx === index
                                 ? {
-                                    ...f,
-                                    type: e.target.value,
-                                    dropDownOP:
-                                      e.target.value === "dropDown"
-                                        ? [{ text: "", isChecked: false }]
-                                        : [],
-                                  }
+                                  ...f,
+                                  type: e.target.value,
+                                  dropDownOP:
+                                    e.target.value === "dropDown"
+                                      ? [{ text: "", isChecked: false }]
+                                      : [],
+                                }
                                 : f
                             )
                           )
@@ -1792,7 +1792,8 @@ export default function AddHonors({ setDataUpdated, setActiveKey }) {
                                   setFiledOrder(updatedFiledOrder);
                                 }}
                                 required
-                                className="form-control"
+                                style={{ width: '60%' }}
+        className="form-control"
                               />
 
                               <input
@@ -1809,7 +1810,7 @@ export default function AddHonors({ setDataUpdated, setActiveKey }) {
                                   setFiledOrder(updatedFiledOrder);
                                 }}
                               />
-
+                              مقدار دلخواه
                               {item.dropDownOP.length > 1 && (
                                 <ButtonCancelOrder
                                   type="button"
