@@ -18,6 +18,7 @@ import AddUserBtn from "../DefineUser/AddUserBtn";
 import EditUserBtnfunction from "./EditUserBtn";
 import { Modal, Box } from "@mui/material";
 
+
 const HeadermakeOrder = styled.div`
   padding: 10px;
   color: white;
@@ -109,7 +110,7 @@ const FixTablePlace = styled.div`
     .tabelStyle {
       border-collapse: separate;
       border-radius: 12px;
-      overflow: hidden;
+      /* overflow: hidden; */
       width: 100%;
       th,
       td {
@@ -146,10 +147,10 @@ const SelectFilter = styled.select`
 `;
 
 const SeeAccessTableStyle = styled.p`
- border-top: 1px solid gray;
- width: 100%;
- text-align:center;
- padding-top: 3px;
+  border-top: 1px solid gray;
+  width: 100%;
+  text-align: center;
+  padding-top: 3px;
 `;
 
 const modalStyle = {
@@ -345,7 +346,12 @@ export default function DefineUser({ toggleShow }) {
                                 ))} */}
                                 <div className="d-flex flex-column gap-2 justify-content-center align-items-center w-100">
                                   {item.userRoles?.map((item, index) => (
-                                    <SeeAccessTableStyle key={index} className="NormalTextSizing">{item.role.name}</SeeAccessTableStyle>
+                                    <SeeAccessTableStyle
+                                      key={index}
+                                      className="NormalTextSizing"
+                                    >
+                                      {item.role.name}
+                                    </SeeAccessTableStyle>
                                   ))}
                                 </div>
                               </div>
@@ -429,7 +435,6 @@ export default function DefineUser({ toggleShow }) {
                               />
                             </HeaderModalShowAccessMainDiv>
                             <div className="d-flex flex-column gap-2 justify-content-center align-items-center p-3">
-                              
                               <div className="d-flex flex-row gap-2 justify-content-center">
                                 {item.userRoles?.map((item, index) => (
                                   <div key={index}>{item.role.name}</div>
@@ -439,7 +444,6 @@ export default function DefineUser({ toggleShow }) {
                           </Box>
                         </Modal>
                       </div>
-                      
                     </div>
 
                     <div className="eachTabelStyle">

@@ -10,7 +10,7 @@ import { editUser, deleteUser } from "@/app/Store/thunks";
 import AreYouShureModal from "@/app/BaseComponent/AreYouSureModal";
 import { NavDropdown } from "react-bootstrap";
 import EditIcon from "@mui/icons-material/Edit";
-
+import DeleteIcon from "@mui/icons-material/Delete";
 
 const NavDropDown = styled(NavDropdown)`
   .dropdown-menu {
@@ -122,8 +122,6 @@ function EditUserBtnfunction({ data, setDataUpdated, setConfirmModal }) {
     setWhereLogin(data?.domain);
   }, [data, showEditModal]);
 
-
-
   const handleEditModalClose = () => {
     setShowEditModal(false);
   };
@@ -174,7 +172,6 @@ function EditUserBtnfunction({ data, setDataUpdated, setConfirmModal }) {
 
   return (
     <>
-      
       <NavDropDown
         title={
           <>
@@ -194,7 +191,7 @@ function EditUserBtnfunction({ data, setDataUpdated, setConfirmModal }) {
           <div
             onClick={handleEditModalShow}
             style={{
-              
+              borderBottom: "1px solid black",
               cursor: "pointer",
             }}
             className="d-flex flex-row gap-2 align-items-center pb-1"
@@ -202,10 +199,22 @@ function EditUserBtnfunction({ data, setDataUpdated, setConfirmModal }) {
             <div style={{ color: "#F3802C" }}>
               <EditIcon className="subitem" />
             </div>
-            <p className="NormalTextSizing text-end" >ویرایش</p>
+            <p className="NormalTextSizing text-end">ویرایش</p>
           </div>
 
-          
+          <div
+            onClick={(e) => areYouShureFunction(e, { code: userData?.code })}
+            style={{
+              cursor: "pointer",
+            }}
+            className="d-flex flex-row gap-2 align-items-center mt-2"
+          >
+            <div style={{ color: "#F3802C" }}>
+              <DeleteIcon className="text-danger subitem" />
+            </div>
+            <p className="NormalTextSizing text-end">حذف اکانت</p>
+          </div>
+
         </NavBarInsideDiv>
         <div className="d-flex justify-content-end"></div>
       </NavDropDown>
@@ -247,12 +256,12 @@ function EditUserBtnfunction({ data, setDataUpdated, setConfirmModal }) {
               />
             </div>
             <div className="form-group">
-              <label className="mb-1 me-1" htmlFor="age">
+              <label className="mb-1 me-1" htmlFor="username">
                 شماره همراه
               </label>
               <input
                 type="number"
-                id="age"
+                id="username"
                 className="form-control"
                 placeholder="شماره همراه"
                 name="username"
@@ -311,7 +320,10 @@ function EditUserBtnfunction({ data, setDataUpdated, setConfirmModal }) {
               </select>
             </div> */}
             <div className="d-flex flex-row justify-content-between">
-              <Button style={{backgroundColor : "#43A047" , border : "unset"}} type="submit">
+              <Button
+                style={{ backgroundColor: "#43A047", border: "unset" }}
+                type="submit"
+              >
                 ذخیره
               </Button>
               <DeleteButtonStyle

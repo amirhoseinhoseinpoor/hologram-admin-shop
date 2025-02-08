@@ -64,6 +64,10 @@ const SectionMain = styled.section`
   }
 `;
 
+const ModalHimselfStyle = styled(Modal)`
+  overflow-y: scroll;
+`;
+
 const StyledTable = styled.table`
   @media (min-width: 980px) {
     border-collapse: separate;
@@ -165,13 +169,26 @@ const BUTTONSSTYLE = styled.div`
     border: none;
     border-radius: 4px;
   }
+  .editRole {
+    background-color: rgb(225, 223, 223);
+    border-top: 1px solid gray;
+    border-bottom-left-radius: 4px !important;
+    border-bottom-right-radius: 4px !important;
+  }
+`;
+
+const BorderStyleAccessbility = styled.label`
+  border-top: 1px solid gray !important;
+  width: 100% !important;
+  justify-content: center;
+  padding-top: 4px;
 `;
 
 const SeeAccessTableStyle = styled.p`
- border-top: 1px solid gray;
- width: 100%;
- text-align:center;
- padding-top: 3px;
+  border-top: 1px solid gray;
+  width: 100%;
+  text-align: center;
+  padding-top: 3px;
 `;
 
 export default function Accessibility({ toggleShow }) {
@@ -378,7 +395,7 @@ export default function Accessibility({ toggleShow }) {
             >
               ساخت دسترسی
             </button>
-            <Modal
+            <ModalHimselfStyle
               open={modalCreateAccess}
               onClose={handleCloseModalCreateAccess}
               aria-labelledby="modal-modal-title"
@@ -421,7 +438,7 @@ export default function Accessibility({ toggleShow }) {
 
                 <div className="d-flex flex-column gap-2 justify-content-center align-items-center p-3">
                   {[1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12].map((value) => (
-                    <label
+                    <BorderStyleAccessbility
                       key={value}
                       className="d-flex flex-row align-items-center gap-2"
                     >
@@ -444,27 +461,31 @@ export default function Accessibility({ toggleShow }) {
                         {value === 11 && "کاربر سایت"}
                         {value === 12 && "سطح دسترسی ها"}
                       </div>
-                    </label>
+                    </BorderStyleAccessbility>
                   ))}
                 </div>
-                <BUTTONSSTYLE className="d-flex flex-row mt-3 mb-3 justify-content-around">
-                  <button
-                    className="NormalTextSizing confirmButtonStyle"
-                    type="button"
-                    onClick={handleCreateNewAccess}
-                  >
-                    {loadingUpdateAccess ? <LoadingCss /> : "ویرایش"}
-                  </button>
-                  <button
-                    className="NormalTextSizing cancelButtonStyle"
-                    type="button"
-                    onClick={handleCloseModalCreateAccess}
-                  >
-                    انصراف
-                  </button>
+                <BUTTONSSTYLE>
+                  <div className="editRole">
+                    <div className="d-flex flex-row pt-2 pb-2 justify-content-around">
+                      <button
+                        className="NormalTextSizing confirmButtonStyle"
+                        type="button"
+                        onClick={handleCreateNewAccess}
+                      >
+                        {loadingUpdateAccess ? <LoadingCss /> : "ویرایش"}
+                      </button>
+                      <button
+                        className="NormalTextSizing cancelButtonStyle"
+                        type="button"
+                        onClick={handleCloseModalCreateAccess}
+                      >
+                        انصراف
+                      </button>
+                    </div>
+                  </div>
                 </BUTTONSSTYLE>
               </Box>
-            </Modal>
+            </ModalHimselfStyle>
           </div>
 
           <div>
@@ -495,7 +516,7 @@ export default function Accessibility({ toggleShow }) {
                         >
                           مشاهده
                         </p>
-                        <Modal
+                        <ModalHimselfStyle
                           open={modalPermision === index}
                           onClose={handleCloseModal}
                           aria-labelledby="modal-modal-title"
@@ -513,18 +534,21 @@ export default function Accessibility({ toggleShow }) {
                             </HeaderModalShowAccessMainDiv>
                             <div className="d-flex flex-column gap-2 justify-content-center align-items-center p-3">
                               {item?.permissions?.map((eachPer, index) => (
-                                <SeeAccessTableStyle key={index} className="NormalTextSizing">
+                                <SeeAccessTableStyle
+                                  key={index}
+                                  className="NormalTextSizing"
+                                >
                                   {eachPer?.permission?.name}
                                 </SeeAccessTableStyle>
                               ))}
                             </div>
                           </Box>
-                        </Modal>
+                        </ModalHimselfStyle>
                       </div>
                     </td>
 
                     <td>
-                      <Modal
+                      <ModalHimselfStyle
                         open={modalchangeAccess === index || false}
                         onClose={handleclosemodalChangeAccess}
                         aria-labelledby="modal-modal-title"
@@ -553,7 +577,7 @@ export default function Accessibility({ toggleShow }) {
 
                             {[1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12].map(
                               (value) => (
-                                <label
+                                <BorderStyleAccessbility
                                   key={value}
                                   className="d-flex flex-row align-items-center gap-2"
                                 >
@@ -577,28 +601,36 @@ export default function Accessibility({ toggleShow }) {
                                     {value === 11 && "کاربر سایت"}
                                     {value === 12 && "سطح دسترسی ها"}
                                   </div>
-                                </label>
+                                </BorderStyleAccessbility>
                               )
                             )}
                           </div>
-                          <BUTTONSSTYLE className="d-flex flex-row mt-3 mb-3 justify-content-around">
-                            <button
-                              className="NormalTextSizing confirmButtonStyle"
-                              type="button"
-                              onClick={handleUpdatePermissionRole}
-                            >
-                              {loadingUpdateAccess ? <LoadingCss /> : "ویرایش"}
-                            </button>
-                            <button
-                              className="NormalTextSizing cancelButtonStyle"
-                              type="button"
-                              onClick={handleclosemodalChangeAccess}
-                            >
-                              انصراف
-                            </button>
+                          <BUTTONSSTYLE>
+                            <div className="editRole">
+                              <div className="d-flex flex-row pt-2 pb-2 justify-content-around">
+                                <button
+                                  className="NormalTextSizing confirmButtonStyle"
+                                  type="button"
+                                  onClick={handleUpdatePermissionRole}
+                                >
+                                  {loadingUpdateAccess ? (
+                                    <LoadingCss />
+                                  ) : (
+                                    "ویرایش"
+                                  )}
+                                </button>
+                                <button
+                                  className="NormalTextSizing cancelButtonStyle"
+                                  type="button"
+                                  onClick={handleclosemodalChangeAccess}
+                                >
+                                  انصراف
+                                </button>
+                              </div>
+                            </div>
                           </BUTTONSSTYLE>
                         </Box>
-                      </Modal>
+                      </ModalHimselfStyle>
 
                       <NavDropDown
                         title={
