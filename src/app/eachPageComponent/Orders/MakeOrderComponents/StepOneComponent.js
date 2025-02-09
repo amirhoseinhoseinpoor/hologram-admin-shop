@@ -604,7 +604,7 @@ export default function SteponeComponent({
                             onChange={(e) =>
                               handleDropdownChange(inProd.code, e)
                             }
-                            disabled={disabelInput}
+                            disabled
                             required
                             className={`${style.formInputNumber} form-control description`}
                           >
@@ -643,7 +643,7 @@ export default function SteponeComponent({
                               }
                               className={`${style.formInputNumber} form-control description mt-2`}
                               placeholder={`${item.name} خود را وارد کنید`}
-                              disabled={disabelInput}
+                              disabled
                               required
                             />
                           )}
