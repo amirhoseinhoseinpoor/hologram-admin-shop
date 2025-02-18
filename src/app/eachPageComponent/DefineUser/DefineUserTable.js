@@ -147,9 +147,9 @@ const SelectFilter = styled.select`
 `;
 
 const SeeAccessTableStyle = styled.p`
-  border-top: 1px solid gray;
+  /* border-top: 1px solid gray; */
   width: 100%;
-  text-align: center;
+  /* text-align: center; */
   padding-top: 3px;
 `;
 

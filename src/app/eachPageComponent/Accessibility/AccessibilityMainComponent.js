@@ -46,22 +46,31 @@ const HeadermakeOrder = styled.div`
 
 const SectionMain = styled.section`
   /* padding: 10px; */
-  border-radius: 4px;
-  border: 2px solid #ccc;
+  /* border-radius: 4px;
+  border: 2px solid #ccc; */
 
-  .addRoleButtonStyle {
+  /* .addRoleButtonStyle {
     background-color: #43a047;
     color: white;
     border: none;
     border-radius: 4px;
     padding: 4px 12px;
     cursor: pointer;
-  }
-  .headerBAckGroundColor {
+  } */
+  /* .headerBAckGroundColor {
     background-color: rgb(225, 223, 223);
     border-radius: 4px;
     padding: 8px;
-  }
+  } */
+`;
+
+const AddRoleButton = styled.button`
+  background-color: #43a047;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  padding: 5px 12px !important;
+  cursor: pointer;
 `;
 
 const ModalHimselfStyle = styled(Modal)`
@@ -178,17 +187,54 @@ const BUTTONSSTYLE = styled.div`
 `;
 
 const BorderStyleAccessbility = styled.label`
-  border-top: 1px solid gray !important;
+  /* border-top: 1px solid gray !important; */
   width: 100% !important;
-  justify-content: center;
+  /* justify-content: center; */
   padding-top: 4px;
 `;
 
 const SeeAccessTableStyle = styled.p`
-  border-top: 1px solid gray;
+  /* border-top: 1px solid gray; */
   width: 100%;
-  text-align: center;
+  /* text-align: center; */
   padding-top: 3px;
+`;
+
+const FixTablePlace = styled.div`
+  @media (min-width: 980px) {
+    position: relative;
+    margin-top: 60px;
+    .pTagForStyle {
+      position: absolute;
+      transform: translate(-50%, 50%);
+      left: 50%;
+      width: 94%;
+      top: -55px;
+      border-radius: 10px;
+      padding: 18px 12px;
+      background-image: linear-gradient(195deg, #42424a 0%, #191919 100%);
+      color: white;
+    }
+    .tabelStyle {
+      border-collapse: separate;
+      border-radius: 12px;
+      /* overflow: hidden; */
+      width: 100%;
+      th,
+      td {
+        padding: 10px;
+        text-align: center;
+      }
+      th {
+        padding-top: 55px;
+      }
+    }
+  }
+
+  .SeeAccessButtom {
+    cursor: pointer;
+    color: #43a047;
+  }
 `;
 
 export default function Accessibility({ toggleShow }) {
@@ -384,17 +430,19 @@ export default function Accessibility({ toggleShow }) {
       </HeadermakeOrder>
 
       <div className="container">
+        <div className="d-flex justify-content-end">
+          <AddRoleButton
+            onClick={() => {
+              handlechangeAccessCreate();
+            }}
+            type="buttton"
+            className="NormalTextSizing "
+          >
+            اضافه کردن
+          </AddRoleButton>
+        </div>
         <SectionMain>
           <div className="d-flex justify-content-end headerBAckGroundColor">
-            <button
-              onClick={() => {
-                handlechangeAccessCreate();
-              }}
-              type="buttton"
-              className="addRoleButtonStyle NormalTextSizing"
-            >
-              ساخت دسترسی
-            </button>
             <ModalHimselfStyle
               open={modalCreateAccess}
               onClose={handleCloseModalCreateAccess}
@@ -472,7 +520,7 @@ export default function Accessibility({ toggleShow }) {
                         type="button"
                         onClick={handleCreateNewAccess}
                       >
-                        {loadingUpdateAccess ? <LoadingCss /> : "ویرایش"}
+                        {loadingUpdateAccess ? <LoadingCss /> : "ذخیره"}
                       </button>
                       <button
                         className="NormalTextSizing cancelButtonStyle"
@@ -489,202 +537,208 @@ export default function Accessibility({ toggleShow }) {
           </div>
 
           <div>
-            <StyledTable className="table table-striped">
-              <thead className="text-center">
-                <tr className="table-head">
-                  <th className="NormalTextSizing">ردیف</th>
-                  <th className="NormalTextSizing">نام</th>
-                  <th className="NormalTextSizing">دسترسی ها</th>
-                  <th className="NormalTextSizing">عملیات</th>
-                </tr>
-              </thead>
-              <tbody className="table-body text-center">
-                {rolesData?.map((item, index) => (
-                  <tr key={index}>
-                    <td
-                      style={{ verticalAlign: "middle" }}
-                      className="VodeoDisSizing"
-                    >
-                      {++index}
-                    </td>
-                    <td style={{ verticalAlign: "middle" }}>{item.name}</td>
-                    <td style={{ verticalAlign: "middle" }}>
-                      <div>
-                        <p
-                          className="SeeAccessButtom"
-                          onClick={() => setModalPermision(index)}
-                        >
-                          مشاهده
-                        </p>
+            <FixTablePlace className="table table-striped">
+              <p className="me-2 NormalTextSizing mb-2 pTagForStyle">
+               سطح دسترسی ها
+              </p>
+
+              <table className="table table-striped tabelStyle">
+                <thead className="text-center">
+                  <tr className="table-head">
+                    <th className="NormalTextSizing">ردیف</th>
+                    <th className="NormalTextSizing">نام</th>
+                    <th className="NormalTextSizing">دسترسی ها</th>
+                    <th className="NormalTextSizing">عملیات</th>
+                  </tr>
+                </thead>
+                <tbody className="table-body text-center">
+                  {rolesData?.map((item, index) => (
+                    <tr key={index}>
+                      <td
+                        style={{ verticalAlign: "middle" }}
+                        className="VodeoDisSizing"
+                      >
+                        {++index}
+                      </td>
+                      <td style={{ verticalAlign: "middle" }}>{item.name}</td>
+                      <td style={{ verticalAlign: "middle" }}>
+                        <div>
+                          <p
+                            className="SeeAccessButtom"
+                            onClick={() => setModalPermision(index)}
+                          >
+                            مشاهده
+                          </p>
+                          <ModalHimselfStyle
+                            open={modalPermision === index}
+                            onClose={handleCloseModal}
+                            aria-labelledby="modal-modal-title"
+                            aria-describedby="modal-modal-description"
+                          >
+                            <Box sx={modalStyle}>
+                              <HeaderModalShowAccessMainDiv className="d-flex flex-row justify-content-between align-items-center">
+                                <p className="NormalTextSizing HeaderModalShowAccess">
+                                  دسترسی ها
+                                </p>
+                                <CustomCloseButton
+                                  onClick={handleCloseModal}
+                                  color={`#e91e63`}
+                                />
+                              </HeaderModalShowAccessMainDiv>
+                              <div className="d-flex flex-column gap-2 justify-content-center align-items-center p-3">
+                                {item?.permissions?.map((eachPer, index) => (
+                                  <SeeAccessTableStyle
+                                    key={index}
+                                    className="NormalTextSizing"
+                                  >
+                                    {eachPer?.permission?.name}
+                                  </SeeAccessTableStyle>
+                                ))}
+                              </div>
+                            </Box>
+                          </ModalHimselfStyle>
+                        </div>
+                      </td>
+
+                      <td>
                         <ModalHimselfStyle
-                          open={modalPermision === index}
-                          onClose={handleCloseModal}
+                          open={modalchangeAccess === index || false}
+                          onClose={handleclosemodalChangeAccess}
                           aria-labelledby="modal-modal-title"
                           aria-describedby="modal-modal-description"
                         >
                           <Box sx={modalStyle}>
                             <HeaderModalShowAccessMainDiv className="d-flex flex-row justify-content-between align-items-center">
                               <p className="NormalTextSizing HeaderModalShowAccess">
-                                دسترسی ها
+                                ویرایش
                               </p>
+                              <p className="NormalTextSizing HeaderModalShowAccess">
+                                {item.name}
+                              </p>
+
                               <CustomCloseButton
-                                onClick={handleCloseModal}
+                                onClick={handleclosemodalChangeAccess}
                                 color={`#e91e63`}
                               />
                             </HeaderModalShowAccessMainDiv>
                             <div className="d-flex flex-column gap-2 justify-content-center align-items-center p-3">
-                              {item?.permissions?.map((eachPer, index) => (
-                                <SeeAccessTableStyle
-                                  key={index}
-                                  className="NormalTextSizing"
-                                >
-                                  {eachPer?.permission?.name}
-                                </SeeAccessTableStyle>
-                              ))}
-                            </div>
-                          </Box>
-                        </ModalHimselfStyle>
-                      </div>
-                    </td>
-
-                    <td>
-                      <ModalHimselfStyle
-                        open={modalchangeAccess === index || false}
-                        onClose={handleclosemodalChangeAccess}
-                        aria-labelledby="modal-modal-title"
-                        aria-describedby="modal-modal-description"
-                      >
-                        <Box sx={modalStyle}>
-                          <HeaderModalShowAccessMainDiv className="d-flex flex-row justify-content-between align-items-center">
-                            <p className="NormalTextSizing HeaderModalShowAccess">
-                              ویرایش
-                            </p>
-                            <p className="NormalTextSizing HeaderModalShowAccess">
-                              {item.name}
-                            </p>
-
-                            <CustomCloseButton
-                              onClick={handleclosemodalChangeAccess}
-                              color={`#e91e63`}
-                            />
-                          </HeaderModalShowAccessMainDiv>
-                          <div className="d-flex flex-column gap-2 justify-content-center align-items-center p-3">
-                            {/* {item?.permissions?.map((eachPer, index) => (
+                              {/* {item?.permissions?.map((eachPer, index) => (
                               <p key={index} className="NormalTextSizing">
                                 {eachPer?.permission?.name}
                               </p>
                             ))} */}
 
-                            {[1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12].map(
-                              (value) => (
-                                <BorderStyleAccessbility
-                                  key={value}
-                                  className="d-flex flex-row align-items-center gap-2"
-                                >
-                                  <input
-                                    type="checkbox"
-                                    value={value}
-                                    onChange={handleChange}
-                                    checked={selectedValues.includes(value)} // Prefill based on selected values
-                                  />
-                                  <div>
-                                    {value === 1 && "داشبورد"}
-                                    {value === 2 && "محصولات"}
-                                    {value === 3 && "سفارشات"}
-                                    {value === 4 && "ساخت هدر"}
-                                    {value === 5 && "مقالات"}
-                                    {value === 6 && "افتخارات"}
-                                    {value === 7 && "نمایشگاه ها"}
-                                    {value === 8 && "بنر"}
-                                    {value === 9 && "ویدیو"}
-                                    {value === 10 && "کاربر سیستم"}
-                                    {value === 11 && "کاربر سایت"}
-                                    {value === 12 && "سطح دسترسی ها"}
-                                  </div>
-                                </BorderStyleAccessbility>
-                              )
-                            )}
-                          </div>
-                          <BUTTONSSTYLE>
-                            <div className="editRole">
-                              <div className="d-flex flex-row pt-2 pb-2 justify-content-around">
-                                <button
-                                  className="NormalTextSizing confirmButtonStyle"
-                                  type="button"
-                                  onClick={handleUpdatePermissionRole}
-                                >
-                                  {loadingUpdateAccess ? (
-                                    <LoadingCss />
-                                  ) : (
-                                    "ویرایش"
-                                  )}
-                                </button>
-                                <button
-                                  className="NormalTextSizing cancelButtonStyle"
-                                  type="button"
-                                  onClick={handleclosemodalChangeAccess}
-                                >
-                                  انصراف
-                                </button>
-                              </div>
+                              {[1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12].map(
+                                (value) => (
+                                  <BorderStyleAccessbility
+                                    key={value}
+                                    className="d-flex flex-row align-items-center gap-2"
+                                  >
+                                    <input
+                                      type="checkbox"
+                                      value={value}
+                                      onChange={handleChange}
+                                      checked={selectedValues.includes(value)} // Prefill based on selected values
+                                    />
+                                    <div>
+                                      {value === 1 && "داشبورد"}
+                                      {value === 2 && "محصولات"}
+                                      {value === 3 && "سفارشات"}
+                                      {value === 4 && "ساخت هدر"}
+                                      {value === 5 && "مقالات"}
+                                      {value === 6 && "افتخارات"}
+                                      {value === 7 && "نمایشگاه ها"}
+                                      {value === 8 && "بنر"}
+                                      {value === 9 && "ویدیو"}
+                                      {value === 10 && "کاربر سیستم"}
+                                      {value === 11 && "کاربر سایت"}
+                                      {value === 12 && "سطح دسترسی ها"}
+                                    </div>
+                                  </BorderStyleAccessbility>
+                                )
+                              )}
                             </div>
-                          </BUTTONSSTYLE>
-                        </Box>
-                      </ModalHimselfStyle>
+                            <BUTTONSSTYLE>
+                              <div className="editRole">
+                                <div className="d-flex flex-row pt-2 pb-2 justify-content-around">
+                                  <button
+                                    className="NormalTextSizing confirmButtonStyle"
+                                    type="button"
+                                    onClick={handleUpdatePermissionRole}
+                                  >
+                                    {loadingUpdateAccess ? (
+                                      <LoadingCss />
+                                    ) : (
+                                      "ذخیره"
+                                    )}
+                                  </button>
+                                  <button
+                                    className="NormalTextSizing cancelButtonStyle"
+                                    type="button"
+                                    onClick={handleclosemodalChangeAccess}
+                                  >
+                                    انصراف
+                                  </button>
+                                </div>
+                              </div>
+                            </BUTTONSSTYLE>
+                          </Box>
+                        </ModalHimselfStyle>
 
-                      <NavDropDown
-                        title={
-                          <>
-                            <MoreHorizIcon
+                        <NavDropDown
+                          title={
+                            <>
+                              <MoreHorizIcon
+                                style={{
+                                  color: "#191919",
+                                  cursor: "pointer",
+                                  fontSize: "28px",
+                                  cursor: "pointer",
+                                }}
+                              />
+                            </>
+                          }
+                          id="basic-nav-dropdown"
+                        >
+                          <NavBarInsideDiv>
+                            <div
+                              onClick={() => {
+                                handlechangeAccess(index);
+                                setStoreRoleId(item.id);
+                              }}
                               style={{
-                                color: "#191919",
-                                cursor: "pointer",
-                                fontSize: "28px",
+                                borderBottom: "1px solid black",
                                 cursor: "pointer",
                               }}
-                            />
-                          </>
-                        }
-                        id="basic-nav-dropdown"
-                      >
-                        <NavBarInsideDiv>
-                          <div
-                            onClick={() => {
-                              handlechangeAccess(index);
-                              setStoreRoleId(item.id);
-                            }}
-                            style={{
-                              borderBottom: "1px solid black",
-                              cursor: "pointer",
-                            }}
-                            className="d-flex flex-row gap-2 align-items-center pb-2"
-                          >
-                            <div style={{ color: "#F3802C" }}>
-                              <EditIcon className="subitem" />
+                              className="d-flex flex-row gap-2 align-items-center pb-2"
+                            >
+                              <div style={{ color: "#F3802C" }}>
+                                <EditIcon className="subitem" />
+                              </div>
+                              <p className="VodeoDisSizing  text-end">ویرایش</p>
                             </div>
-                            <p className="VodeoDisSizing  text-end">ویرایش</p>
-                          </div>
 
-                          <div
-                            onClick={() => areYouShureFunction(item.id)}
-                            style={{
-                              cursor: "pointer",
-                            }}
-                            className="d-flex flex-row gap-2 align-items-center mt-2"
-                          >
-                            <div style={{ color: "#F3802C" }}>
-                              <DeleteIcon className="text-danger subitem" />
+                            <div
+                              onClick={() => areYouShureFunction(item.id)}
+                              style={{
+                                cursor: "pointer",
+                              }}
+                              className="d-flex flex-row gap-2 align-items-center mt-2"
+                            >
+                              <div style={{ color: "#F3802C" }}>
+                                <DeleteIcon className="text-danger subitem" />
+                              </div>
+                              <p className="VodeoDisSizing text-end">حذف</p>
                             </div>
-                            <p className="VodeoDisSizing text-end">حذف</p>
-                          </div>
-                        </NavBarInsideDiv>
-                        <div className="d-flex justify-content-end"></div>
-                      </NavDropDown>
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </StyledTable>
+                          </NavBarInsideDiv>
+                          <div className="d-flex justify-content-end"></div>
+                        </NavDropDown>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </FixTablePlace>
           </div>
         </SectionMain>
       </div>

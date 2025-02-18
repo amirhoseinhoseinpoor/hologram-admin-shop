@@ -29,6 +29,7 @@ import SettingsIcon from "@mui/icons-material/Settings";
 import PersonIcon from "@mui/icons-material/Person";
 import ArrowDropDownIcon from "@mui/icons-material/ArrowDropDown";
 import AccessibilityIcon from "@mui/icons-material/Accessibility";
+import { Box } from "@mui/material";
 
 // import components
 const DefineUser = lazy(() =>
@@ -209,7 +210,18 @@ const AdminPanel = () => {
   return (
     <section className={` ${style.adminPanel}`}>
       <aside className={`${style.sidebar} d-lg-flex d-none me-2 my-2`}>
-        <h4 className={`${style.titleStyleHeader} title`}>Logo</h4>
+        <h4 className={`${style.titleStyleHeader} title`}>
+          <Box
+            component="img"
+            sx={{
+              width: "70px",
+              height: "100%",
+              objectFit: "cover",
+            }}
+            alt="image."
+            src="/LOGO/cropped-com.chakavak.adv_512x512.png"
+          />
+        </h4>
 
         <Tabs
           activeKey={activeTab}
@@ -255,7 +267,18 @@ const AdminPanel = () => {
               className={`${style.offcanvasheader} ${style.nextoffcanvas} ${style.offcanvasHeaderResponsive} justify-content-between position-relative`}
               closeButton={false}
             >
-              <Offcanvas.Title className="me-2">لوگو</Offcanvas.Title>
+              <Offcanvas.Title className="me-2">
+                <Box
+                  component="img"
+                  sx={{
+                    width: "40px",
+                    height: "100%",
+                    objectFit: "cover",
+                  }}
+                  alt="image."
+                  src="/LOGO/cropped-com.chakavak.adv_512x512.png"
+                />
+              </Offcanvas.Title>
               <CustomCloseButton
                 className="me-2"
                 color={"#262626"}
