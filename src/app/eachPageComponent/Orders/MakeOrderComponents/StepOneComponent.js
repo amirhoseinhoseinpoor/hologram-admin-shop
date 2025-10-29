@@ -533,7 +533,7 @@ export default function SteponeComponent({
   
 
   return (
-    <>
+    <div className="container">
       {prodFiled.length > 0 ? (
         <div>
           {prodFiled.map((inProd, index) => (
@@ -1753,6 +1753,7 @@ export default function SteponeComponent({
         )}
       </div>
 
+
       {/* modals */}
       <ErrorModal
         open={openModal3}
@@ -1765,6 +1766,6 @@ export default function SteponeComponent({
         src={zoomModal}
         alt={`uploaded image`}
       />
-    </>
+    </div>
   );
 }

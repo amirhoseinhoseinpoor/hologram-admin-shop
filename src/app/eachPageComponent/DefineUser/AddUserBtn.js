@@ -46,7 +46,7 @@ const AddUserModal = styled(Modal)`
 const AddUserBtnstyle = styled(Button)`
   border: none;
   color: white;
-  padding: 5px;
+  padding: 5px !important;
   text-align: center;
   cursor: pointer;
   border-radius: 4px;
@@ -73,7 +73,7 @@ export default function AddUserBtn({
   const [updateData, setUpdateData] = useState(false);
   const [selectedValues, setSelectedValues] = useState([]);
   console.log(selectedValues);
-  
+
   const [loadingAddUser, setLoadingAddUser] = useState(false);
 
   const [newUserData, setNewUserData] = useState({
@@ -81,12 +81,41 @@ export default function AddUserBtn({
     lastName: "",
     username: "",
     password: "",
+    confirmPassword: "",
     domain: "",
     roleId: [],
   });
 
+  const [isButtonDisabled, setisButtonDisabled] = useState(true);
+  const [hideAcceseebility, setHideAcceseebility] = useState(true);
+
   console.log(newUserData);
   
+
+  useEffect(() => {
+    if (
+      newUserData?.password === newUserData?.confirmPassword &&
+      newUserData?.password?.length >= 4 &&
+      newUserData?.confirmPassword?.length >= 4 &&
+      newUserData?.firstName?.length > 0 &&
+      newUserData?.lastName?.length > 0 &&
+      newUserData?.domain &&
+      newUserData?.roleId &&
+      newUserData?.username?.length === 11
+    ) {
+      setisButtonDisabled(false);
+    } else {
+      setisButtonDisabled(true);
+    }
+  }, [newUserData]);
+
+  useEffect(() => {
+    if (newUserData?.domain == 1) {
+      setHideAcceseebility(false);
+    } else {
+      setHideAcceseebility(true);
+    }
+  }, [newUserData]);
 
   const [showAddModal, setShowAddModal] = useState(false);
 
@@ -101,13 +130,11 @@ export default function AddUserBtn({
 
   const handleAddModalClose = () => setShowAddModal(false);
   const handleAddModalShow = () => setShowAddModal(true);
-  
 
   const handleAddUser = async (event) => {
     event.preventDefault();
     try {
       setLoadingAddUser(true);
-     
 
       const gettingResponseAPI = await dispatch(addUser(newUserData)).unwrap();
 
@@ -135,29 +162,29 @@ export default function AddUserBtn({
     GettingRoles();
   }, [dispatch, updateData]);
 
-  const handleChange = (event) => {  
-    const value = Number(event.target.value);  
-  
-    if (event.target.checked) {  
-      // Add to selectedValues if checked  
-      setSelectedValues((prev) => [...prev, value]);  
-      
-      // Update newUserData with the new roleId  
-      setNewUserData((prevUserData) => ({  
-        ...prevUserData,  
-        roleId: [...prevUserData.roleId, value],  
-      }));  
-    } else {  
-      // Remove from selectedValues if unchecked  
-      setSelectedValues((prev) => prev.filter((v) => v !== value));  
-      
-      // Update newUserData to remove the unchecked roleId  
-      setNewUserData((prevUserData) => ({  
-        ...prevUserData,  
-        roleId: prevUserData.roleId.filter((id) => id !== value),  
-      }));  
-    }  
-  };  
+  const handleChange = (event) => {
+    const value = Number(event.target.value);
+
+    if (event.target.checked) {
+      // Add to selectedValues if checked
+      setSelectedValues((prev) => [...prev, value]);
+
+      // Update newUserData with the new roleId
+      setNewUserData((prevUserData) => ({
+        ...prevUserData,
+        roleId: [...prevUserData.roleId, value],
+      }));
+    } else {
+      // Remove from selectedValues if unchecked
+      setSelectedValues((prev) => prev.filter((v) => v !== value));
+
+      // Update newUserData to remove the unchecked roleId
+      setNewUserData((prevUserData) => ({
+        ...prevUserData,
+        roleId: prevUserData.roleId.filter((id) => id !== value),
+      }));
+    }
+  };
   return (
     <section>
       <AddUserBtnstyle
@@ -165,7 +192,7 @@ export default function AddUserBtn({
         variant="primary"
         onClick={handleAddModalShow}
       >
-        اضافه کردن کاربر جدید
+        اضافه کردن
       </AddUserBtnstyle>
       <AddUserModal show={showAddModal} onHide={handleAddModalClose}>
         <Modal.Header closeButton>
@@ -250,6 +277,22 @@ export default function AddUserBtn({
               />
             </div>
 
+            <div className="form-group">
+              <label className="mb-1 me-1" htmlFor="confirmPassword">
+                تکرار رمز
+              </label>
+              <input
+                type="password"
+                id="confirmPassword"
+                name="confirmPassword"
+                placeholder="تکرار رمز"
+                className="form-control"
+                value={newUserData.confirmPassword}
+                onChange={handleInputChange}
+                required
+              />
+            </div>
+
             {/* <div className="form-group">  
               <label className="mb-1 me-1" htmlFor="gender">جنسیت</label>  
               <select  
@@ -304,38 +347,50 @@ export default function AddUserBtn({
                 ))}
               </select>
             </div> */}
-
-            <div className="form-group">
-              <label className="mb-1 me-1">سطح دسترسی</label>
-              <RoleDivGridStyle className="mt-2">
-                {rolesData?.map((item, index) => (
-                  <label
-                    key={index}
-                    className="d-flex flex-row align-items-center gap-2"
-                  >
-                    <input
-                      type="checkbox"
-                      value={item.id}
-                      onChange={handleChange}
-                    />
-                    <div>{item.name}</div>
-                  </label>
-                ))}
-              </RoleDivGridStyle>
-            </div>
+            {hideAcceseebility && (
+              <div className="form-group">
+                <label className="mb-1 me-1">سطح دسترسی</label>
+                <RoleDivGridStyle className="mt-2">
+                  {rolesData?.map((item, index) => (
+                    <label
+                      key={index}
+                      className="d-flex flex-row align-items-center gap-2"
+                    >
+                      <input
+                        type="checkbox"
+                        value={item.id}
+                        onChange={handleChange}
+                      />
+                      <div>{item.name}</div>
+                    </label>
+                  ))}
+                </RoleDivGridStyle>
+              </div>
+            )}
           </form>
         </Modal.Body>
         <Modal.Footer>
           <Button variant="secondary" onClick={handleAddModalClose}>
             لغو
           </Button>
-          <Button variant="primary" onClick={handleAddUser}>
+          <Button
+            variant="primary"
+            onClick={handleAddUser}
+            disabled={isButtonDisabled}
+            style={{
+              backgroundColor: "#191919",
+              border: "unset",
+              backgroundColor: isButtonDisabled ? "#868686" : "",
+              border: isButtonDisabled ? "#868686" : "",
+              cursor: isButtonDisabled ? "not-allowed" : "pointer",
+            }}
+          >
             {loadingAddUser ? (
               <>
                 <LoadingCss />
               </>
             ) : (
-              <>اضافه کردن</>
+              <>ذخیره</>
             )}
           </Button>
         </Modal.Footer>

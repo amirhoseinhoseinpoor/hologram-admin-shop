@@ -116,6 +116,8 @@ function EditUserBtnfunction({ data, setDataUpdated, setConfirmModal }) {
   const [firstPassword, setfirstPassword] = useState("");
   const [secondPassword, setSecondPassword] = useState("");
 
+  const [hideAcceseebility, setHideAcceseebility] = useState(true);
+
   useEffect(() => {
     if (
       firstPassword === secondPassword &&
@@ -128,7 +130,13 @@ function EditUserBtnfunction({ data, setDataUpdated, setConfirmModal }) {
     }
   }, [firstPassword, secondPassword]);
 
-  console.log(secondPassword);
+  useEffect(() => {
+    if (whereLogin == 1) {
+      setHideAcceseebility(false);
+    } else {
+      setHideAcceseebility(true);
+    }
+  }, [whereLogin]);
 
   // modals state
   const [openModal, setOpenModal] = useState(false);
@@ -441,25 +449,28 @@ function EditUserBtnfunction({ data, setDataUpdated, setConfirmModal }) {
                 <option value="3">مشتری</option>
               </select>
             </div> */}
-            <div className="form-group">
-              <label className="mb-1 me-1">سطح دسترسی</label>
-              <RoleDivGridStyle className="mt-2">
-                {rolesData?.map((item, index) => (
-                  <label
-                    key={index}
-                    className="d-flex flex-row align-items-center gap-2"
-                  >
-                    <input
-                      type="checkbox"
-                      value={item.id}
-                      onChange={handleChange}
-                      checked={selectedValues.includes(item.id)}
-                    />
-                    <div>{item.name}</div>
-                  </label>
-                ))}
-              </RoleDivGridStyle>
-            </div>
+            {hideAcceseebility && (
+              <div className="form-group">
+                <label className="mb-1 me-1">سطح دسترسی</label>
+                <RoleDivGridStyle className="mt-2">
+                  {rolesData?.map((item, index) => (
+                    <label
+                      key={index}
+                      className="d-flex flex-row align-items-center gap-2"
+                    >
+                      <input
+                        type="checkbox"
+                        value={item.id}
+                        onChange={handleChange}
+                        checked={selectedValues.includes(item.id)}
+                      />
+                      <div>{item.name}</div>
+                    </label>
+                  ))}
+                </RoleDivGridStyle>
+              </div>
+            )}
+
             <div className="d-flex flex-row justify-content-between">
               <Button variant="primary" type="submit">
                 {loadingConfirmEdit ? <LoadingCss /> : "ذخیره"}
