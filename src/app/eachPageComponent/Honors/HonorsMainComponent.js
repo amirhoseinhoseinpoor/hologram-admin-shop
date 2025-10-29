@@ -18,8 +18,9 @@ import { formatPersianDate } from "@/app/utils/persionDateUtils";
 
 import styled from "styled-components";
 import PreviewIcon from "@mui/icons-material/Preview";
+import VisibilityIcon from "@mui/icons-material/Visibility";
 import DeleteIcon from "@mui/icons-material/Delete";
-import {Skeleton} from "@mui/material";
+import { Skeleton } from "@mui/material";
 
 const HeadermakeOrder = styled.div`
   padding: 10px;
@@ -46,13 +47,42 @@ const CARD = styled(Card)`
   background-color: white !important;
   color: black !important;
   border: 1px solid #ddd;
-  box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+  /* box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05); */
   display: flex;
   flex-direction: column;
+  .zIndex {
+    z-index: 12;
+  }
+
+  position: relative;
+  border-radius: 20px;
+  overflow: hidden;
+  box-shadow: 0px 10px 20px rgba(0, 0, 0, 0.2);
+  background-color: #f7f7f7;
+  transition: transform 0.3s ease;
+  cursor: pointer;
+
+  &:hover {
+    transform: translateY(-5px);
+  }
+
+  .deleteDiv {
+    background-color: rgba(255, 255, 255, 0.2);
+    border-radius: 50%;
+    padding: 10px;
+    &:hover {
+      background-color: #66bb6a;
+    }
+  }
   .MuiCardContent-root {
+    position: absolute;
+    bottom: 0;
+    color: white;
+    padding: 1.5rem;
+
     .titleHonors {
-      font-size: 20px;
-      font-weight: 500;
+      font-size: 1.5rem;
+      font-weight: 600;
     }
   }
   .css-46bh2p-MuiCardContent-root:last-child {
@@ -61,11 +91,17 @@ const CARD = styled(Card)`
   }
 `;
 
+const GradientOverlay = styled.div`
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(to top, rgba(0, 0, 0, 0.8), transparent);
+`;
+
 const GridbaseDiv = styled.div`
   display: grid;
   grid-template-columns: repeat(2, 1fr);
-  grid-gap: 100px;
-  width: 60%;
+  grid-gap: 70px;
+  width: 67%;
   @media (max-width: 980px) {
     grid-template-columns: repeat(2, 1fr);
   }
@@ -233,30 +269,34 @@ export default function HonorsMainComponent({ toggleShow }) {
                   className="w-100"
                   height={300}
                 />
-                
               </>
             ) : (
               <>
                 {dataCome.length > 0 ? (
                   dataCome.map((data, index) => (
                     <React.Fragment key={index}>
-                      <CARD>
-                        <div className="d-flex mb-1 mt-1 justify-content-lg-between container">
-                          <div
+                      <CARD className="position-relative">
+                        <div className="position-absolute zIndex  w-100 top-0 ">
+                          <div className="d-flex mb-1 mt-1 justify-content-end align-items-center container ">
+                            {/* <div
+                           
+                            className="preiweDiv"
                             onClick={() => {
                               setEditedHonor(data);
                             }}
                           >
-                            <PreviewIcon style={{ color: "#3892F3" }} />
-                          </div>
+                            <VisibilityIcon style={{ color: "#262626" }} />
+                          </div> */}
 
-                          <div
-                            onClick={(e) => {
-                              setIndexDeleted(data.code);
-                              areYouShureFunction2(e);
-                            }}
-                          >
-                            <DeleteIcon style={{ color: "#e81d46" }} />
+                            <div
+                              className="deleteDiv"
+                              onClick={(e) => {
+                                setIndexDeleted(data.code);
+                                areYouShureFunction2(e);
+                              }}
+                            >
+                              <DeleteIcon style={{ color: "#FF4C4C" }} />
+                            </div>
                           </div>
                         </div>
 
@@ -274,6 +314,7 @@ export default function HonorsMainComponent({ toggleShow }) {
                               borderRadius: "2px",
                             }}
                           />
+                          <GradientOverlay />
                           <CardContent className="d-flex flex-column justify-content-around">
                             <TYPOGRAPHY className="titleHonors">
                               {data.title}
@@ -298,7 +339,7 @@ export default function HonorsMainComponent({ toggleShow }) {
       {activekey === "addUser" && !editedHonor && (
         <>
           <div>
-            <AddHonors setActiveKey={setActiveKey}/>
+            <AddHonors setActiveKey={setActiveKey} />
           </div>
         </>
       )}
