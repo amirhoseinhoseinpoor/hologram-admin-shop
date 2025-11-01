@@ -61,6 +61,9 @@ const CARD = styled(Card)`
   background-color: #f7f7f7;
   transition: transform 0.3s ease;
   cursor: pointer;
+  max-width:500px;
+  max-height:500px;
+  min-height:100px;
 
   &:hover {
     transform: translateY(-5px);
@@ -79,6 +82,7 @@ const CARD = styled(Card)`
     bottom: 0;
     color: white;
     padding: 1.5rem;
+ 
 
     .titleHonors {
       font-size: 1.5rem;
@@ -100,15 +104,15 @@ const GradientOverlay = styled.div`
 const GridbaseDiv = styled.div`
   display: grid;
   grid-template-columns: repeat(2, 1fr);
-  grid-gap: 70px;
-  width: 67%;
+  grid-gap: 50px;
+  width: 70%;
   @media (max-width: 980px) {
     grid-template-columns: repeat(2, 1fr);
   }
   @media (max-width: 768px) {
     grid-template-columns: repeat(1, 1fr);
     width: 70%;
-    grid-gap: 50px;
+    grid-gap: 40px;
   }
 `;
 
