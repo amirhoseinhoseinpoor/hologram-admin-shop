@@ -38,8 +38,17 @@ const ResponsiveDivInputs = styled.div`
 `;
 
 const MainDivSection = styled.section`
-  border: 2px solid #c0c0c0;
-  border-radius: 6px;
+  /* border: 2px solid #c0c0c0; */
+  /* border-radius: 6px; */
+
+
+  padding: 1.25rem;
+  gap: 1rem;
+  border: 1px solid rgba(0, 0, 0, 0.08);
+  border-radius: 14px;
+  background: #ffffff;
+  box-shadow: 0 3px 16px rgba(0, 0, 0, 0.06);
+  align-items: center;
 `;
 
 const BOX = styled(Box)`
@@ -69,22 +78,39 @@ const DELETEUPLODEDIMAGE = styled.button`
 `;
 
 const BUTTONSSTYLE = styled.div`
+  display: flex;
+  width: 100%;
+
+  .confirmButtonStyle,
   .cancelButtonStyle {
-    color: #e91e63;
-    background-color: unset;
-    border : 1px solid #e91e63;
-    padding-right : 10px;
-    padding-left : 10px;
+    font-size: 14px;
+    padding: 10px 32px;
+    border-radius: 10px;
+    font-weight: 500;
+    transition: 160ms ease;
   }
 
-  .deleteButtonStyle {
-    color: #ff4f3f !important;
-    background-color: transparent;
-  }
   .confirmButtonStyle {
-    padding : 0 60px;
-    color: white;
-    background-color: #43A047;
+    background: #43a047;
+    color: #fff;
+    border: none;
+
+    &:hover {
+      background: #3a8c3e;
+      transform: translateY(-1px);
+    }
+  }
+
+  .cancelButtonStyle {
+    background: #fafafa;
+    border: 1px solid #d0d0d0;
+    color: #444;
+
+    &:hover {
+      background: #f0f0f0;
+      border-color: #bdbdbd;
+      transform: translateY(-1px);
+    }
   }
 `;
 
