@@ -21,54 +21,68 @@ import { fixTitleSize } from "@/app/utils/fixTitleSize";
 const DivAdjustColorDivs = styled.div`
   display: grid;
   grid-template-columns: ${(props) => props.columns || "1fr"};
-  /* grid-gap: 18px; */
+  gap: 20px;
   width: 100%;
-  /* padding: 15px; */
+
+  background: #ffffff;
+  padding: 15px;
+  margin-top:15px;
+  border-radius: 14px;
+  border: 1px solid #e7e7e7;
+  box-shadow: 0 4px 14px rgba(0,0,0,0.04);
+
   .dropDownSpecoficStyle {
-    border: 1.5px solid #c0c0c0;
-    border-radius: 4px;
-  }
-  .dropDownSpecoficStyleHeader {
-    border-bottom: 1.5px solid #c0c0c0;
-    border-radius: 4px;
-    padding: 8px;
-    background-color: rgb(225, 223, 223);
-  }
-  .BGhead {
-    background-color: rgb(225, 223, 223);
-  }
-  .labelInsteadOfInput {
-    border: 1px solid #c0c0c0;
-    border-radius: 4px;
+    border: 1px solid #d9d9d9;
+    border-radius: 10px;
+    background: #fafafa;
     padding: 10px;
+  }
+
+  .dropDownSpecoficStyleHeader {
+    border-bottom: none;
+    background: #f4f4f6;
+    font-weight: 600;
+    padding: 10px 14px;
+    border-radius: 10px;
+  }
+
+  .labelInsteadOfInput {
+    border: 1px solid #d9d9d9;
+    border-radius: 12px;
+    padding: 14px;
     width: 100%;
-    height: 77%;
+    background: #fafafa;
+    transition: 150ms;
     display: flex;
     justify-content: center;
     align-items: center;
     cursor: pointer;
+
+    &:hover {
+      border-color: #bdbdbd;
+      background: #f1f1f1;
+    }
   }
+
   .colorTheInputFile {
-    color: #404040;
+    color: #474747;
     margin: 0;
   }
-  .divBorderFileds {
-    border: 1.5px solid #c0c0c0;
-    padding: 10px;
-    border-radius: 4px;
-  }
-  .BoxFiledFirstTab {
-    border: 1.5px solid #c0c0c0;
-    border-radius: 4px;
-  }
+
   @media (max-width: 768px) {
-    grid-template-columns: ${(props) => props.recolumns || ""};
+    grid-template-columns: ${(props) => props.recolumns || "1fr"};
+    padding: 14px;
   }
 `;
 
 const DivAdjustGrodimageMedia = styled.div`
-  border: 2px solid #ccc;
-  border-radius: 4px;
+ background: #ffffff;
+  padding: 15px;
+  margin-top:15px;
+  border-radius: 14px;
+  border: 1px solid #e7e7e7;
+  box-shadow: 0 4px 14px rgba(0,0,0,0.04);
+  
   /* padding: 10px; */
   display: grid;
   grid-template-columns: repeat(1, 1fr);
@@ -159,15 +173,21 @@ const NavTabs = styled(Tabs)`
 `;
 
 const AddSectionForm = styled.div`
-  border: 2px solid #ccc;
-  margin-bottom: 20px;
-  border-radius: 8px;
+  padding: 1.25rem;
+  border: 1px solid rgba(0, 0, 0, 0.05);
+  border-radius: 14px;
+  background: #ffffff;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.06);
+  gap: 1rem;
 `;
 
 const BorderInputBox = styled.div`
-  border: 2px solid #ccc;
-  margin-bottom: 20px;
-  border-radius: 8px;
+  padding: 1rem;
+  border: 1px solid rgba(0, 0, 0, 0.05);
+  border-radius: 14px;
+  background: #ffffff;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.06);
+  gap: 1rem;
 `;
 
 const ResponsiveDivFileds = styled.div`
@@ -176,7 +196,7 @@ const ResponsiveDivFileds = styled.div`
   grid-gap: 20px;
   width: 100%;
   .labelInsteadOfInput {
-    border: 1px solid #c0c0c0;
+    border: 1px solid #e7e7e7;
     border-radius: 4px;
     padding: 10px;
     width: 100%;
@@ -196,13 +216,20 @@ const ResponsiveDivFileds = styled.div`
 `;
 
 const ButtonCancelOrder = styled.button`
-  border: 1px solid #e91e63 !important;
-  color: #e91e63 !important;
+  background: #fafafa !important;
+  border: 1px solid #d0d0d0 !important;
+  color: #444 !important;
+
+  &:hover {
+    background: #f0f0f0 !important;
+    border-color: #bdbdbd !important;
+    transform: translateY(-1px);
+  }
 `;
 
 const HeaderEachSection = styled.div`
   background-color: rgb(225, 223, 223);
-  border-bottom: 2px solid #ccc;
+  /* border-bottom: 2px solid #ccc; */
   padding: 10px;
   border-radius: 4px;
   width: 100%;
@@ -227,10 +254,12 @@ const DivHeaderInfoMedia = styled.div`
 `;
 
 const MediaDivMainGrid = styled.div`
-  /* display: flex; */
-  border: 2px solid #ccc;
-  border-radius: 4px;
-  /* padding: 10px; */
+  background: #ffffff;
+  padding: 15px;
+  margin-top:15px;
+  border-radius: 14px;
+  border: 1px solid #e7e7e7;
+  box-shadow: 0 4px 14px rgba(0,0,0,0.04);
 `;
 
 const StyleGridInsideMedia = styled.div`
@@ -251,7 +280,7 @@ const modalStyle = {
 };
 
 const SelectStyle = styled.select`
-  border: none;
+  /* border: none; */
   border-radius: 4px;
   padding: 3px 6px;
   &:focus {
@@ -966,8 +995,8 @@ export default function AddHonors({ setDataUpdated, setActiveKey }) {
                         <div>
                           <div className="mt-3">
                             {section.type === "image" &&
-                              URL &&
-                              section?.items[0]?.src ? (
+                            URL &&
+                            section?.items[0]?.src ? (
                               <div className="d-flex flex-column align-items-center">
                                 <BoxFirstSection
                                   component="img"
@@ -1146,7 +1175,6 @@ export default function AddHonors({ setDataUpdated, setActiveKey }) {
                                       itemIndex
                                     )
                                   }
-
                                 />
 
                                 {section.type === "image" && item.src && (
@@ -1578,9 +1606,9 @@ export default function AddHonors({ setDataUpdated, setActiveKey }) {
                                         media.map((m, iIdx) =>
                                           iIdx === index
                                             ? {
-                                              ...m,
-                                              poster: e.target.files[0],
-                                            }
+                                                ...m,
+                                                poster: e.target.files[0],
+                                              }
                                             : m
                                         )
                                       )
@@ -1704,13 +1732,13 @@ export default function AddHonors({ setDataUpdated, setActiveKey }) {
                             filedOrder.map((f, iIdx) =>
                               iIdx === index
                                 ? {
-                                  ...f,
-                                  type: e.target.value,
-                                  dropDownOP:
-                                    e.target.value === "dropDown"
-                                      ? [{ text: "", isChecked: false }]
-                                      : [],
-                                }
+                                    ...f,
+                                    type: e.target.value,
+                                    dropDownOP:
+                                      e.target.value === "dropDown"
+                                        ? [{ text: "", isChecked: false }]
+                                        : [],
+                                  }
                                 : f
                             )
                           )
@@ -1792,10 +1820,9 @@ export default function AddHonors({ setDataUpdated, setActiveKey }) {
                                   setFiledOrder(updatedFiledOrder);
                                 }}
                                 required
-                                style={{ width: '60%' }}
-        className="form-control"
+                                style={{ width: "60%" }}
+                                className="form-control"
                               />
-
                               <input
                                 type="checkbox"
                                 checked={option.isChecked}
@@ -1860,7 +1887,7 @@ export default function AddHonors({ setDataUpdated, setActiveKey }) {
         <AreYouShureModal
           open={openModal}
           onClose={closeModal}
-          text={"ایا از اضافه کردن محصول مطمعن هستید"}
+          text={"ایا از اضافه کردن محصول مطمئن هستید"}
           func={handleSubmit}
           loading={loadingConfirmModal}
         />

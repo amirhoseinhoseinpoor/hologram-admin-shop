@@ -19,22 +19,39 @@ import { fixTitleSize } from "@/app/utils/fixTitleSize";
 
 // Styled Components
 const BUTTONSSTYLE = styled.div`
+  display: flex;
+  width: 100%;
+
+  .confirmButtonStyle,
   .cancelButtonStyle {
-    color: #e91e63;
-    background-color: unset;
-    border: 1px solid #e91e63;
-    padding-right: 10px;
-    padding-left: 10px;
+    font-size: 14px;
+    padding: 10px 32px;
+    border-radius: 10px;
+    font-weight: 500;
+    transition: 160ms ease;
   }
 
-  .deleteButtonStyle {
-    color: #ff4f3f !important;
-    background-color: transparent;
-  }
   .confirmButtonStyle {
-    padding: 0 60px !important;
-    color: white;
-    background-color: #43a047;
+    background: #43a047;
+    color: #fff;
+    border: none;
+
+    &:hover {
+      background: #3a8c3e;
+      transform: translateY(-1px);
+    }
+  }
+
+  .cancelButtonStyle {
+    background: #fafafa;
+    border: 1px solid #d0d0d0;
+    color: #444;
+
+    &:hover {
+      background: #f0f0f0;
+      border-color: #bdbdbd;
+      transform: translateY(-1px);
+    }
   }
 `;
 
@@ -68,54 +85,68 @@ const BoxFirstSection = styled(Box)`
 const DivAdjustColorDivs = styled.div`
   display: grid;
   grid-template-columns: ${(props) => props.columns || "1fr"};
-  /* grid-gap: 18px; */
+  gap: 20px;
   width: 100%;
-  /* padding: 15px; */
+
+  background: #ffffff;
+  padding: 15px;
+  margin-top:15px;
+  border-radius: 14px;
+  border: 1px solid #e7e7e7;
+  box-shadow: 0 4px 14px rgba(0,0,0,0.04);
+
   .dropDownSpecoficStyle {
-    border: 1.5px solid #c0c0c0;
-    border-radius: 4px;
-  }
-  .dropDownSpecoficStyleHeader {
-    border-bottom: 1.5px solid #c0c0c0;
-    background-color: rgb(225, 223, 223);
-    border-radius: 4px;
-    padding: 8px;
-  }
-  .BGhead {
-    background-color: rgb(225, 223, 223);
-  }
-  .labelInsteadOfInput {
-    border: 1px solid #c0c0c0;
-    border-radius: 4px;
+    border: 1px solid #d9d9d9;
+    border-radius: 10px;
+    background: #fafafa;
     padding: 10px;
+  }
+
+  .dropDownSpecoficStyleHeader {
+    border-bottom: none;
+    background: #f4f4f6;
+    font-weight: 600;
+    padding: 10px 14px;
+    border-radius: 10px;
+  }
+
+  .labelInsteadOfInput {
+    border: 1px solid #d9d9d9;
+    border-radius: 12px;
+    padding: 14px;
     width: 100%;
-    height: 77%;
+    background: #fafafa;
+    transition: 150ms;
     display: flex;
     justify-content: center;
     align-items: center;
     cursor: pointer;
+
+    &:hover {
+      border-color: #bdbdbd;
+      background: #f1f1f1;
+    }
   }
+
   .colorTheInputFile {
-    color: #404040;
+    color: #474747;
     margin: 0;
   }
-  .divBorderFileds {
-    border: 1.5px solid #c0c0c0;
-    padding: 10px;
-    border-radius: 4px;
-  }
-  .BoxFiledFirstTab {
-    border: 1.5px solid #c0c0c0;
-    border-radius: 4px;
-  }
+
   @media (max-width: 768px) {
-    grid-template-columns: ${(props) => props.recolumns || ""};
+    grid-template-columns: ${(props) => props.recolumns || "1fr"};
+    padding: 14px;
   }
 `;
 
 const DivAdjustGrodimageMedia = styled.div`
-  border: 2px solid #ccc;
-  border-radius: 4px;
+  background: #ffffff;
+  padding: 15px;
+  margin-top:15px;
+  border-radius: 14px;
+  border: 1px solid #e7e7e7;
+  box-shadow: 0 4px 14px rgba(0,0,0,0.04);
+  
   /* padding: 10px; */
   display: grid;
   grid-template-columns: repeat(1, 1fr);
@@ -187,21 +218,30 @@ const NavTabs = styled(Tabs)`
 `;
 
 const AddSectionForm = styled.div`
-  border: 2px solid #ccc;
-  margin-bottom: 20px;
-  border-radius: 8px;
+   padding: 1.25rem;
+  border: 1px solid rgba(0, 0, 0, 0.05);
+  border-radius: 14px;
+  background: #ffffff;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.06);
+  gap: 1rem;
 `;
 
 const BorderInputBox = styled.div`
-  border: 2px solid #ccc;
-  margin-bottom: 20px;
-  border-radius: 8px;
+ padding: 1rem;
+  border: 1px solid rgba(0, 0, 0, 0.05);
+  border-radius: 14px;
+  background: #ffffff;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.06);
+  gap: 1rem;
 `;
 
 const DynamicSectionBox = styled.div`
-  border: 2px solid #ccc;
-  margin-bottom: 20px;
-  border-radius: 8px;
+  padding: 1.25rem;
+  border: 1px solid rgba(0, 0, 0, 0.05);
+  border-radius: 14px;
+  background: #ffffff;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.06);
+  gap: 1rem;
 `;
 
 const ButtonAddSection = styled.button`
@@ -214,7 +254,7 @@ const ResponsiveDivFileds = styled.div`
   grid-gap: 20px;
   width: 100%;
   .labelInsteadOfInput {
-    border: 1px solid #c0c0c0;
+    border: 1px solid #e7e7e7;
     border-radius: 4px;
     padding: 10px;
     width: 100%;
@@ -234,13 +274,20 @@ const ResponsiveDivFileds = styled.div`
 `;
 
 const ButtonCancelOrder = styled.button`
-  border: 1px solid #e91e63 !important;
-  color: #e91e63 !important;
+  background: #fafafa !important;
+  border: 1px solid #d0d0d0 !important;
+  color: #444 !important;
+
+  &:hover {
+    background: #f0f0f0 !important;
+    border-color: #bdbdbd !important;
+    transform: translateY(-1px);
+  }
 `;
 
 const HeaderEachSection = styled.div`
   background-color: rgb(225, 223, 223);
-  border-bottom: 2px solid #ccc;
+  /* border-bottom: 2px solid #ccc; */
   padding: 10px;
   border-radius: 4px;
   width: 100%;
@@ -261,10 +308,12 @@ const HeaderModalShowAccessMainDiv = styled.div`
 `;
 
 const MediaDivMainGrid = styled.div`
-  /* display: flex; */
-  border: 2px solid #ccc;
-  border-radius: 4px;
-  /* padding: 10px; */
+  background: #ffffff;
+  padding: 15px;
+  margin-top:15px;
+  border-radius: 14px;
+  border: 1px solid #e7e7e7;
+  box-shadow: 0 4px 14px rgba(0,0,0,0.04);
 `;
 
 const modalStyle = {
@@ -2085,14 +2134,14 @@ export default function EditHonors({
       <AreYouShureModal
         open={openModal}
         onClose={closeModal}
-        text={"ایا از ویرایش محصول مطمعن هستید"}
+        text={"ایا از ویرایش محصول مطمئن هستید"}
         func={handleSubmit}
         loading={loadingConfirmModal}
       />
       <AreYouShureModal
         open={openModal4}
         onClose={closeModal4}
-        text={"ایا از حذف محصول مطمعن هستید"}
+        text={"ایا از حذف محصول مطمئن هستید"}
         func={handleDelete}
         loading={loadingConfirmModal}
       />

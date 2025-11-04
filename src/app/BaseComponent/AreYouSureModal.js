@@ -8,6 +8,45 @@ const TYPOGRAPHY = styled(Typography)`
   text-align: center;
 `;
 
+const BUTTONSSTYLE = styled.div`
+  display: flex;
+  width: 100%;
+
+  .confirmButtonStyle,
+  .cancelButtonStyle {
+    font-size: 14px;
+    padding: 5px 12px;
+    margin-top: 15px;
+    border-radius: 10px;
+    font-weight: 500;
+    transition: 160ms ease;
+  }
+
+  .confirmButtonStyle {
+    background: #43a047;
+    color: #fff;
+    border: none;
+
+    &:hover {
+      background: #3a8c3e;
+      transform: translateY(-1px);
+    }
+  }
+
+  .cancelButtonStyle {
+    background: #fafafa;
+    border: 1px solid #d0d0d0;
+    color: #444;
+
+    &:hover {
+      background: #f0f0f0;
+      border-color: #bdbdbd;
+      transform: translateY(-1px);
+    }
+  }
+`;
+
+
 const modalStyle = {
   position: "absolute",
   top: "50%",
@@ -142,15 +181,16 @@ export default function AreYouShureModal({
             <TYPOGRAPHY id="modal-modal-description" sx={{ mt: 2 }}>
               {text}
             </TYPOGRAPHY>
-            <div className="d-flex justify-content-end">
+            <BUTTONSSTYLE className="d-flex justify-content-end gap-3">
               <MUIButton
                 variant="contained"
                 onClick={onClose}
+                className="cancelButtonStyle"
                 color="error"
                 style={{
-                  marginLeft: "10px",
+                  // marginLeft: "10px",
                   fontFamily: "unset",
-                  marginTop: "20px",
+                  // marginTop: "20px",
                 }}
               >
                 لغو
@@ -158,9 +198,10 @@ export default function AreYouShureModal({
               <MUIButton
                 style={{
                   fontFamily: "unset",
-                  marginTop: "20px",
-                  backgroundColor: "#43A047",
+                  // marginTop: "20px",
+                  // backgroundColor: "#43A047",
                 }}
+                className="confirmButtonStyle"
                 variant="contained"
                 onClick={func}
               >
@@ -172,7 +213,7 @@ export default function AreYouShureModal({
                   <>تایید</>
                 )}
               </MUIButton>
-            </div>
+            </BUTTONSSTYLE>
           </div>
         </Box>
       </Modal>

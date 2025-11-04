@@ -349,7 +349,7 @@ export default function HonorsMainComponent({ toggleShow }) {
       {activekey === "addUser" && !editedHonor && (
         <>
           <div>
-            <AddBlogs />
+            <AddBlogs setActiveKey={setActiveKey}/>
           </div>
         </>
       )}

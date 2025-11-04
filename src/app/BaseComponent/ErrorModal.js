@@ -44,6 +44,45 @@ const circleAnim = keyframes`
 `;
 
 
+const BUTTONSSTYLE = styled.div`
+  display: flex;
+  width: 100%;
+
+  .confirmButtonStyle,
+  .cancelButtonStyle {
+    font-size: 14px;
+    padding: 6px 12px;
+    margin-top: 15px;
+    border-radius: 10px;
+    font-weight: 500;
+    transition: 160ms ease;
+  }
+
+  .confirmButtonStyle {
+    background: #43a047;
+    color: #fff;
+    border: none;
+
+    &:hover {
+      background: #3a8c3e;
+      transform: translateY(-1px);
+    }
+  }
+
+  .cancelButtonStyle {
+    background: #fafafa;
+    border: 1px solid #d0d0d0;
+    color: #444;
+
+    &:hover {
+      background: #f0f0f0;
+      border-color: #bdbdbd;
+      transform: translateY(-1px);
+    }
+  }
+`;
+
+
 
 const Container = styled.div`
   
@@ -124,15 +163,16 @@ export default function ErrorModal({ open, onClose, text }) {
             {text}
           </TYPOGRAPHY>
 
-          <div style={{ marginTop: "20px", textAlign: "end" }}>
+          <BUTTONSSTYLE style={{ marginTop: "20px", textAlign: "end" }} className="d-flex justify-content-end">
             <MUIButton
               variant="contained"
+              className="confirmButtonStyle"
               onClick={onClose}
               style={{ marginLeft: "10px", fontFamily: "unset" }}
             >
               تایید
             </MUIButton>
-          </div>
+          </BUTTONSSTYLE>
         </Box>
       </Modal>
     </section>

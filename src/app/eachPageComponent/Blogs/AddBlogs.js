@@ -108,7 +108,7 @@ import { useDispatch } from "react-redux";
 import { uploadFile } from "@/app/Store/thunks";
 import { blogspot } from "@/app/Store/thunks";
 
-export default function AddHonors() {
+export default function AddHonors({ setActiveKey }) {
   const dispatch = useDispatch();
 
   const [content, setContent] = useState("");
@@ -609,7 +609,7 @@ export default function AddHonors() {
           />
         </div>
 
-        <BUTTONSSTYLE>
+        <BUTTONSSTYLE className="d-flex justify-content-around">
           <button
             // style={{ fontFamily: "unset" }}
             type="submit"
@@ -617,6 +617,13 @@ export default function AddHonors() {
             className="mt-3 confirmButtonStyle"
           >
             تایید
+          </button>
+          <button
+            className="cancelButtonStyle mt-3"
+            type="button"
+            onClick={() => setActiveKey("editUserPage")}
+          >
+            انصراف
           </button>
         </BUTTONSSTYLE>
 
