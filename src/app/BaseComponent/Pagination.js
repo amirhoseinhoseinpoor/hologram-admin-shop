@@ -27,8 +27,10 @@ const ButtonStyle = styled.button`
   transition: background-color 0.3s, color 0.3s;
 
   &:hover:not(:disabled) {
-    background-color: #007bff;
-    color: white;
+    background-color: #007bff !important;
+    color: white !important;
+    border-radius: 50% !important;
+    padding : 4px !important;
   }
 
   &:disabled {
@@ -46,8 +48,9 @@ const PageNumber = styled.button`
   height: 2.5rem;
   margin: 0 0.25rem;
   border-radius: 50% !important;
-  background-color: ${(props) => (props.$isCurrent ? "#007bff" : "#f0f0f0")};
-  color: ${(props) => (props.$isCurrent ? "#fff" : "#000")};
+  background-color: ${(props) =>
+    props.$isCurrent ? "#007bff" : "white"} !important;
+  color: ${(props) => (props.$isCurrent ? "#fff" : "#000")} !important;
   border: none;
   cursor: pointer;
   transition: background-color 0.3s, color 0.3s, transform 0.2s;
@@ -91,34 +94,40 @@ const Pagination = ({ currentPage, totalPages, onPageChange }) => {
 
   const pageNumbers = getPageNumbers();
 
+  console.log(pageNumbers);
+
   return (
     <PaginationContainer>
-      {/* Previous Button */}
+       <ButtonStyle
+        onClick={() => onPageChange(currentPage + 1)}
+        disabled={currentPage === totalPages}
+        aria-label="Next Page"
+      >
+         <ArrowForwardIosIcon />
+      </ButtonStyle>
+     
+
+      {/* Page Numbers */}
+      <div style={{direction :"ltr"}}>
+        {pageNumbers.map((page) => (
+          <PageNumber
+            key={page}
+            $isCurrent={page === currentPage}
+            onClick={() => onPageChange(page)}
+            aria-label={`Page ${page}`}
+          >
+            {page}
+          </PageNumber>
+        ))}
+      </div>
+
+      
+     
+
       <ButtonStyle
         onClick={() => onPageChange(currentPage - 1)}
         disabled={currentPage === 1}
         aria-label="Previous Page"
-      >
-        <ArrowForwardIosIcon />
-      </ButtonStyle>
-
-      {/* Page Numbers */}
-      {pageNumbers.map((page) => (
-        <PageNumber
-          key={page}
-          $isCurrent={page === currentPage}
-          onClick={() => onPageChange(page)}
-          aria-label={`Page ${page}`}
-        >
-          {page}
-        </PageNumber>
-      ))}
-
-      {/* Next Button */}
-      <ButtonStyle
-        onClick={() => onPageChange(currentPage + 1)}
-        disabled={currentPage === totalPages}
-        aria-label="Next Page"
       >
         <ArrowBackIosIcon />
       </ButtonStyle>

@@ -167,6 +167,7 @@ export default function OrderMainComponent({ toggleShow }) {
       const ordersData = await dispatch(
         listorders({ status, sortBy: sortField, sortOrder, page, limit })
       ).unwrap();
+ 
 
       // Fetch user data for all orders
       const userPromises = ordersData.data.map(async (item) => {
@@ -239,8 +240,8 @@ export default function OrderMainComponent({ toggleShow }) {
       });
     }
 
-    setTotalPages(Math.ceil(filtered.length / itemsPerPage));
-    setCurrentPage(1); 
+    // setTotalPages(Math.ceil(filtered.length / itemsPerPage));
+    // setCurrentPage(1); 
     setFilteredOrders(filtered);
   }, [
     orders,

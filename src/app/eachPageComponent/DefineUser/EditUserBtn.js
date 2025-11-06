@@ -4,12 +4,20 @@ import { Modal, Button } from "react-bootstrap";
 import styled from "styled-components";
 // import redux
 import { useDispatch } from "react-redux";
-import { editUser, deleteUser } from "@/app/Store/thunks";
+import {
+  editUser,
+  deleteUser,
+  gettingAllRoles,
+  editUserPassword,
+} from "@/app/Store/thunks";
 // import base component
 import AreYouShureModal from "@/app/BaseComponent/AreYouSureModal";
 import { NavDropdown } from "react-bootstrap";
 import MoreHorizIcon from "@mui/icons-material/MoreHoriz";
 import EditIcon from "@mui/icons-material/Edit";
+import LoadingCss from "@/app/BaseComponent/LoadingCss";
+import DeleteIcon from "@mui/icons-material/Delete";
+import LockIcon from "@mui/icons-material/Lock";
 
 const NavDropDown = styled(NavDropdown)`
   .dropdown-menu {
@@ -30,8 +38,6 @@ const NavBarInsideDiv = styled.div`
   flex-direction: column;
   justify-content: space-between;
 `;
-
-
 
 const EditUserModal = styled(Modal)`
   .modal-dialog {
@@ -68,7 +74,6 @@ const EditUserModal = styled(Modal)`
   }
 `;
 
-
 const DeleteButtonStyle = styled.button`
   border: none;
   padding: 3px 5px !important;
@@ -81,25 +86,68 @@ const DeleteButtonStyle = styled.button`
   }
 `;
 
+const RoleDivGridStyle = styled.div`
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  grid-gap: 6px;
+  background-color: white;
+  padding: 10px;
+  border-radius: 4px;
+`;
+
 function EditUserBtnfunction({ data, setDataUpdated, setConfirmModal }) {
   const dispatch = useDispatch();
+
+  const [rolesData, setRolesData] = useState(null);
+  const [selectedValues, setSelectedValues] = useState([]);
+  const [loadingConfirmEdit, setLoadingConfirmEdit] = useState(false);
+  const [loadingDelete, setLoadingDelete] = useState(false);
+
+  const [updateData, setUpdateData] = useState(false);
+
   const [showEditModal, setShowEditModal] = useState(false);
   const [userData, setUserData] = useState({});
   const [factorType, setFactorType] = useState("");
   const [whereLogin, setWhereLogin] = useState("");
-  const [rolesChange, setrolesChange] = useState("");
+
   const [deleteCode, setDeleteCode] = useState("");
+
+  const [isButtonDisabled, setIsButtonDisabled] = useState(true);
+  const [firstPassword, setfirstPassword] = useState("");
+  const [secondPassword, setSecondPassword] = useState("");
+
+  const [hideAcceseebility, setHideAcceseebility] = useState(true);
+
+  useEffect(() => {
+    if (
+      firstPassword === secondPassword &&
+      firstPassword.length >= 4 &&
+      secondPassword.length >= 4
+    ) {
+      setIsButtonDisabled(false);
+    } else {
+      setIsButtonDisabled(true);
+    }
+  }, [firstPassword, secondPassword]);
+
+  useEffect(() => {
+    if (whereLogin == 1) {
+      setHideAcceseebility(false);
+    } else {
+      setHideAcceseebility(true);
+    }
+  }, [whereLogin]);
 
   // modals state
   const [openModal, setOpenModal] = useState(false);
   const closeModal = () => setOpenModal(false);
 
+  const [modalEditPassword, setModalEditPassword] = useState(false);
+
+  const handleCloseEditModalPassword = () => setModalEditPassword(false);
+
   const handleDomainChange = (event) => {
     setWhereLogin(event.target.value);
-  };
-
-  const handleRoleChange = (event) => {
-    setrolesChange(event.target.value);
   };
 
   const handleActiveStateChange = (event) => {
@@ -110,18 +158,9 @@ function EditUserBtnfunction({ data, setDataUpdated, setConfirmModal }) {
     setUserData(data || {});
     setFactorType(data?.active);
     setWhereLogin(data?.domain);
-    setrolesChange(data?.userRoles[0]?.role?.name || 3);
-  }, [data, showEditModal]);
 
-  useEffect(() => {
-    if (rolesChange == "admin") {
-      setrolesChange(2);
-    } else if (rolesChange == "master") {
-      setrolesChange(1);
-    } else if (rolesChange == "customer") {
-      setrolesChange(3);
-    }
-  }, [rolesChange]);
+    setSelectedValues(data?.userRoles?.map((item) => item.role.id) || [3]);
+  }, [data]);
 
   const handleEditModalClose = () => {
     setShowEditModal(false);
@@ -134,6 +173,16 @@ function EditUserBtnfunction({ data, setDataUpdated, setConfirmModal }) {
     setUserData((prevData) => ({ ...prevData, [name]: value }));
   };
 
+  const handleInputChangeFirstPassword = (event) => {
+    const value = event.target.value;
+    setfirstPassword(value);
+  };
+
+  const handelInputChangeSecondPassword = (event) => {
+    const value = event.target.value;
+    setSecondPassword(value);
+  };
+
   const areYouShureFunction = (e, { code }) => {
     e.preventDefault();
     setDeleteCode(code);
@@ -141,40 +190,102 @@ function EditUserBtnfunction({ data, setDataUpdated, setConfirmModal }) {
   };
 
   const handleDeleteUser = async () => {
-    const deleteUserApiCall = await dispatch(
-      deleteUser({ code: deleteCode })
-    ).unwrap();
+    try {
+      setLoadingDelete(true);
 
-    setOpenModal(false);
-    setDataUpdated(true);
-    if (deleteUserApiCall.statusCode == 200) {
-      setConfirmModal(true);
+      const deleteUserApiCall = await dispatch(
+        deleteUser({ code: deleteCode })
+      ).unwrap();
+
+      setOpenModal(false);
+      setDataUpdated(true);
+      if (deleteUserApiCall.statusCode == 200) {
+        setConfirmModal(true);
+      }
+    } catch (error) {
+      console.error("Error deleting user:", error);
+    } finally {
+      setLoadingDelete(false);
     }
   };
 
   const handleEditSubmit = async (event) => {
     event.preventDefault();
+    try {
+      setLoadingConfirmEdit(true);
+      const sendingEditUser = await dispatch(
+        editUser({
+          code: userData?.code,
+          firstName: userData.firstName,
+          lastName: userData.lastName,
+          username: userData.username,
+          active: factorType,
+          domain: whereLogin,
+          roleIds: selectedValues,
+        })
+      ).unwrap();
 
-    const sendingEditUser = await dispatch(
-      editUser({
-        code: userData?.code,
-        firstName: userData.firstName,
-        lastName: userData.lastName,
-        username: userData.username,
-        active: factorType,
-        domain: whereLogin,
-        roleIds: [rolesChange],
-      })
-    ).unwrap();
+      if (sendingEditUser.statusCode == 200) {
+        setConfirmModal(true);
+      }
 
-    setDataUpdated(true);
-    console.log(sendingEditUser);
-    handleEditModalClose();
+      setDataUpdated(true);
+
+      handleEditModalClose();
+    } catch (error) {
+      console.error("Error editing user:", error);
+    } finally {
+      setLoadingConfirmEdit(false);
+    }
   };
+
+  const handleChangePassword = async (event) => {
+    event.preventDefault();
+    try {
+      setLoadingConfirmEdit(true);
+
+      const SendingEditUserAPI = await dispatch(
+        editUserPassword({ code: userData?.code, password: secondPassword })
+      );
+
+      if (SendingEditUserAPI.statusCode == 200) {
+        setConfirmModal(true);
+      }
+
+      console.log(SendingEditUserAPI);
+
+      setDataUpdated(true);
+      handleCloseEditModalPassword();
+    } catch (error) {
+      console.error("Error editing user:", error);
+    } finally {
+      setLoadingConfirmEdit(false);
+    }
+  };
+
+  const handleChange = (event) => {
+    const value = Number(event.target.value);
+
+    if (event.target.checked) {
+      // Add to selectedValues if checked
+      setSelectedValues((prev) => [...prev, value]);
+    } else {
+      // Remove from selectedValues if unchecked
+      setSelectedValues((prev) => prev.filter((v) => v !== value));
+    }
+  };
+
+  useEffect(() => {
+    const GettingRoles = async () => {
+      const ReturnDataApi = await dispatch(gettingAllRoles()).unwrap();
+      setRolesData(ReturnDataApi);
+      setUpdateData(false);
+    };
+    GettingRoles();
+  }, [dispatch, updateData]);
 
   return (
     <>
-
       <NavDropDown
         title={
           <>
@@ -194,7 +305,7 @@ function EditUserBtnfunction({ data, setDataUpdated, setConfirmModal }) {
           <div
             onClick={handleEditModalShow}
             style={{
-              
+              borderBottom: "1px solid black",
               cursor: "pointer",
             }}
             className="d-flex flex-row gap-2 align-items-center pb-1"
@@ -202,14 +313,41 @@ function EditUserBtnfunction({ data, setDataUpdated, setConfirmModal }) {
             <div style={{ color: "#F3802C" }}>
               <EditIcon className="subitem" />
             </div>
-            <p className="NormalTextSizing text-end" >ویرایش</p>
+            <p className="NormalTextSizing text-end">ویرایش</p>
           </div>
 
-          
+          <div
+            onClick={() => setModalEditPassword(true)}
+            style={{
+              borderBottom: "1px solid black",
+              cursor: "pointer",
+            }}
+            className="d-flex flex-row gap-2 align-items-center pb-1 pt-1"
+          >
+            <div style={{ color: "#F3802C" }}>
+              <LockIcon className="subitem" />
+            </div>
+            <p className="NormalTextSizing text-end">تغییر رمز</p>
+          </div>
+
+          <div
+            onClick={(e) => areYouShureFunction(e, { code: userData?.code })}
+            style={{
+              cursor: "pointer",
+            }}
+            className="d-flex flex-row gap-2 align-items-center mt-2"
+          >
+            <div style={{ color: "#F3802C" }}>
+              <DeleteIcon className="text-danger subitem" />
+            </div>
+            <p className="NormalTextSizing text-end">
+              {loadingDelete ? <LoadingCss /> : "حذف اکانت"}
+            </p>
+          </div>
         </NavBarInsideDiv>
         <div className="d-flex justify-content-end"></div>
       </NavDropDown>
-      
+
       <EditUserModal show={showEditModal} onHide={handleEditModalClose}>
         <Modal.Header closeButton>
           <Modal.Title>ویرایش کاربر</Modal.Title>
@@ -247,15 +385,15 @@ function EditUserBtnfunction({ data, setDataUpdated, setConfirmModal }) {
               />
             </div>
             <div className="form-group">
-              <label className="mb-1 me-1" htmlFor="age">
+              <label className="mb-1 me-1" htmlFor="username">
                 شماره همراه
               </label>
               <input
                 type="number"
-                id="age"
+                id="username"
                 className="form-control"
                 placeholder="شماره همراه"
-                name="age"
+                name="username"
                 value={userData.username || ""}
                 onChange={handleInputChange}
                 required
@@ -293,7 +431,8 @@ function EditUserBtnfunction({ data, setDataUpdated, setConfirmModal }) {
                 <option value="2">ادمین و سایت</option>
               </select>
             </div>
-            <div className="form-group">
+
+            {/* <div className="form-group">
               <label className="mb-1 me-1" htmlFor="rolesChange">
                 دسترسی
               </label>
@@ -309,23 +448,110 @@ function EditUserBtnfunction({ data, setDataUpdated, setConfirmModal }) {
                 <option value="2">ادمین</option>
                 <option value="3">مشتری</option>
               </select>
-            </div>
+            </div> */}
+            {hideAcceseebility && (
+              <div className="form-group">
+                <label className="mb-1 me-1">سطح دسترسی</label>
+                <RoleDivGridStyle className="mt-2">
+                  {rolesData?.map((item, index) => (
+                    <label
+                      key={index}
+                      className="d-flex flex-row align-items-center gap-2"
+                    >
+                      <input
+                        type="checkbox"
+                        value={item.id}
+                        onChange={handleChange}
+                        checked={selectedValues.includes(item.id)}
+                      />
+                      <div>{item.name}</div>
+                    </label>
+                  ))}
+                </RoleDivGridStyle>
+              </div>
+            )}
+
             <div className="d-flex flex-row justify-content-between">
               <Button variant="primary" type="submit">
-                ذخیره
+                {loadingConfirmEdit ? <LoadingCss /> : "ذخیره"}
               </Button>
-              <DeleteButtonStyle
+              {/* <DeleteButtonStyle
                 type="button"
-                onClick={(e) =>
-                  areYouShureFunction(e, { code: userData?.code })
-                }
+                
               >
-                حذف اکانت
-              </DeleteButtonStyle>
+                {loadingDelete ? <LoadingCss /> : "حذف اکانت"}
+              </DeleteButtonStyle> */}
             </div>
           </form>
         </Modal.Body>
       </EditUserModal>
+
+      <EditUserModal
+        show={modalEditPassword}
+        onHide={() => setModalEditPassword(false)}
+      >
+        <Modal.Header closeButton>
+          <Modal.Title>تغییر رمز اکانت</Modal.Title>
+        </Modal.Header>
+
+        <Modal.Body>
+          <form onSubmit={handleChangePassword}>
+            <div className="form-group">
+              <label
+                className="mb-1 me-1 NormalTextSizing"
+                htmlFor="firstPassword"
+              >
+                پسورد جدید
+              </label>
+              <input
+                type="password"
+                id="firstPassword"
+                className="form-control NormalTextSizing"
+                placeholder="پسورد جدید"
+                name="firstName"
+                value={firstPassword}
+                onChange={handleInputChangeFirstPassword}
+                required
+              />
+            </div>
+            <div className="form-group">
+              <label
+                className="mb-1 me-1 NormalTextSizing"
+                htmlFor="secondPassword"
+              >
+                تایید پسورد
+              </label>
+              <input
+                type="password"
+                id="secondPassword"
+                className="form-control NormalTextSizing"
+                placeholder="تایید پسورد"
+                name="secondPassword"
+                value={secondPassword}
+                onChange={handelInputChangeSecondPassword}
+                required
+              />
+            </div>
+
+            <div className="d-flex flex-row justify-content-between">
+              <Button
+                className="NormalTextSizing"
+                disabled={isButtonDisabled}
+                style={{
+                  backgroundColor: isButtonDisabled ? "#868686" : "",
+                  border: isButtonDisabled ? "#868686" : "",
+                  cursor: isButtonDisabled ? "not-allowed" : "pointer",
+                }}
+                variant="primary"
+                type="submit"
+              >
+                {loadingConfirmEdit ? <LoadingCss /> : "ذخیره"}
+              </Button>
+            </div>
+          </form>
+        </Modal.Body>
+      </EditUserModal>
+
       {/* modals */}
       <AreYouShureModal
         open={openModal}

@@ -60,6 +60,43 @@ const LABELIMAGEUPLOAD = styled.label`
   width: fit-content;
 `;
 
+const BUTTONSSTYLE = styled.div`
+  display: flex;
+  width: 100%;
+
+  .confirmButtonStyle,
+  .cancelButtonStyle {
+    font-size: 14px;
+    padding: 10px 32px;
+    border-radius: 10px;
+    font-weight: 500;
+    transition: 160ms ease;
+  }
+
+  .confirmButtonStyle {
+    background: #43a047;
+    color: #fff;
+    border: none;
+
+    &:hover {
+      background: #3a8c3e;
+      transform: translateY(-1px);
+    }
+  }
+
+  .cancelButtonStyle {
+    background: #fafafa;
+    border: 1px solid #d0d0d0;
+    color: #444;
+
+    &:hover {
+      background: #f0f0f0;
+      border-color: #bdbdbd;
+      transform: translateY(-1px);
+    }
+  }
+`;
+
 const FORMCONTROLLABEL = styled(FormControlLabel)`
   .css-ahj2mt-MuiTypography-root {
     font-family: unset;
@@ -71,7 +108,7 @@ import { useDispatch } from "react-redux";
 import { uploadFile } from "@/app/Store/thunks";
 import { blogspot } from "@/app/Store/thunks";
 
-export default function AddHonors() {
+export default function AddHonors({ setActiveKey }) {
   const dispatch = useDispatch();
 
   const [content, setContent] = useState("");
@@ -572,15 +609,23 @@ export default function AddHonors() {
           />
         </div>
 
-        <Button
-          style={{ fontFamily: "unset" }}
-          type="submit"
-          variant="contained"
-          color="primary"
-          className="mt-3"
-        >
-          تایید
-        </Button>
+        <BUTTONSSTYLE className="d-flex justify-content-around">
+          <button
+            // style={{ fontFamily: "unset" }}
+            type="submit"
+            variant="contained"
+            className="mt-3 confirmButtonStyle"
+          >
+            تایید
+          </button>
+          <button
+            className="cancelButtonStyle mt-3"
+            type="button"
+            onClick={() => setActiveKey("editUserPage")}
+          >
+            انصراف
+          </button>
+        </BUTTONSSTYLE>
 
         {/* modals */}
         <AreYouShureModal

@@ -107,7 +107,6 @@ const FixTablePlace = styled.div`
     .tabelStyle {
       border-collapse: separate;
       border-radius: 12px;
-      overflow: hidden;
       width: 100%;
       th,
       td {

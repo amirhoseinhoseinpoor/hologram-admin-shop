@@ -10,6 +10,10 @@ import CustomCloseButton from "../BaseComponent/CustomCloseButton.js";
 import { DndProvider } from "react-dnd";
 import { HTML5Backend } from "react-dnd-html5-backend";
 
+// import redux
+import { useSelector } from "react-redux";
+import { permissions } from "../Store/slice.js";
+
 // mui icons import
 import SpaceDashboardIcon from "@mui/icons-material/SpaceDashboard";
 import ListAltIcon from "@mui/icons-material/ListAlt";
@@ -24,6 +28,8 @@ import PeopleIcon from "@mui/icons-material/People";
 import SettingsIcon from "@mui/icons-material/Settings";
 import PersonIcon from "@mui/icons-material/Person";
 import ArrowDropDownIcon from "@mui/icons-material/ArrowDropDown";
+import AccessibilityIcon from "@mui/icons-material/Accessibility";
+import { Box } from "@mui/material";
 
 // import components
 const DefineUser = lazy(() =>
@@ -102,10 +108,94 @@ const HeaderMainComponent = dynamic(
   }
 );
 
+const AccessibilityMainComponent = dynamic(
+  () =>
+    import("../eachPageComponent/Accessibility/AccessibilityMainComponent.js"),
+  {
+    ssr: false,
+    loading: () => <p>Loading...</p>,
+  }
+);
+
 const AdminPanel = () => {
+  const permission = useSelector(permissions);
+
+  console.log(permission);
+
   const [activeTab, setActiveTab] = useState("Product");
-  // State to manage visibility of all off-canvas elements dynamically
   const [visibility, setVisibility] = useState({});
+
+  const tabs = [
+    { id: "Doshbord", title: "داشبورد", icon: <SpaceDashboardIcon /> },
+    { id: "Orders", title: "سفارشات", icon: <ListAltIcon /> },
+    { id: "separator1", isDecorative: true },
+    {
+      id: "settingsHeader",
+      isDecorative: true,
+      title: (
+        <div
+          style={{ cursor: "default" }}
+          className="d-flex flex-row justify-content-between"
+        >
+          <div>
+            <SettingsIcon /> تنظیمات
+          </div>
+          <div>
+            <ArrowDropDownIcon />
+          </div>
+        </div>
+      ),
+    },
+    { id: "header", style: "pe-2", title: "ساخت هدر", icon: <PatternIcon /> },
+    {
+      id: "Product",
+      style: "pe-2",
+      title: "محصولات",
+      icon: <StorefrontIcon />,
+    },
+    { id: "Blogs", style: "pe-2", title: "مقالات", icon: <BookIcon /> },
+    {
+      id: "Honors",
+      style: "pe-2",
+      title: "افتخارات",
+      icon: <MilitaryTechIcon />,
+    },
+    {
+      id: "Exhibition",
+      style: "pe-2",
+      title: "نمایشگاه ها",
+      icon: <BalconyIcon />,
+    },
+    { id: "Banner", style: "pe-2", title: "بنر", icon: <ViewArrayIcon /> },
+    { id: "Video", style: "pe-2", title: "ویدیو", icon: <VideocamIcon /> },
+    {
+      id: "defineUser",
+      style: "pe-2",
+      title: "کاربر های سیستم",
+      icon: <PersonIcon />,
+    },
+    {
+      id: "customerUser",
+      style: "pe-2",
+      title: "مدیریت مشتریان",
+      icon: <PeopleIcon />,
+    },
+    {
+      id: "Accessibility",
+      style: "pe-2",
+      title: "سطح دسترسی ها",
+      icon: <AccessibilityIcon />,
+    },
+  ];
+
+  // Filter only functional tabs based on permissions
+  const filteredTabs = tabs.filter(
+    (tab) =>
+      tab.isDecorative ||
+      permission?.some((permission) => permission.htmlId === tab.id)
+  );
+
+  console.log(filteredTabs);
 
   // Function to close a specific off-canvas
   const handleClose = (key) => {
@@ -120,7 +210,18 @@ const AdminPanel = () => {
   return (
     <section className={` ${style.adminPanel}`}>
       <aside className={`${style.sidebar} d-lg-flex d-none me-2 my-2`}>
-        <h4 className={`${style.titleStyleHeader} title`}>Logo</h4>
+        <h4 className={`${style.titleStyleHeader} title`}>
+          <Box
+            component="img"
+            sx={{
+              width: "70px",
+              height: "100%",
+              objectFit: "cover",
+            }}
+            alt="image."
+            src="/LOGO/cropped-com.chakavak.adv_512x512.png"
+          />
+        </h4>
 
         <Tabs
           activeKey={activeTab}
@@ -128,123 +229,33 @@ const AdminPanel = () => {
           id="admin-tabs1"
           className={`${style.sidebarMain} discription mt-3`}
         >
-          <Tab
-            eventKey="Doshbord"
-            title={
-              <>
-                <SpaceDashboardIcon /> داشبورد
-              </>
-            }
-          ></Tab>
-
-          <Tab
-            eventKey="Orders"
-            title={
-              <>
-                <ListAltIcon /> سفارشات
-              </>
-            }
-          ></Tab>
-
-          <Tab title={<div className={style.addBorderSideBar}></div>} />
-
-          <Tab
-            title={
-              <div
-                style={{ cursor: "default" }}
-                className="d-flex flex-row justify-content-between"
-              >
-                <div>
-                  <SettingsIcon /> تنظیمات
-                </div>
-                <div>
-                  <ArrowDropDownIcon />
-                </div>
-              </div>
-            }
-          />
-
-          <Tab
-            eventKey="header"
-            title={
-              <div className="pe-2">
-                <PatternIcon /> ساخت هدر
-              </div>
-            }
-          ></Tab>
-          <Tab
-            eventKey="Product"
-            title={
-              <div className="pe-2">
-                <StorefrontIcon /> محصولات
-              </div>
-            }
-          ></Tab>
-          <Tab
-            eventKey="Blogs"
-            title={
-              <div className="pe-2">
-                <BookIcon /> مقالات
-              </div>
-            }
-          ></Tab>
-          <Tab
-            eventKey="Honors"
-            title={
-              <div className="pe-2">
-                <MilitaryTechIcon /> افتخارات
-              </div>
-            }
-          ></Tab>
-          <Tab
-            eventKey="Exhibition"
-            title={
-              <div className="pe-2">
-                <BalconyIcon /> نمایشگاه ها
-              </div>
-            }
-          ></Tab>
-          <Tab
-            eventKey="Banner"
-            title={
-              <div className="pe-2">
-                <ViewArrayIcon /> بنر
-              </div>
-            }
-          ></Tab>
-          <Tab
-            eventKey="Video"
-            title={
-              <div className="pe-2">
-                <VideocamIcon /> ویدیو
-              </div>
-            }
-          ></Tab>
-          <Tab
-            eventKey="defineUser"
-            title={
-              <div className="pe-2">
-                <PersonIcon /> کاربر های سیستم
-              </div>
-            }
-          ></Tab>
-          <Tab
-            eventKey="customerUser"
-            title={
-              <div className="pe-2">
-                <PeopleIcon /> مدیریت مشتریان
-              </div>
-            }
-          ></Tab>
+          {filteredTabs.map((tab) =>
+            tab.isDecorative ? (
+              // Render decorative tabs
+              <Tab
+                key={tab.id}
+                title={
+                  tab.title || <div className={style.addBorderSideBar}></div>
+                }
+              />
+            ) : (
+              // Render functional tabs
+              <Tab
+                key={tab.id}
+                eventKey={tab.id}
+                title={
+                  <div className={`${tab.style}`}>
+                    {tab.icon} {tab.title}
+                  </div>
+                }
+              />
+            )
+          )}
         </Tabs>
       </aside>
 
       <div className={`${style.content}`}>
         <div className="w-100 ">
-          {/* <div className="d-block d-lg-none">
-            <NavBarToggleBurgerButton func={() => toggleShow("main")}/>
-          </div> */}
-
           <Navbar.Offcanvas
             placement="end"
             className={` ${style.navbaritemheader}`}
@@ -256,7 +267,18 @@ const AdminPanel = () => {
               className={`${style.offcanvasheader} ${style.nextoffcanvas} ${style.offcanvasHeaderResponsive} justify-content-between position-relative`}
               closeButton={false}
             >
-              <Offcanvas.Title className="me-2">لوگو</Offcanvas.Title>
+              <Offcanvas.Title className="me-2">
+                <Box
+                  component="img"
+                  sx={{
+                    width: "40px",
+                    height: "100%",
+                    objectFit: "cover",
+                  }}
+                  alt="image."
+                  src="/LOGO/cropped-com.chakavak.adv_512x512.png"
+                />
+              </Offcanvas.Title>
               <CustomCloseButton
                 className="me-2"
                 color={"#262626"}
@@ -275,7 +297,32 @@ const AdminPanel = () => {
                 id="admin-tabs2"
                 className={`${style.sidebarMain} NormalTextSizing`}
               >
-                <Tab
+                {filteredTabs.map((tab) =>
+                  tab.isDecorative ? (
+                    // Render decorative tabs
+                    <Tab
+                      key={tab.id}
+                      title={
+                        tab.title || (
+                          <div className={style.addBorderSideBar}></div>
+                        )
+                      }
+                    />
+                  ) : (
+                    // Render functional tabs
+                    <Tab
+                      key={tab.id}
+                      eventKey={tab.id}
+                      title={
+                        <div className={`${tab.style}`}>
+                          {tab.icon} {tab.title}
+                        </div>
+                      }
+                    />
+                  )
+                )}
+
+                {/* <Tab
                   eventKey="Doshbord"
                   title={
                     <>
@@ -381,7 +428,7 @@ const AdminPanel = () => {
                       <PeopleIcon /> مدیریت مشتریان
                     </div>
                   }
-                ></Tab>
+                ></Tab> */}
               </Tabs>
             </Nav>
           </Navbar.Offcanvas>
@@ -448,6 +495,11 @@ const AdminPanel = () => {
             <Suspense fallback={<div>Loading...</div>}>
               <CustomerUser toggleShow={toggleShow} />
             </Suspense>
+          </div>
+        )}
+        {activeTab === "Accessibility" && (
+          <div className={style.tabContent}>
+            <AccessibilityMainComponent toggleShow={toggleShow} />
           </div>
         )}
       </div>

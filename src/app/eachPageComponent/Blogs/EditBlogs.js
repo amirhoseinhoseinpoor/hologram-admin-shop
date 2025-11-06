@@ -20,21 +20,41 @@ import { blogsEdit } from "@/app/Store/thunks";
 import { blogsDeleted } from "@/app/Store/thunks";
 
 const BUTTONSSTYLE = styled.div`
+  display: flex;
+  width: 100%;
+
+  .confirmButtonStyle,
   .cancelButtonStyle {
-    color: #48abf7;
-    background-color: rgba(72, 171, 247, 0.1);
+    font-size: 14px;
+    padding: 10px 32px;
+    border-radius: 10px;
+    font-weight: 500;
+    transition: 160ms ease;
   }
 
-  .deleteButtonStyle {
-    color: #ff4f3f !important;
-    background-color: transparent;
-  }
   .confirmButtonStyle {
-    color: white;
-    background-color: #1572e8;
+    background: #43a047;
+    color: #fff;
+    border: none;
+
+    &:hover {
+      background: #3a8c3e;
+      transform: translateY(-1px);
+    }
+  }
+
+  .cancelButtonStyle {
+    background: #fafafa;
+    border: 1px solid #d0d0d0;
+    color: #444;
+
+    &:hover {
+      background: #f0f0f0;
+      border-color: #bdbdbd;
+      transform: translateY(-1px);
+    }
   }
 `;
-
 const TEXTFIELD = styled(TextField)`
   .MuiInputBase-input {
     padding: 10px;

@@ -11,34 +11,56 @@ import styled from "styled-components";
 import { Box } from "@mui/material";
 
 const BorderInputBox = styled.div`
-  border: 2px solid #c0c0c0;
-  border-radius: 6px;
+  padding: 1.25rem;
+  border: 1px solid rgba(0, 0, 0, 0.05);
+  border-radius: 14px;
+  background: #ffffff;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.06);
+  gap: 1rem;
 `;
 
 const BOX = styled(Box)`
-  /* max-width: 200px;
-  max-height: 200px; */
   width: 100%;
-  border-radius: 4px;
+  /* width: 180px; */
+  border-radius: 8px;
+  overflow: hidden;
+  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.08);
 `;
 
 const BUTTONSSTYLE = styled.div`
+  display: flex;
+  width: 100%;
+
+  .confirmButtonStyle,
   .cancelButtonStyle {
-    color: #e91e63;
-    background-color: unset;
-    border: 1px solid #e91e63;
-    padding-right: 10px;
-    padding-left: 10px;
+    font-size: 14px;
+    padding: 10px 32px;
+    border-radius: 10px;
+    font-weight: 500;
+    transition: 160ms ease;
   }
 
-  .deleteButtonStyle {
-    color: #ff4f3f !important;
-    background-color: transparent;
-  }
   .confirmButtonStyle {
-    padding: 0 60px;
-    color: white;
-    background-color: #43a047;
+    background: #43a047;
+    color: #fff;
+    border: none;
+
+    &:hover {
+      background: #3a8c3e;
+      transform: translateY(-1px);
+    }
+  }
+
+  .cancelButtonStyle {
+    background: #fafafa;
+    border: 1px solid #d0d0d0;
+    color: #444;
+
+    &:hover {
+      background: #f0f0f0;
+      border-color: #bdbdbd;
+      transform: translateY(-1px);
+    }
   }
 `;
 
@@ -48,14 +70,29 @@ const DivAdjustColorDivs = styled.div`
   grid-gap: 10px;
   /* width: fit-content; */
   .labelInsteadOfInput {
-    border: 1px solid #c0c0c0;
+    /* border: 1px solid #c0c0c0;
     border-radius: 4px;
     padding: 10px;
     width: 100%;
     height: 100%;
     display: flex;
     justify-content: center;
+    align-items: center; */
+    border: 1px dashed #c8c8c8;
+    border-radius: 10px;
+    padding: 16px;
+    width: 100%;
+    min-height: 120px;
+    cursor: pointer;
+    display: flex;
+    justify-content: center;
     align-items: center;
+    transition: 150ms ease;
+
+    &:hover {
+      border-color: #9a9a9a;
+      background: #fafafa;
+    }
   }
   .colorTheInputFile {
     color: #404040;
@@ -77,6 +114,25 @@ const HeaderSection = styled.div`
   background-color: rgb(225, 223, 223);
   border-radius: 4px;
   padding: 10px;
+  border-bottom: 1px solid #e4e4e4;
+  background-color: #f7f7f7;
+  padding: 12px 16px;
+  border-radius: 10px 10px 0 0;
+
+  button {
+    background: #43a047;
+    border: none;
+    color: #fff;
+    padding: 6px 18px;
+    font-size: 14px;
+    border-radius: 8px;
+    transition: 160ms ease;
+
+    &:hover {
+      background: #3b8b3f;
+      transform: translateY(-1px);
+    }
+  }
 `;
 
 export default function AddHonors({ setActiveKey }) {

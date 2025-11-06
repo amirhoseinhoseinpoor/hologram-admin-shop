@@ -14,32 +14,44 @@ import Tabs from "react-bootstrap/Tabs";
 import AreYouShureModal from "@/app/BaseComponent/AreYouSureModal";
 import ConfirmModal from "@/app/BaseComponent/ConfirmingModal";
 import ErrorModal from "@/app/BaseComponent/ErrorModal";
+// import utiles
+import { fixTitleSize } from "@/app/utils/fixTitleSize";
 
 // Styled Components
 const BUTTONSSTYLE = styled.div`
+  display: flex;
+  width: 100%;
+
+  .confirmButtonStyle,
   .cancelButtonStyle {
-    color: #48abf7;
-    background-color: rgba(72, 171, 247, 0.1);
-    border: none;
-    padding: 8px 16px;
-    border-radius: 4px;
-    cursor: pointer;
+    font-size: 14px;
+    padding: 10px 32px;
+    border-radius: 10px;
+    font-weight: 500;
+    transition: 160ms ease;
   }
 
-  .deleteButtonStyle {
-    color: #ff4f3f !important;
-    background-color: transparent;
-    border: none;
-    padding: 8px 16px;
-    cursor: pointer;
-  }
   .confirmButtonStyle {
-    color: white;
-    background-color: #1572e8;
+    background: #43a047;
+    color: #fff;
     border: none;
-    padding: 8px 16px;
-    border-radius: 4px;
-    cursor: pointer;
+
+    &:hover {
+      background: #3a8c3e;
+      transform: translateY(-1px);
+    }
+  }
+
+  .cancelButtonStyle {
+    background: #fafafa;
+    border: 1px solid #d0d0d0;
+    color: #444;
+
+    &:hover {
+      background: #f0f0f0;
+      border-color: #bdbdbd;
+      transform: translateY(-1px);
+    }
   }
 `;
 
@@ -64,36 +76,81 @@ const BOX = styled(Box)`
   border-radius: 4px;
 `;
 
+const BoxFirstSection = styled(Box)`
+  max-height: 120px;
+  border-radius: 4px;
+  height: 100%;
+`;
+
 const DivAdjustColorDivs = styled.div`
   display: grid;
   grid-template-columns: ${(props) => props.columns || "1fr"};
-  grid-gap: 18px;
+  gap: 20px;
   width: 100%;
+
+  background: #ffffff;
   padding: 15px;
-  .labelInsteadOfInput {
-    border: 1px solid #c0c0c0;
-    border-radius: 4px;
+  margin-top:15px;
+  border-radius: 14px;
+  border: 1px solid #e7e7e7;
+  box-shadow: 0 4px 14px rgba(0,0,0,0.04);
+
+  .dropDownSpecoficStyle {
+    border: 1px solid #d9d9d9;
+    border-radius: 10px;
+    background: #fafafa;
     padding: 10px;
+  }
+
+  .dropDownSpecoficStyleHeader {
+    border-bottom: none;
+    background: #f4f4f6;
+    font-weight: 600;
+    padding: 10px 14px;
+    border-radius: 10px;
+  }
+
+  .labelInsteadOfInput {
+    border: 1px solid #d9d9d9;
+    border-radius: 12px;
+    padding: 14px;
     width: 100%;
-    height: 77%;
+    background: #fafafa;
+    transition: 150ms;
     display: flex;
     justify-content: center;
     align-items: center;
     cursor: pointer;
+
+    &:hover {
+      border-color: #bdbdbd;
+      background: #f1f1f1;
+    }
   }
+
   .colorTheInputFile {
-    color: #404040;
+    color: #474747;
     margin: 0;
   }
+
   @media (max-width: 768px) {
-    grid-template-columns: ${(props) => props.recolumns || ""};
+    grid-template-columns: ${(props) => props.recolumns || "1fr"};
+    padding: 14px;
   }
 `;
 
 const DivAdjustGrodimageMedia = styled.div`
+  background: #ffffff;
+  padding: 15px;
+  margin-top:15px;
+  border-radius: 14px;
+  border: 1px solid #e7e7e7;
+  box-shadow: 0 4px 14px rgba(0,0,0,0.04);
+  
+  /* padding: 10px; */
   display: grid;
-  grid-template-columns: repeat(2, 1fr);
-  grid-gap: 20px;
+  grid-template-columns: repeat(1, 1fr);
+  grid-gap: 6px;
   width: 100%;
 
   @media (max-width: 768px) {
@@ -104,6 +161,17 @@ const DivAdjustGrodimageMedia = styled.div`
 const SelectWidth = styled.select`
   width: 50%;
 
+  border: none;
+  border-radius: 4px;
+  padding: 3px 6px;
+  &:focus {
+    outline: none;
+  }
+
+  &:focus-visible {
+    outline: none;
+  }
+
   @media (max-width: 768px) {
     width: 75%;
   }
@@ -113,8 +181,9 @@ const NavTabs = styled(Tabs)`
   display: flex;
   flex-direction: row;
   border-bottom: none;
-  gap: 14px;
+  gap: 10px;
   width: 100%;
+  border-bottom: 1px solid #191919;
 
   .nav-item {
     border-radius: 10px !important;
@@ -127,7 +196,7 @@ const NavTabs = styled(Tabs)`
     border-radius: 10px !important;
     color: #191919;
     width: 100%;
-    padding: 6px 11px;
+    padding: 5px 11px;
     position: relative;
     cursor: pointer;
   }
@@ -149,21 +218,30 @@ const NavTabs = styled(Tabs)`
 `;
 
 const AddSectionForm = styled.div`
-  border: 2px solid #ccc;
-  margin-bottom: 20px;
-  border-radius: 8px;
+   padding: 1.25rem;
+  border: 1px solid rgba(0, 0, 0, 0.05);
+  border-radius: 14px;
+  background: #ffffff;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.06);
+  gap: 1rem;
 `;
 
 const BorderInputBox = styled.div`
-  border: 2px solid #ccc;
-  margin-bottom: 20px;
-  border-radius: 8px;
+ padding: 1rem;
+  border: 1px solid rgba(0, 0, 0, 0.05);
+  border-radius: 14px;
+  background: #ffffff;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.06);
+  gap: 1rem;
 `;
 
 const DynamicSectionBox = styled.div`
-  border: 2px solid #ccc;
-  margin-bottom: 20px;
-  border-radius: 8px;
+  padding: 1.25rem;
+  border: 1px solid rgba(0, 0, 0, 0.05);
+  border-radius: 14px;
+  background: #ffffff;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.06);
+  gap: 1rem;
 `;
 
 const ButtonAddSection = styled.button`
@@ -176,7 +254,7 @@ const ResponsiveDivFileds = styled.div`
   grid-gap: 20px;
   width: 100%;
   .labelInsteadOfInput {
-    border: 1px solid #c0c0c0;
+    border: 1px solid #e7e7e7;
     border-radius: 4px;
     padding: 10px;
     width: 100%;
@@ -196,20 +274,74 @@ const ResponsiveDivFileds = styled.div`
 `;
 
 const ButtonCancelOrder = styled.button`
-  border: 1px solid #e91e63 !important;
-  color: #e91e63 !important;
+  background: #fafafa !important;
+  border: 1px solid #d0d0d0 !important;
+  color: #444 !important;
+
+  &:hover {
+    background: #f0f0f0 !important;
+    border-color: #bdbdbd !important;
+    transform: translateY(-1px);
+  }
 `;
 
 const HeaderEachSection = styled.div`
   background-color: rgb(225, 223, 223);
-  border-bottom: 2px solid #ccc;
+  /* border-bottom: 2px solid #ccc; */
   padding: 10px;
   border-radius: 4px;
   width: 100%;
 `;
 
+const DivHeaderInfoMedia = styled.div`
+  background-color: rgb(225, 223, 223);
+  padding: 7px;
+  border-radius: 4px;
+`;
+const HeaderModalShowAccessMainDiv = styled.div`
+  background-color: rgb(225, 223, 223);
+  border-top-right-radius: 10px;
+  border-top-left-radius: 10px;
+  .HeaderModalShowAccess {
+    padding: 10px;
+  }
+`;
+
+const MediaDivMainGrid = styled.div`
+  background: #ffffff;
+  padding: 15px;
+  margin-top:15px;
+  border-radius: 14px;
+  border: 1px solid #e7e7e7;
+  box-shadow: 0 4px 14px rgba(0,0,0,0.04);
+`;
+
+const modalStyle = {
+  position: "absolute",
+  top: "50%",
+  left: "50%",
+  transform: "translate(-50%, -50%)",
+  width: 400,
+  bgcolor: "background.paper",
+  boxShadow: 24,
+  borderRadius: 2,
+};
+
 const InsideAddSectionForm = styled.div`
   padding: 13px;
+`;
+
+const SelectStyle = styled.select`
+  border: none;
+  border-radius: 4px;
+  padding: 3px 6px;
+  &:focus {
+    outline: none;
+  }
+
+  &:focus-visible {
+    outline: none;
+  }
 `;
 
 export default function EditHonors({
@@ -237,7 +369,7 @@ export default function EditHonors({
   ]);
 
   const [filedOrder, setFiledOrder] = useState([
-    { type: "text", name: "", dropDownOP: [""] },
+    { type: "text", name: "", dropDownOP: [{ text: "", isChecked: false }] },
   ]);
 
   const [dynamicSections, setDynamicSections] = useState([]);
@@ -262,15 +394,6 @@ export default function EditHonors({
   const [objectUrls, setObjectUrls] = useState({});
   const [posterObjectUrls, setPosterObjectUrls] = useState({});
 
-  // Define top-level navigation titles to exclude
-  const excludedTopLevelTitles = [
-    "خانه",
-    "محصولات",
-    "مقالات",
-    "تماس با ما",
-    "درباره‌ی ما",
-  ];
-
   // Fetch Header and Product Data on Mount
   useEffect(() => {
     const fetchData = async () => {
@@ -292,23 +415,28 @@ export default function EditHonors({
     fetchData();
   }, [dispatch]);
 
-  // Flatten Header Items Excluding Specified Top-Level Titles
   useEffect(() => {
-    // Function to recursively flatten header items, excluding specified top-level titles
-    const flattenHeader = (items, isTopLevel = true) => {
+    const flattenHeader = (items, parentPath = "", isTopLevel = true) => {
       let flatList = [];
       items.forEach((item) => {
-        if (isTopLevel && excludedTopLevelTitles.includes(item.title)) {
-          // Skip adding this top-level item but process its subItems
-          if (item.subItems && item.subItems.length > 0) {
-            flatList = flatList.concat(flattenHeader(item.subItems, false));
+        if (isTopLevel) {
+          // Process subItems with full path but skip parent-level entry
+          if (item.subItems?.length) {
+            flatList = flatList.concat(
+              flattenHeader(item.subItems, item.title, false)
+            );
           }
         } else {
-          // Add the current item
-          flatList.push({ id: item.id, title: item.title });
-          // Process subItems if any
-          if (item.subItems && item.subItems.length > 0) {
-            flatList = flatList.concat(flattenHeader(item.subItems, false));
+          const currentPath = parentPath
+            ? `${parentPath} / ${item.title}`
+            : item.title;
+          // Only add final leaf nodes with full hierarchy
+          if (item.subItems?.length) {
+            flatList = flatList.concat(
+              flattenHeader(item.subItems, currentPath, false)
+            );
+          } else {
+            flatList.push({ id: item.id, title: currentPath });
           }
         }
       });
@@ -319,8 +447,9 @@ export default function EditHonors({
     const filteredItems = allHeaderItems.filter(
       (item) =>
         !usedNavIds.includes(item.id.toString()) ||
-        item?.id?.toString() === editedHonor?.navId?.toString()
+        item.id.toString() === editedHonor?.navId?.toString()
     );
+
     setAvailableItems(filteredItems);
     setSelectedNavId(editedHonor?.navId?.toString() || "");
   }, [headerCome, usedNavIds, editedHonor.navId]);
@@ -612,15 +741,65 @@ export default function EditHonors({
 
   // Handler to Add a New Dropdown Option
   const handleAddDropDownOption = (fieldIndex) => {
-    const updatedFiledOrder = [...filedOrder];
-    updatedFiledOrder[fieldIndex].dropDownOP.push("");
+    const updatedFiledOrder = filedOrder.map((field, index) => {
+      if (index === fieldIndex) {
+        return {
+          ...field,
+          dropDownOP: [...field.dropDownOP, { text: "", isChecked: false }], // Adding a new option with initial empty text
+        };
+      }
+      return field;
+    });
     setFiledOrder(updatedFiledOrder);
   };
 
   // Handler to Remove a Dropdown Option
   const handleRemoveDropDownOption = (fieldIndex, optionIndex) => {
-    const updatedFiledOrder = [...filedOrder];
-    updatedFiledOrder[fieldIndex].dropDownOP.splice(optionIndex, 1);
+    const updatedFiledOrder = filedOrder.map((field, index) => {
+      if (index === fieldIndex) {
+        return {
+          ...field,
+          dropDownOP: field.dropDownOP.filter((_, i) => i !== optionIndex), // Filter out the selected option
+        };
+      }
+      return field;
+    });
+    setFiledOrder(updatedFiledOrder);
+  };
+
+  const handleToggleDropDownOption = (fieldIndex, optIndex) => {
+    const updatedFiledOrder = filedOrder.map((field, index) => {
+      if (index === fieldIndex) {
+        return {
+          ...field,
+          dropDownOP: field.dropDownOP.map((option, optIdx) => {
+            if (optIdx === optIndex) {
+              return { ...option, isChecked: !option.isChecked }; // Toggle the isChecked property
+            }
+            return option;
+          }),
+        };
+      }
+      return field;
+    });
+    setFiledOrder(updatedFiledOrder);
+  };
+
+  const handleDropDownOptionTextChange = (fieldIndex, optIndex, text) => {
+    const updatedFiledOrder = filedOrder.map((field, index) => {
+      if (index === fieldIndex) {
+        return {
+          ...field,
+          dropDownOP: field.dropDownOP.map((option, optIdx) => {
+            if (optIdx === optIndex) {
+              return { ...option, text }; // Update text for the option
+            }
+            return option;
+          }),
+        };
+      }
+      return field;
+    });
     setFiledOrder(updatedFiledOrder);
   };
 
@@ -925,42 +1104,8 @@ export default function EditHonors({
         <div>
           {/* Add Section Form */}
           <AddSectionForm>
-            <HeaderEachSection>اضافه کردن بخش جدید</HeaderEachSection>
-            <InsideAddSectionForm className="d-flex flex-column gap-3">
-              <div className="d-flex flex-row gap-2 mt-3 align-items-center">
-                <label
-                  htmlFor="newSectionName"
-                  className="NormalTextSizing"
-                  style={{ whiteSpace: "nowrap" }}
-                >
-                  نام بخش:
-                </label>
-                <input
-                  type="text"
-                  id="newSectionName"
-                  value={newSectionName}
-                  onChange={(e) => setNewSectionName(e.target.value)}
-                  placeholder="نام بخش"
-                  className="form-control NormalTextSizing"
-                />
-              </div>
-              <div className="d-flex flex-row gap-2 mt-3 align-items-center">
-                <label
-                  htmlFor="newSectionType"
-                  style={{ whiteSpace: "nowrap" }}
-                >
-                  نوع بخش:
-                </label>
-                <select
-                  id="newSectionType"
-                  value={newSectionType}
-                  onChange={(e) => setNewSectionType(e.target.value)}
-                  className="form-select"
-                >
-                  <option value="text">متن</option>
-                  <option value="image">تصویر</option>
-                </select>
-              </div>
+            <HeaderEachSection className="NormalTextSizing d-flex flex-row align-items-center justify-content-between">
+              <p className="NormalTextSizing">مشخصه</p>
               <div className="d-flex justify-content-end">
                 <BUTTONADDSECTIONSTYLE
                   type="button"
@@ -968,6 +1113,125 @@ export default function EditHonors({
                 >
                   اضافه کردن بخش
                 </BUTTONADDSECTIONSTYLE>
+              </div>
+            </HeaderEachSection>
+            <InsideAddSectionForm className="d-flex flex-row gap-3">
+              <div className="w-50">
+                <div className="d-flex flex-column gap-1">
+                  <label
+                    htmlFor="newSectionName"
+                    className="NormalTextSizing"
+                    style={{ whiteSpace: "nowrap" }}
+                  >
+                    نام مشخصه:
+                  </label>
+                  <input
+                    type="text"
+                    id="newSectionName"
+                    value={newSectionName}
+                    onChange={(e) => setNewSectionName(e.target.value)}
+                    placeholder="نام مشخصه"
+                    className="form-control w-100"
+                  />
+                </div>
+                <div className="d-flex flex-column gap-1 mt-3">
+                  <label
+                    htmlFor="newSectionType"
+                    className="NormalTextSizing"
+                    style={{ whiteSpace: "nowrap" }}
+                  >
+                    نوع بخش:
+                  </label>
+                  <SelectStyle
+                    id="newSectionType"
+                    value={newSectionType}
+                    onChange={(e) => setNewSectionType(e.target.value)}
+                    className="w-100"
+                    required
+                  >
+                    <option value="text">متن</option>
+                    <option value="image">تصویر</option>
+                  </SelectStyle>
+                </div>
+                {/* <div>
+                              <ButtonAddSection
+                                className="bg-success text-white px-2 py-1 rounded"
+                                type="button"
+                                onClick={() => setModalthings(true)}
+                              >
+                                تعریف مقدار مشخصه
+                              </ButtonAddSection>
+                              <Modal
+                                open={modalthings}
+                                onClose={handleCloseModalThings}
+                                aria-labelledby="modal-modal-title"
+                                aria-describedby="modal-modal-description"
+                              >
+                                <Box sx={modalStyle}>
+                                  <HeaderModalShowAccessMainDiv className="d-flex flex-row justify-content-between align-items-center">
+                                    <p className="NormalTextSizing HeaderModalShowAccess">
+                                      دسترسی ها
+                                    </p>
+                                    <CustomCloseButton
+                                      onClick={handleCloseModalThings}
+                                      color={`#e91e63`}
+                                    />
+                                  </HeaderModalShowAccessMainDiv>
+                                  <div className="d-flex flex-column gap-2 justify-content-center align-items-center p-3">
+                                    <p>awpidierf</p>
+                                  </div>
+                                </Box>
+                              </Modal>
+                            </div> */}
+              </div>
+
+              <div
+                className="d-flex flex-row gap-2 w-50 overflow-x-auto"
+                style={{ maxWidth: "100%" }}
+              >
+                {dynamicSections.map((section, sectionIndex) => (
+                  <div className="d-flex flex-row gap-2" key={sectionIndex}>
+                    <div className="d-flex flex-column gap-1">
+                      <div>
+                        <div className="mt-3">
+                          {section.type === "image" &&
+                          URL &&
+                          section?.items[0]?.src ? (
+                            <div className="d-flex flex-column align-items-center">
+                              <BoxFirstSection
+                                component="img"
+                                src={
+                                  section?.items[0]?.src instanceof Blob
+                                    ? URL.createObjectURL(
+                                        section?.items[0]?.src
+                                      )
+                                    : `${process.env.NEXT_PUBLIC_BACK_END_SERVER}/system/download/${section?.items[0]?.src}`
+                                }
+                                alt="ItemImage"
+                              />
+                            </div>
+                          ) : (
+                            <>
+                              <div className="d-flex flex-column align-items-center">
+                                <BoxFirstSection
+                                  component="img"
+                                  src="/HomeImages/360_F_470299797_UD0eoVMMSUbHCcNJCdv2t8B2g1GVqYgs.jpg"
+                                  alt="ItemImage"
+                                />
+                              </div>
+                            </>
+                          )}
+                        </div>
+                      </div>
+                      <p className="text-center NormalTextSizing">
+                        {fixTitleSize({
+                          text: section.sectionName,
+                          length: 7,
+                        })}
+                      </p>
+                    </div>
+                  </div>
+                ))}
               </div>
             </InsideAddSectionForm>
           </AddSectionForm>
@@ -983,7 +1247,7 @@ export default function EditHonors({
                         htmlFor={`sectionName-${sectionIndex}`}
                         style={{ whiteSpace: "nowrap" }}
                       >
-                        نام بخش:
+                        لیست مشخصه ها:
                       </label>
                       <input
                         type="text"
@@ -1010,43 +1274,48 @@ export default function EditHonors({
               </div>
 
               <DivAdjustColorDivs
+                className="container gap-3"
                 columns="repeat(2, 1fr)"
                 recolumns="repeat(1, 1fr)"
               >
                 {section.items.map((item, itemIndex) => (
                   <div
                     style={{ height: "fit-content" }}
-                    className="d-flex flex-column gap-2 mb-3"
+                    className="d-flex flex-column gap-2 mb-3 BoxFiledFirstTab"
                     key={itemIndex}
                   >
-                    <div className="d-flex flex-row align-items-center gap-2">
-                      <div className="d-flex flex-column w-100">
-                        <div className="d-flex flex-row align-items-center gap-2">
+                    <div className="d-flex flex-column gap-2">
+                      <div className="dropDownSpecoficStyleHeader BGhead d-flex justify-content-end">
+                        <ButtonCancelOrder
+                          className=" px-2 py-1 rounded"
+                          style={{ width: "fit-content" }}
+                          type="button"
+                          onClick={() =>
+                            handleRemoveItem(sectionIndex, itemIndex)
+                          }
+                        >
+                          حذف
+                        </ButtonCancelOrder>
+                      </div>
+                      <div className="d-flex flex-column w-100 p-2">
+                        <div className="d-flex flex-column">
                           <label
-                            htmlFor={`ItemInsideName-${sectionIndex}-${itemIndex}`}
+                            htmlFor="ItemInsideName"
                             style={{ whiteSpace: "nowrap" }}
                           >
                             نام ایتم :
                           </label>
                           <input
                             type="text"
-                            id={`ItemInsideName-${sectionIndex}-${itemIndex}`}
+                            id="ItemInsideName"
                             placeholder="نام آیتم"
                             value={item.name}
                             onChange={(e) =>
                               handleItemNameChange(e, sectionIndex, itemIndex)
                             }
                             className="flex-grow-1 form-control"
+                            required
                           />
-                          <ButtonCancelOrder
-                            className="px-2 py-1 rounded"
-                            type="button"
-                            onClick={() =>
-                              handleRemoveItem(sectionIndex, itemIndex)
-                            }
-                          >
-                            حذف
-                          </ButtonCancelOrder>
                         </div>
                         <div>
                           {section.type === "image" && (
@@ -1105,6 +1374,7 @@ export default function EditHonors({
                                     itemIndex
                                   )
                                 }
+                                
                               />
 
                               {section.type === "image" && item.src && (
@@ -1130,6 +1400,7 @@ export default function EditHonors({
               </DivAdjustColorDivs>
               <div className="d-flex justify-content-end mb-3 ms-3">
                 <BUTTONADDSECTIONSTYLE
+                  className="bg-success text-white px2 py-1 rounded mt-2"
                   type="button"
                   onClick={() => handleAddItem(sectionIndex)}
                 >
@@ -1146,127 +1417,65 @@ export default function EditHonors({
         <div>
           {/* Image and Video Section */}
           <BorderInputBox className="mt-3">
-            <HeaderEachSection className="NormalTextSizing">
-              عکس ها و فیلم های محصول :
+            <HeaderEachSection className="NormalTextSizing d-flex flex-row align-items-center justify-content-between">
+              <p className="NormalTextSizing">عکس و ویدیو محصول</p>
+              <div className="d-flex justify-content-end ">
+                <ButtonAddSection
+                  className=" ms-3 bg-success text-white px-2 py-1 rounded"
+                  type="button"
+                  onClick={handleAddImgData}
+                >
+                  اضافه کردن
+                </ButtonAddSection>
+              </div>
             </HeaderEachSection>
-            <DivAdjustColorDivs columns="repeat(1, 1fr)">
+
+            <DivAdjustColorDivs columns="repeat(2, 1fr)">
               {imgData.map((item, index) => (
                 <div
                   style={{ height: "fit-content" }}
                   className="d-flex flex-row gap-2 flex-wrap mt-2 align-items-center justify-content-between"
                   key={index}
                 >
-                  <select
-                    value={item.type}
-                    onChange={(e) =>
-                      setImgData(
-                        imgData.map((img, iIdx) =>
-                          iIdx === index
-                            ? { ...img, type: e.target.value, src: "" } // Reset src on type change
-                            : img
-                        )
-                      )
-                    }
-                    required
-                    className="form-select mt-2 mb-1 w-50"
-                  >
-                    <option value="1">عکس :</option>
-                    <option value="2">فیلم :</option>
-                  </select>
-                  <ButtonCancelOrder
-                    className="px-2 py-1 rounded"
-                    style={{ width: "fit-content" }}
-                    type="button"
-                    onClick={() => handleRemoveImgData(index)}
-                  >
-                    حذف
-                  </ButtonCancelOrder>
-                  <DivAdjustGrodimageMedia>
-                    <div className="d-flex flex-column w-100">
-                      <span className="mb-1 NormalTextSizing">عکس یا فیلم</span>
-                      {item?.src === "" ? (
-                        <>
-                          <label
-                            className="labelInsteadOfInput"
-                            htmlFor={`ImageVideoForProduct-${index}`}
-                          >
-                            <div className="d-flex flex-column text-center p-1">
-                              <div>
-                                <svg
-                                  width={21}
-                                  height={21}
-                                  viewBox="0 0 18 18"
-                                  fill="none"
-                                  xmlns="http://www.w3.org/2000/svg"
-                                >
-                                  <path
-                                    d="M2.25 11.25C2.25 13.3713 2.25 14.432 2.909 15.091C3.568 15.75 4.629 15.75 6.75 15.75H11.25C13.3713 15.75 14.432 15.75 15.091 15.091C15.75 14.432 15.75 13.3713 15.75 11.25"
-                                    stroke="#404040"
-                                    strokeLinecap="round"
-                                    strokeLinejoin="round"
-                                  />
-                                  <path
-                                    d="M9 12V2.25M9 2.25L12 5.53125M9 2.25L6 5.53125"
-                                    stroke="#404040"
-                                    strokeLinecap="round"
-                                    strokeLinejoin="round"
-                                  />
-                                </svg>
-                              </div>
-                              <p className={`colorTheInputFile discription`}>
-                                بارگذاری فایل .png یا .jpg
-                              </p>
-                              <p className={`colorTheInputFile discription`}>
-                                یا فیلم mp4
-                              </p>
-                            </div>
-                          </label>
-                          <input
-                            className="d-none"
-                            id={`ImageVideoForProduct-${index}`}
-                            accept={`${process.env.NEXT_PUBLIC_INPUT_IMAGE_AND_VIDEO_FORMAT}`}
-                            type="file"
-                            onChange={
-                              (e) =>
-                                handleFileChange(e, index, setImgData, imgData) // Corrected state parameter
-                            }
-                          />
-                        </>
-                      ) : (
-                        <>
-                          <div
-                            className="d-flex flex-column"
-                            style={{ width: "fit-content" }}
-                          >
-                            <BOX
-                              component={item.type === "1" ? "img" : "video"}
-                              src={
-                                item.type === "1"
-                                  ? item.src instanceof Blob
-                                    ? URL.createObjectURL(item.src)
-                                    : `${process.env.NEXT_PUBLIC_BACK_END_SERVER}/system/download/${item.src}`
-                                  : item.src instanceof Blob
-                                  ? URL.createObjectURL(item.src)
-                                  : `${process.env.NEXT_PUBLIC_BACK_END_SERVER}/system/download/${item.src}`
-                              }
-                              alt="ProductMedia"
-                              controls={item.type === "2"}
-                            />
-                          </div>
-                        </>
-                      )}
-                    </div>
+                  <DivAdjustGrodimageMedia className="mb-2 me-2 ms-2">
+                    <DivHeaderInfoMedia className="d-flex justify-content-between">
+                      <SelectStyle
+                        value={item.type}
+                        onChange={(e) =>
+                          setImgData(
+                            imgData.map((img, iIdx) =>
+                              iIdx === index
+                                ? { ...img, type: e.target.value }
+                                : img
+                            )
+                          )
+                        }
+                        required
+                      >
+                        <option value={1}>عکس</option>
+                        <option value={2}>فیلم</option>
+                      </SelectStyle>
+                      <ButtonCancelOrder
+                        className="px-2 py-1 rounded"
+                        style={{ width: "fit-content" }}
+                        type="button"
+                        onClick={() => handleRemoveImgData(index)}
+                      >
+                        حذف
+                      </ButtonCancelOrder>
+                    </DivHeaderInfoMedia>
 
-                    {item.type === "2" && (
+                    <div className="p-2">
                       <div className="d-flex flex-column w-100">
                         <span className="mb-1 NormalTextSizing">
-                          پوستر فیلم :
+                          {item?.type == 1 && <>عکس</>}
+                          {item?.type == 2 && <>فیلم</>}
                         </span>
-                        {item?.poster === "" ? (
+                        {item?.src === "" ? (
                           <>
                             <label
                               className="labelInsteadOfInput"
-                              htmlFor={`posterFilm-${index}`}
+                              htmlFor={`ImageVideoForProduct-${index}`}
                             >
                               <div className="d-flex flex-column text-center p-1">
                                 <div>
@@ -1278,7 +1487,7 @@ export default function EditHonors({
                                     xmlns="http://www.w3.org/2000/svg"
                                   >
                                     <path
-                                      d="M2.25 11.25C2.25 13.3713 2.25 14.432 2.909 15.091C3.568 15.75 4.629 15.75 6.75 15.75H11.25C13.3713 15.75 14.432 15.75 15.091 15.091C15.75 14.432 15.75 13.3713 15.75 11.25"
+                                      d="M2.25 11.25C2.25 13.3713 2.25 14.432 2.909 15.091C3.568 15.75 4.62868 15.75 6.75 15.75H11.25C13.3713 15.75 14.432 15.75 15.091 15.091C15.75 14.432 15.75 13.3713 15.75 11.25"
                                       stroke="#404040"
                                       strokeLinecap="round"
                                       strokeLinejoin="round"
@@ -1295,23 +1504,25 @@ export default function EditHonors({
                                   بارگذاری فایل .png یا .jpg
                                 </p>
                                 <p className={`colorTheInputFile discription`}>
-                                  حداکثر تا 5 مگابایت
+                                  یا فیلم mp4
                                 </p>
                               </div>
                             </label>
                             <input
-                              className="d-none"
-                              id={`posterFilm-${index}`}
-                              accept={`${process.env.NEXT_PUBLIC_INPUT_IMAGE_FORMAT}`}
                               type="file"
-                              onChange={(e) =>
-                                handleFileChangePoster(
-                                  e,
-                                  index,
-                                  setImgData,
-                                  imgData // Corrected state parameter
-                                )
+                              className="d-none"
+                              id={`ImageVideoForProduct-${index}`}
+                              accept={`${process.env.NEXT_PUBLIC_INPUT_IMAGE_AND_VIDEO_FORMAT}`}
+                              onChange={
+                                (e) =>
+                                  handleFileChange(
+                                    e,
+                                    index,
+                                    setImgData,
+                                    imgData
+                                  ) // Corrected state parameter
                               }
+                              required
                             />
                           </>
                         ) : (
@@ -1320,33 +1531,135 @@ export default function EditHonors({
                               className="d-flex flex-column"
                               style={{ width: "fit-content" }}
                             >
-                              <BOX
-                                component="img"
-                                src={
-                                  item.poster instanceof Blob
-                                    ? URL.createObjectURL(item.poster)
-                                    : `${process.env.NEXT_PUBLIC_BACK_END_SERVER}/system/download/${item.poster}`
-                                }
-                                alt="PosterImage"
-                              />
+                              {item.type === "2" ? (
+                                <BOX
+                                  style={{
+                                    maxWidth: "unset",
+                                    maxHeight: "unset",
+                                  }}
+                                  component="video"
+                                  src={
+                                    typeof item.src === "object" &&
+                                    item.src instanceof Blob
+                                      ? URL.createObjectURL(item.src)
+                                      : `${process.env.NEXT_PUBLIC_BACK_END_SERVER}/system/download/${item.src}`
+                                  }
+                                  controls
+                                />
+                              ) : (
+                                <BOX
+                                  style={{
+                                    maxWidth: "unset",
+                                    maxHeight: "unset",
+                                  }}
+                                  component="img"
+                                  // src={URL.createObjectURL(item.src)}
+                                  src={
+                                    typeof item.src === "object" &&
+                                    item.src instanceof Blob
+                                      ? URL.createObjectURL(item.src)
+                                      : `${process.env.NEXT_PUBLIC_BACK_END_SERVER}/system/download/${item.src}`
+                                  }
+                                  alt="ProductImage"
+                                />
+                              )}
                             </div>
                           </>
                         )}
                       </div>
-                    )}
+                      {item.type === "2" && (
+                        <div className="d-flex flex-column w-100">
+                          <span className="mb-1 NormalTextSizing">
+                            پوستر فیلم :
+                          </span>
+                          {item?.poster === "" ? (
+                            <>
+                              <label
+                                className="labelInsteadOfInput"
+                                htmlFor={`posterFilm-${index}`}
+                              >
+                                <div className="d-flex flex-column text-center p-1">
+                                  <div>
+                                    <svg
+                                      width={21}
+                                      height={21}
+                                      viewBox="0 0 18 18"
+                                      fill="none"
+                                      xmlns="http://www.w3.org/2000/svg"
+                                    >
+                                      <path
+                                        d="M2.25 11.25C2.25 13.3713 2.25 14.432 2.909 15.091C3.568 15.75 4.62868 15.75 6.75 15.75H11.25C13.3713 15.75 14.432 15.75 15.091 15.091C15.75 14.432 15.75 13.3713 15.75 11.25"
+                                        stroke="#404040"
+                                        strokeLinecap="round"
+                                        strokeLinejoin="round"
+                                      />
+                                      <path
+                                        d="M9 12V2.25M9 2.25L12 5.53125M9 2.25L6 5.53125"
+                                        stroke="#404040"
+                                        strokeLinecap="round"
+                                        strokeLinejoin="round"
+                                      />
+                                    </svg>
+                                  </div>
+                                  <p
+                                    className={`colorTheInputFile discription`}
+                                  >
+                                    بارگذاری فایل .png یا .jpg
+                                  </p>
+                                  <p
+                                    className={`colorTheInputFile discription`}
+                                  >
+                                    حداکثر تا 5 مگابایت
+                                  </p>
+                                </div>
+                              </label>
+                              <input
+                                type="file"
+                                className="d-none"
+                                id={`posterFilm-${index}`}
+                                accept={`${process.env.NEXT_PUBLIC_INPUT_IMAGE_FORMAT}`}
+                                onChange={(e) =>
+                                  handleFileChangePoster(
+                                    e,
+                                    index,
+                                    setImgData,
+                                    imgData
+                                  )
+                                }
+                                required
+                              />
+                            </>
+                          ) : (
+                            <>
+                              <div
+                                className="d-flex flex-column"
+                                style={{ width: "fit-content" }}
+                              >
+                                <BOX
+                                  style={{
+                                    maxWidth: "unset",
+                                    maxHeight: "unset",
+                                  }}
+                                  component="img"
+                                  // src={URL.createObjectURL(item.poster)}
+                                  src={
+                                    typeof item.src === "object" &&
+                                    item.src instanceof Blob
+                                      ? URL.createObjectURL(item.poster)
+                                      : `${process.env.NEXT_PUBLIC_BACK_END_SERVER}/system/download/${item.poster}`
+                                  }
+                                  alt="PosterImage"
+                                />
+                              </div>
+                            </>
+                          )}
+                        </div>
+                      )}
+                    </div>
                   </DivAdjustGrodimageMedia>
                 </div>
               ))}
             </DivAdjustColorDivs>
-            <div className="d-flex justify-content-end mt-3">
-              <BUTTONADDSECTIONSTYLE
-                type="button"
-                className="mt-2 mb-3 ms-3"
-                onClick={handleAddImgData}
-              >
-                اضافه کردن عکس / فیلم
-              </BUTTONADDSECTIONSTYLE>
-            </div>
           </BorderInputBox>
         </div>
       )}
@@ -1356,208 +1669,273 @@ export default function EditHonors({
         <div>
           {/* Media Section */}
           <BorderInputBox>
-            <HeaderEachSection>فیلم ها:</HeaderEachSection>
+            <HeaderEachSection className="NormalTextSizing d-flex flex-row align-items-center justify-content-between">
+              <p className="NormalTextSizing">فیلم ها:</p>
+              <div className="d-flex justify-content-end">
+                <ButtonAddSection
+                  className="ms-2 bg-success text-white px-2 py-1 rounded"
+                  type="button"
+                  onClick={handleAddMedia}
+                >
+                  اضافه کردن ویدیو
+                </ButtonAddSection>
+              </div>
+            </HeaderEachSection>
+
             <DivAdjustColorDivs
-              style={{ width: "100%" }}
+              style={{ width: "100%", padding: "20px" }}
               columns="repeat(1, 1fr)"
             >
               {media.map((item, index) => (
-                <div className="mt-2 d-flex flex-column gap-3" key={index}>
-                  <div className="d-flex flex-row align-items-center gap-3 flex-wrap">
-                    <input
-                      style={{ width: "43%" }}
-                      type="text"
-                      placeholder="عنوان فیلم"
-                      value={item.title}
-                      onChange={(e) =>
-                        setMedia(
-                          media.map((m, iIdx) =>
-                            iIdx === index ? { ...m, title: e.target.value } : m
-                          )
-                        )
-                      }
-                      className="form-control"
-                    />
+                <>
+                  <MediaDivMainGrid className="mt-2" key={index}>
+                    <DivHeaderInfoMedia className="d-flex justify-content-between align-items-center">
+                      <div>
+                        <p className="NormalTextSizing">
+                          ویدیو شماره {index + 1}
+                        </p>
+                      </div>
+                      <ButtonCancelOrder
+                        className="px-2 py-1 rounded"
+                        style={{ width: "fit-content" }}
+                        type="button"
+                        onClick={() => handleRemoveMedia(index)}
+                      >
+                        حذف
+                      </ButtonCancelOrder>
+                    </DivHeaderInfoMedia>
 
-                    <input
-                      style={{ width: "43%" }}
-                      type="text"
-                      placeholder="توضیحات"
-                      value={item.description}
-                      onChange={(e) =>
-                        setMedia(
-                          media.map((m, iIdx) =>
-                            iIdx === index
-                              ? { ...m, description: e.target.value }
-                              : m
-                          )
-                        )
-                      }
-                      className="form-control"
-                    />
-                    <ButtonCancelOrder
-                      className="px-2 py-1 rounded"
-                      type="button"
-                      onClick={() => handleRemoveMedia(index)}
-                    >
-                      حذف
-                    </ButtonCancelOrder>
-                  </div>
-
-                  <DivAdjustGrodimageMedia
-                    className="mt-2 mb-2"
-                    columns="repeat(2, 1fr)"
-                  >
-                    <div className="d-flex flex-column">
-                      <span className="NormalTextSizing">فیلم :</span>
-                      {item?.src === "" ? (
-                        <>
-                          <label
-                            className="labelInsteadOfInput"
-                            htmlFor={`MediaVideo-${index}`}
-                          >
-                            <div className="d-flex flex-column text-center p-1">
-                              <div>
-                                <svg
-                                  width={21}
-                                  height={21}
-                                  viewBox="0 0 18 18"
-                                  fill="none"
-                                  xmlns="http://www.w3.org/2000/svg"
+                    <div className="p-3">
+                      <div className="d-flex flex-row gap-3">
+                        <DivAdjustColorDivs
+                          columns="repeat(1, 1fr)"
+                          className="w-50"
+                        >
+                          <div className="d-flex flex-column">
+                            <span className="NormalTextSizing">فیلم :</span>
+                            {item?.src === "" ? (
+                              <>
+                                <label
+                                  className="labelInsteadOfInput"
+                                  htmlFor={`MediaVideo-${index}`}
                                 >
-                                  <path
-                                    d="M2.25 11.25C2.25 13.3713 2.25 14.432 2.90901 15.091C3.56802 15.75 4.62868 15.75 6.75 15.75H11.25C13.3713 15.75 14.432 15.75 15.091 15.091C15.75 14.432 15.75 13.3713 15.75 11.25"
-                                    stroke="#404040"
-                                    strokeLinecap="round"
-                                    strokeLinejoin="round"
-                                  />
-                                  <path
-                                    d="M9 12V2.25M9 2.25L12 5.53125M9 2.25L6 5.53125"
-                                    stroke="#404040"
-                                    strokeLinecap="round"
-                                    strokeLinejoin="round"
-                                  />
-                                </svg>
-                              </div>
+                                  <div className="d-flex flex-column text-center p-1">
+                                    <div>
+                                      <svg
+                                        width={21}
+                                        height={21}
+                                        viewBox="0 0 18 18"
+                                        fill="none"
+                                        xmlns="http://www.w3.org/2000/svg"
+                                      >
+                                        <path
+                                          d="M2.25 11.25C2.25 13.3713 2.25 14.432 2.909 15.091C3.568 15.75 4.62868 15.75 6.75 15.75H11.25C13.3713 15.75 14.432 15.75 15.091 15.091C15.75 14.432 15.75 13.3713 15.75 11.25"
+                                          stroke="#404040"
+                                          strokeLinecap="round"
+                                          strokeLinejoin="round"
+                                        />
+                                        <path
+                                          d="M9 12V2.25M9 2.25L12 5.53125M9 2.25L6 5.53125"
+                                          stroke="#404040"
+                                          strokeLinecap="round"
+                                          strokeLinejoin="round"
+                                        />
+                                      </svg>
+                                    </div>
 
-                              <p className={`colorTheInputFile discription`}>
-                                فیلم mp4
-                              </p>
-                            </div>
-                          </label>
-                          <input
-                            className="d-none"
-                            id={`MediaVideo-${index}`}
-                            accept={`${process.env.NEXT_PUBLIC_INPUT_VIDEO_FORMAT}`}
-                            type="file"
-                            onChange={(e) =>
-                              handleFileChange(e, index, setMedia, media)
-                            }
-                          />
-                        </>
-                      ) : (
-                        <>
-                          <div
-                            className="d-flex flex-column"
-                            style={{ width: "fit-content" }}
-                          >
-                            <BOX
-                              component="video"
-                              src={
-                                typeof item.src === "object" &&
-                                item.src instanceof Blob
-                                  ? URL.createObjectURL(item.src)
-                                  : `${process.env.NEXT_PUBLIC_BACK_END_SERVER}/system/download/${item.src}`
+                                    <p
+                                      className={`colorTheInputFile discription`}
+                                    >
+                                      فیلم mp4
+                                    </p>
+                                  </div>
+                                </label>
+                                <input
+                                  type="file"
+                                  className="d-none"
+                                  id={`MediaVideo-${index}`}
+                                  accept={`${process.env.NEXT_PUBLIC_INPUT_VIDEO_FORMAT}`}
+                                  onChange={(e) =>
+                                    setMedia(
+                                      media.map((m, iIdx) =>
+                                        iIdx === index
+                                          ? { ...m, src: e.target.files[0] }
+                                          : m
+                                      )
+                                    )
+                                  }
+                                  required
+                                />
+                              </>
+                            ) : (
+                              <>
+                                <div
+                                  className="d-flex flex-column"
+                                  style={{ width: "fit-content" }}
+                                >
+                                  <BOX
+                                    component="video"
+                                    // src={URL.createObjectURL(item.src)}
+                                    src={
+                                      typeof item.src === "object" &&
+                                      item.src instanceof Blob
+                                        ? URL.createObjectURL(item.src)
+                                        : `${process.env.NEXT_PUBLIC_BACK_END_SERVER}/system/download/${item.src}`
+                                    }
+                                    controls
+                                  />
+                                </div>
+                              </>
+                            )}
+                          </div>
+
+                          <div className="d-flex flex-column">
+                            <span className="NormalTextSizing">
+                              پوستر فیلم :
+                            </span>
+                            {item?.poster === "" ? (
+                              <>
+                                <label
+                                  className="labelInsteadOfInput"
+                                  htmlFor={`PosterVideo-${index}`}
+                                >
+                                  <div className="d-flex flex-column text-center p-1">
+                                    <div>
+                                      <svg
+                                        width={21}
+                                        height={21}
+                                        viewBox="0 0 18 18"
+                                        fill="none"
+                                        xmlns="http://www.w3.org/2000/svg"
+                                      >
+                                        <path
+                                          d="M2.25 11.25C2.25 13.3713 2.25 14.432 2.909 15.091C3.568 15.75 4.62868 15.75 6.75 15.75H11.25C13.3713 15.75 14.432 15.75 15.091 15.091C15.75 14.432 15.75 13.3713 15.75 11.25"
+                                          stroke="#404040"
+                                          strokeLinecap="round"
+                                          strokeLinejoin="round"
+                                        />
+                                        <path
+                                          d="M9 12V2.25M9 2.25L12 5.53125M9 2.25L6 5.53125"
+                                          stroke="#404040"
+                                          strokeLinecap="round"
+                                          strokeLinejoin="round"
+                                        />
+                                      </svg>
+                                    </div>
+                                    <p
+                                      className={`colorTheInputFile discription`}
+                                    >
+                                      بارگذاری فایل .png یا .jpg
+                                    </p>
+                                    <p
+                                      className={`colorTheInputFile discription`}
+                                    >
+                                      حداکثر تا 5 مگابایت
+                                    </p>
+                                  </div>
+                                </label>
+                                <input
+                                  type="file"
+                                  className="d-none"
+                                  id={`PosterVideo-${index}`}
+                                  accept={`${process.env.NEXT_PUBLIC_INPUT_IMAGE_FORMAT}`}
+                                  onChange={(e) =>
+                                    setMedia(
+                                      media.map((m, iIdx) =>
+                                        iIdx === index
+                                          ? {
+                                              ...m,
+                                              poster: e.target.files[0],
+                                            }
+                                          : m
+                                      )
+                                    )
+                                  }
+                                  required
+                                />
+                              </>
+                            ) : (
+                              <>
+                                <div
+                                  className="d-flex flex-column"
+                                  style={{ width: "fit-content" }}
+                                >
+                                  <BOX
+                                    component="img"
+                                    // src={URL.createObjectURL(item.poster)}
+                                    src={
+                                      typeof item.poster === "object" &&
+                                      item.poster instanceof Blob
+                                        ? URL.createObjectURL(item.poster)
+                                        : `${process.env.NEXT_PUBLIC_BACK_END_SERVER}/system/download/${item.poster}`
+                                    }
+                                    alt="PosterImage"
+                                  />
+                                </div>
+                              </>
+                            )}
+                          </div>
+                        </DivAdjustColorDivs>
+
+                        <div className="d-flex flex-column align-items-center gap-2 flex-wrap w-50">
+                          <div className="d-flex flex-column gap-1 w-100">
+                            <label
+                              htmlFor="OnvanFilm"
+                              className="NormalTextSizing"
+                            >
+                              عنوان
+                            </label>
+                            <input
+                              id="OnvanFilm"
+                              // style={{ width: "45%" }}
+                              type="text"
+                              placeholder="عنوان فیلم"
+                              value={item.title}
+                              onChange={(e) =>
+                                setMedia(
+                                  media.map((m, iIdx) =>
+                                    iIdx === index
+                                      ? { ...m, title: e.target.value }
+                                      : m
+                                  )
+                                )
                               }
-                              controls
+                              required
+                              className="form-control"
                             />
                           </div>
-                        </>
-                      )}
-                    </div>
-
-                    <div className="d-flex flex-column">
-                      <span className="NormalTextSizing">پوستر فیلم :</span>
-                      {item?.poster === "" ? (
-                        <>
-                          <label
-                            className="labelInsteadOfInput"
-                            htmlFor={`PosterVideo-${index}`}
-                          >
-                            <div className="d-flex flex-column text-center p-1">
-                              <div>
-                                <svg
-                                  width={21}
-                                  height={21}
-                                  viewBox="0 0 18 18"
-                                  fill="none"
-                                  xmlns="http://www.w3.org/2000/svg"
-                                >
-                                  <path
-                                    d="M2.25 11.25C2.25 13.3713 2.25 14.432 2.90901 15.091C3.56802 15.75 4.62868 15.75 6.75 15.75H11.25C13.3713 15.75 14.432 15.75 15.091 15.091C15.75 14.432 15.75 13.3713 15.75 11.25"
-                                    stroke="#404040"
-                                    strokeLinecap="round"
-                                    strokeLinejoin="round"
-                                  />
-                                  <path
-                                    d="M9 12V2.25M9 2.25L12 5.53125M9 2.25L6 5.53125"
-                                    stroke="#404040"
-                                    strokeLinecap="round"
-                                    strokeLinejoin="round"
-                                  />
-                                </svg>
-                              </div>
-                              <p className={`colorTheInputFile discription`}>
-                                بارگذاری فایل .png یا .jpg
-                              </p>
-                              <p className={`colorTheInputFile discription`}>
-                                حداکثر تا 5 مگابایت
-                              </p>
-                            </div>
-                          </label>
-                          <input
-                            className="d-none"
-                            id={`PosterVideo-${index}`}
-                            accept={`${process.env.NEXT_PUBLIC_INPUT_IMAGE_FORMAT}`}
-                            type="file"
-                            onChange={(e) =>
-                              handleFileChangePoster(e, index, setMedia, media)
-                            }
-                          />
-                        </>
-                      ) : (
-                        <>
-                          <div
-                            className="d-flex flex-column"
-                            style={{ width: "fit-content" }}
-                          >
-                            <BOX
-                              component="img"
-                              src={
-                                typeof item.poster === "object" &&
-                                item.poster instanceof Blob
-                                  ? URL.createObjectURL(item.poster)
-                                  : `${process.env.NEXT_PUBLIC_BACK_END_SERVER}/system/download/${item.poster}`
+                          <div className="d-flex flex-column gap-1 w-100">
+                            <label
+                              htmlFor="OnvanFilm"
+                              className="NormalTextSizing"
+                            >
+                              توضیحات
+                            </label>
+                            <textarea
+                              style={{ height: "120px" }}
+                              type="text"
+                              placeholder="توضیحات"
+                              value={item.description}
+                              onChange={(e) =>
+                                setMedia(
+                                  media.map((m, iIdx) =>
+                                    iIdx === index
+                                      ? { ...m, description: e.target.value }
+                                      : m
+                                  )
+                                )
                               }
-                              alt="PosterImage"
+                              required
+                              className="form-control"
                             />
                           </div>
-                        </>
-                      )}
+                        </div>
+                      </div>
                     </div>
-                  </DivAdjustGrodimageMedia>
-                </div>
+                  </MediaDivMainGrid>
+                </>
               ))}
             </DivAdjustColorDivs>
-            <div className="d-flex justify-content-end mt-3">
-              <BUTTONADDSECTIONSTYLE
-                type="button"
-                className="mt-2 mb-3 ms-3"
-                onClick={handleAddMedia}
-              >
-                اضافه کردن ویدیو
-              </BUTTONADDSECTIONSTYLE>
-            </div>
           </BorderInputBox>
         </div>
       )}
@@ -1566,15 +1944,33 @@ export default function EditHonors({
       {activeTab === "fileds" && (
         <div>
           <BorderInputBox>
-            <HeaderEachSection>فیلد ها:</HeaderEachSection>
+            <HeaderEachSection className="NormalTextSizing d-flex flex-row align-items-center justify-content-between">
+              <p>فیلد ها:</p>
+
+              <div className="d-flex justify-content-end">
+                <ButtonAddSection
+                  className="ms-2 bg-success text-white px-2 py-1 rounded"
+                  type="button"
+                  onClick={handleAddFileds}
+                >
+                  اضافه کردن
+                </ButtonAddSection>
+              </div>
+            </HeaderEachSection>
+
             <DivAdjustColorDivs
+              className="p-2"
               style={{ width: "100%" }}
               columns="repeat(1, 1fr)"
             >
               {filedOrder.map((item, index) => (
-                <div className="mt-2 d-flex flex-column gap-3" key={index}>
-                  <div className="d-flex  flex-row align-items-center gap-3">
-                    <select
+                <div
+                  className="mt-2 d-flex flex-column gap-3 divBorderFileds"
+                  key={index}
+                >
+                  <div className="d-flex flex-row align-items-center gap-3">
+                    {/* Dropdown Type */}
+                    <SelectStyle
                       value={item.type}
                       onChange={(e) =>
                         setFiledOrder(
@@ -1583,18 +1979,18 @@ export default function EditHonors({
                               ? {
                                   ...f,
                                   type: e.target.value,
-                                  dropDownOP: [""],
-                                }
+                                  dropDownOP: [{ text: "", isChecked: false }],
+                                } // Reset dropdown options
                               : f
                           )
                         )
                       }
                       required
-                      className="form-select mt-2 mb-1 w-50"
+                      className="mt-2 mb-1 w-50"
                     >
-                      <option value="text">متن :</option>
-                      <option value="dropDown">دراپ دون :</option>
-                    </select>
+                      <option value="text">متن</option>
+                      <option value="dropDown">دراپ دون</option>
+                    </SelectStyle>
                     <input
                       style={{ width: "45%" }}
                       type="text"
@@ -1611,7 +2007,7 @@ export default function EditHonors({
                       className="form-control"
                     />
                     <ButtonCancelOrder
-                      className=" px-2 py-1 rounded"
+                      className="px-2 py-1 rounded"
                       type="button"
                       style={{ width: "fit-content" }}
                       onClick={() => handleRemoveFileds(index)}
@@ -1620,18 +2016,32 @@ export default function EditHonors({
                     </ButtonCancelOrder>
                   </div>
 
+                  {/* Dropdown Options */}
                   {item.type === "dropDown" && (
-                    <div className="d-flex flex-column gap-2 mt-2">
-                      <label
-                        htmlFor={`dropDownOP-${index}`}
-                        className="form-label"
-                        style={{ whiteSpace: "nowrap" }}
-                      >
-                        گزینه‌های دراپ دون:
-                      </label>
+                    <div className="d-flex flex-column dropDownSpecoficStyle gap-2">
+                      <div className="d-flex flex-row align-items-center justify-content-between dropDownSpecoficStyleHeader">
+                        <label
+                          htmlFor={`dropDownOP-${index}`}
+                          className="form-label NormalTextSizing"
+                          style={{ whiteSpace: "nowrap" }}
+                        >
+                          گزینه‌های دراپ دون:
+                        </label>
+                        <button
+                          type="button"
+                          className="NormalTextSizing"
+                          style={{
+                            backgroundColor: "#43A047",
+                            width: "fit-content",
+                          }}
+                          onClick={() => handleAddDropDownOption(index)}
+                        >
+                          اضافه کردن گزینه
+                        </button>
+                      </div>
 
                       <ResponsiveDivFileds
-                        className="mt-2 mb-2"
+                        className="mt-2 mb-2 p-2"
                         columns="repeat(2, 1fr)"
                       >
                         {item.dropDownOP.map((option, optIndex) => (
@@ -1642,20 +2052,32 @@ export default function EditHonors({
                             <input
                               type="text"
                               placeholder={`گزینه ${optIndex + 1}`}
-                              value={option}
-                              onChange={(e) => {
-                                const updatedFiledOrder = [...filedOrder];
-                                updatedFiledOrder[index].dropDownOP[optIndex] =
-                                  e.target.value;
-                                setFiledOrder(updatedFiledOrder);
-                              }}
+                              value={option.text}
+                              style={{width: '60%'}}
+                              onChange={(e) =>
+                                handleDropDownOptionTextChange(
+                                  index,
+                                  optIndex,
+                                  e.target.value
+                                )
+                              }
                               required
                               className="form-control"
                             />
+
+                            {/* Checkbox for the option */}
+                            <input
+                              type="checkbox"
+                              checked={option.isChecked}
+                              onChange={() =>
+                                handleToggleDropDownOption(index, optIndex)
+                              }
+                            />
+                            مقدار دلخواه
                             {item.dropDownOP.length > 1 && (
                               <ButtonCancelOrder
                                 type="button"
-                                className=" px-2 py-1 rounded"
+                                className="px-2 py-1 rounded"
                                 onClick={() =>
                                   handleRemoveDropDownOption(index, optIndex)
                                 }
@@ -1666,39 +2088,18 @@ export default function EditHonors({
                           </div>
                         ))}
                       </ResponsiveDivFileds>
-                      <button
-                        type="button"
-                        className="NormalTextSizing"
-                        style={{
-                          backgroundColor: "#43A047",
-                          width: "fit-content",
-                        }}
-                        onClick={() => handleAddDropDownOption(index)}
-                      >
-                        اضافه کردن گزینه
-                      </button>
                     </div>
                   )}
                 </div>
               ))}
             </DivAdjustColorDivs>
-
-            <div className="d-flex justify-content-end mt-3">
-              <ButtonAddSection
-                className="mt-2 mb-3 ms-3 bg-success text-white px-2 py-1 rounded"
-                type="button"
-                onClick={handleAddFileds}
-              >
-                اضافه کردن فیلد
-              </ButtonAddSection>
-            </div>
           </BorderInputBox>
         </div>
       )}
 
       {/* Action Buttons */}
       <BUTTONSSTYLE className="d-flex flex-row justify-content-between container">
-        <div className="d-flex flex-row mt-3 mb-3 gap-3">
+        <div className="d-flex flex-row mt-3 mb-3 gap-3 justify-content-around w-100">
           <button
             type="submit"
             className="confirmButtonStyle"
@@ -1718,7 +2119,7 @@ export default function EditHonors({
             انصراف
           </button>
         </div>
-        <div>
+        {/* <div>
           <ButtonCancelOrder
             className="mt-2 mb-2 deleteButtonStyle"
             type="button"
@@ -1726,21 +2127,21 @@ export default function EditHonors({
           >
             حذف محصول
           </ButtonCancelOrder>
-        </div>
+        </div> */}
       </BUTTONSSTYLE>
 
       {/* Confirmation Modals */}
       <AreYouShureModal
         open={openModal}
         onClose={closeModal}
-        text={"ایا از ویرایش محصول مطمعن هستید"}
+        text={"ایا از ویرایش محصول مطمئن هستید"}
         func={handleSubmit}
         loading={loadingConfirmModal}
       />
       <AreYouShureModal
         open={openModal4}
         onClose={closeModal4}
-        text={"ایا از حذف محصول مطمعن هستید"}
+        text={"ایا از حذف محصول مطمئن هستید"}
         func={handleDelete}
         loading={loadingConfirmModal}
       />

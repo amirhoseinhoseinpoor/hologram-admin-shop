@@ -6,6 +6,7 @@ import { useDispatch } from "react-redux";
 import { getuser } from "@/app/Store/thunks";
 // import base component
 import NavBarToggleBurgerButton from "@/app/BaseComponent/NavBarToggleBurgerButton";
+import CustomCloseButton from "@/app/BaseComponent/CustomCloseButton";
 import ConfirmingModal from "@/app/BaseComponent/ConfirmingModal";
 import ErrorModal from "@/app/BaseComponent/ErrorModal";
 import ProfileComponent from "@/app/BaseComponent/ProfileComponent";
@@ -15,13 +16,15 @@ import styled from "styled-components";
 // import components
 import AddUserBtn from "../DefineUser/AddUserBtn";
 import EditUserBtnfunction from "./EditUserBtn";
+import { Modal, Box } from "@mui/material";
+
 
 const HeadermakeOrder = styled.div`
   padding: 10px;
   color: white;
   background-color: rgb(225, 223, 223);
   border-radius: 4px;
-  margin : 7px 15px;
+  margin: 7px 15px;
   .textHeaderStyle {
     color: black;
   }
@@ -107,7 +110,7 @@ const FixTablePlace = styled.div`
     .tabelStyle {
       border-collapse: separate;
       border-radius: 12px;
-      overflow: hidden;
+      /* overflow: hidden; */
       width: 100%;
       th,
       td {
@@ -119,6 +122,20 @@ const FixTablePlace = styled.div`
       }
     }
   }
+
+  .SeeAccessButtom {
+    cursor: pointer;
+    color: #43a047;
+  }
+`;
+
+const HeaderModalShowAccessMainDiv = styled.div`
+  background-color: rgb(225, 223, 223);
+  border-top-right-radius: 10px;
+  border-top-left-radius: 10px;
+  .HeaderModalShowAccess {
+    padding: 10px;
+  }
 `;
 
 const SelectFilter = styled.select`
@@ -128,6 +145,24 @@ const SelectFilter = styled.select`
   border-radius: 4px;
   cursor: pointer;
 `;
+
+const SeeAccessTableStyle = styled.p`
+  /* border-top: 1px solid gray; */
+  width: 100%;
+  /* text-align: center; */
+  padding-top: 3px;
+`;
+
+const modalStyle = {
+  position: "absolute",
+  top: "50%",
+  left: "50%",
+  transform: "translate(-50%, -50%)",
+  width: 400,
+  bgcolor: "background.paper",
+  boxShadow: 24,
+  borderRadius: 2,
+};
 
 export default function DefineUser({ toggleShow }) {
   const dispatch = useDispatch();
@@ -140,6 +175,7 @@ export default function DefineUser({ toggleShow }) {
   // filter states
   const [searchTerm, setSearchTerm] = useState("");
   const [filteredUsers, setFilteredUsers] = useState(null);
+  console.log(filteredUsers);
 
   // loading
   const [trackLoading, setTrackLoading] = useState(false);
@@ -150,6 +186,12 @@ export default function DefineUser({ toggleShow }) {
 
   const [openModal3, setOpenModal3] = useState(false);
   const closeModal3 = () => setOpenModal3(false);
+
+  const [modalPermision, setModalPermision] = useState(null);
+  const handleCloseModal = () => setModalPermision(null);
+
+  const [modalPermisionRe, setModalPermisionRe] = useState(null);
+  const handleCloseModalRe = () => setModalPermisionRe(null);
 
   // helper for trim & lowerCase
   const normalizeString = (str) => str.replace(/\s+/g, "").toLowerCase();
@@ -273,10 +315,48 @@ export default function DefineUser({ toggleShow }) {
                         <td>{item.active ? "فعال" : "غیرفعال"}</td>
                         <td>{item.domain === 1 ? "سایت" : "سایت و ادمین"}</td>
                         <td>
-                          {item.userRoles[0]?.role?.name === "admin" && "ادمین"}
-                          {item.userRoles[0]?.role?.name === "master" && "مدیر"}
-                          {item.userRoles[0]?.role?.name === "customer" &&
-                            "مشتری"}
+                          <p
+                            className="SeeAccessButtom"
+                            onClick={() => setModalPermision(index)}
+                          >
+                            مشاهده
+                          </p>
+
+                          <Modal
+                            open={modalPermision === index}
+                            onClose={handleCloseModal}
+                            aria-labelledby="modal-modal-title"
+                            aria-describedby="modal-modal-description"
+                          >
+                            <Box sx={modalStyle}>
+                              <HeaderModalShowAccessMainDiv className="d-flex flex-row justify-content-between align-items-center">
+                                <p className="NormalTextSizing HeaderModalShowAccess">
+                                  دسترسی ها
+                                </p>
+                                <CustomCloseButton
+                                  onClick={handleCloseModal}
+                                  color={`#e91e63`}
+                                />
+                              </HeaderModalShowAccessMainDiv>
+                              <div className="d-flex flex-column gap-2 justify-content-center align-items-center p-3">
+                                {/* {item?.permissions?.map((eachPer, index) => (
+                                  <p key={index} className="NormalTextSizing">
+                                    {eachPer?.permission?.name}
+                                  </p>
+                                ))} */}
+                                <div className="d-flex flex-column gap-2 justify-content-center align-items-center w-100">
+                                  {item.userRoles?.map((item, index) => (
+                                    <SeeAccessTableStyle
+                                      key={index}
+                                      className="NormalTextSizing"
+                                    >
+                                      {item.role.name}
+                                    </SeeAccessTableStyle>
+                                  ))}
+                                </div>
+                              </div>
+                            </Box>
+                          </Modal>
                         </td>
                         <td>
                           <div className="d-flex flex-row justify-content-center">
@@ -327,15 +407,45 @@ export default function DefineUser({ toggleShow }) {
                         {item.domain === 1 ? "سایت" : "سایت و ادمین"}
                       </div>
                     </div>
+
                     <div className="eachTabelStyle">
                       <p className="NormalTextSizing">دسترسی :</p>
+
                       <div className="SecondValueTabel NormalTextSizing">
-                        {item.userRoles[0]?.role?.name === "admin" && "ادمین"}
-                        {item.userRoles[0]?.role?.name === "master" && "مدیر"}
-                        {item.userRoles[0]?.role?.name === "customer" &&
-                          "مشتری"}
+                        <div
+                          style={{ cursor: "pointer", color: "#43a047" }}
+                          onClick={() => setModalPermisionRe(idx)}
+                        >
+                          مشاهده
+                        </div>
+                        <Modal
+                          open={modalPermisionRe === idx}
+                          onClose={handleCloseModalRe}
+                          aria-labelledby="modal-modal-title"
+                          aria-describedby="modal-modal-description"
+                        >
+                          <Box sx={modalStyle}>
+                            <HeaderModalShowAccessMainDiv className="d-flex flex-row justify-content-between align-items-center">
+                              <p className="NormalTextSizing HeaderModalShowAccess">
+                                دسترسی ها
+                              </p>
+                              <CustomCloseButton
+                                onClick={handleCloseModal}
+                                color={`#e91e63`}
+                              />
+                            </HeaderModalShowAccessMainDiv>
+                            <div className="d-flex flex-column gap-2 justify-content-center align-items-center p-3">
+                              <div className="d-flex flex-row gap-2 justify-content-center">
+                                {item.userRoles?.map((item, index) => (
+                                  <div key={index}>{item.role.name}</div>
+                                ))}
+                              </div>
+                            </div>
+                          </Box>
+                        </Modal>
                       </div>
                     </div>
+
                     <div className="eachTabelStyle">
                       <p className="NormalTextSizing">عملیات :</p>
                       <div className="SecondValueTabel NormalTextSizing">

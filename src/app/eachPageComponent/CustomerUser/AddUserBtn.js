@@ -3,7 +3,6 @@ import React, { useState, useEffect } from "react";
 import { Modal, Button } from "react-bootstrap";
 import styled from "styled-components";
 
-
 // import redux
 import { useDispatch } from "react-redux";
 import { addUser, getuser } from "@/app/Store/thunks";
@@ -45,14 +44,12 @@ const AddUserModal = styled(Modal)`
 const AddUserBtnstyle = styled(Button)`
   border: none;
   color: white;
-  padding: 5px;
+  padding: 5px !important;
   text-align: center;
   cursor: pointer;
   border-radius: 4px;
-  background-image : linear-gradient(195deg, #66BB6A 0%, #43A047 100%);;
+  background-image: linear-gradient(195deg, #66bb6a 0%, #43a047 100%);
 `;
-
-
 
 export default function AddUserBtn({
   setDataUpdated,
@@ -66,13 +63,28 @@ export default function AddUserBtn({
     lastName: "",
     username: "",
     password: "",
+    confirmPassword: "",
     domain: "1",
-    roleId: "3",
   });
-  
+
   const [showAddModal, setShowAddModal] = useState(false);
 
-  // const [dataCome , setDataCome] = useState([]);
+  const [isButtonDisabled, setisButtonDisabled] = useState(true);
+
+  useEffect(() => {
+    if (
+      newUserData?.password === newUserData?.confirmPassword &&
+      newUserData?.password?.length >= 4 &&
+      newUserData?.confirmPassword?.length >= 4 &&
+      newUserData?.firstName?.length > 0 && 
+      newUserData?.lastName?.length > 0 &&
+      newUserData?.username?.length === 11 
+    ) {
+      setisButtonDisabled(false);
+    } else {
+      setisButtonDisabled(true);
+    }
+  }, [newUserData]);
 
   const handleInputChange = (event) => {
     const { name, value } = event.target;
@@ -120,7 +132,7 @@ export default function AddUserBtn({
         variant="primary"
         onClick={handleAddModalShow}
       >
-        اضافه کردن کاربر جدید
+        اضافه کردن
       </AddUserBtnstyle>
       <AddUserModal show={showAddModal} onHide={handleAddModalClose}>
         <Modal.Header closeButton>
@@ -205,6 +217,22 @@ export default function AddUserBtn({
               />
             </div>
 
+            <div className="form-group">
+              <label className="mb-1 me-1" htmlFor="confirmPassword">
+                تکرار رمز
+              </label>
+              <input
+                type="password"
+                id="confirmPassword"
+                name="confirmPassword"
+                placeholder="تکرار رمز"
+                className="form-control"
+                value={newUserData.confirmPassword}
+                onChange={handleInputChange}
+                required
+              />
+            </div>
+
             {/* <div className="form-group">  
               <label className="mb-1 me-1" htmlFor="gender">جنسیت</label>  
               <select  
@@ -263,11 +291,24 @@ export default function AddUserBtn({
           </form>
         </Modal.Body>
         <Modal.Footer>
-          <Button style={{border : "unset"}} variant="secondary" onClick={handleAddModalClose}>
+          <Button
+            style={{ border: "unset" }}
+            variant="secondary"
+            onClick={handleAddModalClose}
+          >
             لغو
           </Button>
-          <Button style={{backgroundColor : "#191919" , border : "unset"}} onClick={handleAddUser}>
-            اضافه کردن
+          <Button
+            onClick={handleAddUser}
+            disabled={isButtonDisabled}
+            style={{
+              backgroundColor: "#191919", border: "unset",
+              backgroundColor: isButtonDisabled ? "#868686" : "",
+              border: isButtonDisabled ? "#868686" : "",
+              cursor: isButtonDisabled ? "not-allowed" : "pointer",
+            }}
+          >
+            ذخیره
           </Button>
         </Modal.Footer>
       </AddUserModal>

@@ -5,6 +5,8 @@ import { Box } from "@mui/system";
 import ZoomModal from "@/app/BaseComponent/ZoomModal";
 import ErrorModal from "@/app/BaseComponent/ErrorModal";
 import LoadingCss from "@/app/BaseComponent/LoadingCss";
+// import utils
+import { downloadImage } from "@/app/utils/downloadImage";
 // import redux
 import { useDispatch } from "react-redux";
 import {
@@ -13,7 +15,12 @@ import {
   increaseStep,
   fetchPrivateImage,
   paymentStepData,
+  updateFirstStep,
 } from "@/app/Store/thunks";
+// improt icons
+import FolderZipIcon from "@mui/icons-material/FolderZip";
+import DoneIcon from "@mui/icons-material/Done";
+import PictureAsPdfIcon from "@mui/icons-material/PictureAsPdf";
 
 export default function SteponeComponent({
   data,
@@ -36,8 +43,6 @@ export default function SteponeComponent({
 
   const handleCloseZoomModal = () => setZoomModal(false);
 
-  console.log(data);
-
   // const [inputFields, setInputFields] = useState([{ title: "", price: "" }]);
   const [disablenextStep, setDisableNextStep] = useState(true);
   const [statusTraking, setStatusTraking] = useState(false);
@@ -50,7 +55,7 @@ export default function SteponeComponent({
   const [bothFactor, setBothFactor] = useState(null);
   const [loading, setLoading] = useState(false);
 
-  console.log(paymentType);
+  console.log(finalFactor);
 
   const [formData, setFormData] = useState({
     feature: "",
@@ -73,6 +78,9 @@ export default function SteponeComponent({
   const [prodFiled, setProdFiled] = useState([]);
   const [hasDynamicFields, setHasDynamicFields] = useState(false);
 
+  console.log(dynamicForm);
+  console.log(prodFiled);
+
   useEffect(() => {
     if (step > 1) {
       setMoveForward(true);
@@ -85,7 +93,10 @@ export default function SteponeComponent({
         const returnFactor = await dispatch(
           fetchPrivateImage({ filename: reqComment?.paymentImage })
         ).unwrap();
-        setLogo({ imageUrl: returnFactor || null });
+        setLogo({
+          imageUrl: returnFactor || null,
+          paymentImageType: reqComment?.paymentImageType,
+        });
       } else {
         setLogo(null);
       }
@@ -93,8 +104,15 @@ export default function SteponeComponent({
         const returnFactor = await dispatch(
           fetchPrivateImage({ filename: payment?.finalPayment })
         ).unwrap();
-        setFinalFactor({ imageUrl: returnFactor || null });
-        setBothFactor({ imageUrl: returnFactor || null });
+        setFinalFactor({
+          imageUrl: returnFactor || null,
+          finalPaymentType: payment.finalPaymentType,
+        });
+        setBothFactor({
+          imageUrl: returnFactor || null,
+          finalPaymentType: payment.finalPaymentType,
+          paymentImageType: reqComment?.paymentImageType,
+        });
       } else {
         setFinalFactor(null);
       }
@@ -123,6 +141,8 @@ export default function SteponeComponent({
           filedOrder: prod.filedOrder.map((field) => ({
             name: field.name,
             type: field.type,
+            value: field.value,
+            dropVal: field.dropVal,
             dropDownOP:
               field.type === "dropDown" ? field.dropDownOP : undefined,
           })),
@@ -134,9 +154,11 @@ export default function SteponeComponent({
         initialDynamicForm[prod.code] = {};
         prod.filedOrder.forEach((field) => {
           initialDynamicForm[prod.code][field.name] = field.value || "";
+          initialDynamicForm[prod.code][field.name] = field.dropVal || "";
         });
       });
-      setDynamicForm(initialDynamicForm);
+
+      // setDynamicForm(initialDynamicForm);
       setHasDynamicFields(true);
       setStatusTraking(true);
     } else if (typeof data === "object" && data !== null) {
@@ -216,8 +238,13 @@ export default function SteponeComponent({
     const imageUrl = URL.createObjectURL(file);
     setLogo({
       imageUrl,
+      paymentImageType: file?.name.split(".").pop(),
     });
-    setInformation({ ...information, paymentImage: file });
+    setInformation({
+      ...information,
+      paymentImage: file,
+      paymentImageType: file?.name.split(".").pop(),
+    });
   };
 
   const handleFinalFactorChange = (event) => {
@@ -225,8 +252,13 @@ export default function SteponeComponent({
     const imageUrl = URL.createObjectURL(file);
     setFinalFactor({
       imageUrl,
+      finalPaymentType: file?.name.split(".").pop(),
     });
-    setInformation({ ...information, finalPayment: file });
+    setInformation({
+      ...information,
+      finalPayment: file,
+      finalPaymentType: file?.name.split(".").pop(),
+    });
   };
 
   const handleBothFactorChange = (event) => {
@@ -234,22 +266,36 @@ export default function SteponeComponent({
     const imageUrl = URL.createObjectURL(file);
     setBothFactor({
       imageUrl,
+      finalPaymentType: file?.name.split(".").pop(),
+      paymentImageType: file?.name.split(".").pop(),
     });
-    setInformation({ ...information, paymentImage: file, finalPayment: file });
+    setInformation({
+      ...information,
+      paymentImage: file,
+      finalPayment: file,
+      finalPaymentType: file?.name.split(".").pop(),
+      paymentImageType: file?.name.split(".").pop(),
+    });
   };
 
   const handleDeleteLogo = () => {
     setLogo(null);
-    setInformation({ ...information, paymentImage: "" });
+    setInformation({ ...information, paymentImage: "", paymentImageType: "" });
   };
 
   const handleDeleteFinalFactor = () => {
     setFinalFactor(null);
-    setInformation({ ...information, finalPayment: "" });
+    setInformation({ ...information, finalPayment: "", finalPaymentType: "" });
   };
   const handleDeleteBothFactor = () => {
     setBothFactor(null);
-    setInformation({ ...information, paymentImage: "", finalPayment: "" });
+    setInformation({
+      ...information,
+      paymentImage: "",
+      finalPayment: "",
+      paymentImageType: "",
+      finalPaymentType: "",
+    });
   };
 
   const checkAllFieldsFilled = () => {
@@ -299,6 +345,81 @@ export default function SteponeComponent({
     });
   };
 
+  const handleDropdownChange = (code, event) => {
+    const { name, value } = event.target;
+
+    // Ensure inProd is used in the right scope inside the map loop
+    const selectedProduct = prodFiled.find((prod) => prod.code === code);
+    if (selectedProduct) {
+      const selectedOption = selectedProduct.filedOrder.find(
+        (field) =>
+          field.name === name &&
+          field.dropDownOP.some((op) => op.text === value)
+      );
+
+      // If the option has isChecked = true, show the related input field
+      if (selectedOption && selectedOption.isChecked) {
+        setDynamicForm((prev) => ({
+          ...prev,
+          [code]: {
+            ...prev[code],
+            [name]: value,
+            [`${name}_custom`]: "", // Clear any previous custom value (if needed)
+          },
+        }));
+      } else {
+        // Update dynamicForm with the selected value
+        setDynamicForm((prev) => ({
+          ...prev,
+          [code]: {
+            ...prev[code],
+            [name]: value,
+          },
+        }));
+      }
+    }
+  };
+
+  const handleInputChangeForOther = (code, event) => {
+    const { name, value } = event.target;
+
+    // When typing in the "Other" field, store the custom value separately
+    setDynamicForm((prev) => ({
+      ...prev,
+      [code]: {
+        ...prev[code],
+        [`${name}_custom`]: value, // Store the custom value in a separate field
+      },
+    }));
+  };
+
+  useEffect(() => {
+    if (data) {
+      if (Array.isArray(data)) {
+        const initialDynamicForm = {};
+  
+        // Iterate through the products
+        data.forEach((prod) => {
+          initialDynamicForm[prod.code] = {}; // Initialize the product code in dynamicForm
+  
+          // Iterate through each field of the product
+          prod.filedOrder.forEach((field) => {
+            initialDynamicForm[prod.code][field.name] = field.value || "";  // Prefill field value
+  
+            // Check for 'Other' fields (dropVal) and prefill the '_custom' field if necessary
+            if (field.dropVal) {
+              initialDynamicForm[prod.code][`${field.name}_custom`] = field.dropVal;  // Prefill custom value if available
+            } else {
+              initialDynamicForm[prod.code][`${field.name}_custom`] = "";  // Empty custom if 'Other' isn't selected
+            }
+          });
+        });
+  
+        setDynamicForm(initialDynamicForm);  // Set the prefilled dynamic form
+      }
+    }
+  }, [data]);
+
   const handleSubmit = async () => {
     try {
       setLoading(true);
@@ -306,7 +427,7 @@ export default function SteponeComponent({
       let updatedInformation;
       let uploadFinalFactor;
       let updatedFinalFactor;
-
+  
       if (information?.paymentImage) {
         uploadFactor = await dispatch(
           uploadFile({
@@ -316,15 +437,17 @@ export default function SteponeComponent({
             isPublic: false,
           })
         ).unwrap();
-
+  
         updatedInformation = {
           paymentImage: uploadFactor,
           docInfo: information.docInfo,
+          paymentImageType: information.paymentImageType,
         };
       } else {
         updatedInformation = {
           paymentImage: reqComment?.paymentImage,
           docInfo: information.docInfo,
+          paymentImageType: reqComment?.paymentImageType,
         };
       }
       if (information?.finalPayment) {
@@ -336,50 +459,81 @@ export default function SteponeComponent({
             isPublic: false,
           })
         ).unwrap();
-
+  
         updatedFinalFactor = {
           finalPayment: uploadFinalFactor,
+          finalPaymentType: information.finalPaymentType,
         };
       } else {
         updatedFinalFactor = {
           finalPayment: payment?.finalPayment,
+          finalPaymentType: reqComment?.finalPaymentType,
         };
       }
-
+  
+      let dataToSend = {};
+  
+      if (hasDynamicFields && prodFiled.length > 0) {
+        // Construct products data with name, code, and dynamic fields including type and options
+        const productsData = prodFiled.map((prod) => ({
+          name: prod.name,
+          code: prod.code,
+          filedOrder: prod.filedOrder.map((field) => ({
+            name: field.name,
+            type: field.type,
+            dropDownOP:
+              field.type === "dropDown" ? field.dropDownOP : undefined,
+            value: dynamicForm[prod.code]?.[field.name] || "",  // Keep default value if available
+            dropVal:
+              dynamicForm[prod.code]?.[`${field.name}_custom`] || "", // Send the custom value if filled
+          })),
+        }));
+  
+        dataToSend = { request: productsData };
+      } else {
+        // Only static form data
+        dataToSend = { request: { ...formData } };
+      }
+  
+      const resultAction = await dispatch(
+        updateFirstStep({ code, dataToSend })
+      );
+  
       // Send updatedInformation with the second API call
       const uploadDocumentUser = await dispatch(
         requestAdminCommnet({ code, reqComment: updatedInformation })
       );
-
+  
       const uploadPaymentLastStep = await dispatch(
         paymentStepData({ code, payment: updatedFinalFactor })
       );
-
+  
       if (
+        resultAction.payload.message == "Success" &&
         uploadDocumentUser.payload.message == "Success" &&
         uploadPaymentLastStep.payload.message == "Success"
       ) {
         const increaseStepOrder = await dispatch(
           increaseStep({ code, step: 2 })
         );
-
+  
         if (increaseStepOrder.payload.message == "Success") {
           setNavStep(2);
           setStep(2);
         }
       }
-
+  
       setLoading(false);
-      // setInformation(updatedInformation);
     } catch (error) {
       console.error("Error uploading file:", error);
       setOpenModal3(true);
       setLoading(false);
     }
   };
+  
 
   return (
-    <>
+    <div className="container">
       {prodFiled.length > 0 ? (
         <div>
           {prodFiled.map((inProd, index) => (
@@ -441,26 +595,59 @@ export default function SteponeComponent({
                             *
                           </span>
                         </label>
-                        <select
-                          id={`dropDown-${inProd.code}-${idx}`}
-                          name={item.name}
-                          value={dynamicForm[inProd.code]?.[item.name] || ""}
-                          onChange={(e) =>
-                            handleInputDynamicChange(inProd.code, e)
-                          }
-                          disabled={disabelInput}
-                          required
-                          className={`${style.formInputNumber} form-control description`}
-                        >
-                          <option value="" disabled>
-                            انتخاب کنید
-                          </option>
-                          {item?.dropDownOP?.map((POP, popIdx) => (
-                            <option key={popIdx} value={POP}>
-                              {POP}
+
+                        <div className="dropdown-wrapper">
+                          <select
+                            id={`dropDown-${inProd.code}-${idx}`}
+                            name={item.name}
+                            value={dynamicForm[inProd.code]?.[item.name] || ""}
+                            onChange={(e) =>
+                              handleDropdownChange(inProd.code, e)
+                            }
+                            disabled
+                            required
+                            className={`${style.formInputNumber} form-control description`}
+                          >
+                            <option value="" disabled>
+                              انتخاب کنید
                             </option>
-                          ))}
-                        </select>
+                            {item?.dropDownOP?.map((POP, popIdx) => (
+                              <option
+                                key={popIdx}
+                                value={POP.text}
+                                isCheckedData={POP.isChecked}
+                              >
+                                {POP.text}
+                              </option>
+                            ))}
+                          </select>
+
+                          {/* Only show the input when the selected option has isChecked = true */}
+                          {item?.dropDownOP?.some(
+                            (op) =>
+                              op.isChecked &&
+                              dynamicForm[inProd.code]?.[item.name] === op.text
+                          ) && (
+                            <input
+                              type="text"
+                              name={item.name}
+                              value={
+                                dynamicForm[inProd.code]?.[
+                                  `${item.name}_custom`
+                                ] ||
+                                item?.dropVal ||
+                                ""
+                              }
+                              onChange={(e) =>
+                                handleInputChangeForOther(inProd.code, e)
+                              }
+                              className={`${style.formInputNumber} form-control description mt-2`}
+                              placeholder={`${item.name} خود را وارد کنید`}
+                              disabled
+                              required
+                            />
+                          )}
+                        </div>
                       </div>
                     )}
                   </div>
@@ -736,8 +923,6 @@ export default function SteponeComponent({
       <div
         className={`${style.responsiveBottomMainDiv} d-flex flex-row gap-3 justify-content-between`}
       >
-        
-
         <div
           className={`d-flex flex-row gap-2 align-items-center mt-2 mb-2 ${style.responsiveSelectWidth}`}
         >
@@ -811,59 +996,194 @@ export default function SteponeComponent({
               <span className={style.StarFixReq}>*</span>
             </div>
 
-            {logo ? (
-              <div className={`d-flex position-relative`}>
-                <Box
-                  onClick={() => setZoomModal(logo.imageUrl)}
-                  component="img"
-                  src={logo.imageUrl}
-                  alt="UserLogo"
-                  className={style.LogoReplaceStyle}
-                />
-                <button
-                  onClick={handleDeleteLogo}
-                  className={style.deleteButton}
+            {(logo && logo?.paymentImageType === "zip") ||
+            logo?.paymentImageType === "rar" ? (
+              <>
+                <div
+                  className={`${style.emptyBoxDonlowadDocument} d-flex position-relative`}
+                  onClick={() => {
+                    if (logo.imageUrl) {
+                      const date = new Date();
+                      downloadImage(
+                        logo.imageUrl,
+                        `${date.toISOString()}.${logo?.paymentImageType}`
+                      );
+                    }
+                  }}
                 >
-                  <svg
-                    width={17}
-                    height={17}
-                    viewBox="0 0 12 12"
-                    fill="none"
-                    xmlns="http://www.w3.org/2000/svg"
+                  <>
+                    <FolderZipIcon />
+                    <button
+                      onClick={(event) => {
+                        event.stopPropagation();
+                        handleDeleteLogo();
+                      }}
+                      className={style.deleteButton}
+                    >
+                      <svg
+                        width={17}
+                        height={17}
+                        viewBox="0 0 12 12"
+                        fill="none"
+                        xmlns="http://www.w3.org/2000/svg"
+                      >
+                        <path
+                          d="M10.5 2.98828C8.835 2.82328 7.16 2.73828 5.49 2.73828C4.5 2.73828 3.51 2.78828 2.52 2.88828L1.5 2.98828"
+                          stroke="#FF4F3F"
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                        />
+                        <path
+                          d="M4.25 2.485L4.36 1.83C4.44 1.355 4.5 1 5.345 1H6.655C7.5 1 7.565 1.375 7.64 1.835L7.75 2.485"
+                          stroke="#FF4F3F"
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                        />
+                        <path
+                          d="M9.4252 4.57031L9.1002 9.60531C9.0452 10.3903 9.0002 11.0003 7.6052 11.0003H4.3952C3.0002 11.0003 2.9552 10.3903 2.9002 9.60531L2.5752 4.57031"
+                          stroke="#FF4F3F"
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                        />
+                        <path
+                          d="M5.16504 8.25H6.83004"
+                          stroke="#FF4F3F"
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                        />
+                        <path
+                          d="M4.75 6.25H7.25"
+                          stroke="#FF4F3F"
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                        />
+                      </svg>
+                    </button>
+                  </>
+                </div>
+              </>
+            ) : logo && logo?.paymentImageType === "pdf" ? (
+              <>
+                <div
+                  className={`${style.emptyBoxDonlowadDocument} d-flex position-relative`}
+                  onClick={() => {
+                    if (logo.imageUrl) {
+                      const date = new Date();
+                      downloadImage(
+                        logo.imageUrl,
+                        `${date.toISOString()}.${logo?.finalPaymentType}`
+                      );
+                    } else {
+                      handleImageClick(index, fileObj.file);
+                    }
+                  }}
+                >
+                  <>
+                    <PictureAsPdfIcon />
+                    <button
+                      onClick={(event) => {
+                        event.stopPropagation();
+                        handleDeleteLogo();
+                      }}
+                      className={style.deleteButton}
+                    >
+                      <svg
+                        width={17}
+                        height={17}
+                        viewBox="0 0 12 12"
+                        fill="none"
+                        xmlns="http://www.w3.org/2000/svg"
+                      >
+                        <path
+                          d="M10.5 2.98828C8.835 2.82328 7.16 2.73828 5.49 2.73828C4.5 2.73828 3.51 2.78828 2.52 2.88828L1.5 2.98828"
+                          stroke="#FF4F3F"
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                        />
+                        <path
+                          d="M4.25 2.485L4.36 1.83C4.44 1.355 4.5 1 5.345 1H6.655C7.5 1 7.565 1.375 7.64 1.835L7.75 2.485"
+                          stroke="#FF4F3F"
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                        />
+                        <path
+                          d="M9.4252 4.57031L9.1002 9.60531C9.0452 10.3903 9.0002 11.0003 7.6052 11.0003H4.3952C3.0002 11.0003 2.9552 10.3903 2.9002 9.60531L2.5752 4.57031"
+                          stroke="#FF4F3F"
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                        />
+                        <path
+                          d="M5.16504 8.25H6.83004"
+                          stroke="#FF4F3F"
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                        />
+                        <path
+                          d="M4.75 6.25H7.25"
+                          stroke="#FF4F3F"
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                        />
+                      </svg>
+                    </button>
+                  </>
+                </div>
+              </>
+            ) : logo ? (
+              <>
+                <div className={`d-flex position-relative`}>
+                  <Box
+                    onClick={() => setZoomModal(logo.imageUrl)}
+                    component="img"
+                    src={logo.imageUrl}
+                    alt="UserLogo"
+                    className={style.LogoReplaceStyle}
+                  />
+                  <button
+                    onClick={handleDeleteLogo}
+                    className={style.deleteButton}
                   >
-                    <path
-                      d="M10.5 2.98828C8.835 2.82328 7.16 2.73828 5.49 2.73828C4.5 2.73828 3.51 2.78828 2.52 2.88828L1.5 2.98828"
-                      stroke="#FF4F3F"
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                    />
-                    <path
-                      d="M4.25 2.485L4.36 1.83C4.44 1.355 4.5 1 5.345 1H6.655C7.5 1 7.565 1.375 7.64 1.835L7.75 2.485"
-                      stroke="#FF4F3F"
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                    />
-                    <path
-                      d="M9.4252 4.57031L9.1002 9.60531C9.0452 10.3903 9.0002 11.0003 7.6052 11.0003H4.3952C3.0002 11.0003 2.9552 10.3903 2.9002 9.60531L2.5752 4.57031"
-                      stroke="#FF4F3F"
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                    />
-                    <path
-                      d="M5.16504 8.25H6.83004"
-                      stroke="#FF4F3F"
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                    />
-                    <path
-                      d="M4.75 6.25H7.25"
-                      stroke="#FF4F3F"
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                    />
-                  </svg>
-                </button>
-              </div>
+                    <svg
+                      width={17}
+                      height={17}
+                      viewBox="0 0 12 12"
+                      fill="none"
+                      xmlns="http://www.w3.org/2000/svg"
+                    >
+                      <path
+                        d="M10.5 2.98828C8.835 2.82328 7.16 2.73828 5.49 2.73828C4.5 2.73828 3.51 2.78828 2.52 2.88828L1.5 2.98828"
+                        stroke="#FF4F3F"
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                      />
+                      <path
+                        d="M4.25 2.485L4.36 1.83C4.44 1.355 4.5 1 5.345 1H6.655C7.5 1 7.565 1.375 7.64 1.835L7.75 2.485"
+                        stroke="#FF4F3F"
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                      />
+                      <path
+                        d="M9.4252 4.57031L9.1002 9.60531C9.0452 10.3903 9.0002 11.0003 7.6052 11.0003H4.3952C3.0002 11.0003 2.9552 10.3903 2.9002 9.60531L2.5752 4.57031"
+                        stroke="#FF4F3F"
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                      />
+                      <path
+                        d="M5.16504 8.25H6.83004"
+                        stroke="#FF4F3F"
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                      />
+                      <path
+                        d="M4.75 6.25H7.25"
+                        stroke="#FF4F3F"
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                      />
+                    </svg>
+                  </button>
+                </div>
+              </>
             ) : (
               <>
                 <div>
@@ -907,7 +1227,7 @@ export default function SteponeComponent({
                     id="paymentImage"
                     type="file"
                     name="paymentImage"
-                    accept={`${process.env.NEXT_PUBLIC_INPUT_IMAGE_FORMAT}`}
+                    accept={`${process.env.NEXT_PUBLIC_INPUT_IMAGE_FORMAT},.pdf,.zip,.rar`}
                     onChange={handleLogoChange}
                   />
                 </div>
@@ -920,7 +1240,140 @@ export default function SteponeComponent({
               <span className="NormalTextSizing">فاکتور نهایی</span>
               <span className={style.StarFixReq}>*</span>
             </div>
-            {finalFactor ? (
+            {(finalFactor && finalFactor?.finalPaymentType === "zip") ||
+            finalFactor?.finalPaymentType === "rar" ? (
+              <>
+                <div
+                  className={`${style.emptyBoxDonlowadDocument} d-flex position-relative`}
+                  onClick={() => {
+                    if (finalFactor.imageUrl) {
+                      const date = new Date();
+                      downloadImage(
+                        finalFactor.imageUrl,
+                        `${date.toISOString()}.${finalFactor?.finalPaymentType}`
+                      );
+                    }
+                  }}
+                >
+                  <>
+                    <FolderZipIcon />
+                    <button
+                      onClick={(event) => {
+                        event.stopPropagation();
+                        handleDeleteFinalFactor();
+                      }}
+                      className={style.deleteButton}
+                    >
+                      <svg
+                        width={17}
+                        height={17}
+                        viewBox="0 0 12 12"
+                        fill="none"
+                        xmlns="http://www.w3.org/2000/svg"
+                      >
+                        <path
+                          d="M10.5 2.98828C8.835 2.82328 7.16 2.73828 5.49 2.73828C4.5 2.73828 3.51 2.78828 2.52 2.88828L1.5 2.98828"
+                          stroke="#FF4F3F"
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                        />
+                        <path
+                          d="M4.25 2.485L4.36 1.83C4.44 1.355 4.5 1 5.345 1H6.655C7.5 1 7.565 1.375 7.64 1.835L7.75 2.485"
+                          stroke="#FF4F3F"
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                        />
+                        <path
+                          d="M9.4252 4.57031L9.1002 9.60531C9.0452 10.3903 9.0002 11.0003 7.6052 11.0003H4.3952C3.0002 11.0003 2.9552 10.3903 2.9002 9.60531L2.5752 4.57031"
+                          stroke="#FF4F3F"
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                        />
+                        <path
+                          d="M5.16504 8.25H6.83004"
+                          stroke="#FF4F3F"
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                        />
+                        <path
+                          d="M4.75 6.25H7.25"
+                          stroke="#FF4F3F"
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                        />
+                      </svg>
+                    </button>
+                  </>
+                </div>
+              </>
+            ) : finalFactor && finalFactor?.finalPaymentType === "pdf" ? (
+              <>
+                <div
+                  className={`${style.emptyBoxDonlowadDocument} d-flex position-relative`}
+                  onClick={() => {
+                    if (finalFactor.imageUrl) {
+                      const date = new Date();
+                      downloadImage(
+                        finalFactor.imageUrl,
+                        `${date.toISOString()}.${finalFactor?.finalPaymentType}`
+                      );
+                    } else {
+                      handleImageClick(index, fileObj.file);
+                    }
+                  }}
+                >
+                  <>
+                    <PictureAsPdfIcon />
+                    <button
+                      onClick={(event) => {
+                        event.stopPropagation();
+                        handleDeleteFinalFactor();
+                      }}
+                      className={style.deleteButton}
+                    >
+                      <svg
+                        width={17}
+                        height={17}
+                        viewBox="0 0 12 12"
+                        fill="none"
+                        xmlns="http://www.w3.org/2000/svg"
+                      >
+                        <path
+                          d="M10.5 2.98828C8.835 2.82328 7.16 2.73828 5.49 2.73828C4.5 2.73828 3.51 2.78828 2.52 2.88828L1.5 2.98828"
+                          stroke="#FF4F3F"
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                        />
+                        <path
+                          d="M4.25 2.485L4.36 1.83C4.44 1.355 4.5 1 5.345 1H6.655C7.5 1 7.565 1.375 7.64 1.835L7.75 2.485"
+                          stroke="#FF4F3F"
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                        />
+                        <path
+                          d="M9.4252 4.57031L9.1002 9.60531C9.0452 10.3903 9.0002 11.0003 7.6052 11.0003H4.3952C3.0002 11.0003 2.9552 10.3903 2.9002 9.60531L2.5752 4.57031"
+                          stroke="#FF4F3F"
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                        />
+                        <path
+                          d="M5.16504 8.25H6.83004"
+                          stroke="#FF4F3F"
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                        />
+                        <path
+                          d="M4.75 6.25H7.25"
+                          stroke="#FF4F3F"
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                        />
+                      </svg>
+                    </button>
+                  </>
+                </div>
+              </>
+            ) : finalFactor ? (
               <>
                 <div className={`d-flex position-relative`}>
                   <Box
@@ -977,7 +1430,6 @@ export default function SteponeComponent({
               </>
             ) : (
               <>
-                {/* second input */}
                 <div>
                   <label
                     className={style.labelInsteadOfInput}
@@ -1019,7 +1471,7 @@ export default function SteponeComponent({
                     id="paymentImageFFactor"
                     type="file"
                     name="finalPayment"
-                    accept={`${process.env.NEXT_PUBLIC_INPUT_IMAGE_FORMAT}`}
+                    accept={`${process.env.NEXT_PUBLIC_INPUT_IMAGE_FORMAT},.pdf,.zip,.rar`}
                     onChange={handleFinalFactorChange}
                   />
                 </div>
@@ -1035,7 +1487,141 @@ export default function SteponeComponent({
             <span className="NormalTextSizing">پیش فاکتور و فاکتور نهایی</span>
             <span className={style.StarFixReq}>*</span>
           </div>
-          {bothFactor ? (
+
+          {(bothFactor && bothFactor?.finalPaymentType === "zip") ||
+          bothFactor?.finalPaymentType === "rar" ? (
+            <>
+              <div
+                className={`${style.emptyBoxDonlowadDocument} d-flex position-relative`}
+                onClick={() => {
+                  if (bothFactor.imageUrl) {
+                    const date = new Date();
+                    downloadImage(
+                      bothFactor.imageUrl,
+                      `${date.toISOString()}.${bothFactor?.finalPaymentType}`
+                    );
+                  }
+                }}
+              >
+                <>
+                  <FolderZipIcon />
+                  <button
+                    onClick={(event) => {
+                      event.stopPropagation();
+                      handleDeleteBothFactor();
+                    }}
+                    className={style.deleteButton}
+                  >
+                    <svg
+                      width={17}
+                      height={17}
+                      viewBox="0 0 12 12"
+                      fill="none"
+                      xmlns="http://www.w3.org/2000/svg"
+                    >
+                      <path
+                        d="M10.5 2.98828C8.835 2.82328 7.16 2.73828 5.49 2.73828C4.5 2.73828 3.51 2.78828 2.52 2.88828L1.5 2.98828"
+                        stroke="#FF4F3F"
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                      />
+                      <path
+                        d="M4.25 2.485L4.36 1.83C4.44 1.355 4.5 1 5.345 1H6.655C7.5 1 7.565 1.375 7.64 1.835L7.75 2.485"
+                        stroke="#FF4F3F"
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                      />
+                      <path
+                        d="M9.4252 4.57031L9.1002 9.60531C9.0452 10.3903 9.0002 11.0003 7.6052 11.0003H4.3952C3.0002 11.0003 2.9552 10.3903 2.9002 9.60531L2.5752 4.57031"
+                        stroke="#FF4F3F"
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                      />
+                      <path
+                        d="M5.16504 8.25H6.83004"
+                        stroke="#FF4F3F"
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                      />
+                      <path
+                        d="M4.75 6.25H7.25"
+                        stroke="#FF4F3F"
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                      />
+                    </svg>
+                  </button>
+                </>
+              </div>
+            </>
+          ) : bothFactor && bothFactor?.finalPaymentType === "pdf" ? (
+            <>
+              <div
+                className={`${style.emptyBoxDonlowadDocument} d-flex position-relative`}
+                onClick={() => {
+                  if (bothFactor.imageUrl) {
+                    const date = new Date();
+                    downloadImage(
+                      bothFactor.imageUrl,
+                      `${date.toISOString()}.${bothFactor?.finalPaymentType}`
+                    );
+                  } else {
+                    handleImageClick(index, fileObj.file);
+                  }
+                }}
+              >
+                <>
+                  <PictureAsPdfIcon />
+                  <button
+                    onClick={(event) => {
+                      event.stopPropagation();
+                      handleDeleteBothFactor();
+                    }}
+                    className={style.deleteButton}
+                  >
+                    <svg
+                      width={17}
+                      height={17}
+                      viewBox="0 0 12 12"
+                      fill="none"
+                      xmlns="http://www.w3.org/2000/svg"
+                    >
+                      <path
+                        d="M10.5 2.98828C8.835 2.82328 7.16 2.73828 5.49 2.73828C4.5 2.73828 3.51 2.78828 2.52 2.88828L1.5 2.98828"
+                        stroke="#FF4F3F"
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                      />
+                      <path
+                        d="M4.25 2.485L4.36 1.83C4.44 1.355 4.5 1 5.345 1H6.655C7.5 1 7.565 1.375 7.64 1.835L7.75 2.485"
+                        stroke="#FF4F3F"
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                      />
+                      <path
+                        d="M9.4252 4.57031L9.1002 9.60531C9.0452 10.3903 9.0002 11.0003 7.6052 11.0003H4.3952C3.0002 11.0003 2.9552 10.3903 2.9002 9.60531L2.5752 4.57031"
+                        stroke="#FF4F3F"
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                      />
+                      <path
+                        d="M5.16504 8.25H6.83004"
+                        stroke="#FF4F3F"
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                      />
+                      <path
+                        d="M4.75 6.25H7.25"
+                        stroke="#FF4F3F"
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                      />
+                    </svg>
+                  </button>
+                </>
+              </div>
+            </>
+          ) : bothFactor ? (
             <>
               <div className={`d-flex position-relative`}>
                 <Box
@@ -1091,51 +1677,53 @@ export default function SteponeComponent({
               </div>
             </>
           ) : (
-            <div>
-              <label
-                className={style.labelInsteadOfInput}
-                htmlFor="paymentImageSecondOption"
-              >
-                <div className="d-flex flex-column text-center p-1">
-                  <div>
-                    <svg
-                      width={21}
-                      height={21}
-                      viewBox="0 0 18 18"
-                      fill="none"
-                      xmlns="http://www.w3.org/2000/svg"
-                    >
-                      <path
-                        d="M2.25 11.25C2.25 13.3713 2.25 14.432 2.90901 15.091C3.56802 15.75 4.62868 15.75 6.75 15.75H11.25C13.3713 15.75 14.432 15.75 15.091 15.091C15.75 14.432 15.75 13.3713 15.75 11.25"
-                        stroke="#404040"
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                      />
-                      <path
-                        d="M9 12V2.25M9 2.25L12 5.53125M9 2.25L6 5.53125"
-                        stroke="#404040"
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                      />
-                    </svg>
+            <>
+              <div>
+                <label
+                  className={style.labelInsteadOfInput}
+                  htmlFor="paymentImageSecondOption"
+                >
+                  <div className="d-flex flex-column text-center p-1">
+                    <div>
+                      <svg
+                        width={21}
+                        height={21}
+                        viewBox="0 0 18 18"
+                        fill="none"
+                        xmlns="http://www.w3.org/2000/svg"
+                      >
+                        <path
+                          d="M2.25 11.25C2.25 13.3713 2.25 14.432 2.90901 15.091C3.56802 15.75 4.62868 15.75 6.75 15.75H11.25C13.3713 15.75 14.432 15.75 15.091 15.091C15.75 14.432 15.75 13.3713 15.75 11.25"
+                          stroke="#404040"
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                        />
+                        <path
+                          d="M9 12V2.25M9 2.25L12 5.53125M9 2.25L6 5.53125"
+                          stroke="#404040"
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                        />
+                      </svg>
+                    </div>
+                    <p className={`${style.colorTheInputFile} description`}>
+                      بارگذاری فایل .png یا .jpg
+                    </p>
+                    <p className={`${style.colorTheInputFile} description`}>
+                      حداکثر تا 5 مگابایت
+                    </p>
                   </div>
-                  <p className={`${style.colorTheInputFile} description`}>
-                    بارگذاری فایل .png یا .jpg
-                  </p>
-                  <p className={`${style.colorTheInputFile} description`}>
-                    حداکثر تا 5 مگابایت
-                  </p>
-                </div>
-              </label>
-              <input
-                className={style.displayNoneTheInput}
-                id="paymentImageSecondOption"
-                type="file"
-                name="paymentImage"
-                accept={`${process.env.NEXT_PUBLIC_INPUT_IMAGE_FORMAT}`}
-                onChange={handleBothFactorChange}
-              />
-            </div>
+                </label>
+                <input
+                  className={style.displayNoneTheInput}
+                  id="paymentImageSecondOption"
+                  type="file"
+                  name="paymentImage"
+                  accept={`${process.env.NEXT_PUBLIC_INPUT_IMAGE_FORMAT},.pdf,.zip,.rar`}
+                  onChange={handleBothFactorChange}
+                />
+              </div>
+            </>
           )}
         </div>
       )}
@@ -1160,10 +1748,11 @@ export default function SteponeComponent({
             onClick={handleNextStep}
             className={`${style.continueButton} mt-3 mb-2`}
           >
-           مرحله بعد
+            مرحله بعد
           </button>
         )}
       </div>
+
 
       {/* modals */}
       <ErrorModal
@@ -1177,6 +1766,6 @@ export default function SteponeComponent({
         src={zoomModal}
         alt={`uploaded image`}
       />
-    </>
+    </div>
   );
 }

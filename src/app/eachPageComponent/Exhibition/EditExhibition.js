@@ -15,42 +15,76 @@ import ErrorModal from "@/app/BaseComponent/ErrorModal";
 import ConfirmModal from "@/app/BaseComponent/ConfirmingModal";
 
 const BUTTONSSTYLE = styled.div`
+  display: flex;
+  width: 100%;
+
+  .confirmButtonStyle,
   .cancelButtonStyle {
-    color: #e91e63;
-    background-color: unset;
-    border : 1px solid #e91e63;
-    padding-right : 10px;
-    padding-left : 10px;
+    font-size: 14px;
+    padding: 10px 32px;
+    border-radius: 10px;
+    font-weight: 500;
+    transition: 160ms ease;
   }
 
-  .deleteButtonStyle {
-    color: #ff4f3f !important;
-    background-color: transparent;
-  }
   .confirmButtonStyle {
-    padding : 0 50px;
-    color: white;
-    background-color: #43A047;
+    background: #43a047;
+    color: #fff;
+    border: none;
+
+    &:hover {
+      background: #3a8c3e;
+      transform: translateY(-1px);
+    }
+  }
+
+  .cancelButtonStyle {
+    background: #fafafa;
+    border: 1px solid #d0d0d0;
+    color: #444;
+
+    &:hover {
+      background: #f0f0f0;
+      border-color: #bdbdbd;
+      transform: translateY(-1px);
+    }
   }
 `;
 
 const LABELIMAGEUPLOAD = styled.label`
   border: 1px solid #c0c0c0;
   border-radius: 4px;
-  padding: 10px;
+  padding: 25px;
   width: 100%;
   height: 77%;
   display: flex;
   justify-content: center;
   align-items: center;
   width: fit-content;
+  @media (max-width: 768px) {
+    padding: 10px;
+  }
 `;
 
 const BorderDiv = styled.div`
-  border: 2px solid #42424a;
-  border-radius: 6px;
-  padding: 10px;
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  padding: 1.25rem;
+  gap: 1rem;
+  border: 1px solid rgba(0, 0, 0, 0.08);
+  border-radius: 14px;
+  background: #ffffff;
+  box-shadow: 0 3px 16px rgba(0, 0, 0, 0.06);
+  align-items: center;
+  @media (max-width: 768px) {
+    flex-direction: column !important;
+    .inputMainDiv {
+      width: 100% !important;
+    }
+  }
 `;
+
 
 const TEXTFIELD = styled(TextField)`
   .MuiInputBase-input {
@@ -227,7 +261,7 @@ export default function EditHonors({
       <p className="QASize text-center mb-4">ویرایش نمایشگاه</p>
       <form onSubmit={areYouShureFunction}>
         <BorderDiv className="d-flex flex-row justify-content-between">
-          <div className="me-3 w-50">
+          <div className="inputMainDiv me-3 w-50">
             <div className="d-flex flex-row gap-2 align-items-center">
               <p style={{ whiteSpace: "nowrap" }} className="seeOrderFont">
                 عنوان :
@@ -253,7 +287,7 @@ export default function EditHonors({
               />
             </div>
           </div>
-          <div className="ms-4">
+          <div>
             {bannerImage ? (
               <>
                 <div
@@ -314,7 +348,7 @@ export default function EditHonors({
             ) : (
               <>
                 <LABELIMAGEUPLOAD htmlFor="blogImage">
-                  <div className="d-flex flex-column text-center p-1">
+                  <div className="d-flex flex-column text-center p-1 ">
                     <div>
                       <svg
                         width={21}
@@ -399,7 +433,6 @@ export default function EditHonors({
               انصراف
             </button>
           </div>
-         
         </BUTTONSSTYLE>
 
         {/* modal  */}

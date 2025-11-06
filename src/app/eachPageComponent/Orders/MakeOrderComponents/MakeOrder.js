@@ -120,7 +120,7 @@ export default function MakeOrder({
         return (
           <div className={style.stepContent}>
             <SteponeComponent
-              reqComment={seeOrder.reqComment}
+              reqComment={seeOrder?.reqComment}
               payment={seeOrder.payment}
               step={seeOrder.step}
               data={seeOrder.request}

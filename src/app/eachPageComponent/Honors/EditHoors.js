@@ -10,24 +10,42 @@ import AreYouShureModal from "@/app/BaseComponent/AreYouSureModal";
 import ConfirmModal from "@/app/BaseComponent/ConfirmingModal";
 
 const BUTTONSSTYLE = styled.div`
+  display: flex;
+  width: 100%;
+
+  .confirmButtonStyle,
   .cancelButtonStyle {
-    color: #e91e63;
-    background-color: unset;
-    border : 1px solid #e91e63;
-    padding-right : 10px;
-    padding-left : 10px;
+    font-size: 14px;
+    padding: 10px 32px;
+    border-radius: 10px;
+    font-weight: 500;
+    transition: 160ms ease;
   }
 
-  .deleteButtonStyle {
-    color: #ff4f3f !important;
-    background-color: transparent;
-  }
   .confirmButtonStyle {
-    padding : 0 60px;
-    color: white;
-    background-color: #43A047;
+    background: #43a047;
+    color: #fff;
+    border: none;
+
+    &:hover {
+      background: #3a8c3e;
+      transform: translateY(-1px);
+    }
+  }
+
+  .cancelButtonStyle {
+    background: #fafafa;
+    border: 1px solid #d0d0d0;
+    color: #444;
+
+    &:hover {
+      background: #f0f0f0;
+      border-color: #bdbdbd;
+      transform: translateY(-1px);
+    }
   }
 `;
+
 const DELETEUPLODEDIMAGE = styled.button`
   position: absolute;
   top: 0;
@@ -56,10 +74,23 @@ const LABELIMAGEUPLOAD = styled.label`
 `;
 
 const BorderDiv = styled.div`
- border : 2px solid #42424a;
- border-radius: 6px;
- padding: 10px;
-`
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  padding: 1.25rem;
+  gap: 1rem;
+  border: 1px solid rgba(0, 0, 0, 0.08);
+  border-radius: 14px;
+  background: #ffffff;
+  box-shadow: 0 3px 16px rgba(0, 0, 0, 0.06);
+  align-items: center;
+  @media (max-width: 768px) {
+    flex-direction: column !important;
+    .inputMainDiv {
+      width: 100% !important;
+    }
+  }
+`;
 
 const TEXTFIELD = styled(TextField)`
   .MuiInputBase-input {
@@ -80,7 +111,7 @@ const TEXTFIELD = styled(TextField)`
   .css-1jy569b-MuiFormLabel-root-MuiInputLabel-root {
     left: 3px;
   }
-  .css-17vbkzs-MuiFormControl-root-MuiTextField-root{
+  .css-17vbkzs-MuiFormControl-root-MuiTextField-root {
     margin: 0px !important;
   }
 `;
@@ -226,9 +257,11 @@ export default function EditHonors({
       <p className="QASize text-center mb-4">ویرایش افتخارات</p>
       <form onSubmit={areYouShureFunction}>
         <BorderDiv className="d-flex flex-row justify-content-between">
-          <div className="me-3 w-50">
+          <div className="inputMainDiv me-3 w-50">
             <div className="d-flex flex-row gap-2 align-items-center">
-              <p style={{whiteSpace : "nowrap"}} className="seeOrderFont">عنوان :</p>
+              <p style={{ whiteSpace: "nowrap" }} className="seeOrderFont">
+                عنوان :
+              </p>
               <TEXTFIELD
                 label="عنوان"
                 value={bannerTitle}
@@ -239,7 +272,9 @@ export default function EditHonors({
             </div>
 
             <div className="d-flex flex-row gap-2 align-items-center">
-              <p style={{whiteSpace : "nowrap"}} className="seeOrderFont">تگ ها :</p>
+              <p style={{ whiteSpace: "nowrap" }} className="seeOrderFont">
+                تگ ها :
+              </p>
               <TEXTFIELD
                 label="تگ ها"
                 value={bannerTags}
@@ -369,8 +404,8 @@ export default function EditHonors({
         <div className="mt-4">
           <Editor
             apiKey="3akk9p7jow7ksa3txzom0c8qr4e59rtg6xy1fzvux8vysqs0"
-            value={content} 
-            onEditorChange={handleEditorChange} 
+            value={content}
+            onEditorChange={handleEditorChange}
             init={{
               height: 500,
               menubar: false,
