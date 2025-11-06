@@ -24,34 +24,21 @@ const BUTTONSSTYLE = styled.div`
 
   .confirmButtonStyle,
   .cancelButtonStyle {
-    font-size: 14px;
-    padding: 10px 32px;
-    border-radius: 10px;
-    font-weight: 500;
-    transition: 160ms ease;
+    color: #e91e63;
+    background-color: unset;
+    border: 1px solid #e91e63;
+    padding-right: 10px;
+    padding-left: 10px;
   }
 
+  .deleteButtonStyle {
+    color: #ff4f3f !important;
+    background-color: transparent;
+  }
   .confirmButtonStyle {
-    background: #43a047;
-    color: #fff;
-    border: none;
-
-    &:hover {
-      background: #3a8c3e;
-      transform: translateY(-1px);
-    }
-  }
-
-  .cancelButtonStyle {
-    background: #fafafa;
-    border: 1px solid #d0d0d0;
-    color: #444;
-
-    &:hover {
-      background: #f0f0f0;
-      border-color: #bdbdbd;
-      transform: translateY(-1px);
-    }
+    padding: 0 60px !important;
+    color: white;
+    background-color: #43a047;
   }
 `;
 
@@ -85,20 +72,25 @@ const BoxFirstSection = styled(Box)`
 const DivAdjustColorDivs = styled.div`
   display: grid;
   grid-template-columns: ${(props) => props.columns || "1fr"};
-  gap: 20px;
+  /* grid-gap: 18px; */
   width: 100%;
-
-  background: #ffffff;
-  padding: 15px;
-  margin-top:15px;
-  border-radius: 14px;
-  border: 1px solid #e7e7e7;
-  box-shadow: 0 4px 14px rgba(0,0,0,0.04);
-
+  /* padding: 15px; */
   .dropDownSpecoficStyle {
-    border: 1px solid #d9d9d9;
-    border-radius: 10px;
-    background: #fafafa;
+    border: 1.5px solid #c0c0c0;
+    border-radius: 4px;
+  }
+  .dropDownSpecoficStyleHeader {
+    border-bottom: 1.5px solid #c0c0c0;
+    background-color: rgb(225, 223, 223);
+    border-radius: 4px;
+    padding: 8px;
+  }
+  .BGhead {
+    background-color: rgb(225, 223, 223);
+  }
+  .labelInsteadOfInput {
+    border: 1px solid #c0c0c0;
+    border-radius: 4px;
     padding: 10px;
   }
 
@@ -132,7 +124,15 @@ const DivAdjustColorDivs = styled.div`
     color: #474747;
     margin: 0;
   }
-
+  .divBorderFileds {
+    border: 1.5px solid #c0c0c0;
+    padding: 10px;
+    border-radius: 4px;
+  }
+  .BoxFiledFirstTab {
+    border: 1.5px solid #c0c0c0;
+    border-radius: 4px;
+  }
   @media (max-width: 768px) {
     grid-template-columns: ${(props) => props.recolumns || "1fr"};
     padding: 14px;
@@ -140,13 +140,8 @@ const DivAdjustColorDivs = styled.div`
 `;
 
 const DivAdjustGrodimageMedia = styled.div`
-  background: #ffffff;
-  padding: 15px;
-  margin-top:15px;
-  border-radius: 14px;
-  border: 1px solid #e7e7e7;
-  box-shadow: 0 4px 14px rgba(0,0,0,0.04);
-  
+  border: 2px solid #ccc;
+  border-radius: 4px;
   /* padding: 10px; */
   display: grid;
   grid-template-columns: repeat(1, 1fr);
@@ -308,12 +303,10 @@ const HeaderModalShowAccessMainDiv = styled.div`
 `;
 
 const MediaDivMainGrid = styled.div`
-  background: #ffffff;
-  padding: 15px;
-  margin-top:15px;
-  border-radius: 14px;
-  border: 1px solid #e7e7e7;
-  box-shadow: 0 4px 14px rgba(0,0,0,0.04);
+  /* display: flex; */
+  border: 2px solid #ccc;
+  border-radius: 4px;
+  /* padding: 10px; */
 `;
 
 const modalStyle = {

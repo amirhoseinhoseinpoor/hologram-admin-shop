@@ -21,20 +21,25 @@ import { fixTitleSize } from "@/app/utils/fixTitleSize";
 const DivAdjustColorDivs = styled.div`
   display: grid;
   grid-template-columns: ${(props) => props.columns || "1fr"};
-  gap: 20px;
+  /* grid-gap: 18px; */
   width: 100%;
-
-  background: #ffffff;
-  padding: 15px;
-  margin-top:15px;
-  border-radius: 14px;
-  border: 1px solid #e7e7e7;
-  box-shadow: 0 4px 14px rgba(0,0,0,0.04);
-
+  /* padding: 15px; */
   .dropDownSpecoficStyle {
-    border: 1px solid #d9d9d9;
-    border-radius: 10px;
-    background: #fafafa;
+    border: 1.5px solid #c0c0c0;
+    border-radius: 4px;
+  }
+  .dropDownSpecoficStyleHeader {
+    border-bottom: 1.5px solid #c0c0c0;
+    border-radius: 4px;
+    padding: 8px;
+    background-color: rgb(225, 223, 223);
+  }
+  .BGhead {
+    background-color: rgb(225, 223, 223);
+  }
+  .labelInsteadOfInput {
+    border: 1px solid #c0c0c0;
+    border-radius: 4px;
     padding: 10px;
   }
 
@@ -68,21 +73,23 @@ const DivAdjustColorDivs = styled.div`
     color: #474747;
     margin: 0;
   }
-
+  .divBorderFileds {
+    border: 1.5px solid #c0c0c0;
+    padding: 10px;
+    border-radius: 4px;
+  }
+  .BoxFiledFirstTab {
+    border: 1.5px solid #c0c0c0;
+    border-radius: 4px;
+  }
   @media (max-width: 768px) {
-    grid-template-columns: ${(props) => props.recolumns || "1fr"};
-    padding: 14px;
+    grid-template-columns: ${(props) => props.recolumns || ""};
   }
 `;
 
 const DivAdjustGrodimageMedia = styled.div`
- background: #ffffff;
-  padding: 15px;
-  margin-top:15px;
-  border-radius: 14px;
-  border: 1px solid #e7e7e7;
-  box-shadow: 0 4px 14px rgba(0,0,0,0.04);
-  
+  border: 2px solid #ccc;
+  border-radius: 4px;
   /* padding: 10px; */
   display: grid;
   grid-template-columns: repeat(1, 1fr);
@@ -254,12 +261,10 @@ const DivHeaderInfoMedia = styled.div`
 `;
 
 const MediaDivMainGrid = styled.div`
-  background: #ffffff;
-  padding: 15px;
-  margin-top:15px;
-  border-radius: 14px;
-  border: 1px solid #e7e7e7;
-  box-shadow: 0 4px 14px rgba(0,0,0,0.04);
+  /* display: flex; */
+  border: 2px solid #ccc;
+  border-radius: 4px;
+  /* padding: 10px; */
 `;
 
 const StyleGridInsideMedia = styled.div`
@@ -280,7 +285,7 @@ const modalStyle = {
 };
 
 const SelectStyle = styled.select`
-  /* border: none; */
+  border: none;
   border-radius: 4px;
   padding: 3px 6px;
   &:focus {
@@ -995,8 +1000,8 @@ export default function AddHonors({ setDataUpdated, setActiveKey }) {
                         <div>
                           <div className="mt-3">
                             {section.type === "image" &&
-                            URL &&
-                            section?.items[0]?.src ? (
+                              URL &&
+                              section?.items[0]?.src ? (
                               <div className="d-flex flex-column align-items-center">
                                 <BoxFirstSection
                                   component="img"
@@ -1606,9 +1611,9 @@ export default function AddHonors({ setDataUpdated, setActiveKey }) {
                                         media.map((m, iIdx) =>
                                           iIdx === index
                                             ? {
-                                                ...m,
-                                                poster: e.target.files[0],
-                                              }
+                                              ...m,
+                                              poster: e.target.files[0],
+                                            }
                                             : m
                                         )
                                       )
@@ -1732,13 +1737,13 @@ export default function AddHonors({ setDataUpdated, setActiveKey }) {
                             filedOrder.map((f, iIdx) =>
                               iIdx === index
                                 ? {
-                                    ...f,
-                                    type: e.target.value,
-                                    dropDownOP:
-                                      e.target.value === "dropDown"
-                                        ? [{ text: "", isChecked: false }]
-                                        : [],
-                                  }
+                                  ...f,
+                                  type: e.target.value,
+                                  dropDownOP:
+                                    e.target.value === "dropDown"
+                                      ? [{ text: "", isChecked: false }]
+                                      : [],
+                                }
                                 : f
                             )
                           )
@@ -1820,9 +1825,10 @@ export default function AddHonors({ setDataUpdated, setActiveKey }) {
                                   setFiledOrder(updatedFiledOrder);
                                 }}
                                 required
-                                style={{ width: "60%" }}
-                                className="form-control"
+                                style={{ width: '60%' }}
+        className="form-control"
                               />
+
                               <input
                                 type="checkbox"
                                 checked={option.isChecked}
