@@ -94,8 +94,6 @@ const Pagination = ({ currentPage, totalPages, onPageChange }) => {
 
   const pageNumbers = getPageNumbers();
 
-  console.log(pageNumbers);
-
   return (
     <PaginationContainer>
        <ButtonStyle

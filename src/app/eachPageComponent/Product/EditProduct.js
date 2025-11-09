@@ -90,10 +90,10 @@ const DivAdjustColorDivs = styled.div`
 
   background: #ffffff;
   padding: 15px;
-  margin-top:15px;
+  margin-top: 15px;
   border-radius: 14px;
   border: 1px solid #e7e7e7;
-  box-shadow: 0 4px 14px rgba(0,0,0,0.04);
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.04);
 
   .dropDownSpecoficStyle {
     border: 1px solid #d9d9d9;
@@ -142,11 +142,11 @@ const DivAdjustColorDivs = styled.div`
 const DivAdjustGrodimageMedia = styled.div`
   background: #ffffff;
   padding: 15px;
-  margin-top:15px;
+  margin-top: 15px;
   border-radius: 14px;
   border: 1px solid #e7e7e7;
-  box-shadow: 0 4px 14px rgba(0,0,0,0.04);
-  
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.04);
+
   /* padding: 10px; */
   display: grid;
   grid-template-columns: repeat(1, 1fr);
@@ -218,7 +218,7 @@ const NavTabs = styled(Tabs)`
 `;
 
 const AddSectionForm = styled.div`
-   padding: 1.25rem;
+  padding: 1.25rem;
   border: 1px solid rgba(0, 0, 0, 0.05);
   border-radius: 14px;
   background: #ffffff;
@@ -227,7 +227,7 @@ const AddSectionForm = styled.div`
 `;
 
 const BorderInputBox = styled.div`
- padding: 1rem;
+  padding: 1rem;
   border: 1px solid rgba(0, 0, 0, 0.05);
   border-radius: 14px;
   background: #ffffff;
@@ -310,10 +310,10 @@ const HeaderModalShowAccessMainDiv = styled.div`
 const MediaDivMainGrid = styled.div`
   background: #ffffff;
   padding: 15px;
-  margin-top:15px;
+  margin-top: 15px;
   border-radius: 14px;
   border: 1px solid #e7e7e7;
-  box-shadow: 0 4px 14px rgba(0,0,0,0.04);
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.04);
 `;
 
 const modalStyle = {
@@ -350,7 +350,7 @@ export default function EditHonors({
   setEditedHonor,
   setDataUpdated,
 }) {
-  console.log(editedHonor);
+  // console.log(editedHonor);
 
   const dispatch = useDispatch();
 
@@ -358,6 +358,8 @@ export default function EditHonors({
   const [selectedNavId, setSelectedNavId] = useState("");
   const [availableItems, setAvailableItems] = useState([]);
   const [usedNavIds, setUsedNavIds] = useState([]);
+
+  // console.log(editedHonor);
 
   const [name, setName] = useState("");
   const [title, setTitle] = useState("");
@@ -464,6 +466,7 @@ export default function EditHonors({
       setImgData(
         editedHonor.info.imgData || [{ src: "", type: "1", poster: "" }]
       );
+      setSelectedNavId(editedHonor.navId || "");
       setMedia(
         editedHonor.media || [
           { title: "", description: "", src: "", poster: "" },
@@ -955,7 +958,7 @@ export default function EditHonors({
         filedOrder,
       };
 
-      console.log(productData);
+      // console.log(productData);
 
       // Dispatch the final product submission
       const dataConfirmComing = await dispatch(
@@ -1011,6 +1014,7 @@ export default function EditHonors({
           انتخاب محصول :
         </label>
         <SelectWidth
+          disabled={true}
           id="productSelect"
           value={selectedNavId}
           onChange={(e) => {
@@ -1018,7 +1022,13 @@ export default function EditHonors({
               (item) => item.id.toString() === e.target.value
             );
             setSelectedNavId(e.target.value);
-            setName(selectedItem ? selectedItem.title : "");
+            if (selectedItem) {
+              const safe = selectedItem.title.replaceAll("/", "-").trim();
+              setName(safe);
+            } else {
+              setName("");
+            }
+            // setName(selectedItem ? selectedItem.title : "");
           }}
         >
           <option value="" disabled>
@@ -1374,7 +1384,6 @@ export default function EditHonors({
                                     itemIndex
                                   )
                                 }
-                                
                               />
 
                               {section.type === "image" && item.src && (
@@ -2053,7 +2062,7 @@ export default function EditHonors({
                               type="text"
                               placeholder={`گزینه ${optIndex + 1}`}
                               value={option.text}
-                              style={{width: '60%'}}
+                              style={{ width: "60%" }}
                               onChange={(e) =>
                                 handleDropDownOptionTextChange(
                                   index,
@@ -2064,7 +2073,6 @@ export default function EditHonors({
                               required
                               className="form-control"
                             />
-
                             {/* Checkbox for the option */}
                             <input
                               type="checkbox"

@@ -26,10 +26,10 @@ const DivAdjustColorDivs = styled.div`
 
   background: #ffffff;
   padding: 15px;
-  margin-top:15px;
+  margin-top: 15px;
   border-radius: 14px;
   border: 1px solid #e7e7e7;
-  box-shadow: 0 4px 14px rgba(0,0,0,0.04);
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.04);
 
   .dropDownSpecoficStyle {
     border: 1px solid #d9d9d9;
@@ -76,13 +76,13 @@ const DivAdjustColorDivs = styled.div`
 `;
 
 const DivAdjustGrodimageMedia = styled.div`
- background: #ffffff;
+  background: #ffffff;
   padding: 15px;
-  margin-top:15px;
+  margin-top: 15px;
   border-radius: 14px;
   border: 1px solid #e7e7e7;
-  box-shadow: 0 4px 14px rgba(0,0,0,0.04);
-  
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.04);
+
   /* padding: 10px; */
   display: grid;
   grid-template-columns: repeat(1, 1fr);
@@ -256,10 +256,10 @@ const DivHeaderInfoMedia = styled.div`
 const MediaDivMainGrid = styled.div`
   background: #ffffff;
   padding: 15px;
-  margin-top:15px;
+  margin-top: 15px;
   border-radius: 14px;
   border: 1px solid #e7e7e7;
-  box-shadow: 0 4px 14px rgba(0,0,0,0.04);
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.04);
 `;
 
 const StyleGridInsideMedia = styled.div`
@@ -812,7 +812,12 @@ export default function AddHonors({ setDataUpdated, setActiveKey }) {
                 (item) => item.id.toString() === e.target.value
               );
               setSelectedNavId(e.target.value);
-              setName(selectedItem ? selectedItem.title : "");
+              if (selectedItem) {
+                const safe = selectedItem.title.replaceAll("/", "-").trim();
+                setName(safe);
+              } else {
+                setName("");
+              }
             }}
             required
           >
