@@ -52,6 +52,7 @@ const CARD = styled(Card)`
   /* box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05); */
   display: flex;
   flex-direction: column;
+  height: fit-content;
   .zIndex {
     z-index: 12;
   }
@@ -65,7 +66,7 @@ const CARD = styled(Card)`
   cursor: pointer;
   max-width: 500px;
   max-height: 500px;
-  min-height:100px;
+  min-height: 100px;
 
   &:hover {
     transform: translateY(-5px);
@@ -349,13 +350,17 @@ export default function HonorsMainComponent({ toggleShow }) {
       {activekey === "addUser" && !editedHonor && (
         <>
           <div>
-            <AddBlogs setActiveKey={setActiveKey}/>
+            <AddBlogs
+              setActiveKey={setActiveKey}
+              setUpdateData={setUpdateData}
+            />
           </div>
         </>
       )}
       {editedHonor && (
         <>
           <EditBlogs
+            setUpdateData={setUpdateData}
             editedHonor={editedHonor}
             handleCancelEdit={handleCancelEdit}
             setEditedHonor={setEditedHonor}

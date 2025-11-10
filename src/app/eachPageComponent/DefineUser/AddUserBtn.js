@@ -72,7 +72,6 @@ export default function AddUserBtn({
 
   const [updateData, setUpdateData] = useState(false);
   const [selectedValues, setSelectedValues] = useState([]);
-  console.log(selectedValues);
 
   const [loadingAddUser, setLoadingAddUser] = useState(false);
 
@@ -89,8 +88,7 @@ export default function AddUserBtn({
   const [isButtonDisabled, setisButtonDisabled] = useState(true);
   const [hideAcceseebility, setHideAcceseebility] = useState(true);
 
-  console.log(newUserData);
-  
+  const [error, seterror] = useState(null);
 
   useEffect(() => {
     if (
@@ -147,6 +145,7 @@ export default function AddUserBtn({
 
       handleAddModalClose();
     } catch (error) {
+      seterror(error);
       console.error("Error adding user:", error);
     } finally {
       setLoadingAddUser(false);
@@ -200,7 +199,13 @@ export default function AddUserBtn({
         </Modal.Header>
         <Modal.Body>
           <form>
-            {/* Input fields for new user data (replace with appropriate labels) */}
+            {error && (
+              <>
+                <p style={{ color: "#e91e63" }} className="text-center">
+                  {error}
+                </p>
+              </>
+            )}
             <div className="form-group">
               <label className="mb-1 me-1" htmlFor="firstName">
                 نام

@@ -97,7 +97,7 @@ const BUTTONSSTYLE = styled.div`
   }
 `;
 
-export default function AddHonors({ setActiveKey }) {
+export default function AddHonors({ setActiveKey , setUpdateData }) {
   const dispatch = useDispatch();
 
   const [bannerTitle, setBannerTitle] = useState("");
@@ -150,6 +150,7 @@ export default function AddHonors({ setActiveKey }) {
   function closeModalOnTimeout() {
     setTimeout(() => {
       setOpenModal2(false);
+      setActiveKey("editUserPage");
     }, 3000);
   }
 
@@ -164,6 +165,8 @@ export default function AddHonors({ setActiveKey }) {
       src: bannerImage,
       link: bannerLink,
     };
+
+
     try {
       const fetchData = await dispatch(bannerpot(formData)).unwrap();
       if (fetchData) {
@@ -173,6 +176,8 @@ export default function AddHonors({ setActiveKey }) {
     } catch (error) {
       setOpenModal3(true);
       console.error("Error submitting data:", error);
+    }finally {
+      setUpdateData(true);
     }
   };
 

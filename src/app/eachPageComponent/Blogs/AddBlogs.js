@@ -108,7 +108,7 @@ import { useDispatch } from "react-redux";
 import { uploadFile } from "@/app/Store/thunks";
 import { blogspot } from "@/app/Store/thunks";
 
-export default function AddHonors({ setActiveKey }) {
+export default function AddHonors({ setActiveKey , setUpdateData }) {
   const dispatch = useDispatch();
 
   const [content, setContent] = useState("");
@@ -250,6 +250,7 @@ export default function AddHonors({ setActiveKey }) {
   function closeModalOnTimeout() {
     setTimeout(() => {
       setOpenModal2(false);
+      setActiveKey("editUserPage");
     }, 3000);
   }
 
@@ -288,6 +289,8 @@ export default function AddHonors({ setActiveKey }) {
     } catch (error) {
       setOpenModal3(true);
       console.error("Error submitting data:", error);
+    } finally{
+      setUpdateData(true);
     }
   };
 
