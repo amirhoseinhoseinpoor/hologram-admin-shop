@@ -123,6 +123,7 @@ const BUTTONSSTYLE = styled.div`
 `;
 
 export default function EditHonors({
+  setUpdateData,
   editedHonor,
   handleCancelEdit,
   setEditedHonor,
@@ -221,6 +222,7 @@ export default function EditHonors({
   function closeModalOnTimeout() {
     setTimeout(() => {
       setOpenModal2(false);
+      handleCancelEdit();
     }, 3000);
   }
 
@@ -271,6 +273,8 @@ export default function EditHonors({
     } catch (error) {
       setOpenModal3(true);
       console.error("Error creating product:", error);
+    }finally{
+      setUpdateData(true);
     }
   };
 

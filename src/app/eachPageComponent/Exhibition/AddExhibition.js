@@ -95,7 +95,7 @@ const BUTTONSSTYLE = styled.div`
   }
 `;
 
-export default function AddHonors({ setActiveKey }) {
+export default function AddHonors({ setActiveKey  ,setUpdateData }) {
   const dispatch = useDispatch();
 
   const [content, setContent] = useState("");
@@ -181,6 +181,7 @@ export default function AddHonors({ setActiveKey }) {
   function closeModalOnTimeout() {
     setTimeout(() => {
       setOpenModal2(false);
+      setActiveKey("editUserPage");
     }, 3000);
   }
 
@@ -208,6 +209,8 @@ export default function AddHonors({ setActiveKey }) {
     } catch (error) {
       setOpenModal3(true);
       console.error("Error submitting data:", error);
+    }finally {
+      setUpdateData(true);
     }
   };
 

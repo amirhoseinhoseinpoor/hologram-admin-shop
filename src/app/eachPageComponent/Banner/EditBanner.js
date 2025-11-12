@@ -41,7 +41,6 @@ const MainDivSection = styled.section`
   /* border: 2px solid #c0c0c0; */
   /* border-radius: 6px; */
 
-
   padding: 1.25rem;
   gap: 1rem;
   border: 1px solid rgba(0, 0, 0, 0.08);
@@ -115,6 +114,7 @@ const BUTTONSSTYLE = styled.div`
 `;
 
 export default function EditHonors({
+  setUpdateData,
   editedHonor,
   handleCancelEdit,
   setEditedHonor,
@@ -202,6 +202,7 @@ export default function EditHonors({
   function closeModalOnTimeout() {
     setTimeout(() => {
       setOpenModal2(false);
+      handleCancelEdit();
     }, 3000);
   }
 
@@ -223,6 +224,8 @@ export default function EditHonors({
     } catch (error) {
       setOpenModal3(true);
       console.error("Error submitting data:", error);
+    }finally {
+      setUpdateData(true);
     }
   };
 

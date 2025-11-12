@@ -53,6 +53,7 @@ const CARD = styled(Card)`
   /* box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05); */
   display: flex;
   flex-direction: column;
+  height: fit-content;
   .zIndex {
     z-index: 12;
   }
@@ -334,7 +335,7 @@ export default function HonorsMainComponent({ toggleShow }) {
                     </React.Fragment>
                   ))
                 ) : (
-                  <TYPOGRAPHY variant="body2">No data available</TYPOGRAPHY>
+                  <TYPOGRAPHY variant="body2">در حال حاضر دیتایی موجود نمیباشد</TYPOGRAPHY>
                 )}
               </>
             )}
@@ -345,13 +346,14 @@ export default function HonorsMainComponent({ toggleShow }) {
       {activekey === "addUser" && !editedHonor && (
         <>
           <div>
-            <AddBanner setActiveKey={setActiveKey} />
+            <AddBanner setUpdateData={setUpdateData} setActiveKey={setActiveKey} />
           </div>
         </>
       )}
       {editedHonor && (
         <>
           <EditBanner
+            setUpdateData={setUpdateData}
             editedHonor={editedHonor}
             handleCancelEdit={handleCancelEdit}
             setEditedHonor={setEditedHonor}
@@ -372,7 +374,7 @@ export default function HonorsMainComponent({ toggleShow }) {
       <ErrorModal
         open={openModal3}
         onClose={closeModal3}
-        text={"خطا از لاگین بودن خود اطمینان حاصل فرمایید"}
+        text={"خطا در انجام عملیات"}
       />
     </section>
   );

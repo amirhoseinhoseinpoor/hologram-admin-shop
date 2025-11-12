@@ -85,7 +85,6 @@ const BorderDiv = styled.div`
   }
 `;
 
-
 const TEXTFIELD = styled(TextField)`
   .MuiInputBase-input {
     padding: 10px;
@@ -123,6 +122,7 @@ const DELETEUPLODEDIMAGE = styled.button`
 `;
 
 export default function EditHonors({
+  setUpdateData,
   editedHonor,
   handleCancelEdit,
   setEditedHonor,
@@ -232,6 +232,7 @@ export default function EditHonors({
   function closeModalOnTimeout() {
     setTimeout(() => {
       setOpenModal2(false);
+      handleCancelEdit();
     }, 3000);
   }
 
@@ -253,6 +254,8 @@ export default function EditHonors({
     } catch (error) {
       setOpenModal3(true);
       console.error("Error submitting data:", error);
+    }finally{
+      setUpdateData(true);
     }
   };
 
@@ -439,13 +442,13 @@ export default function EditHonors({
         <AreYouShureModal
           open={openModal}
           onClose={closeModal}
-          text={"ایا از ویرایش وبلاگ مطمعن هستید"}
+          text={"ایا از ویرایش نمایشگاه مطمئن هستید"}
           func={handleSubmit}
         />
         <AreYouShureModal
           open={openModal4}
           onClose={closeModal4}
-          text={"ایا از حذف وبلاگ مطمعن هستید"}
+          text={"ایا از حذف نمایشگاه مطمئن هستید"}
           func={handleDelete}
         />
         <ConfirmModal
@@ -456,7 +459,7 @@ export default function EditHonors({
         <ErrorModal
           open={openModal3}
           onClose={closeModal3}
-          text={"خطا از لاگین بودن خود اطمینان حاصل فرمایید"}
+          text={"خطا در انجام عملیات"}
         />
       </form>
     </div>

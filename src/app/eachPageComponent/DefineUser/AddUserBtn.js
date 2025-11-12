@@ -110,6 +110,8 @@ export default function AddUserBtn({
   const [rolesData, setRolesData] = useState(null);
   const [updateData, setUpdateData] = useState(false);
   const [selectedValues, setSelectedValues] = useState([]);
+  console.log(selectedValues);
+
   const [loadingAddUser, setLoadingAddUser] = useState(false);
   const [newUserData, setNewUserData] = useState({
     firstName: "",
@@ -249,7 +251,13 @@ export default function AddUserBtn({
             </>
           )}
           <form>
-            {/* Input fields for new user data (replace with appropriate labels) */}
+            {error && (
+              <>
+                <p style={{ color: "#e91e63" }} className="text-center">
+                  {error}
+                </p>
+              </>
+            )}
             <div className="form-group">
               <label className="mb-1 me-1" htmlFor="firstName">
                 نام
