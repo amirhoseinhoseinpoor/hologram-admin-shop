@@ -21,7 +21,7 @@ const HeadermakeOrder = styled.div`
   color: white;
   background-color: rgb(225, 223, 223);
   border-radius: 4px;
-  margin : 7px 15px;
+  margin: 7px 15px;
   .textHeaderStyle {
     color: black;
   }
@@ -140,7 +140,6 @@ export default function CustomerUserTabel({ toggleShow }) {
   const [searchTerm, setSearchTerm] = useState("");
   const [filteredUsers, setFilteredUsers] = useState(null);
 
-
   // loading
   const [trackLoading, setTrackLoading] = useState(false);
 
@@ -150,6 +149,12 @@ export default function CustomerUserTabel({ toggleShow }) {
 
   const [openModal3, setOpenModal3] = useState(false);
   const closeModal3 = () => setOpenModal3(false);
+
+  function closeModalOnTimeout() {
+    setTimeout(() => {
+      setOpenModal2(false);
+    }, 3000);
+  }
 
   // helper for trim & lowerCase
   const normalizeString = (str) => str.replace(/\s+/g, "").toLowerCase();
@@ -225,6 +230,7 @@ export default function CustomerUserTabel({ toggleShow }) {
       {/* add user */}
       <div className="d-flex justify-content-end  mb-3 container">
         <AddUserBtn
+          closeModalOnTimeout={() => closeModalOnTimeout()}
           setDataUpdated={setDataUpdated}
           setConfirmModal={() => setOpenModal2(true)}
           setErrorModal={() => setOpenModal3(true)}
@@ -281,6 +287,7 @@ export default function CustomerUserTabel({ toggleShow }) {
                         <td>
                           <div className="d-flex flex-row justify-content-center">
                             <EditUserBtnfunction
+                              closeModalOnTimeout={() => closeModalOnTimeout()}
                               setDataUpdated={setDataUpdated}
                               data={item}
                               setConfirmModal={() => setOpenModal2(true)}
@@ -340,6 +347,7 @@ export default function CustomerUserTabel({ toggleShow }) {
                       <p className="NormalTextSizing">عملیات :</p>
                       <div className="SecondValueTabel NormalTextSizing">
                         <EditUserBtnfunction
+                          closeModalOnTimeout={() => closeModalOnTimeout()}
                           setDataUpdated={setDataUpdated}
                           data={item}
                           setConfirmModal={() => setOpenModal2(true)}

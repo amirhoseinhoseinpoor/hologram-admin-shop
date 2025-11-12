@@ -251,13 +251,6 @@ export default function AddUserBtn({
             </>
           )}
           <form>
-            {error && (
-              <>
-                <p style={{ color: "#e91e63" }} className="text-center">
-                  {error}
-                </p>
-              </>
-            )}
             <div className="form-group">
               <label className="mb-1 me-1" htmlFor="firstName">
                 نام

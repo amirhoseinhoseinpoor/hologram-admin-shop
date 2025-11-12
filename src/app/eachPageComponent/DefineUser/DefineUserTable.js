@@ -457,6 +457,7 @@ export default function DefineUser({ toggleShow }) {
                       <p className="NormalTextSizing">عملیات :</p>
                       <div className="SecondValueTabel NormalTextSizing">
                         <EditUserBtnfunction
+                          closeModalOnTimeout={() => closeModalOnTimeout()}
                           setDataUpdated={setDataUpdated}
                           data={item}
                           setConfirmModal={() => setOpenModal2(true)}
