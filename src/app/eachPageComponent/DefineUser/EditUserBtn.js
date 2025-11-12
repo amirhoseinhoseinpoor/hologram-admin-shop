@@ -95,7 +95,49 @@ const RoleDivGridStyle = styled.div`
   border-radius: 4px;
 `;
 
-function EditUserBtnfunction({ data, setDataUpdated, setConfirmModal }) {
+const BUTTONSSTYLE = styled.div`
+  display: flex;
+  width: 100%;
+
+  .confirmButtonStyle,
+  .cancelButtonStyle {
+    font-size: 14px;
+    padding: 8px 25px;
+    border-radius: 10px;
+    font-weight: 500;
+    transition: 160ms ease;
+  }
+
+  .confirmButtonStyle {
+    background: #43a047;
+    color: #fff;
+    border: none;
+
+    &:hover {
+      background: #3a8c3e;
+      transform: translateY(-1px);
+    }
+  }
+
+  .cancelButtonStyle {
+    background: #fafafa;
+    border: 1px solid #d0d0d0;
+    color: #444;
+
+    &:hover {
+      background: #f0f0f0;
+      border-color: #bdbdbd;
+      transform: translateY(-1px);
+    }
+  }
+`;
+
+function EditUserBtnfunction({
+  data,
+  setDataUpdated,
+  setConfirmModal,
+  closeModalOnTimeout,
+}) {
   const dispatch = useDispatch();
 
   const [rolesData, setRolesData] = useState(null);
@@ -117,6 +159,9 @@ function EditUserBtnfunction({ data, setDataUpdated, setConfirmModal }) {
   const [secondPassword, setSecondPassword] = useState("");
 
   const [hideAcceseebility, setHideAcceseebility] = useState(true);
+
+  const [error, seterror] = useState(null);
+  const hasError = Boolean(error);
 
   useEffect(() => {
     if (
@@ -201,8 +246,11 @@ function EditUserBtnfunction({ data, setDataUpdated, setConfirmModal }) {
       setDataUpdated(true);
       if (deleteUserApiCall.statusCode == 200) {
         setConfirmModal(true);
+        seterror(null);
+        closeModalOnTimeout();
       }
     } catch (error) {
+      seterror(error);
       console.error("Error deleting user:", error);
     } finally {
       setLoadingDelete(false);
@@ -230,9 +278,12 @@ function EditUserBtnfunction({ data, setDataUpdated, setConfirmModal }) {
       }
 
       setDataUpdated(true);
+      seterror(null);
 
+      closeModalOnTimeout();
       handleEditModalClose();
     } catch (error) {
+      seterror(error);
       console.error("Error editing user:", error);
     } finally {
       setLoadingConfirmEdit(false);
@@ -252,9 +303,8 @@ function EditUserBtnfunction({ data, setDataUpdated, setConfirmModal }) {
         setConfirmModal(true);
       }
 
-      console.log(SendingEditUserAPI);
-
       setDataUpdated(true);
+      closeModalOnTimeout();
       handleCloseEditModalPassword();
     } catch (error) {
       console.error("Error editing user:", error);
@@ -353,12 +403,23 @@ function EditUserBtnfunction({ data, setDataUpdated, setConfirmModal }) {
           <Modal.Title>ویرایش کاربر</Modal.Title>
         </Modal.Header>
         <Modal.Body>
+          {error && (
+            <>
+              <p
+                className="d-flex justify-content-center mb-2"
+                style={{ color: "#e91e63" }}
+              >
+                {error}
+              </p>
+            </>
+          )}
           <form onSubmit={handleEditSubmit}>
             <div className="form-group">
               <label className="mb-1 me-1" htmlFor="firstName">
                 نام
               </label>
               <input
+                style={{ border: hasError ? "1.2px solid #FF4F3F" : "" }}
                 type="text"
                 id="firstName"
                 className="form-control"
@@ -374,6 +435,7 @@ function EditUserBtnfunction({ data, setDataUpdated, setConfirmModal }) {
                 نام خانوادگی
               </label>
               <input
+                style={{ border: hasError ? "1.2px solid #FF4F3F" : "" }}
                 type="text"
                 id="lastName"
                 className="form-control"
@@ -389,6 +451,7 @@ function EditUserBtnfunction({ data, setDataUpdated, setConfirmModal }) {
                 شماره همراه
               </label>
               <input
+                style={{ border: hasError ? "1.2px solid #FF4F3F" : "" }}
                 type="number"
                 id="username"
                 className="form-control"
@@ -404,12 +467,15 @@ function EditUserBtnfunction({ data, setDataUpdated, setConfirmModal }) {
                 وضعیت
               </label>
               <select
+                style={{
+                  border: hasError ? "1.2px solid #FF4F3F" : "",
+                  boxShadow: "unset",
+                }}
                 id="factorType"
                 value={factorType}
                 name="active"
                 onChange={handleActiveStateChange}
                 className="form-select mb-2"
-                style={{ boxShadow: "unset" }}
               >
                 <option value="true">فعال</option>
                 <option value="false">غیرفعال</option>
@@ -425,7 +491,10 @@ function EditUserBtnfunction({ data, setDataUpdated, setConfirmModal }) {
                 name="whereLogin"
                 onChange={handleDomainChange}
                 className="form-select mb-2"
-                style={{ boxShadow: "unset" }}
+                style={{
+                  border: hasError ? "1.2px solid #FF4F3F" : "",
+                  boxShadow: "unset",
+                }}
               >
                 <option value="1">سایت</option>
                 <option value="2">ادمین و سایت</option>
@@ -459,6 +528,9 @@ function EditUserBtnfunction({ data, setDataUpdated, setConfirmModal }) {
                       className="d-flex flex-row align-items-center gap-2"
                     >
                       <input
+                        style={{
+                          border: hasError ? "1.2px solid #FF4F3F" : "",
+                        }}
                         type="checkbox"
                         value={item.id}
                         onChange={handleChange}
@@ -472,15 +544,21 @@ function EditUserBtnfunction({ data, setDataUpdated, setConfirmModal }) {
             )}
 
             <div className="d-flex flex-row justify-content-between">
-              <Button variant="primary" type="submit">
-                {loadingConfirmEdit ? <LoadingCss /> : "ذخیره"}
-              </Button>
-              {/* <DeleteButtonStyle
+              <BUTTONSSTYLE className="justify-content-end">
+                <Button
+                  className="confirmButtonStyle"
+                  variant="primary"
+                  type="submit"
+                >
+                  {loadingConfirmEdit ? <LoadingCss /> : "ذخیره"}
+                </Button>
+                {/* <DeleteButtonStyle
                 type="button"
                 
               >
                 {loadingDelete ? <LoadingCss /> : "حذف اکانت"}
               </DeleteButtonStyle> */}
+              </BUTTONSSTYLE>
             </div>
           </form>
         </Modal.Body>
@@ -495,6 +573,16 @@ function EditUserBtnfunction({ data, setDataUpdated, setConfirmModal }) {
         </Modal.Header>
 
         <Modal.Body>
+          {error && (
+            <>
+              <p
+                className="d-flex justify-content-center mb-2"
+                style={{ color: "#e91e63" }}
+              >
+                {error}
+              </p>
+            </>
+          )}
           <form onSubmit={handleChangePassword}>
             <div className="form-group">
               <label
@@ -504,6 +592,7 @@ function EditUserBtnfunction({ data, setDataUpdated, setConfirmModal }) {
                 پسورد جدید
               </label>
               <input
+                style={{ border: hasError ? "1.2px solid #FF4F3F" : "" }}
                 type="password"
                 id="firstPassword"
                 className="form-control NormalTextSizing"
@@ -522,6 +611,7 @@ function EditUserBtnfunction({ data, setDataUpdated, setConfirmModal }) {
                 تایید پسورد
               </label>
               <input
+                style={{ border: hasError ? "1.2px solid #FF4F3F" : "" }}
                 type="password"
                 id="secondPassword"
                 className="form-control NormalTextSizing"
@@ -534,19 +624,21 @@ function EditUserBtnfunction({ data, setDataUpdated, setConfirmModal }) {
             </div>
 
             <div className="d-flex flex-row justify-content-between">
-              <Button
-                className="NormalTextSizing"
-                disabled={isButtonDisabled}
-                style={{
-                  backgroundColor: isButtonDisabled ? "#868686" : "",
-                  border: isButtonDisabled ? "#868686" : "",
-                  cursor: isButtonDisabled ? "not-allowed" : "pointer",
-                }}
-                variant="primary"
-                type="submit"
-              >
-                {loadingConfirmEdit ? <LoadingCss /> : "ذخیره"}
-              </Button>
+              <BUTTONSSTYLE className="justify-content-end">
+                <Button
+                  className="NormalTextSizing confirmButtonStyle"
+                  disabled={isButtonDisabled}
+                  style={{
+                    backgroundColor: isButtonDisabled ? "#868686" : "",
+                    border: isButtonDisabled ? "#868686" : "",
+                    cursor: isButtonDisabled ? "not-allowed" : "pointer",
+                  }}
+                  variant="primary"
+                  type="submit"
+                >
+                  {loadingConfirmEdit ? <LoadingCss /> : "ذخیره"}
+                </Button>
+              </BUTTONSSTYLE>
             </div>
           </form>
         </Modal.Body>
