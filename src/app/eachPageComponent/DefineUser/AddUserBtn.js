@@ -52,6 +52,44 @@ const AddUserBtnstyle = styled(Button)`
   border-radius: 4px;
   background-image: linear-gradient(195deg, #66bb6a 0%, #43a047 100%);
 `;
+
+const BUTTONSSTYLE = styled.div`
+  display: flex;
+  width: 100%;
+
+  .confirmButtonStyle,
+  .cancelButtonStyle {
+    font-size: 14px;
+    padding: 7px 20px;
+    border-radius: 10px;
+    font-weight: 500;
+    transition: 160ms ease;
+  }
+
+  .confirmButtonStyle {
+    background: #43a047;
+    color: #fff;
+    border: none;
+
+    &:hover {
+      background: #3a8c3e;
+      transform: translateY(-1px);
+    }
+  }
+
+  .cancelButtonStyle {
+    background: #fafafa;
+    border: 1px solid #d0d0d0;
+    color: #444;
+
+    &:hover {
+      background: #f0f0f0;
+      border-color: #bdbdbd;
+      transform: translateY(-1px);
+    }
+  }
+`;
+
 const RoleDivGridStyle = styled.div`
   display: grid;
   grid-template-columns: repeat(3, 1fr);
@@ -62,6 +100,7 @@ const RoleDivGridStyle = styled.div`
 `;
 
 export default function AddUserBtn({
+  closeModalOnTimeout,
   setDataUpdated,
   setConfirmModal,
   setErrorModal,
@@ -69,13 +108,11 @@ export default function AddUserBtn({
   const dispatch = useDispatch();
 
   const [rolesData, setRolesData] = useState(null);
-
   const [updateData, setUpdateData] = useState(false);
   const [selectedValues, setSelectedValues] = useState([]);
   console.log(selectedValues);
 
   const [loadingAddUser, setLoadingAddUser] = useState(false);
-
   const [newUserData, setNewUserData] = useState({
     firstName: "",
     lastName: "",
@@ -89,8 +126,8 @@ export default function AddUserBtn({
   const [isButtonDisabled, setisButtonDisabled] = useState(true);
   const [hideAcceseebility, setHideAcceseebility] = useState(true);
 
-  console.log(newUserData);
-  
+  const [error, seterror] = useState(null);
+  const hasError = Boolean(error);
 
   useEffect(() => {
     if (
@@ -141,12 +178,16 @@ export default function AddUserBtn({
       if (gettingResponseAPI) {
         setDataUpdated(true);
         setConfirmModal(true);
+        closeModalOnTimeout();
       } else {
         setErrorModal(true);
       }
 
+      seterror(null);
+
       handleAddModalClose();
     } catch (error) {
+      seterror(error);
       console.error("Error adding user:", error);
     } finally {
       setLoadingAddUser(false);
@@ -199,13 +240,23 @@ export default function AddUserBtn({
           <Modal.Title>اضافه کردن کاربر جدید</Modal.Title>
         </Modal.Header>
         <Modal.Body>
+          {error && (
+            <>
+              <p
+                className="d-flex justify-content-center mb-2"
+                style={{ color: "#e91e63" }}
+              >
+                {error}
+              </p>
+            </>
+          )}
           <form>
-            {/* Input fields for new user data (replace with appropriate labels) */}
             <div className="form-group">
               <label className="mb-1 me-1" htmlFor="firstName">
                 نام
               </label>
               <input
+                style={{ border: hasError ? "1.2px solid #FF4F3F" : "" }}
                 type="text"
                 id="firstName"
                 name="firstName"
@@ -222,6 +273,7 @@ export default function AddUserBtn({
                 نام خانوادگی
               </label>
               <input
+                style={{ border: hasError ? "1.2px solid #FF4F3F" : "" }}
                 type="text"
                 id="lastName"
                 name="lastName"
@@ -250,6 +302,7 @@ export default function AddUserBtn({
                 شماره همراه
               </label>
               <input
+                style={{ border: hasError ? "1.2px solid #FF4F3F" : "" }}
                 type="number"
                 id="username"
                 name="username"
@@ -266,6 +319,7 @@ export default function AddUserBtn({
                 رمز
               </label>
               <input
+                style={{ border: hasError ? "1.2px solid #FF4F3F" : "" }}
                 type="password"
                 id="password"
                 name="password"
@@ -282,6 +336,7 @@ export default function AddUserBtn({
                 تکرار رمز
               </label>
               <input
+                style={{ border: hasError ? "1.2px solid #FF4F3F" : "" }}
                 type="password"
                 id="confirmPassword"
                 name="confirmPassword"
@@ -313,6 +368,7 @@ export default function AddUserBtn({
                 امکان دسترسی
               </label>
               <select
+              style={{ border: hasError ? "1.2px solid #FF4F3F" : "" }}
                 id="domain"
                 name="domain"
                 className="form-control"
@@ -357,6 +413,9 @@ export default function AddUserBtn({
                       className="d-flex flex-row align-items-center gap-2"
                     >
                       <input
+                        style={{
+                          border: hasError ? "1.2px solid #FF4F3F" : "",
+                        }}
                         type="checkbox"
                         value={item.id}
                         onChange={handleChange}
@@ -370,29 +429,35 @@ export default function AddUserBtn({
           </form>
         </Modal.Body>
         <Modal.Footer>
-          <Button variant="secondary" onClick={handleAddModalClose}>
-            لغو
-          </Button>
-          <Button
-            variant="primary"
-            onClick={handleAddUser}
-            disabled={isButtonDisabled}
-            style={{
-              backgroundColor: "#191919",
-              border: "unset",
-              backgroundColor: isButtonDisabled ? "#868686" : "",
-              border: isButtonDisabled ? "#868686" : "",
-              cursor: isButtonDisabled ? "not-allowed" : "pointer",
-            }}
-          >
-            {loadingAddUser ? (
-              <>
-                <LoadingCss />
-              </>
-            ) : (
-              <>ذخیره</>
-            )}
-          </Button>
+          <BUTTONSSTYLE className="flex gap-2 justify-content-end">
+            <Button
+              className="cancelButtonStyle"
+              variant="secondary"
+              onClick={handleAddModalClose}
+            >
+              لغو
+            </Button>
+            <Button
+              variant="primary"
+              onClick={handleAddUser}
+              disabled={isButtonDisabled}
+              className="confirmButtonStyle"
+              style={{
+                border: "unset",
+                backgroundColor: isButtonDisabled ? "#868686" : "",
+                border: isButtonDisabled ? "#868686" : "",
+                cursor: isButtonDisabled ? "not-allowed" : "pointer",
+              }}
+            >
+              {loadingAddUser ? (
+                <>
+                  <LoadingCss />
+                </>
+              ) : (
+                <>ذخیره</>
+              )}
+            </Button>
+          </BUTTONSSTYLE>
         </Modal.Footer>
       </AddUserModal>
     </section>

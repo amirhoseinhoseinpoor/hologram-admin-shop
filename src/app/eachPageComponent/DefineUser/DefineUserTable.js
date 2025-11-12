@@ -18,7 +18,6 @@ import AddUserBtn from "../DefineUser/AddUserBtn";
 import EditUserBtnfunction from "./EditUserBtn";
 import { Modal, Box } from "@mui/material";
 
-
 const HeadermakeOrder = styled.div`
   padding: 10px;
   color: white;
@@ -214,6 +213,12 @@ export default function DefineUser({ toggleShow }) {
     fetchUsers();
   }, [dispatch, dataUpdated]);
 
+  function closeModalOnTimeout() {
+    setTimeout(() => {
+      setOpenModal2(false);
+    }, 3000);
+  }
+
   // handle search filter
   useEffect(() => {
     if (!searchTerm) {
@@ -269,6 +274,7 @@ export default function DefineUser({ toggleShow }) {
         <AddUserBtn
           setDataUpdated={setDataUpdated}
           setConfirmModal={() => setOpenModal2(true)}
+          closeModalOnTimeout={() => closeModalOnTimeout()}
           setErrorModal={() => setOpenModal3(true)}
         />
       </div>
@@ -361,6 +367,7 @@ export default function DefineUser({ toggleShow }) {
                         <td>
                           <div className="d-flex flex-row justify-content-center">
                             <EditUserBtnfunction
+                              closeModalOnTimeout={() => closeModalOnTimeout()}
                               setDataUpdated={setDataUpdated}
                               data={item}
                               setConfirmModal={() => setOpenModal2(true)}
@@ -450,6 +457,7 @@ export default function DefineUser({ toggleShow }) {
                       <p className="NormalTextSizing">عملیات :</p>
                       <div className="SecondValueTabel NormalTextSizing">
                         <EditUserBtnfunction
+                          closeModalOnTimeout={() => closeModalOnTimeout()}
                           setDataUpdated={setDataUpdated}
                           data={item}
                           setConfirmModal={() => setOpenModal2(true)}

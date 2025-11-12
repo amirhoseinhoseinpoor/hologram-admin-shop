@@ -208,7 +208,7 @@ export default function HonorsMainComponent({ toggleShow }) {
     setEditedHonor(null);
   };
 
-  const areYouShureFunction = (product) => {
+  const areYouShureFunction = (product) => {    
     setDataForDelete(product);
     setOpenModal(true);
   };

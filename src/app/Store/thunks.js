@@ -35,7 +35,10 @@ export const login = createAsyncThunk(
         }
       );
 
-      console.log(gettingRole.data);
+      console.log(token);
+      
+
+      // console.log(gettingRole.data);
 
       return {
         token,
@@ -577,12 +580,18 @@ export const deleted = createAsyncThunk(
     const state = thunkAPI.getState();
     const token = state.auth.token.token;
 
+    
+    
+
     try {
       const response2 = await axios.get(
         `${process.env.NEXT_PUBLIC_BACK_END_SERVER}/system/download/list/${name}`
       );
 
       const listOfDelete = response2.data;
+
+      console.log(listOfDelete);
+      
 
       listOfDelete.map((item) => {
         const responseDelete = axios.delete(
@@ -593,8 +602,6 @@ export const deleted = createAsyncThunk(
             },
           }
         );
-        console.log(responseDelete);
-        console.log(item.fileName);
       });
 
       const responseDelete = await axios.delete(
@@ -605,6 +612,9 @@ export const deleted = createAsyncThunk(
           },
         }
       );
+
+      console.log(responseDelete);
+      
 
       const response = await axios.delete(
         `${process.env.NEXT_PUBLIC_BACK_END_SERVER}/product/${code}`,

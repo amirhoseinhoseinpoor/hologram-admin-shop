@@ -120,8 +120,6 @@ const AccessibilityMainComponent = dynamic(
 const AdminPanel = () => {
   const permission = useSelector(permissions);
 
-  console.log(permission);
-
   const [activeTab, setActiveTab] = useState("Product");
   const [visibility, setVisibility] = useState({});
 
@@ -195,7 +193,6 @@ const AdminPanel = () => {
       permission?.some((permission) => permission.htmlId === tab.id)
   );
 
-  console.log(filteredTabs);
 
   // Function to close a specific off-canvas
   const handleClose = (key) => {
