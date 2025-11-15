@@ -253,7 +253,7 @@ const AdminPanel = () => {
         </Tabs>
       </aside>
 
-      <div className={`${style.content}`}>
+      <div className={`${style.content} mb-3`}>
         <div className="w-100 ">
           <Navbar.Offcanvas
             placement="end"
@@ -501,7 +501,7 @@ const AdminPanel = () => {
             <AccessibilityMainComponent toggleShow={toggleShow} />
           </div>
         )}
-        <ShowVersionServer />
+        <ShowVersionServer/>
       </div>
     </section>
   );

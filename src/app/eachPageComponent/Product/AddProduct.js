@@ -1867,7 +1867,7 @@ export default function AddHonors({ setDataUpdated, setActiveKey }) {
         )}
 
         {/* Submit Button */}
-        <div className="d-flex flex-row align-items-center justify-content-between">
+        <div className="d-flex flex-row align-items-center justify-content-around">
           <button
             type="submit"
             className="mt-3 mb-3 text-white px-4 py-2 rounded"
@@ -1877,7 +1877,7 @@ export default function AddHonors({ setDataUpdated, setActiveKey }) {
               cursor: disableConfirm ? "not-allowed" : "pointer",
             }}
           >
-            اضافه کردن محصول
+            ذخیره
           </button>
           <ButtonCancelOrder
             type="button"

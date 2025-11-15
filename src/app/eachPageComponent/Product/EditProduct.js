@@ -2117,7 +2117,7 @@ export default function EditHonors({
               cursor: disableConfirm ? "not-allowed" : "pointer",
             }}
           >
-            ویرایش محصول
+            ذخیره
           </button>
           <button
             type="button"
