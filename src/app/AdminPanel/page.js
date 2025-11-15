@@ -30,6 +30,7 @@ import PersonIcon from "@mui/icons-material/Person";
 import ArrowDropDownIcon from "@mui/icons-material/ArrowDropDown";
 import AccessibilityIcon from "@mui/icons-material/Accessibility";
 import { Box } from "@mui/material";
+import ShowVersionServer from "../Components/ShowVersionServer.js";
 
 // import components
 const DefineUser = lazy(() =>
@@ -193,7 +194,6 @@ const AdminPanel = () => {
       permission?.some((permission) => permission.htmlId === tab.id)
   );
 
-
   // Function to close a specific off-canvas
   const handleClose = (key) => {
     setVisibility((prev) => ({ ...prev, [key]: false }));
@@ -207,7 +207,9 @@ const AdminPanel = () => {
   return (
     <section className={` ${style.adminPanel}`}>
       <aside className={`${style.sidebar} d-lg-flex d-none me-2 my-2`}>
-        <h4 className={`${style.titleStyleHeader} title`}>
+        <h4
+          className={`${style.titleStyleHeader} title d-flex flex-column justify-content-center gap-2 align-items-center`}
+        >
           <Box
             component="img"
             sx={{
@@ -499,6 +501,7 @@ const AdminPanel = () => {
             <AccessibilityMainComponent toggleShow={toggleShow} />
           </div>
         )}
+        <ShowVersionServer />
       </div>
     </section>
   );

@@ -69,32 +69,49 @@ const EditUserModal = styled(Modal)`
   }
 `;
 
-const EditUserBtn = styled.button`
-  border: none;
-  color: white;
-  padding: 5px;
-  text-align: center;
-  text-decoration: none;
-  display: inline-block;
-  margin: 4px 2px;
-  cursor: pointer;
-  border-radius: 4px;
-  background-image: linear-gradient(195deg, #66bb6a 0%, #43a047 100%);
-`;
+const BUTTONSSTYLE = styled.div`
+  display: flex;
+  width: 100%;
 
-const DeleteButtonStyle = styled.button`
-  border: none;
-  padding: 3px 5px !important;
-  background-color: unset !important;
-  border-radius: 4px;
-  color: red !important;
+  .confirmButtonStyle,
+  .cancelButtonStyle {
+    font-size: 14px;
+    padding: 8px 25px;
+    border-radius: 10px;
+    font-weight: 500;
+    transition: 160ms ease;
+  }
 
-  @media (max-width: 768px) {
-    padding: 3px 3px !important;
+  .confirmButtonStyle {
+    background: #43a047;
+    color: #fff;
+    border: none;
+
+    &:hover {
+      background: #3a8c3e;
+      transform: translateY(-1px);
+    }
+  }
+
+  .cancelButtonStyle {
+    background: #fafafa;
+    border: 1px solid #d0d0d0;
+    color: #444;
+
+    &:hover {
+      background: #f0f0f0;
+      border-color: #bdbdbd;
+      transform: translateY(-1px);
+    }
   }
 `;
 
-function EditUserBtnfunction({ data, setDataUpdated, setConfirmModal }) {
+function EditUserBtnfunction({
+  data,
+  setDataUpdated,
+  closeModalOnTimeout,
+  setConfirmModal,
+}) {
   const dispatch = useDispatch();
   const [showEditModal, setShowEditModal] = useState(false);
   const [userData, setUserData] = useState({});
@@ -107,6 +124,10 @@ function EditUserBtnfunction({ data, setDataUpdated, setConfirmModal }) {
   const [isButtonDisabled, setIsButtonDisabled] = useState(true);
   const [firstPassword, setfirstPassword] = useState("");
   const [secondPassword, setSecondPassword] = useState("");
+  const [loadingDelete, setLoadingDelete] = useState(false);
+
+  const [error, seterror] = useState(null);
+  const hasError = Boolean(error);
 
   useEffect(() => {
     if (
@@ -119,8 +140,6 @@ function EditUserBtnfunction({ data, setDataUpdated, setConfirmModal }) {
       setIsButtonDisabled(true);
     }
   }, [firstPassword, secondPassword]);
-
-  console.log(secondPassword);
 
   // modals state
   const [openModal, setOpenModal] = useState(false);
@@ -168,34 +187,60 @@ function EditUserBtnfunction({ data, setDataUpdated, setConfirmModal }) {
   };
 
   const handleDeleteUser = async () => {
-    const deleteUserApiCall = await dispatch(
-      deleteUser({ code: deleteCode })
-    ).unwrap();
+    try {
+      setLoadingDelete(true);
 
-    setOpenModal(false);
-    setDataUpdated(true);
-    if (deleteUserApiCall.statusCode == 200) {
-      setConfirmModal(true);
+      const deleteUserApiCall = await dispatch(
+        deleteUser({ code: deleteCode })
+      ).unwrap();
+
+      setOpenModal(false);
+      setDataUpdated(true);
+
+      if (deleteUserApiCall.statusCode == 200) {
+        setConfirmModal(true);
+        seterror(null);
+        closeModalOnTimeout();
+      }
+    } catch (error) {
+      seterror(error);
+      console.error("Error deleting user:", error);
+    } finally {
+      setLoadingDelete(false);
     }
   };
 
   const handleEditSubmit = async (event) => {
     event.preventDefault();
 
-    const sendingEditUser = await dispatch(
-      editUser({
-        code: userData?.code,
-        firstName: userData.firstName,
-        lastName: userData.lastName,
-        username: userData.username,
-        active: factorType,
-        domain: whereLogin,
-      })
-    ).unwrap();
+    try {
+      setLoadingConfirmEdit(true);
 
-    setDataUpdated(true);
-    console.log(sendingEditUser);
-    handleEditModalClose();
+      const sendingEditUser = await dispatch(
+        editUser({
+          code: userData?.code,
+          firstName: userData.firstName,
+          lastName: userData.lastName,
+          username: userData.username,
+          active: factorType,
+          domain: whereLogin,
+        })
+      ).unwrap();
+
+      if (sendingEditUser.statusCode == 200) {
+        setConfirmModal(true);
+      }
+
+      setDataUpdated(true);
+      seterror(null);
+      closeModalOnTimeout();
+      handleEditModalClose();
+    } catch (error) {
+      seterror(error);
+      console.error("Error editing user:", error);
+    } finally {
+      setLoadingConfirmEdit(false);
+    }
   };
 
   const handleChangePassword = async (event) => {
@@ -211,9 +256,8 @@ function EditUserBtnfunction({ data, setDataUpdated, setConfirmModal }) {
         setConfirmModal(true);
       }
 
-      console.log(SendingEditUserAPI);
-
       setDataUpdated(true);
+      closeModalOnTimeout();
       handleCloseEditModalPassword();
     } catch (error) {
       console.error("Error editing user:", error);
@@ -278,7 +322,9 @@ function EditUserBtnfunction({ data, setDataUpdated, setConfirmModal }) {
             <div style={{ color: "#F3802C" }}>
               <DeleteIcon className="text-danger subitem" />
             </div>
-            <p className="NormalTextSizing text-end">حذف اکانت</p>
+            <p className="NormalTextSizing text-end">
+              {loadingDelete ? <LoadingCss /> : "حذف اکانت"}
+            </p>
           </div>
         </NavBarInsideDiv>
         <div className="d-flex justify-content-end"></div>
@@ -385,13 +431,11 @@ function EditUserBtnfunction({ data, setDataUpdated, setConfirmModal }) {
               </select>
             </div> */}
             <div className="d-flex flex-row justify-content-between">
-              <Button
-                style={{ backgroundColor: "#43A047", border: "unset" }}
-                type="submit"
-              >
-                ذخیره
-              </Button>
-              {/* <DeleteButtonStyle
+              <BUTTONSSTYLE className="justify-content-end">
+                <Button className="confirmButtonStyle" type="submit">
+                  {loadingConfirmEdit ? <LoadingCss /> : "ذخیره"}
+                </Button>
+                {/* <DeleteButtonStyle
                 type="button"
                 onClick={(e) =>
                   areYouShureFunction(e, { code: userData?.code })
@@ -399,6 +443,7 @@ function EditUserBtnfunction({ data, setDataUpdated, setConfirmModal }) {
               >
                 حذف اکانت
               </DeleteButtonStyle> */}
+              </BUTTONSSTYLE>
             </div>
           </form>
         </Modal.Body>
@@ -452,19 +497,21 @@ function EditUserBtnfunction({ data, setDataUpdated, setConfirmModal }) {
             </div>
 
             <div className="d-flex flex-row justify-content-between">
-              <Button
-                className="NormalTextSizing"
-                disabled={isButtonDisabled}
-                style={{
-                  backgroundColor: isButtonDisabled ? "#868686" : "",
-                  border: isButtonDisabled ? "#868686" : "",
-                  cursor: isButtonDisabled ? "not-allowed" : "pointer",
-                }}
-                variant="primary"
-                type="submit"
-              >
-                {loadingConfirmEdit ? <LoadingCss /> : "ذخیره"}
-              </Button>
+              <BUTTONSSTYLE className="justify-content-end">
+                <Button
+                  className="NormalTextSizing confirmButtonStyle"
+                  disabled={isButtonDisabled}
+                  style={{
+                    backgroundColor: isButtonDisabled ? "#868686" : "",
+                    border: isButtonDisabled ? "#868686" : "",
+                    cursor: isButtonDisabled ? "not-allowed" : "pointer",
+                  }}
+                  variant="primary"
+                  type="submit"
+                >
+                  {loadingConfirmEdit ? <LoadingCss /> : "ذخیره"}
+                </Button>
+              </BUTTONSSTYLE>
             </div>
           </form>
         </Modal.Body>
