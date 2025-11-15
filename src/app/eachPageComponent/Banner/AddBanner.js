@@ -321,7 +321,7 @@ export default function AddHonors({ setActiveKey , setUpdateData }) {
 
         <BUTTONSSTYLE className="d-flex flex-row mt-3 mb-3 justify-content-around">
           <button className="confirmButtonStyle" type="submit">
-            اضافه کردن بنر
+            ذخیره
           </button>
 
           <button

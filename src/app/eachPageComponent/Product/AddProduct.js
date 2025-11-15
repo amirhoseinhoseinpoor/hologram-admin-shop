@@ -99,9 +99,9 @@ const ButtonAddSection = styled.button`
 `;
 
 const BOX = styled(Box)`
-  max-width: 350px;
+  max-width: 100%;
   width: 100%;
-  max-height: 200px;
+  /* max-height: 200px; */
   border-radius: 4px;
 `;
 

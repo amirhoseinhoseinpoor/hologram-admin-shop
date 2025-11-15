@@ -480,7 +480,7 @@ export default function AddHonors({ setActiveKey , setUpdateData }) {
         <BUTTONSSTYLE className="d-flex flex-row">
           <div className="d-flex flex-row mt-3 mb-3 gap-3 justify-content-around w-100">
             <button className="confirmButtonStyle" type="submit">
-              اضافه کردن ویدیو
+              ذخیره
             </button>
             <button
               className="cancelButtonStyle"

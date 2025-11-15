@@ -388,7 +388,7 @@ export default function AddHonors({ setActiveKey , setUpdateData }) {
             className="confirmButtonStyle"
             type="submit"
           >
-            تایید
+            ذخیره
           </button>
           <button className="cancelButtonStyle" type="button" onClick={() => setActiveKey('editUserPage')}>
             انصراف

@@ -191,7 +191,7 @@ export default function HonorsMainComponent({ toggleShow }) {
       setCurrentPage(dataResponse?.page);
     } catch (error) {
       console.error(error);
-    }finally {
+    } finally {
       setDataUpdated(false);
     }
   };
@@ -208,7 +208,7 @@ export default function HonorsMainComponent({ toggleShow }) {
     setEditedHonor(null);
   };
 
-  const areYouShureFunction = (product) => {    
+  const areYouShureFunction = (product) => {
     setDataForDelete(product);
     setOpenModal(true);
   };
@@ -270,7 +270,7 @@ export default function HonorsMainComponent({ toggleShow }) {
         <div>
           {activekey === "editUserPage" && !editedHonor && (
             <>
-              <div className="NormalTextSizing text-decoration-underline textHeaderStyle d-flex align-items-center">
+              <div className="NormalTextSizing textHeaderStyle d-flex align-items-center">
                 مدیریت محصولات
               </div>
             </>
@@ -282,7 +282,7 @@ export default function HonorsMainComponent({ toggleShow }) {
                 onClick={() => setActiveKey("editUserPage")}
                 className="text-decoration-underline NormalTextSizing textHeaderStyle d-flex align-items-center"
               >
-                مدیریت محصولات
+                مدیریت محصولات {`>`} اضافه کردن
               </div>
             </>
           )}
@@ -293,7 +293,7 @@ export default function HonorsMainComponent({ toggleShow }) {
                 onClick={handleCancelEdit}
                 className="NormalTextSizing text-decoration-underline textHeaderStyle d-flex align-items-center"
               >
-                مدیریت محصولات
+                مدیریت محصولات {`>`} ویرایش
               </div>
             </>
           )}
@@ -521,7 +521,10 @@ export default function HonorsMainComponent({ toggleShow }) {
 
       {activekey === "addUser" && !editedHonor && (
         <>
-          <AddProduct setDataUpdated={setDataUpdated} setActiveKey={setActiveKey}/>
+          <AddProduct
+            setDataUpdated={setDataUpdated}
+            setActiveKey={setActiveKey}
+          />
         </>
       )}
       {editedHonor && (

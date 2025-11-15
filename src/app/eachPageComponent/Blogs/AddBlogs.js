@@ -619,7 +619,7 @@ export default function AddHonors({ setActiveKey , setUpdateData }) {
             variant="contained"
             className="mt-3 confirmButtonStyle"
           >
-            تایید
+            ذخیره
           </button>
           <button
             className="cancelButtonStyle mt-3"

@@ -198,7 +198,7 @@ export default function HonorsMainComponent({ toggleShow }) {
         </div>
         {activekey === "editUserPage" && !editedHonor && (
           <>
-            <div className="NormalTextSizing text-decoration-underline textHeaderStyle d-flex align-items-center">
+            <div className="NormalTextSizing  textHeaderStyle d-flex align-items-center">
               مدیریت افتخارات
             </div>
           </>
@@ -210,7 +210,7 @@ export default function HonorsMainComponent({ toggleShow }) {
               onClick={() => setActiveKey("editUserPage")}
               className="NormalTextSizing text-decoration-underline textHeaderStyle d-flex align-items-center"
             >
-              مدیریت افتخارات
+              مدیریت افتخارات {`>`} اضافه کردن
             </div>
           </>
         )}
@@ -221,7 +221,7 @@ export default function HonorsMainComponent({ toggleShow }) {
               onClick={handleCancelEdit}
               className="NormalTextSizing text-decoration-underline textHeaderStyle d-flex align-items-center"
             >
-              مدیریت افتخارات
+              مدیریت افتخارات {`>`} ویرایش
             </div>
           </>
         )}

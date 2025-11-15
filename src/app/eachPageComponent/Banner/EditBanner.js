@@ -384,7 +384,7 @@ export default function EditHonors({
         <BUTTONSSTYLE className="d-flex flex-row">
           <div className="d-flex flex-row mt-3 mb-3 gap-3 w-100 justify-content-around">
             <button type="submit" className="confirmButtonStyle">
-              ویرایش بنر
+              ذخیره
             </button>
             <button className="cancelButtonStyle" onClick={handleCancelEdit}>
               انصراف

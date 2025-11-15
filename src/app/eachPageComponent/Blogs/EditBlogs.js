@@ -493,7 +493,6 @@ export default function EditHonors({
         </label>
         {productSrc ? (
           <>
-           
             <div
               className="d-flex flex-column position-relative"
               style={{ width: "fit-content" }}
@@ -674,15 +673,14 @@ export default function EditHonors({
           />
         </div>
 
-        <BUTTONSSTYLE className="d-flex flex-row justify-content-between">
-          <div className="d-flex flex-row mt-3 mb-3 gap-3">
-            <button type="submit" className="confirmButtonStyle">
-              ویرایش مقاله
-            </button>
-            <button className="cancelButtonStyle" onClick={handleCancelEdit}>
-              انصراف
-            </button>
-          </div>
+        <BUTTONSSTYLE className="d-flex flex-row justify-content-around  mt-3 mb-3">
+          <button type="submit" className="confirmButtonStyle">
+            ذخیره
+          </button>
+          <button className="cancelButtonStyle" onClick={handleCancelEdit}>
+            انصراف
+          </button>
+
           {/* <div>
             <button
               className="mt-2 mb-2 deleteButtonStyle"
