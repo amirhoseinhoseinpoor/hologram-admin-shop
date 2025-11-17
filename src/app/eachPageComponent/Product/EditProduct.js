@@ -1780,7 +1780,7 @@ export default function EditHonors({
                               <>
                                 <div
                                   className="d-flex flex-column"
-                                  style={{ width: "fit-content" }}
+                                  style={{ width: "100%" , alignItems: "center" }}
                                 >
                                   <BOX
                                     component="video"
@@ -1867,7 +1867,7 @@ export default function EditHonors({
                               <>
                                 <div
                                   className="d-flex flex-column"
-                                  style={{ width: "fit-content" }}
+                                  style={{ width: "100%" , alignItems: "center" }}
                                 >
                                   <BOX
                                     component="img"
