@@ -508,5 +508,6 @@ const AdminPanel = () => {
 };
 
 AdminPanel.displayName = "AdminPanel";
-Hoc(AdminPanel);
-export default AdminPanel;
+
+
+export default Hoc(AdminPanel);

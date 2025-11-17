@@ -1,28 +1,24 @@
-'use client'
+'use client';
 
 import React, { useEffect } from 'react';
 import { useSelector } from 'react-redux';
 import { useRouter } from 'next/navigation';
 
-function withPageAuthRequired(WrappedComponent) {
-    function WithPageAuthRequired(props) {
-        const authState = useSelector((state) => state.auth);  
-        const router = useRouter();
-        
-        useEffect(() => {
-            // if (!authState.token) {
-            //     router.push('/'); 
-            // }
-        }, [authState.token, router]);
-    
-        // if (!authState.token) {
-        //     return null;
-        // }
+export default function withPageAuthRequired(WrappedComponent) {
+  return function WithPageAuthRequired(props) {
+    const authState = useSelector((state) => state.auth);
+    const router = useRouter();
 
-        return <WrappedComponent {...props} />;
+    useEffect(() => {
+      if (!authState.token) {
+        router.push('/');
+      }
+    }, [authState.token, router]);
+
+    if (!authState.token) {
+      return null;
     }
 
-    return WithPageAuthRequired;
+    return <WrappedComponent {...props} />;
+  };
 }
-
-export default withPageAuthRequired;
