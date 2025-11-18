@@ -164,6 +164,9 @@ export default function HonorsMainComponent({ toggleShow }) {
   const [searchTerm, setSearchTerm] = useState("");
   const [filteredOrders, setFilteredOrders] = useState([]);
 
+  console.log(filteredOrders);
+  
+
   const [currentPage, setCurrentPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
 
@@ -374,13 +377,20 @@ export default function HonorsMainComponent({ toggleShow }) {
                           filteredOrders?.map((product, index) => (
                             <tr key={index}>
                               <td>
-                                {product && product.info?.imgData?.[0]?.src && (
+                                {product && product.info?.imgData?.[0]?.src && product.info?.imgData?.[0]?.type == 1  ? (
                                   <ProductCard>
                                     <ImageWrapper
                                       component="img"
                                       src={`${process.env.NEXT_PUBLIC_BACK_END_SERVER}/system/download/${product.info.imgData[0].src}`}
                                     />
                                   </ProductCard>
+                                ) : (
+                                  <>
+                                    <ImageWrapper
+                                      component="img"
+                                      src={`/HomeImages/360_F_470299797_UD0eoVMMSUbHCcNJCdv2t8B2g1GVqYgs.jpg`}
+                                    />
+                                  </>
                                 )}
                               </td>
                               <td>{product.name}</td>

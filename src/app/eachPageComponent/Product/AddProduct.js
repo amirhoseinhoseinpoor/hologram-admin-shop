@@ -302,7 +302,6 @@ export default function AddHonors({ setDataUpdated, setActiveKey }) {
   const [subtitle, setSubtitle] = useState("");
   const [subtitleCompelete, setSubtitleCompelete] = useState("");
   const [dynamicSections, setDynamicSections] = useState([]);
-  console.log(dynamicSections);
 
   const [imgData, setImgData] = useState([{ src: "", type: "1", poster: "" }]);
   const [media, setMedia] = useState([
@@ -573,6 +572,30 @@ export default function AddHonors({ setDataUpdated, setActiveKey }) {
       });
       setImgData(updatedImgData);
     }
+  };
+
+  const handleVideoChangeMedia = (e, index) => {
+    const file = e.target.files[0];
+    if (!file) return;
+
+    const url = URL.createObjectURL(file);
+
+    setMedia((prev) =>
+      prev.map((m, i) => (i === index ? { ...m, src: file, srcUrl: url } : m))
+    );
+  };
+
+  const handlePosterChangeMedia = (e, index) => {
+    const file = e.target.files[0];
+    if (!file) return;
+
+    const url = URL.createObjectURL(file);
+
+    setMedia((prev) =>
+      prev.map((m, i) =>
+        i === index ? { ...m, poster: file, posterUrl: url } : m
+      )
+    );
   };
 
   // Handlers to Add/Remove ImgData and Media Items
@@ -1242,15 +1265,15 @@ export default function AddHonors({ setDataUpdated, setActiveKey }) {
                       <DivHeaderInfoMedia className="d-flex justify-content-between">
                         <SelectStyle
                           value={item.type}
-                          onChange={(e) =>
+                          onChange={(e) => {
                             setImgData(
                               imgData.map((img, iIdx) =>
                                 iIdx === index
-                                  ? { ...img, type: e.target.value }
+                                  ? { ...img, type: e.target.value, src: "" }
                                   : img
                               )
-                            )
-                          }
+                            );
+                          }}
                           required
                         >
                           <option value={1}>عکس</option>
@@ -1301,23 +1324,34 @@ export default function AddHonors({ setDataUpdated, setActiveKey }) {
                                       />
                                     </svg>
                                   </div>
-                                  <p
-                                    className={`colorTheInputFile discription`}
-                                  >
-                                    بارگذاری فایل .png یا .jpg
-                                  </p>
-                                  <p
-                                    className={`colorTheInputFile discription`}
-                                  >
-                                    یا فیلم mp4
-                                  </p>
+                                  {item.type == 1 ? (
+                                    <>
+                                      <p
+                                        className={`colorTheInputFile discription`}
+                                      >
+                                        بارگذاری فایل .png یا .jpg
+                                      </p>
+                                    </>
+                                  ) : (
+                                    <>
+                                      <p
+                                        className={`colorTheInputFile discription`}
+                                      >
+                                        فیلم mp4
+                                      </p>
+                                    </>
+                                  )}
                                 </div>
                               </label>
                               <input
                                 type="file"
                                 className="d-none"
                                 id={`ImageVideoForProduct-${index}`}
-                                accept={`${process.env.NEXT_PUBLIC_INPUT_IMAGE_AND_VIDEO_FORMAT}`}
+                                accept={
+                                  item.type == 1
+                                    ? `${process.env.NEXT_PUBLIC_INPUT_IMAGE_FORMAT}`
+                                    : `${process.env.NEXT_PUBLIC_INPUT_VIDEO_FORMAT}`
+                                }
                                 onChange={(e) => handleImgDataChange(e, index)}
                                 required
                               />
@@ -1486,7 +1520,7 @@ export default function AddHonors({ setDataUpdated, setActiveKey }) {
                           >
                             <div className="d-flex flex-column">
                               <span className="NormalTextSizing">فیلم :</span>
-                              {item?.src === "" ? (
+                              {!item?.src && (
                                 <>
                                   <label
                                     className="labelInsteadOfInput"
@@ -1523,24 +1557,29 @@ export default function AddHonors({ setDataUpdated, setActiveKey }) {
                                       </p>
                                     </div>
                                   </label>
-                                  <input
-                                    type="file"
-                                    className="d-none"
-                                    id={`MediaVideo-${index}`}
-                                    accept={`${process.env.NEXT_PUBLIC_INPUT_VIDEO_FORMAT}`}
-                                    onChange={(e) =>
-                                      setMedia(
-                                        media.map((m, iIdx) =>
-                                          iIdx === index
-                                            ? { ...m, src: e.target.files[0] }
-                                            : m
-                                        )
-                                      )
-                                    }
-                                    required
-                                  />
                                 </>
-                              ) : (
+                              )}
+                              <input
+                                type="file"
+                                className="d-none"
+                                id={`MediaVideo-${index}`}
+                                accept={`${process.env.NEXT_PUBLIC_INPUT_VIDEO_FORMAT}`}
+                                // onChange={(e) =>
+                                //   setMedia(
+                                //     media.map((m, iIdx) =>
+                                //       iIdx === index
+                                //         ? { ...m, src: e.target.files[0] }
+                                //         : m
+                                //     )
+                                //   )
+                                // }
+                                onChange={(e) =>
+                                  handleVideoChangeMedia(e, index)
+                                }
+                                required
+                              />
+
+                              {item.src && (
                                 <>
                                   <div
                                     className="d-flex flex-column"
@@ -1548,7 +1587,7 @@ export default function AddHonors({ setDataUpdated, setActiveKey }) {
                                   >
                                     <BOX
                                       component="video"
-                                      src={URL.createObjectURL(item.src)}
+                                      src={item.srcUrl}
                                       controls
                                     />
                                   </div>
@@ -1560,7 +1599,7 @@ export default function AddHonors({ setDataUpdated, setActiveKey }) {
                               <span className="NormalTextSizing">
                                 پوستر فیلم :
                               </span>
-                              {item?.poster === "" ? (
+                              {!item?.poster && (
                                 <>
                                   <label
                                     className="labelInsteadOfInput"
@@ -1601,27 +1640,32 @@ export default function AddHonors({ setDataUpdated, setActiveKey }) {
                                       </p>
                                     </div>
                                   </label>
-                                  <input
-                                    type="file"
-                                    className="d-none"
-                                    id={`PosterVideo-${index}`}
-                                    accept={`${process.env.NEXT_PUBLIC_INPUT_IMAGE_FORMAT}`}
-                                    onChange={(e) =>
-                                      setMedia(
-                                        media.map((m, iIdx) =>
-                                          iIdx === index
-                                            ? {
-                                                ...m,
-                                                poster: e.target.files[0],
-                                              }
-                                            : m
-                                        )
-                                      )
-                                    }
-                                    required
-                                  />
                                 </>
-                              ) : (
+                              )}
+                              <input
+                                type="file"
+                                className="d-none"
+                                id={`PosterVideo-${index}`}
+                                accept={`${process.env.NEXT_PUBLIC_INPUT_IMAGE_FORMAT}`}
+                                // onChange={(e) =>
+                                //   setMedia(
+                                //     media.map((m, iIdx) =>
+                                //       iIdx === index
+                                //         ? {
+                                //             ...m,
+                                //             poster: e.target.files[0],
+                                //           }
+                                //         : m
+                                //     )
+                                //   )
+                                // }
+                                onChange={(e) =>
+                                  handlePosterChangeMedia(e, index)
+                                }
+                                required
+                              />
+
+                              {item?.poster && (
                                 <>
                                   <div
                                     className="d-flex flex-column"
@@ -1629,7 +1673,7 @@ export default function AddHonors({ setDataUpdated, setActiveKey }) {
                                   >
                                     <BOX
                                       component="img"
-                                      src={URL.createObjectURL(item.poster)}
+                                      src={item.posterUrl}
                                       alt="PosterImage"
                                     />
                                   </div>

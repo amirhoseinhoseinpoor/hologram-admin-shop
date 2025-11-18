@@ -332,7 +332,6 @@ const InsideAddSectionForm = styled.div`
 `;
 
 const SelectStyle = styled.select`
-  border: none;
   border-radius: 4px;
   padding: 3px 6px;
   &:focus {
@@ -366,6 +365,8 @@ export default function EditHonors({
   const [subtitle, setSubtitle] = useState("");
   const [subtitleCompelete, setSubtitleCompelete] = useState("");
   const [imgData, setImgData] = useState([{ src: "", type: "1", poster: "" }]);
+  console.log(imgData);
+
   const [media, setMedia] = useState([
     { title: "", description: "", src: "", poster: "" },
   ]);
@@ -467,10 +468,19 @@ export default function EditHonors({
         editedHonor.info.imgData || [{ src: "", type: "1", poster: "" }]
       );
       setSelectedNavId(editedHonor.navId || "");
+
+      const prepared = editedHonor.media.map((m) => ({
+        ...m,
+        srcUrl: m.src
+          ? `${process.env.NEXT_PUBLIC_BACK_END_SERVER}/system/download/${m.src}`
+          : "",
+        posterUrl: m.poster
+          ? `${process.env.NEXT_PUBLIC_BACK_END_SERVER}/system/download/${m.poster}`
+          : "",
+      }));
+
       setMedia(
-        editedHonor.media || [
-          { title: "", description: "", src: "", poster: "" },
-        ]
+        prepared || [{ title: "", description: "", src: "", poster: "" }]
       );
       setDynamicSections(editedHonor.info.sections || []);
       setFiledOrder(
@@ -491,10 +501,6 @@ export default function EditHonors({
         i === index ? { ...item, src: file } : item
       );
       setFunction(updatedState);
-      setObjectUrls((prev) => ({
-        ...prev,
-        [index]: objectUrl,
-      }));
     }
   };
 
@@ -507,10 +513,6 @@ export default function EditHonors({
         i === index ? { ...item, poster: file } : item
       );
       setFunction(updatedState);
-      setPosterObjectUrls((prev) => ({
-        ...prev,
-        [index]: objectUrl,
-      }));
     }
   };
 
@@ -532,6 +534,36 @@ export default function EditHonors({
       });
       setDynamicSections(updatedSections);
     }
+  };
+
+  const handleEditVideoChange = (e, index) => {
+    const file = e.target.files[0];
+    if (!file) return;
+
+    const url = URL.createObjectURL(file);
+
+    setMedia((prev) =>
+      prev.map((m, i) =>
+        i === index
+          ? { ...m, src: file, srcUrl: url } // store url
+          : m
+      )
+    );
+  };
+
+  const handleEditPosterChange = (e, index) => {
+    const file = e.target.files[0];
+    if (!file) return;
+
+    const url = URL.createObjectURL(file);
+
+    setMedia((prev) =>
+      prev.map((m, i) =>
+        i === index
+          ? { ...m, poster: file, posterUrl: url } // store url
+          : m
+      )
+    );
   };
 
   useEffect(() => {
@@ -1454,7 +1486,7 @@ export default function EditHonors({
                           setImgData(
                             imgData.map((img, iIdx) =>
                               iIdx === index
-                                ? { ...img, type: e.target.value }
+                                ? { ...img, type: e.target.value, src: "" }
                                 : img
                             )
                           )
@@ -1480,7 +1512,7 @@ export default function EditHonors({
                           {item?.type == 1 && <>عکس</>}
                           {item?.type == 2 && <>فیلم</>}
                         </span>
-                        {item?.src === "" ? (
+                        {item?.src == "" && (
                           <>
                             <label
                               className="labelInsteadOfInput"
@@ -1509,19 +1541,34 @@ export default function EditHonors({
                                     />
                                   </svg>
                                 </div>
-                                <p className={`colorTheInputFile discription`}>
-                                  بارگذاری فایل .png یا .jpg
-                                </p>
-                                <p className={`colorTheInputFile discription`}>
-                                  یا فیلم mp4
-                                </p>
+                                {item.type == 1 ? (
+                                  <>
+                                    <p
+                                      className={`colorTheInputFile discription`}
+                                    >
+                                      بارگذاری فایل .png یا .jpg
+                                    </p>
+                                  </>
+                                ) : (
+                                  <>
+                                    <p
+                                      className={`colorTheInputFile discription`}
+                                    >
+                                      فیلم mp4
+                                    </p>
+                                  </>
+                                )}
                               </div>
                             </label>
                             <input
                               type="file"
                               className="d-none"
                               id={`ImageVideoForProduct-${index}`}
-                              accept={`${process.env.NEXT_PUBLIC_INPUT_IMAGE_AND_VIDEO_FORMAT}`}
+                              accept={
+                                item.type == 1
+                                  ? `${process.env.NEXT_PUBLIC_INPUT_IMAGE_FORMAT}`
+                                  : `${process.env.NEXT_PUBLIC_INPUT_VIDEO_FORMAT}`
+                              }
                               onChange={
                                 (e) =>
                                   handleFileChange(
@@ -1534,13 +1581,15 @@ export default function EditHonors({
                               required
                             />
                           </>
-                        ) : (
+                        )}
+
+                        {item?.src && (
                           <>
                             <div
                               className="d-flex flex-column"
                               style={{ width: "fit-content" }}
                             >
-                              {item.type === "2" ? (
+                              {item.type == "2" && (
                                 <BOX
                                   style={{
                                     maxWidth: "unset",
@@ -1555,14 +1604,15 @@ export default function EditHonors({
                                   }
                                   controls
                                 />
-                              ) : (
+                              )}
+
+                              {item.type == "1" && (
                                 <BOX
                                   style={{
                                     maxWidth: "unset",
                                     maxHeight: "unset",
                                   }}
                                   component="img"
-                                  // src={URL.createObjectURL(item.src)}
                                   src={
                                     typeof item.src === "object" &&
                                     item.src instanceof Blob
@@ -1581,7 +1631,7 @@ export default function EditHonors({
                           <span className="mb-1 NormalTextSizing">
                             پوستر فیلم :
                           </span>
-                          {item?.poster === "" ? (
+                          {item?.poster == "" && (
                             <>
                               <label
                                 className="labelInsteadOfInput"
@@ -1638,7 +1688,9 @@ export default function EditHonors({
                                 required
                               />
                             </>
-                          ) : (
+                          )}
+
+                          {item?.poster && (
                             <>
                               <div
                                 className="d-flex flex-column"
@@ -1650,10 +1702,9 @@ export default function EditHonors({
                                     maxHeight: "unset",
                                   }}
                                   component="img"
-                                  // src={URL.createObjectURL(item.poster)}
                                   src={
-                                    typeof item.src === "object" &&
-                                    item.src instanceof Blob
+                                    typeof item.poster === "object" &&
+                                    item.poster instanceof Blob
                                       ? URL.createObjectURL(item.poster)
                                       : `${process.env.NEXT_PUBLIC_BACK_END_SERVER}/system/download/${item.poster}`
                                   }
@@ -1696,7 +1747,7 @@ export default function EditHonors({
               columns="repeat(1, 1fr)"
             >
               {media.map((item, index) => (
-                <>
+                <React.Fragment key={index}>
                   <MediaDivMainGrid className="mt-2" key={index}>
                     <DivHeaderInfoMedia className="d-flex justify-content-between align-items-center">
                       <div>
@@ -1722,20 +1773,20 @@ export default function EditHonors({
                         >
                           <div className="d-flex flex-column">
                             <span className="NormalTextSizing">فیلم :</span>
-                            {item?.src === "" ? (
+
+                            {!item.src ? (
                               <>
                                 <label
                                   className="labelInsteadOfInput"
                                   htmlFor={`MediaVideo-${index}`}
                                 >
-                                  <div className="d-flex flex-column text-center p-1">
+                                  <div className="d-flex flex-column text-center p-1 gap-1">
                                     <div>
                                       <svg
                                         width={21}
                                         height={21}
                                         viewBox="0 0 18 18"
                                         fill="none"
-                                        xmlns="http://www.w3.org/2000/svg"
                                       >
                                         <path
                                           d="M2.25 11.25C2.25 13.3713 2.25 14.432 2.909 15.091C3.568 15.75 4.62868 15.75 6.75 15.75H11.25C13.3713 15.75 14.432 15.75 15.091 15.091C15.75 14.432 15.75 13.3713 15.75 11.25"
@@ -1751,50 +1802,35 @@ export default function EditHonors({
                                         />
                                       </svg>
                                     </div>
-
-                                    <p
-                                      className={`colorTheInputFile discription`}
-                                    >
+                                    <p className="colorTheInputFile discription">
                                       فیلم mp4
                                     </p>
                                   </div>
                                 </label>
+
                                 <input
                                   type="file"
                                   className="d-none"
                                   id={`MediaVideo-${index}`}
-                                  accept={`${process.env.NEXT_PUBLIC_INPUT_VIDEO_FORMAT}`}
-                                  onChange={(e) =>
-                                    setMedia(
-                                      media.map((m, iIdx) =>
-                                        iIdx === index
-                                          ? { ...m, src: e.target.files[0] }
-                                          : m
-                                      )
-                                    )
+                                  accept={
+                                    process.env.NEXT_PUBLIC_INPUT_VIDEO_FORMAT
                                   }
-                                  required
+                                  onChange={(e) =>
+                                    handleEditVideoChange(e, index)
+                                  }
                                 />
                               </>
                             ) : (
-                              <>
-                                <div
-                                  className="d-flex flex-column"
-                                  style={{ width: "100%" , alignItems: "center" }}
-                                >
-                                  <BOX
-                                    component="video"
-                                    // src={URL.createObjectURL(item.src)}
-                                    src={
-                                      typeof item.src === "object" &&
-                                      item.src instanceof Blob
-                                        ? URL.createObjectURL(item.src)
-                                        : `${process.env.NEXT_PUBLIC_BACK_END_SERVER}/system/download/${item.src}`
-                                    }
-                                    controls
-                                  />
-                                </div>
-                              </>
+                              <div
+                                className="d-flex flex-column"
+                                style={{ width: "100%", alignItems: "center" }}
+                              >
+                                <BOX
+                                  component="video"
+                                  src={item.srcUrl} // 🚀 stable, no re-renders
+                                  controls
+                                />
+                              </div>
                             )}
                           </div>
 
@@ -1802,20 +1838,20 @@ export default function EditHonors({
                             <span className="NormalTextSizing">
                               پوستر فیلم :
                             </span>
-                            {item?.poster === "" ? (
+
+                            {!item.poster ? (
                               <>
                                 <label
                                   className="labelInsteadOfInput"
                                   htmlFor={`PosterVideo-${index}`}
                                 >
-                                  <div className="d-flex flex-column text-center p-1">
+                                  <div className="d-flex flex-column text-center p-1 gap-1">
                                     <div>
                                       <svg
                                         width={21}
                                         height={21}
                                         viewBox="0 0 18 18"
                                         fill="none"
-                                        xmlns="http://www.w3.org/2000/svg"
                                       >
                                         <path
                                           d="M2.25 11.25C2.25 13.3713 2.25 14.432 2.909 15.091C3.568 15.75 4.62868 15.75 6.75 15.75H11.25C13.3713 15.75 14.432 15.75 15.091 15.091C15.75 14.432 15.75 13.3713 15.75 11.25"
@@ -1831,57 +1867,39 @@ export default function EditHonors({
                                         />
                                       </svg>
                                     </div>
-                                    <p
-                                      className={`colorTheInputFile discription`}
-                                    >
+
+                                    <p className="colorTheInputFile discription">
                                       بارگذاری فایل .png یا .jpg
                                     </p>
-                                    <p
-                                      className={`colorTheInputFile discription`}
-                                    >
+                                    <p className="colorTheInputFile discription">
                                       حداکثر تا 5 مگابایت
                                     </p>
                                   </div>
                                 </label>
+
                                 <input
                                   type="file"
                                   className="d-none"
                                   id={`PosterVideo-${index}`}
-                                  accept={`${process.env.NEXT_PUBLIC_INPUT_IMAGE_FORMAT}`}
-                                  onChange={(e) =>
-                                    setMedia(
-                                      media.map((m, iIdx) =>
-                                        iIdx === index
-                                          ? {
-                                              ...m,
-                                              poster: e.target.files[0],
-                                            }
-                                          : m
-                                      )
-                                    )
+                                  accept={
+                                    process.env.NEXT_PUBLIC_INPUT_IMAGE_FORMAT
                                   }
-                                  required
+                                  onChange={(e) =>
+                                    handleEditPosterChange(e, index)
+                                  }
                                 />
                               </>
                             ) : (
-                              <>
-                                <div
-                                  className="d-flex flex-column"
-                                  style={{ width: "100%" , alignItems: "center" }}
-                                >
-                                  <BOX
-                                    component="img"
-                                    // src={URL.createObjectURL(item.poster)}
-                                    src={
-                                      typeof item.poster === "object" &&
-                                      item.poster instanceof Blob
-                                        ? URL.createObjectURL(item.poster)
-                                        : `${process.env.NEXT_PUBLIC_BACK_END_SERVER}/system/download/${item.poster}`
-                                    }
-                                    alt="PosterImage"
-                                  />
-                                </div>
-                              </>
+                              <div
+                                className="d-flex flex-column"
+                                style={{ width: "100%", alignItems: "center" }}
+                              >
+                                <BOX
+                                  component="img"
+                                  src={item.posterUrl} // 🚀 stable, no re-renders
+                                  alt="PosterImage"
+                                />
+                              </div>
                             )}
                           </div>
                         </DivAdjustColorDivs>
@@ -1942,7 +1960,7 @@ export default function EditHonors({
                       </div>
                     </div>
                   </MediaDivMainGrid>
-                </>
+                </React.Fragment>
               ))}
             </DivAdjustColorDivs>
           </BorderInputBox>
