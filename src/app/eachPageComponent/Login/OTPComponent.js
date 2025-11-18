@@ -2,8 +2,10 @@
 
 import React, { useState, useEffect, useRef } from "react";
 import style from "../../Styles/Login/OTPComponent.module.scss"; // Assuming you have a CSS module for styling
+import { Box } from "@mui/material";
 
 export default function OTPInput({
+  errorMessage,
   username,
   onVerifyOtp,
   resendOtp,
@@ -12,23 +14,36 @@ export default function OTPInput({
   const [otp, setOtp] = useState(["", "", "", ""]); // Array for 4-digit OTP
   const [timer, setTimer] = useState(120); // Timer set for 2 minutes (120 seconds)
   const inputRefs = useRef([]); // Array of refs for input elements
+  const [isButtonDisabled, setIsButtonDisabled] = useState(true);
+
+  useEffect(() => {
+    // Disable button if any digit is empty
+    setIsButtonDisabled(otp.some((d) => d === ""));
+  }, [otp]);
+
+  const handleKeyDown = (index, e) => {
+    // If Backspace pressed on an empty field, move to previous
+    if (e.key === "Backspace" && otp[index] === "" && index > 0) {
+      e.preventDefault();
+      inputRefs.current[index - 1].focus();
+    }
+  };
 
   const handleChange = (index, value) => {
-    // Only allow digits (0-9)
+    // Allow digits or empty
     if (value === "" || /^[0-9]$/.test(value)) {
       const newOtp = [...otp];
       newOtp[index] = value;
       setOtp(newOtp);
 
-      // Move focus to previous input if value is empty and there is an input before
-      if (value === "" && index > 0) {
-        inputRefs.current[index - 1].focus();
-      } else if (value && index < otp.length - 1) {
-        // Move focus to next input if a digit is entered
+      // If a digit is entered, move to next input
+      if (value !== "" && index < otp.length - 1) {
         inputRefs.current[index + 1].focus();
       }
+      // If cleared, we keep the focus behavior as controlled by Backspace handler
     }
   };
+
   // Handle OTP verification
   const handleSubmit = (event) => {
     event.preventDefault();
@@ -56,9 +71,21 @@ export default function OTPInput({
     <div className={style.otpContainer}>
       <div className="d-flex flex-row justify-content-center mt-3 mb-4">
         <div>
-          <p className="Banner-title">Logo</p>
+          <Box
+            component="img"
+            sx={{
+              width: "105px",
+              height: "100%",
+              objectFit: "cover",
+            }}
+            alt="image."
+            src="/LOGO/cropped-com.chakavak.adv_512x512.png"
+          />
         </div>
       </div>
+      {errorMessage && (
+        <div className={style.handelLoginError}>{errorMessage}</div>
+      )}
       <p className="discription">
         ما برای شماره {username} کد تایید ارسال کردیم.
       </p>
@@ -74,13 +101,15 @@ export default function OTPInput({
           {otp.map((digit, index) => (
             <input
               key={index}
-              type="number"
-              inputMode="numeric" // Ensures numeric keyboard on mobile devices
+              type="text"
+              inputMode="numeric"
+              
+              onChange={(e) => handleChange(index, e.target.value)}
+              onKeyDown={(e) => handleKeyDown(index, e)}
               maxLength="1"
               ref={(el) => (inputRefs.current[index] = el)} // Assign ref to each input
               id={`otp-input-${index}`}
               value={digit}
-              onChange={(e) => handleChange(index, e.target.value)}
               className={style.otpInput}
               placeholder="-"
               required
@@ -109,7 +138,13 @@ export default function OTPInput({
           </>
         )}
 
-        <button type="submit" className={style.verifyButton}>
+        <button
+          type="submit"
+          className={`${style.verifyButton} ${
+            isButtonDisabled ? style.disabledButton : style.activeButton
+          }`}
+          disabled={isButtonDisabled}
+        >
           تایید
         </button>
       </form>

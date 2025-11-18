@@ -9,6 +9,7 @@ import OTPInput from "../eachPageComponent/Login/OTPComponent";
 import style from "../Styles/Login/LoginStyle.module.scss";
 // import captcha for the login
 import ReCAPTCHA from "react-google-recaptcha";
+import { Box } from "@mui/material";
 
 export default function Login() {
   const dispatch = useDispatch();
@@ -165,24 +166,22 @@ export default function Login() {
 
   // Resend OTP
   const handleResendOtp = async () => {
-    // try {
-    //   const response = await fetch("/api/send-otp", {
-    //     method: "POST",
-    //     headers: {
-    //       "Content-Type": "application/json",
-    //     },
-    //     body: JSON.stringify({ phoneNumber }),
-    //   });
-    //   if (!response.ok) {
-    //     setErrorMessage("Failed to resend OTP. Please try again.");
-    //   }
-    // } catch (error) {
-    //   console.error("Error resending OTP:", error);
-    //   setErrorMessage("An unexpected error occurred. Please try again.");
-    // }
+    try {
+      const response = await fetch("/api/send-otp", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ phoneNumber }),
+      });
+      if (!response.ok) {
+        setErrorMessage("خطا در ارسال کد لطفا بعدا دوباره تلاش کنید");
+      }
+    } catch (error) {
+      console.error("Error resending OTP:", error);
+      setErrorMessage("خطا در ارسال کد لطفا بعدا دوباره تلاش کنید");
+    }
   };
-
-
 
   return (
     <section className={`${style.sectionLoginStyle}  d-flex w-100`}>
@@ -195,7 +194,16 @@ export default function Login() {
             >
               <div className="d-flex flex-row justify-content-center mt-3 mb-4">
                 <div>
-                  <p className="Banner-title">Logo</p>
+                  <Box
+                    component="img"
+                    sx={{
+                      width: "105px",
+                      height: "100%",
+                      objectFit: "cover",
+                    }}
+                    alt="image."
+                    src="/LOGO/cropped-com.chakavak.adv_512x512.png"
+                  />
                 </div>
               </div>
               <p className="mb-3 me-2 mt-3 discription">ورود</p>
@@ -266,7 +274,6 @@ export default function Login() {
               {isCaptchaRequired && (
                 <div className="mb-4">
                   <ReCAPTCHA
-                    
                     ref={recaptchaRef}
                     className={style.captchaContainer}
                     sitekey="6Ld_oI4qAAAAAK1UKDgdrplzpiAbffOBTiarZ37i" // Replace with your site key
@@ -339,6 +346,7 @@ export default function Login() {
             </form>
           ) : (
             <OTPInput
+              errorMessage={errorMessage}
               username={username}
               onVerifyOtp={handleVerifyOtp}
               resendOtp={handleResendOtp}

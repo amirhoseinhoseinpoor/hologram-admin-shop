@@ -121,7 +121,7 @@ const AccessibilityMainComponent = dynamic(
 const AdminPanel = () => {
   const permission = useSelector(permissions);
 
-  const [activeTab, setActiveTab] = useState("Product");
+  const [activeTab, setActiveTab] = useState("Orders");
   const [visibility, setVisibility] = useState({});
 
   const tabs = [
@@ -184,6 +184,13 @@ const AdminPanel = () => {
       style: "pe-2",
       title: "سطح دسترسی ها",
       icon: <AccessibilityIcon />,
+    },
+    {
+      id: "versionTab",
+      isDecorative: true,
+      title: (
+        <ShowVersionServer />
+      ),
     },
   ];
 
@@ -266,11 +273,11 @@ const AdminPanel = () => {
               className={`${style.offcanvasheader} ${style.nextoffcanvas} ${style.offcanvasHeaderResponsive} justify-content-between position-relative`}
               closeButton={false}
             >
-              <Offcanvas.Title className="me-2">
+              <Offcanvas.Title className="me-2 w-100 h-100">
                 <Box
                   component="img"
                   sx={{
-                    width: "40px",
+                    width: "50px",
                     height: "100%",
                     objectFit: "cover",
                   }}
@@ -501,13 +508,11 @@ const AdminPanel = () => {
             <AccessibilityMainComponent toggleShow={toggleShow} />
           </div>
         )}
-        <ShowVersionServer/>
       </div>
     </section>
   );
 };
 
 AdminPanel.displayName = "AdminPanel";
-
 
 export default Hoc(AdminPanel);

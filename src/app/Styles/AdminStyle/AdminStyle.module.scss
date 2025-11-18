@@ -36,7 +36,7 @@
 
 .navbaritemheader{
   background-color: white;
-  width: 250px !important;
+  width: 215px !important;
   overflow-y: auto;
   scrollbar-width: none;
   -ms-overflow-style: none;
@@ -154,7 +154,7 @@
     margin: 0 !important;
   }
   .navbaritemheader > div {
-    align-items: unset !important;
+    align-items: center !important;
     justify-content: center;
   }
 }
