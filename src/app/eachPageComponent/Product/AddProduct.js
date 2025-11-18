@@ -292,6 +292,10 @@ const SelectStyle = styled.select`
   }
 `;
 
+const RedStar = styled.span`
+color : #e91e63;
+`;
+
 export default function AddHonors({ setDataUpdated, setActiveKey }) {
   const dispatch = useDispatch();
 
@@ -825,7 +829,7 @@ export default function AddHonors({ setDataUpdated, setActiveKey }) {
             className="seeOrderFont"
             htmlFor="productSelect"
           >
-            انتخاب محصول :
+            انتخاب محصول <RedStar>*</RedStar>:
           </label>
           <SelectWidth
             id="productSelect"
@@ -862,7 +866,7 @@ export default function AddHonors({ setDataUpdated, setActiveKey }) {
             className="seeOrderFont"
             htmlFor="bannerDate"
           >
-            شرح مختصر :
+            شرح مختصر <RedStar>*</RedStar>:
           </label>
           <input
             type="text"
@@ -882,7 +886,7 @@ export default function AddHonors({ setDataUpdated, setActiveKey }) {
             className="seeOrderFont"
             htmlFor="bannerTags"
           >
-            توضیحات :
+            توضیحات <RedStar>*</RedStar>:
           </label>
           <input
             type="text"
@@ -901,7 +905,7 @@ export default function AddHonors({ setDataUpdated, setActiveKey }) {
             className="seeOrderFont"
             htmlFor="DiscriptionCompelete"
           >
-            توضیحات تکمیلی :
+            توضیحات تکمیلی <RedStar>*</RedStar>:
           </label>
           <textarea
             type="text"
@@ -1292,8 +1296,8 @@ export default function AddHonors({ setDataUpdated, setActiveKey }) {
                       <div className="p-2">
                         <div className="d-flex flex-column w-100">
                           <span className="mb-1 NormalTextSizing">
-                            {item?.type == 1 && <>عکس</>}
-                            {item?.type == 2 && <>فیلم</>}
+                            {item?.type == 1 && <>عکس<RedStar>*</RedStar></>}
+                            {item?.type == 2 && <>فیلم<RedStar>*</RedStar></>}
                           </span>
                           {item?.src === "" ? (
                             <>
@@ -1390,7 +1394,7 @@ export default function AddHonors({ setDataUpdated, setActiveKey }) {
                         {item.type === "2" && (
                           <div className="d-flex flex-column w-100">
                             <span className="mb-1 NormalTextSizing">
-                              پوستر فیلم :
+                              پوستر فیلم <RedStar>*</RedStar>:
                             </span>
                             {item?.poster === "" ? (
                               <>
@@ -1519,7 +1523,7 @@ export default function AddHonors({ setDataUpdated, setActiveKey }) {
                             className="w-50"
                           >
                             <div className="d-flex flex-column">
-                              <span className="NormalTextSizing">فیلم :</span>
+                              <span className="NormalTextSizing">فیلم <RedStar>*</RedStar>:</span>
                               {!item?.src && (
                                 <>
                                   <label
@@ -1597,7 +1601,7 @@ export default function AddHonors({ setDataUpdated, setActiveKey }) {
 
                             <div className="d-flex flex-column">
                               <span className="NormalTextSizing">
-                                پوستر فیلم :
+                                پوستر فیلم <RedStar>*</RedStar>:
                               </span>
                               {!item?.poster && (
                                 <>
@@ -1688,7 +1692,7 @@ export default function AddHonors({ setDataUpdated, setActiveKey }) {
                                 htmlFor="OnvanFilm"
                                 className="NormalTextSizing"
                               >
-                                عنوان
+                                عنوان<RedStar>*</RedStar>
                               </label>
                               <input
                                 id="OnvanFilm"
@@ -1714,7 +1718,7 @@ export default function AddHonors({ setDataUpdated, setActiveKey }) {
                                 htmlFor="OnvanFilm"
                                 className="NormalTextSizing"
                               >
-                                توضیحات
+                                توضیحات<RedStar>*</RedStar>
                               </label>
                               <textarea
                                 style={{ height: "120px" }}

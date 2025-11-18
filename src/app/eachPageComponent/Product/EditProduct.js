@@ -343,6 +343,10 @@ const SelectStyle = styled.select`
   }
 `;
 
+const RedStar = styled.span`
+color : #e91e63;
+`;
+
 export default function EditHonors({
   editedHonor,
   handleCancelEdit,
@@ -1081,7 +1085,7 @@ export default function EditHonors({
           className="seeOrderFont"
           htmlFor="bannerDate"
         >
-          عنوان :
+          عنوان <RedStar>*</RedStar>:
         </label>
         <input
           type="text"
@@ -1099,7 +1103,7 @@ export default function EditHonors({
           className="seeOrderFont"
           htmlFor="bannerTags"
         >
-          توضیحات :
+          توضیحات <RedStar>*</RedStar>:
         </label>
         <input
           type="text"
@@ -1117,7 +1121,7 @@ export default function EditHonors({
           className="seeOrderFont"
           htmlFor="DiscriptionCompelete"
         >
-          توضیحات تکمیلی :
+          توضیحات تکمیلی <RedStar>*</RedStar>:
         </label>
         <textarea
           type="text"
@@ -1182,7 +1186,7 @@ export default function EditHonors({
                     className="NormalTextSizing"
                     style={{ whiteSpace: "nowrap" }}
                   >
-                    نوع بخش:
+                    نوع بخش<RedStar>*</RedStar>:
                   </label>
                   <SelectStyle
                     id="newSectionType"
@@ -1289,7 +1293,7 @@ export default function EditHonors({
                         htmlFor={`sectionName-${sectionIndex}`}
                         style={{ whiteSpace: "nowrap" }}
                       >
-                        لیست مشخصه ها:
+                        لیست مشخصه ها<RedStar>*</RedStar>:
                       </label>
                       <input
                         type="text"
@@ -1345,7 +1349,7 @@ export default function EditHonors({
                             htmlFor="ItemInsideName"
                             style={{ whiteSpace: "nowrap" }}
                           >
-                            نام ایتم :
+                            نام ایتم <RedStar>*</RedStar>:
                           </label>
                           <input
                             type="text"
@@ -1509,8 +1513,8 @@ export default function EditHonors({
                     <div className="p-2">
                       <div className="d-flex flex-column w-100">
                         <span className="mb-1 NormalTextSizing">
-                          {item?.type == 1 && <>عکس</>}
-                          {item?.type == 2 && <>فیلم</>}
+                          {item?.type == 1 && <>عکس<RedStar>*</RedStar></>}
+                          {item?.type == 2 && <>فیلم<RedStar>*</RedStar></>}
                         </span>
                         {item?.src == "" && (
                           <>
@@ -1629,7 +1633,7 @@ export default function EditHonors({
                       {item.type === "2" && (
                         <div className="d-flex flex-column w-100">
                           <span className="mb-1 NormalTextSizing">
-                            پوستر فیلم :
+                            پوستر فیلم <RedStar>*</RedStar>:
                           </span>
                           {item?.poster == "" && (
                             <>
@@ -1772,7 +1776,7 @@ export default function EditHonors({
                           className="w-50"
                         >
                           <div className="d-flex flex-column">
-                            <span className="NormalTextSizing">فیلم :</span>
+                            <span className="NormalTextSizing">فیلم <RedStar>*</RedStar>:</span>
 
                             {!item.src ? (
                               <>
@@ -1836,7 +1840,7 @@ export default function EditHonors({
 
                           <div className="d-flex flex-column">
                             <span className="NormalTextSizing">
-                              پوستر فیلم :
+                              پوستر فیلم <RedStar>*</RedStar>:
                             </span>
 
                             {!item.poster ? (
@@ -1910,7 +1914,7 @@ export default function EditHonors({
                               htmlFor="OnvanFilm"
                               className="NormalTextSizing"
                             >
-                              عنوان
+                              عنوان<RedStar>*</RedStar>
                             </label>
                             <input
                               id="OnvanFilm"
@@ -1936,7 +1940,7 @@ export default function EditHonors({
                               htmlFor="OnvanFilm"
                               className="NormalTextSizing"
                             >
-                              توضیحات
+                              توضیحات<RedStar>*</RedStar>
                             </label>
                             <textarea
                               style={{ height: "120px" }}
@@ -1972,7 +1976,7 @@ export default function EditHonors({
         <div>
           <BorderInputBox>
             <HeaderEachSection className="NormalTextSizing d-flex flex-row align-items-center justify-content-between">
-              <p>فیلد ها:</p>
+              <p>فیلد ها<RedStar>*</RedStar>:</p>
 
               <div className="d-flex justify-content-end">
                 <ButtonAddSection
