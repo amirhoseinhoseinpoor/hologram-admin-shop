@@ -16,6 +16,8 @@ import ConfirmModal from "@/app/BaseComponent/ConfirmingModal";
 import ErrorModal from "@/app/BaseComponent/ErrorModal";
 // import utiles
 import { fixTitleSize } from "@/app/utils/fixTitleSize";
+import toast from "react-hot-toast";
+
 
 // Styled Components
 const BUTTONSSTYLE = styled.div`
@@ -344,7 +346,7 @@ const SelectStyle = styled.select`
 `;
 
 const RedStar = styled.span`
-color : #e91e63;
+  color: #e91e63;
 `;
 
 export default function EditHonors({
@@ -570,40 +572,155 @@ export default function EditHonors({
     );
   };
 
-  useEffect(() => {
-    const isFilled =
-      name.trim() !== "" &&
-      title.trim() !== "" &&
-      subtitle.trim() !== "" &&
-      subtitleCompelete.trim() !== "" &&
-      dynamicSections.length > 0 &&
-      imgData.some((img) => img.src !== "") &&
-      media.some(
-        (item) =>
-          item.title.trim() !== "" &&
-          item.description.trim() !== "" &&
-          item.src !== "" &&
-          item.poster !== ""
-      ) &&
-      filedOrder.some(
-        (item) =>
-          item.name.trim() !== "" &&
-          item.type.trim() !== "" &&
-          item?.dropDownOP?.length > 0
-      );
+  const validateForm = () => {
+    // Main fields
+    if (!name.trim())
+      return { valid: false, message: "محصول خود را انتخاب کنید" };
+    if (!title.trim())
+      return { valid: false, message: "فیلد شرح مختصر را پر کنید" };
+    if (!subtitle.trim())
+      return { valid: false, message: "فیلد توضیحات را پر کنید" };
+    if (!subtitleCompelete.trim())
+      return { valid: false, message: "فیلد توضیحات تکمیلی را پر کنید" };
 
-    // Update the disableConfirm state based on the check
-    setDisableConfirm(!isFilled);
-  }, [
-    name,
-    title,
-    subtitle,
-    subtitleCompelete,
-    dynamicSections,
-    imgData,
-    media,
-    filedOrder,
-  ]);
+    // Dynamic Sections — require at least one section and at least one item per section
+    if (!Array.isArray(dynamicSections) || dynamicSections.length === 0) {
+      return { valid: false, message: "حداقل یک مشخصه محصول را اضافه کنید" };
+    }
+
+    for (let i = 0; i < dynamicSections.length; i++) {
+      const section = dynamicSections[i];
+
+      // sectionName
+      if (!section.sectionName || !section.sectionName.trim()) {
+        return { valid: false, message: `نام بخش شماره ${i + 1} را وارد کنید` };
+      }
+
+      // items must exist
+      if (!Array.isArray(section.items) || section.items.length === 0) {
+        return {
+          valid: false,
+          message: `حداقل یک آیتم برای بخش ${section.sectionName} اضافه کنید`,
+        };
+      }
+
+      if (section.type === "text") {
+        for (let j = 0; j < section.items.length; j++) {
+          if (!section.items[j].name || !section.items[j].name.trim()) {
+            return {
+              valid: false,
+              message: `فیلد متن در بخش ${section.sectionName} را پر کنید`,
+            };
+          }
+        }
+      }
+
+      if (section.type === "image") {
+        for (let j = 0; j < section.items.length; j++) {
+          const item = section.items[j];
+
+          if (!item.name || !item.name.trim()) {
+            return {
+              valid: false,
+              message: `نام تصویر در بخش ${section.sectionName} را وارد کنید`,
+            };
+          }
+
+          if (!item.src) {
+            return {
+              valid: false,
+              message: `تصویر در بخش ${section.sectionName} را آپلود کنید`,
+            };
+          }
+        }
+      }
+    }
+
+    // imgData
+    if (!imgData.some((img) => img.src)) {
+      return { valid: false, message: "حداقل یک تصویر اصلی انتخاب کنید" };
+    }
+
+    // Media
+    for (let m = 0; m < media.length; m++) {
+      const item = media[m];
+      if (!item.title.trim())
+        return { valid: false, message: "عنوان بخش مدیا را وارد کنید" };
+      if (!item.description.trim())
+        return { valid: false, message: "توضیحات بخش مدیا را وارد کنید" };
+      if (!item.src)
+        return { valid: false, message: "فایل بخش مدیا را انتخاب کنید" };
+      if (!item.poster)
+        return { valid: false, message: "پوستر بخش مدیا را انتخاب کنید" };
+    }
+
+    // FiledOrder
+    for (let i = 0; i < filedOrder.length; i++) {
+      const field = filedOrder[i];
+
+      if (!field.name.trim()) {
+        return {
+          valid: false,
+          message: `نام فیلد شماره ${i + 1} را وارد کنید`,
+        };
+      }
+
+      if (field.type === "dropDown") {
+        if (field.dropDownOP.length === 0) {
+          return {
+            valid: false,
+            message: `گزینه‌های فیلد ${field.name} را وارد کنید`,
+          };
+        }
+
+        for (let j = 0; j < field.dropDownOP.length; j++) {
+          if (!field.dropDownOP[j].text.trim()) {
+            return {
+              valid: false,
+              message: `متن گزینه‌ها در فیلد ${field.name} را وارد کنید`,
+            };
+          }
+        }
+      }
+    }
+
+    return { valid: true };
+  };
+
+  // useEffect(() => {
+  //   const isFilled =
+  //     name.trim() !== "" &&
+  //     title.trim() !== "" &&
+  //     subtitle.trim() !== "" &&
+  //     subtitleCompelete.trim() !== "" &&
+  //     dynamicSections.length > 0 &&
+  //     imgData.some((img) => img.src !== "") &&
+  //     media.some(
+  //       (item) =>
+  //         item.title.trim() !== "" &&
+  //         item.description.trim() !== "" &&
+  //         item.src !== "" &&
+  //         item.poster !== ""
+  //     ) &&
+  //     filedOrder.some(
+  //       (item) =>
+  //         item.name.trim() !== "" &&
+  //         item.type.trim() !== "" &&
+  //         item?.dropDownOP?.length > 0
+  //     );
+
+  //   // Update the disableConfirm state based on the check
+  //   setDisableConfirm(!isFilled);
+  // }, [
+  //   name,
+  //   title,
+  //   subtitle,
+  //   subtitleCompelete,
+  //   dynamicSections,
+  //   imgData,
+  //   media,
+  //   filedOrder,
+  // ]);
 
   useEffect(() => {
     return () => {
@@ -761,6 +878,12 @@ export default function EditHonors({
   // Handle Form Submission with Confirmation Modal
   const areYouShureFunction = (e) => {
     e.preventDefault();
+    const result = validateForm();
+
+    if (!result.valid) {
+      toast.error(result.message);
+      return;
+    }
     setOpenModal(true);
   };
 
@@ -1085,7 +1208,7 @@ export default function EditHonors({
           className="seeOrderFont"
           htmlFor="bannerDate"
         >
-          عنوان <RedStar>*</RedStar>:
+          شرح مختصر <RedStar>*</RedStar>:
         </label>
         <input
           type="text"
@@ -1193,7 +1316,6 @@ export default function EditHonors({
                     value={newSectionType}
                     onChange={(e) => setNewSectionType(e.target.value)}
                     className="w-100"
-                    required
                   >
                     <option value="text">متن</option>
                     <option value="image">تصویر</option>
@@ -1360,7 +1482,6 @@ export default function EditHonors({
                               handleItemNameChange(e, sectionIndex, itemIndex)
                             }
                             className="flex-grow-1 form-control"
-                            required
                           />
                         </div>
                         <div>
@@ -1495,7 +1616,6 @@ export default function EditHonors({
                             )
                           )
                         }
-                        required
                       >
                         <option value={1}>عکس</option>
                         <option value={2}>فیلم</option>
@@ -1513,8 +1633,16 @@ export default function EditHonors({
                     <div className="p-2">
                       <div className="d-flex flex-column w-100">
                         <span className="mb-1 NormalTextSizing">
-                          {item?.type == 1 && <>عکس<RedStar>*</RedStar></>}
-                          {item?.type == 2 && <>فیلم<RedStar>*</RedStar></>}
+                          {item?.type == 1 && (
+                            <>
+                              عکس<RedStar>*</RedStar>
+                            </>
+                          )}
+                          {item?.type == 2 && (
+                            <>
+                              فیلم<RedStar>*</RedStar>
+                            </>
+                          )}
                         </span>
                         {item?.src == "" && (
                           <>
@@ -1582,7 +1710,6 @@ export default function EditHonors({
                                     imgData
                                   ) // Corrected state parameter
                               }
-                              required
                             />
                           </>
                         )}
@@ -1689,7 +1816,6 @@ export default function EditHonors({
                                     imgData
                                   )
                                 }
-                                required
                               />
                             </>
                           )}
@@ -1776,7 +1902,9 @@ export default function EditHonors({
                           className="w-50"
                         >
                           <div className="d-flex flex-column">
-                            <span className="NormalTextSizing">فیلم <RedStar>*</RedStar>:</span>
+                            <span className="NormalTextSizing">
+                              فیلم <RedStar>*</RedStar>:
+                            </span>
 
                             {!item.src ? (
                               <>
@@ -1931,7 +2059,6 @@ export default function EditHonors({
                                   )
                                 )
                               }
-                              required
                               className="form-control"
                             />
                           </div>
@@ -1956,7 +2083,6 @@ export default function EditHonors({
                                   )
                                 )
                               }
-                              required
                               className="form-control"
                             />
                           </div>
@@ -1976,7 +2102,9 @@ export default function EditHonors({
         <div>
           <BorderInputBox>
             <HeaderEachSection className="NormalTextSizing d-flex flex-row align-items-center justify-content-between">
-              <p>فیلد ها<RedStar>*</RedStar>:</p>
+              <p>
+                فیلد ها<RedStar>*</RedStar>:
+              </p>
 
               <div className="d-flex justify-content-end">
                 <ButtonAddSection
@@ -2016,7 +2144,6 @@ export default function EditHonors({
                           )
                         )
                       }
-                      required
                       className="mt-2 mb-1 w-50"
                     >
                       <option value="text">متن</option>
@@ -2034,7 +2161,6 @@ export default function EditHonors({
                           )
                         )
                       }
-                      required
                       className="form-control"
                     />
                     <ButtonCancelOrder
@@ -2092,7 +2218,6 @@ export default function EditHonors({
                                   e.target.value
                                 )
                               }
-                              required
                               className="form-control"
                             />
                             {/* Checkbox for the option */}
@@ -2133,10 +2258,10 @@ export default function EditHonors({
           <button
             type="submit"
             className="confirmButtonStyle"
-            disabled={disableConfirm}
+            // disabled={disableConfirm}
             style={{
-              backgroundColor: disableConfirm ? "lightgray" : "#43A047",
-              cursor: disableConfirm ? "not-allowed" : "pointer",
+              backgroundColor: "#43A047",
+              // cursor: disableConfirm ? "not-allowed" : "pointer",
             }}
           >
             ذخیره

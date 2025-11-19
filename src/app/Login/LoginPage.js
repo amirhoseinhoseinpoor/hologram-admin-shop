@@ -217,13 +217,24 @@ export default function Login() {
                   شماره همراه
                 </label>
                 <input
-                  type="number"
                   className={`${style.formInputNumber} form-control`}
                   style={{ border: hasError ? "1.2px solid #FF4F3F" : "" }}
                   id="phoneNumber"
                   value={username}
                   ref={numberRef}
-                  onChange={(e) => setPhoneNumber(e.target.value)}
+                  onChange={(e) => {
+                    const value = e.target.value;
+                    if (/^[0-9]*$/.test(value)) {
+                      setPhoneNumber(value);
+                    }
+                  }}
+                  onKeyDown={(e) => {
+                    if (!/[0-9]/.test(e.key) && e.key !== "Backspace") {
+                      e.preventDefault();
+                    }
+                  }}
+                  type="number"
+                  inputMode="numeric"
                   required
                 />
               </div>
@@ -239,7 +250,18 @@ export default function Login() {
                   id="password"
                   value={password}
                   ref={passwordRef}
-                  onChange={(e) => setPassword(e.target.value)}
+                  // onChange={(e) => setPassword(e.target.value)}
+                  onChange={(e) => {
+                    const value = e.target.value;
+                    if (/^[0-9]*$/.test(value)) {
+                      setPassword(value);
+                    }
+                  }}
+                  onKeyDown={(e) => {
+                    if (!/[0-9]/.test(e.key) && e.key !== "Backspace") {
+                      e.preventDefault();
+                    }
+                  }}
                   required
                 />
                 {/* <div className="mt-2">
