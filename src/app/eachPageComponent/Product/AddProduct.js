@@ -138,7 +138,7 @@ const NavTabs = styled(Tabs)`
   border-bottom: none;
   gap: 10px;
   width: 100%;
-  border-bottom: 1px solid #191919;
+  border-bottom: 1px solid #4b49ac;
 
   .nav-item {
     border-radius: 10px !important;
@@ -147,7 +147,7 @@ const NavTabs = styled(Tabs)`
     }
   }
   .nav-link {
-    border: 1px solid #191919;
+    border: 1px solid #7978e9;
     border-radius: 10px !important;
     color: #191919;
     width: 100%;
@@ -159,7 +159,7 @@ const NavTabs = styled(Tabs)`
     border: 1px solid #191919 !important;
   }
   .nav-link.active {
-    background-image: linear-gradient(195deg, #42424a 0%, #191919 100%);
+    background-image: linear-gradient(195deg, #7978e9 0%, #4b49ac 100%);
     color: white;
     border: none !important;
     border-radius: 10px;
@@ -316,6 +316,9 @@ export default function AddHonors({ setDataUpdated, setActiveKey }) {
     { type: "text", name: "", dropDownOP: [] },
   ]);
 
+  console.log(filedOrder);
+  
+
   const [headerCome, setHeaderCome] = useState([]);
   const [availableItems, setAvailableItems] = useState([]);
   const [usedNavIds, setUsedNavIds] = useState([]);
@@ -437,8 +440,7 @@ export default function AddHonors({ setDataUpdated, setActiveKey }) {
       filedOrder.some(
         (item) =>
           item.name.trim() !== "" &&
-          item.type.trim() !== "" &&
-          item?.dropDownOP?.length > 0
+          item.type.trim() !== ""
       );
 
     // Update the disableConfirm state based on the check
