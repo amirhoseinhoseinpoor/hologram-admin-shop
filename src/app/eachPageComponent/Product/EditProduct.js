@@ -18,7 +18,6 @@ import ErrorModal from "@/app/BaseComponent/ErrorModal";
 import { fixTitleSize } from "@/app/utils/fixTitleSize";
 import toast from "react-hot-toast";
 
-
 // Styled Components
 const BUTTONSSTYLE = styled.div`
   display: flex;
@@ -347,6 +346,8 @@ const SelectStyle = styled.select`
 
 const RedStar = styled.span`
   color: #e91e63;
+  padding-left: 2px;
+  padding-right: 2px;
 `;
 
 export default function EditHonors({
