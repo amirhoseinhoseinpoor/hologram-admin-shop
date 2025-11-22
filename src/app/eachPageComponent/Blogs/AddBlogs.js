@@ -19,6 +19,7 @@ import styled from "styled-components";
 import AreYouShureModal from "@/app/BaseComponent/AreYouSureModal";
 import ConfirmModal from "@/app/BaseComponent/ConfirmingModal";
 import ErrorModal from "@/app/BaseComponent/ErrorModal";
+import toast from "react-hot-toast";
 
 const DELETEUPLODEDIMAGE = styled.button`
   position: absolute;
@@ -105,20 +106,25 @@ const BUTTONSSTYLE = styled.div`
   }
 `;
 
-const BorderDiv = styled.div`
-  display: flex;
-  flex-direction:column;
+const GridBorderDiv = styled.div`
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
   align-items: flex-start;
-  /* justify-content: space-between; */
+  gap: 2.5rem;
+
+  @media (max-width: 768px) {
+    grid-template-columns: repeat(1, 1fr);
+  }
+`;
+
+const BorderDiv = styled.div`
   padding: 1.25rem;
-  gap: 1rem;
   border: 1px solid rgba(0, 0, 0, 0.08);
   border-radius: 14px;
   background: #ffffff;
   box-shadow: 0 3px 16px rgba(0, 0, 0, 0.06);
   /* align-items: center; */
   @media (max-width: 768px) {
-    flex-direction: column !important;
     .inputMainDiv {
       width: 100% !important;
     }
@@ -135,6 +141,11 @@ const FORMCONTROLLABEL = styled(FormControlLabel)`
 import { useDispatch } from "react-redux";
 import { uploadFile } from "@/app/Store/thunks";
 import { blogspot } from "@/app/Store/thunks";
+const RedStar = styled.span`
+  color: #e91e63;
+  padding-left: 2px;
+  padding-right: 2px;
+`;
 
 export default function AddHonors({ setActiveKey, setUpdateData }) {
   const dispatch = useDispatch();
@@ -161,6 +172,41 @@ export default function AddHonors({ setActiveKey, setUpdateData }) {
   const closeModal = () => setOpenModal(false);
   const closeModal2 = () => setOpenModal2(false);
   const closeModal3 = () => setOpenModal3(false);
+
+  const validateForm = () => {
+    // Main fields
+    if (!bannerTitle.trim())
+      return { valid: false, message: "لطفا عنوان را وارد کنید" };
+    if (!blogTime.trim())
+      return { valid: false, message: "لطفا زمان مطالعه را وارد کنید" };
+    if (!blogType.trim())
+      return { valid: false, message: "لطفا فیلد نوع را وارد کنید" };
+    if (!bannerTags.trim())
+      return { valid: false, message: "لطفا فیلد تگ ها را وارد کنید" };
+    if (!bannerImage)
+      return {
+        valid: false,
+        message: "لطفا یک عکس اصلی برای مقاله انتخاب کنید",
+      };
+    if (!posetives.trim())
+      return { valid: false, message: "لطفا فیلد نکات مثبت را وارد کنید" };
+    if (!negetive.trim())
+      return { valid: false, message: "لطفا فیلد نکات منفی را وارد کنید" };
+    if (!productTitle.trim())
+      return { valid: false, message: "لطفا فیلد تایتل محصول را وارد کنید" };
+    if (!productSrc)
+      return {
+        valid: false,
+        message: "لطفا یک عکس برای محصول تبلیغاتی انتخاب کنید",
+      };
+    if (!productLink.trim())
+      return {
+        valid: false,
+        message: "لطفا فیلد لینک محصول تبلیغاتی را وارد کنید",
+      };
+
+    return { valid: true };
+  };
 
   const handleEditorChange = (newContent) => {
     setContent(newContent);
@@ -272,6 +318,12 @@ export default function AddHonors({ setActiveKey, setUpdateData }) {
 
   const areYouShureFunction = (e) => {
     e.preventDefault();
+    const result = validateForm();
+
+    if (!result.valid) {
+      toast.error(result.message);
+      return;
+    }
     setOpenModal(true);
   };
 
@@ -326,359 +378,449 @@ export default function AddHonors({ setActiveKey, setUpdateData }) {
     <>
       <form onSubmit={areYouShureFunction} className="p-3">
         <BorderDiv>
-          <TEXTFIELD
-            fullWidth
-            label="عنوان"
-            value={bannerTitle}
-            onChange={handleTitleChange}
-            margin="normal"
-          />
-          <TEXTFIELD
-            fullWidth
-            label="زمان مطالعه"
-            value={blogTime}
-            onChange={handleTimeChange}
-            margin="normal"
-          />
-          <TEXTFIELD
-            fullWidth
-            label="نوع"
-            value={blogType}
-            onChange={handleTypeChange}
-            margin="normal"
-          />
-          <p className="VodeoDisSizing mb-1 me-1">عکس اصلی مقاله</p>
-          {bannerImage ? (
-            <>
-              <div
-                className="d-flex flex-column position-relative"
-                style={{ width: "fit-content" }}
+          <p className="QASize text-center mb-4 mt-0">مقاله</p>
+          <GridBorderDiv>
+            <div className="d-flex flex-row align-items-center gap-2">
+              <label
+                style={{ whiteSpace: "nowrap" }}
+                className="mt-2 seeOrderFont"
+                htmlFor="bannerTitle"
               >
-                <BOX
-                  // onClick={() => handleOpen(logo)}
-                  component="img"
-                  src={
-                    `${process.env.NEXT_PUBLIC_BACK_END_SERVER}/system/download/${bannerImage}` ||
-                    ""
-                  }
-                  alt="UserColorImage"
-                />
-
-                <DELETEUPLODEDIMAGE onClick={() => setBannerImage(null)}>
-                  <svg
-                    width={17}
-                    height={17}
-                    viewBox="0 0 12 12"
-                    fill="none"
-                    xmlns="http://www.w3.org/2000/svg"
-                  >
-                    <path
-                      d="M10.5 2.98828C8.835 2.82328 7.16 2.73828 5.49 2.73828C4.5 2.73828 3.51 2.78828 2.52 2.88828L1.5 2.98828"
-                      stroke="#FF4F3F"
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                    />
-                    <path
-                      d="M4.25 2.485L4.36 1.83C4.44 1.355 4.5 1 5.345 1H6.655C7.5 1 7.565 1.375 7.64 1.835L7.75 2.485"
-                      stroke="#FF4F3F"
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                    />
-                    <path
-                      d="M9.4252 4.57031L9.1002 9.60531C9.0452 10.3903 9.0002 11.0003 7.6052 11.0003H4.3952C3.0002 11.0003 2.9552 10.3903 2.9002 9.60531L2.5752 4.57031"
-                      stroke="#FF4F3F"
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                    />
-                    <path
-                      d="M5.16504 8.25H6.83004"
-                      stroke="#FF4F3F"
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                    />
-                    <path
-                      d="M4.75 6.25H7.25"
-                      stroke="#FF4F3F"
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                    />
-                  </svg>
-                </DELETEUPLODEDIMAGE>
-              </div>
-            </>
-          ) : (
-            <>
-              <LABELIMAGEUPLOAD htmlFor="blogImage">
-                <div className="d-flex flex-column text-center p-1">
-                  <div>
-                    <svg
-                      width={21}
-                      height={21}
-                      viewBox="0 0 18 18"
-                      fill="none"
-                      xmlns="http://www.w3.org/2000/svg"
-                    >
-                      <path
-                        d="M2.25 11.25C2.25 13.3713 2.25 14.432 2.90901 15.091C3.56802 15.75 4.62868 15.75 6.75 15.75H11.25C13.3713 15.75 14.432 15.75 15.091 15.091C15.75 14.432 15.75 13.3713 15.75 11.25"
-                        stroke="#404040"
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                      />
-                      <path
-                        d="M9 12V2.25M9 2.25L12 5.53125M9 2.25L6 5.53125"
-                        stroke="#404040"
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                      />
-                    </svg>
-                  </div>
-                  <p className={`colorTheInputFile discription`}>
-                    بارگذاری فایل .png یا .jpg
-                  </p>
-                </div>
-              </LABELIMAGEUPLOAD>
-              <input
-                className="d-none"
-                type="file"
-                accept={`${process.env.NEXT_PUBLIC_INPUT_IMAGE_FORMAT}`}
-                id="blogImage"
-                onChange={handleBannerImageUpload}
+                عنوان<RedStar> *</RedStar> :
+              </label>
+              <TEXTFIELD
+                fullWidth
+                label="عنوان"
+                value={bannerTitle}
+                id="bannerTitle"
+                onChange={handleTitleChange}
               />
-            </>
-          )}
-
-          <TEXTFIELD
-            fullWidth
-            label="نکات مثبت"
-            value={posetives}
-            onChange={handlePosetivesChange}
-            margin="normal"
-          />
-
-          <TEXTFIELD
-            fullWidth
-            label="نکات منفی"
-            value={negetive}
-            onChange={handleNegetivesChange}
-            margin="normal"
-          />
-
-          <TEXTFIELD
-            fullWidth
-            label="تایتل محصول"
-            value={productTitle}
-            onChange={handleProductTitleChange}
-            margin="normal"
-          />
-
-          <p className="VodeoDisSizing mb-1">عکس محصول تبلیغاتی</p>
-
-          {productSrc ? (
-            <>
-              <div
-                className="d-flex flex-column position-relative"
-                style={{ width: "fit-content" }}
+            </div>
+            <div className="d-flex flex-row align-items-center gap-2 ">
+              <label
+                style={{ whiteSpace: "nowrap" }}
+                className="mt-2 seeOrderFont"
+                htmlFor="readTime"
               >
-                <BOX
-                  // onClick={() => handleOpen(logo)}
-                  component="img"
-                  src={
-                    `${process.env.NEXT_PUBLIC_BACK_END_SERVER}/system/download/${productSrc}` ||
-                    ""
-                  }
-                  alt="BlogProductImage"
-                />
-
-                <DELETEUPLODEDIMAGE onClick={() => setproductSrc("")}>
-                  <svg
-                    width={17}
-                    height={17}
-                    viewBox="0 0 12 12"
-                    fill="none"
-                    xmlns="http://www.w3.org/2000/svg"
-                  >
-                    <path
-                      d="M10.5 2.98828C8.835 2.82328 7.16 2.73828 5.49 2.73828C4.5 2.73828 3.51 2.78828 2.52 2.88828L1.5 2.98828"
-                      stroke="#FF4F3F"
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                    />
-                    <path
-                      d="M4.25 2.485L4.36 1.83C4.44 1.355 4.5 1 5.345 1H6.655C7.5 1 7.565 1.375 7.64 1.835L7.75 2.485"
-                      stroke="#FF4F3F"
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                    />
-                    <path
-                      d="M9.4252 4.57031L9.1002 9.60531C9.0452 10.3903 9.0002 11.0003 7.6052 11.0003H4.3952C3.0002 11.0003 2.9552 10.3903 2.9002 9.60531L2.5752 4.57031"
-                      stroke="#FF4F3F"
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                    />
-                    <path
-                      d="M5.16504 8.25H6.83004"
-                      stroke="#FF4F3F"
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                    />
-                    <path
-                      d="M4.75 6.25H7.25"
-                      stroke="#FF4F3F"
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                    />
-                  </svg>
-                </DELETEUPLODEDIMAGE>
-              </div>
-            </>
-          ) : (
-            <>
-              <LABELIMAGEUPLOAD
-                className="VodeoDisSizing mb-1"
-                htmlFor="ProductImage"
-              >
-                <div className="d-flex flex-column text-center p-1">
-                  <div>
-                    <svg
-                      width={21}
-                      height={21}
-                      viewBox="0 0 18 18"
-                      fill="none"
-                      xmlns="http://www.w3.org/2000/svg"
-                    >
-                      <path
-                        d="M2.25 11.25C2.25 13.3713 2.25 14.432 2.90901 15.091C3.56802 15.75 4.62868 15.75 6.75 15.75H11.25C13.3713 15.75 14.432 15.75 15.091 15.091C15.75 14.432 15.75 13.3713 15.75 11.25"
-                        stroke="#404040"
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                      />
-                      <path
-                        d="M9 12V2.25M9 2.25L12 5.53125M9 2.25L6 5.53125"
-                        stroke="#404040"
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                      />
-                    </svg>
-                  </div>
-                  <p className={`colorTheInputFile discription`}>
-                    بارگذاری فایل .png یا .jpg
-                  </p>
-                </div>
-              </LABELIMAGEUPLOAD>
-              <input
-                className="d-none"
-                type="file"
-                id="ProductImage"
-                onChange={handleProductSrcChange}
+                زمان مطالعه<RedStar> *</RedStar> :
+              </label>
+              <TEXTFIELD
+                fullWidth
+                id="readTime"
+                label="زمان مطالعه"
+                value={blogTime}
+                onChange={handleTimeChange}
               />
-            </>
-          )}
+            </div>
+            <div className="d-flex flex-row align-items-center gap-2 ">
+              <label
+                style={{ whiteSpace: "nowrap" }}
+                className="mt-2 seeOrderFont"
+                htmlFor="typeBlog"
+              >
+                نوع<RedStar> *</RedStar> :
+              </label>
+              <TEXTFIELD
+                fullWidth
+                id="typeBlog"
+                label="نوع"
+                value={blogType}
+                onChange={handleTypeChange}
+              />
+            </div>
 
-          <TEXTFIELD
-            fullWidth
-            label="لینک محصول"
-            value={productLink}
-            onChange={handleProductLinkChange}
-            margin="normal"
-          />
+            <div className="d-flex flex-row align-items-center gap-2 ">
+              <label
+                style={{ whiteSpace: "nowrap" }}
+                className="mt-2 seeOrderFont"
+                htmlFor="positiveSides"
+              >
+                نکات مثبت<RedStar> *</RedStar> :
+              </label>
+              <TEXTFIELD
+                fullWidth
+                id="positiveSides"
+                label="نکات مثبت"
+                value={posetives}
+                onChange={handlePosetivesChange}
+              />
+            </div>
+            <div className="d-flex flex-row align-items-center gap-2 ">
+              <label
+                style={{ whiteSpace: "nowrap" }}
+                className="mt-2 seeOrderFont"
+                htmlFor="negetiveSides"
+              >
+                نکات منفی<RedStar> *</RedStar> :
+              </label>
+              <TEXTFIELD
+                fullWidth
+                id="negetiveSides"
+                label="نکات منفی"
+                value={negetive}
+                onChange={handleNegetivesChange}
+              />
+            </div>
 
-          <TEXTFIELD
-            fullWidth
-            label="تگ"
-            value={bannerTags}
-            onChange={handleTagsChange}
-            margin="normal"
-          />
+            <div className="d-flex flex-row align-items-center gap-2 ">
+              <label
+                style={{ whiteSpace: "nowrap" }}
+                className="mt-2 seeOrderFont"
+                htmlFor="Tags"
+              >
+                تگ ها<RedStar> *</RedStar> :
+              </label>
 
-          <FORMCONTROLLABEL
-            sx={{ fontFamily: "unset" }}
-            control={
-              <Checkbox checked={notify} onChange={handleNotifyChange} />
-            }
-            label="ایا مقاله مهم و در صفحه اصلی است"
-          />
+              <TEXTFIELD
+                fullWidth
+                id="Tags"
+                label="تگ"
+                value={bannerTags}
+                onChange={handleTagsChange}
+              />
+            </div>
 
-          <div className="w-100">
-            <Editor
-              apiKey="3akk9p7jow7ksa3txzom0c8qr4e59rtg6xy1fzvux8vysqs0" // Replace with your TinyMCE API key
-              value={content}
-              onEditorChange={handleEditorChange}
-              init={{
-                height: 500,
-                menubar: false,
-                plugins: [
-                  "advlist",
-                  "autolink",
-                  "lists",
-                  "link",
-                  "image",
-                  "charmap",
-                  "preview",
-                  "anchor",
-                  "searchreplace",
-                  "visualblocks",
-                  "code",
-                  "fullscreen",
-                  "insertdatetime",
-                  "media",
-                  "table",
-                  "help",
-                  "wordcount",
-                ],
+            <div className="d-flex flex-column">
+              <div>
+                <p className="VodeoDisSizing mb-1 me-1">
+                  عکس اصلی مقاله<RedStar> *</RedStar>
+                </p>
+                {bannerImage ? (
+                  <>
+                    <div
+                      className="d-flex flex-column position-relative"
+                      style={{ width: "fit-content" }}
+                    >
+                      <BOX
+                        // onClick={() => handleOpen(logo)}
+                        component="img"
+                        src={
+                          `${process.env.NEXT_PUBLIC_BACK_END_SERVER}/system/download/${bannerImage}` ||
+                          ""
+                        }
+                        alt="UserColorImage"
+                      />
 
-                toolbar:
-                  "undo redo | formatselect | bold italic backcolor | \
+                      <DELETEUPLODEDIMAGE onClick={() => setBannerImage(null)}>
+                        <svg
+                          width={17}
+                          height={17}
+                          viewBox="0 0 12 12"
+                          fill="none"
+                          xmlns="http://www.w3.org/2000/svg"
+                        >
+                          <path
+                            d="M10.5 2.98828C8.835 2.82328 7.16 2.73828 5.49 2.73828C4.5 2.73828 3.51 2.78828 2.52 2.88828L1.5 2.98828"
+                            stroke="#FF4F3F"
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                          />
+                          <path
+                            d="M4.25 2.485L4.36 1.83C4.44 1.355 4.5 1 5.345 1H6.655C7.5 1 7.565 1.375 7.64 1.835L7.75 2.485"
+                            stroke="#FF4F3F"
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                          />
+                          <path
+                            d="M9.4252 4.57031L9.1002 9.60531C9.0452 10.3903 9.0002 11.0003 7.6052 11.0003H4.3952C3.0002 11.0003 2.9552 10.3903 2.9002 9.60531L2.5752 4.57031"
+                            stroke="#FF4F3F"
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                          />
+                          <path
+                            d="M5.16504 8.25H6.83004"
+                            stroke="#FF4F3F"
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                          />
+                          <path
+                            d="M4.75 6.25H7.25"
+                            stroke="#FF4F3F"
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                          />
+                        </svg>
+                      </DELETEUPLODEDIMAGE>
+                    </div>
+                  </>
+                ) : (
+                  <>
+                    <LABELIMAGEUPLOAD htmlFor="blogImage">
+                      <div className="d-flex flex-column text-center p-1">
+                        <div>
+                          <svg
+                            width={21}
+                            height={21}
+                            viewBox="0 0 18 18"
+                            fill="none"
+                            xmlns="http://www.w3.org/2000/svg"
+                          >
+                            <path
+                              d="M2.25 11.25C2.25 13.3713 2.25 14.432 2.90901 15.091C3.56802 15.75 4.62868 15.75 6.75 15.75H11.25C13.3713 15.75 14.432 15.75 15.091 15.091C15.75 14.432 15.75 13.3713 15.75 11.25"
+                              stroke="#404040"
+                              strokeLinecap="round"
+                              strokeLinejoin="round"
+                            />
+                            <path
+                              d="M9 12V2.25M9 2.25L12 5.53125M9 2.25L6 5.53125"
+                              stroke="#404040"
+                              strokeLinecap="round"
+                              strokeLinejoin="round"
+                            />
+                          </svg>
+                        </div>
+                        <p className={`colorTheInputFile discription`}>
+                          بارگذاری فایل .png یا .jpg
+                        </p>
+                      </div>
+                    </LABELIMAGEUPLOAD>
+                    <input
+                      className="d-none"
+                      type="file"
+                      accept={`${process.env.NEXT_PUBLIC_INPUT_IMAGE_FORMAT}`}
+                      id="blogImage"
+                      onChange={handleBannerImageUpload}
+                    />
+                  </>
+                )}
+              </div>
+              <FORMCONTROLLABEL
+                className="mt-2 p-0 m-0"
+                sx={{ fontFamily: "unset" }}
+                control={
+                  <Checkbox checked={notify} onChange={handleNotifyChange} />
+                }
+                label="ایا مقاله مهم و در صفحه اصلی است"
+              />
+            </div>
+          </GridBorderDiv>
+        </BorderDiv>
+
+        <BorderDiv className="mt-4">
+          <p className="QASize text-center mb-4 mt-0">محصول داخل مقاله</p>
+          <GridBorderDiv>
+            <div className="d-flex flex-row align-items-center gap-2 ">
+              <label
+                style={{ whiteSpace: "nowrap" }}
+                className="mt-2 seeOrderFont"
+                htmlFor="bannerTitle"
+              >
+                تایتل محصول<RedStar> *</RedStar> :
+              </label>
+              <TEXTFIELD
+                fullWidth
+                label="تایتل محصول"
+                value={productTitle}
+                onChange={handleProductTitleChange}
+              />
+            </div>
+
+            <div className="d-flex flex-row align-items-center gap-2 ">
+              <label
+                style={{ whiteSpace: "nowrap" }}
+                className="mt-2 seeOrderFont"
+                htmlFor="prductLink"
+              >
+                لینک محصول<RedStar> *</RedStar> :
+              </label>
+              <TEXTFIELD
+                fullWidth
+                id="prductLink"
+                label="لینک محصول"
+                value={productLink}
+                onChange={handleProductLinkChange}
+              />
+            </div>
+
+            <div>
+              <p className="VodeoDisSizing mb-1">
+                عکس محصول تبلیغاتی<RedStar> *</RedStar>
+              </p>
+              {productSrc ? (
+                <>
+                  <div
+                    className="d-flex flex-column position-relative"
+                    style={{ width: "fit-content" }}
+                  >
+                    <BOX
+                      // onClick={() => handleOpen(logo)}
+                      component="img"
+                      src={
+                        `${process.env.NEXT_PUBLIC_BACK_END_SERVER}/system/download/${productSrc}` ||
+                        ""
+                      }
+                      alt="BlogProductImage"
+                    />
+
+                    <DELETEUPLODEDIMAGE onClick={() => setproductSrc("")}>
+                      <svg
+                        width={17}
+                        height={17}
+                        viewBox="0 0 12 12"
+                        fill="none"
+                        xmlns="http://www.w3.org/2000/svg"
+                      >
+                        <path
+                          d="M10.5 2.98828C8.835 2.82328 7.16 2.73828 5.49 2.73828C4.5 2.73828 3.51 2.78828 2.52 2.88828L1.5 2.98828"
+                          stroke="#FF4F3F"
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                        />
+                        <path
+                          d="M4.25 2.485L4.36 1.83C4.44 1.355 4.5 1 5.345 1H6.655C7.5 1 7.565 1.375 7.64 1.835L7.75 2.485"
+                          stroke="#FF4F3F"
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                        />
+                        <path
+                          d="M9.4252 4.57031L9.1002 9.60531C9.0452 10.3903 9.0002 11.0003 7.6052 11.0003H4.3952C3.0002 11.0003 2.9552 10.3903 2.9002 9.60531L2.5752 4.57031"
+                          stroke="#FF4F3F"
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                        />
+                        <path
+                          d="M5.16504 8.25H6.83004"
+                          stroke="#FF4F3F"
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                        />
+                        <path
+                          d="M4.75 6.25H7.25"
+                          stroke="#FF4F3F"
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                        />
+                      </svg>
+                    </DELETEUPLODEDIMAGE>
+                  </div>
+                </>
+              ) : (
+                <>
+                  <LABELIMAGEUPLOAD
+                    className="VodeoDisSizing mb-1"
+                    htmlFor="ProductImage"
+                  >
+                    <div className="d-flex flex-column text-center p-1">
+                      <div>
+                        <svg
+                          width={21}
+                          height={21}
+                          viewBox="0 0 18 18"
+                          fill="none"
+                          xmlns="http://www.w3.org/2000/svg"
+                        >
+                          <path
+                            d="M2.25 11.25C2.25 13.3713 2.25 14.432 2.90901 15.091C3.56802 15.75 4.62868 15.75 6.75 15.75H11.25C13.3713 15.75 14.432 15.75 15.091 15.091C15.75 14.432 15.75 13.3713 15.75 11.25"
+                            stroke="#404040"
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                          />
+                          <path
+                            d="M9 12V2.25M9 2.25L12 5.53125M9 2.25L6 5.53125"
+                            stroke="#404040"
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                          />
+                        </svg>
+                      </div>
+                      <p className={`colorTheInputFile discription`}>
+                        بارگذاری فایل .png یا .jpg
+                      </p>
+                    </div>
+                  </LABELIMAGEUPLOAD>
+                  <input
+                    className="d-none"
+                    type="file"
+                    id="ProductImage"
+                    accept={`${process.env.NEXT_PUBLIC_INPUT_IMAGE_FORMAT}`}
+                    onChange={handleProductSrcChange}
+                  />
+                </>
+              )}
+            </div>
+          </GridBorderDiv>
+        </BorderDiv>
+
+        <div className="w-100 mt-4">
+          <Editor
+            apiKey="3akk9p7jow7ksa3txzom0c8qr4e59rtg6xy1fzvux8vysqs0" // Replace with your TinyMCE API key
+            value={content}
+            onEditorChange={handleEditorChange}
+            init={{
+              height: 500,
+              menubar: false,
+              plugins: [
+                "advlist",
+                "autolink",
+                "lists",
+                "link",
+                "image",
+                "charmap",
+                "preview",
+                "anchor",
+                "searchreplace",
+                "visualblocks",
+                "code",
+                "fullscreen",
+                "insertdatetime",
+                "media",
+                "table",
+                "help",
+                "wordcount",
+              ],
+
+              toolbar:
+                "undo redo | formatselect | bold italic backcolor | \
                 alignleft aligncenter alignright alignjustify | \
                 bullist numlist outdent indent | removeformat | image |  h1 h2 h3 h4 h5 h6",
-                style_formats: [
-                  { title: "Header 1", block: "h1" },
-                  { title: "Header 2", block: "h2" },
-                  { title: "Header 3", block: "h3" },
-                  { title: "Header 4", block: "h4" },
-                  { title: "Header 5", block: "h5" },
-                  { title: "Header 6", block: "h6" },
-                ],
-                images_upload_handler: handleImageUpload,
-              }}
-            />
-          </div>
+              style_formats: [
+                { title: "Header 1", block: "h1" },
+                { title: "Header 2", block: "h2" },
+                { title: "Header 3", block: "h3" },
+                { title: "Header 4", block: "h4" },
+                { title: "Header 5", block: "h5" },
+                { title: "Header 6", block: "h6" },
+              ],
+              images_upload_handler: handleImageUpload,
+            }}
+          />
+        </div>
 
-          <BUTTONSSTYLE className="d-flex justify-content-around">
-            <button
-              // style={{ fontFamily: "unset" }}
-              type="submit"
-              variant="contained"
-              className="mt-3 confirmButtonStyle"
-            >
-              ذخیره
-            </button>
-            <button
-              className="cancelButtonStyle mt-3"
-              type="button"
-              onClick={() => setActiveKey("editUserPage")}
-            >
-              انصراف
-            </button>
-          </BUTTONSSTYLE>
+        <BUTTONSSTYLE className="d-flex justify-content-around">
+          <button
+            // style={{ fontFamily: "unset" }}
+            type="submit"
+            variant="contained"
+            className="mt-3 confirmButtonStyle"
+          >
+            ذخیره
+          </button>
+          <button
+            className="cancelButtonStyle mt-3"
+            type="button"
+            onClick={() => setActiveKey("editUserPage")}
+          >
+            انصراف
+          </button>
+        </BUTTONSSTYLE>
 
-          {/* modals */}
-          <AreYouShureModal
-            open={openModal}
-            onClose={closeModal}
-            text={"ایا از اضافه کردن بلاگ مطمعن هستید"}
-            func={handleSubmit}
-          />
-          <ConfirmModal
-            open={openModal2}
-            onClose={closeModal2}
-            text={"بلاگ با موفقیت اضافه شد"}
-          />
-          <ErrorModal
-            open={openModal3}
-            onClose={closeModal3}
-            text={"خطا از لاگین بودن خود اطمینان حاصل فرمایید"}
-          />
-        </BorderDiv>
+        {/* modals */}
+        <AreYouShureModal
+          open={openModal}
+          onClose={closeModal}
+          text={"ایا از اضافه کردن بلاگ مطمعن هستید"}
+          func={handleSubmit}
+        />
+        <ConfirmModal
+          open={openModal2}
+          onClose={closeModal2}
+          text={"بلاگ با موفقیت اضافه شد"}
+        />
+        <ErrorModal
+          open={openModal3}
+          onClose={closeModal3}
+          text={"خطا از لاگین بودن خود اطمینان حاصل فرمایید"}
+        />
       </form>
     </>
   );

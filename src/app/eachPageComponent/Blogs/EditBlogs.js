@@ -103,6 +103,27 @@ const LABELIMAGEUPLOAD = styled.label`
   width: fit-content;
 `;
 
+const BorderDiv = styled.div`
+  display: flex;
+  flex-direction:column;
+  align-items: flex-start;
+  /* justify-content: space-between; */
+  padding: 1.25rem;
+  gap: 1rem;
+  border: 1px solid rgba(0, 0, 0, 0.08);
+  border-radius: 14px;
+  background: #ffffff;
+  box-shadow: 0 3px 16px rgba(0, 0, 0, 0.06);
+  /* align-items: center; */
+  @media (max-width: 768px) {
+    flex-direction: column !important;
+    .inputMainDiv {
+      width: 100% !important;
+    }
+  }
+`;
+
+
 const BOX = styled(Box)`
   max-width: 200px;
   max-height: 200px;
@@ -343,6 +364,7 @@ export default function EditHonors({
   return (
     <div className="mt-3">
       <form onSubmit={areYouShureFunction} className="p-3">
+        <BorderDiv>
         <TEXTFIELD
           fullWidth
           label="عنوان"
@@ -628,7 +650,9 @@ export default function EditHonors({
           label="ایا مقاله مهم و در صفحه اصلی است"
         />
 
-        <div className="w-100">
+        </BorderDiv>
+
+        <div className="w-100 mt-4">
           <Editor
             apiKey="3akk9p7jow7ksa3txzom0c8qr4e59rtg6xy1fzvux8vysqs0" // Replace with your TinyMCE API key
             value={content}
