@@ -9,6 +9,7 @@ import ConfirmModal from "@/app/BaseComponent/ConfirmingModal";
 import ErrorModal from "@/app/BaseComponent/ErrorModal";
 import styled from "styled-components";
 import { Box } from "@mui/material";
+import toast from "react-hot-toast";
 
 const BorderInputBox = styled.div`
   padding: 1.25rem;
@@ -62,6 +63,12 @@ const BUTTONSSTYLE = styled.div`
       transform: translateY(-1px);
     }
   }
+`;
+
+const RedStar = styled.span`
+  color: #e91e63;
+  padding-left: 2px;
+  padding-right: 2px;
 `;
 
 const DivAdjustColorDivs = styled.div`
@@ -135,7 +142,7 @@ const HeaderSection = styled.div`
   }
 `;
 
-export default function AddHonors({ setActiveKey , setUpdateData }) {
+export default function AddHonors({ setActiveKey, setUpdateData }) {
   const dispatch = useDispatch();
 
   // modal state
@@ -151,7 +158,22 @@ export default function AddHonors({ setActiveKey , setUpdateData }) {
     { title: "", description: "", src: "", poster: "" },
   ]);
 
-  console.log(media);
+  const validateForm = () => {
+    // Media
+    for (let m = 0; m < media.length; m++) {
+      const item = media[m];
+      if (!item.title.trim())
+        return { valid: false, message: "عنوان  مدیا را وارد کنید" };
+      if (!item.description.trim())
+        return { valid: false, message: "توضیحات  مدیا را وارد کنید" };
+      if (!item.src)
+        return { valid: false, message: "فایل  مدیا را انتخاب کنید" };
+      if (!item.poster)
+        return { valid: false, message: "پوستر  مدیا را انتخاب کنید" };
+    }
+
+    return { valid: true };
+  };
 
   const handleFileChange = (e, index, setFunction, state) => {
     const file = e.target.files[0];
@@ -181,6 +203,13 @@ export default function AddHonors({ setActiveKey , setUpdateData }) {
 
   const areYouShureFunction = (e) => {
     e.preventDefault();
+    const result = validateForm();
+
+    if (!result.valid) {
+      toast.error(result.message);
+      return;
+    }
+
     setOpenModal(true);
   };
 
@@ -234,7 +263,7 @@ export default function AddHonors({ setActiveKey , setUpdateData }) {
     } catch (error) {
       setOpenModal3(true);
       console.error("Error creating product:", error);
-    }finally{
+    } finally {
       setUpdateData(true);
     }
   };
@@ -261,7 +290,9 @@ export default function AddHonors({ setActiveKey , setUpdateData }) {
                 <div className="d-flex flex-row gap-3 align-items-center">
                   <div className="w-50">
                     <div className="d-flex flex-column mt-2">
-                      <span className="mb-1 NormalTextSizing">فیلم :</span>
+                      <span className="mb-1 NormalTextSizing">
+                        فیلم<RedStar> *</RedStar> :
+                      </span>
                       <div style={{ height: "fit-content" }}>
                         <DivAdjustColorDivs columns="repeat(1, 1fr)">
                           {item?.src === "" ? (
@@ -309,7 +340,6 @@ export default function AddHonors({ setActiveKey , setUpdateData }) {
                                 onChange={(e) =>
                                   handleFileChange(e, index, setMedia, media)
                                 }
-                                required
                               />
                             </>
                           ) : (
@@ -338,7 +368,9 @@ export default function AddHonors({ setActiveKey , setUpdateData }) {
                     </div>
 
                     <div className="d-flex flex-column mt-2 mb-1">
-                      <span className="NormalTextSizing">پوستر فیلم :</span>
+                      <span className="NormalTextSizing">
+                        پوستر فیلم <RedStar> *</RedStar>:
+                      </span>
                       <DivAdjustColorDivs columns="repeat(1, 1fr)">
                         {item?.poster === "" ? (
                           <>
@@ -417,7 +449,7 @@ export default function AddHonors({ setActiveKey , setUpdateData }) {
                         htmlFor="TypeVideo"
                         style={{ whiteSpace: "nowrap" }}
                       >
-                        عنوان :
+                        عنوان <RedStar> *</RedStar>:
                       </label>
                       <input
                         id="TypeVideo"
@@ -432,7 +464,6 @@ export default function AddHonors({ setActiveKey , setUpdateData }) {
                             )
                           )
                         }
-                        required
                       />
                     </ResponsiveDivInputs>
 
@@ -442,7 +473,7 @@ export default function AddHonors({ setActiveKey , setUpdateData }) {
                         htmlFor="DisVideo"
                         style={{ whiteSpace: "nowrap" }}
                       >
-                        توضیحات :
+                        توضیحات <RedStar> *</RedStar>:
                       </label>
                       <input
                         id="DisVideo"
@@ -458,7 +489,6 @@ export default function AddHonors({ setActiveKey , setUpdateData }) {
                             )
                           )
                         }
-                        required
                       />
                     </ResponsiveDivInputs>
                     <BUTTONSSTYLE>

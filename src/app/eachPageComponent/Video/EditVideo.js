@@ -9,6 +9,7 @@ import { HomePageVideoDeleted } from "@/app/Store/thunks";
 import ConfirmModal from "@/app/BaseComponent/ConfirmingModal";
 import ErrorModal from "@/app/BaseComponent/ErrorModal";
 import AreYouShureModal from "@/app/BaseComponent/AreYouSureModal";
+import toast from "react-hot-toast";
 
 const LABELIMAGEUPLOAD = styled.label`
   /* border: 1px solid #c0c0c0;
@@ -122,6 +123,13 @@ const BUTTONSSTYLE = styled.div`
   }
 `;
 
+const RedStar = styled.span`
+  color: #e91e63;
+  padding-left: 2px;
+  padding-right: 2px;
+`;
+
+
 export default function EditHonors({
   setUpdateData,
   editedHonor,
@@ -147,6 +155,24 @@ export default function EditHonors({
   const closeModal2 = () => setOpenModal2(false);
   const closeModal3 = () => setOpenModal3(false);
   const closeModal4 = () => setOpenModal4(false);
+
+
+    const validateForm = () => {
+    // Media
+    for (let m = 0; m < media.length; m++) {
+      const item = media[m];
+      if (!item.title.trim())
+        return { valid: false, message: "عنوان  مدیا را وارد کنید" };
+      if (!item.description.trim())
+        return { valid: false, message: "توضیحات  مدیا را وارد کنید" };
+      if (!item.src)
+        return { valid: false, message: "فایل  مدیا را انتخاب کنید" };
+      if (!item.poster)
+        return { valid: false, message: "پوستر  مدیا را انتخاب کنید" };
+    }
+
+    return { valid: true };
+  };
 
   useEffect(() => {
     if (editedHonor) {
@@ -211,6 +237,12 @@ export default function EditHonors({
 
   const areYouShureFunction = (e) => {
     e.preventDefault();
+    const result = validateForm();
+
+    if (!result.valid) {
+      toast.error(result.message);
+      return;
+    }
     setOpenModal(true);
   };
 
@@ -299,7 +331,7 @@ export default function EditHonors({
                 <div className="d-flex flex-row gap-3 align-items-center">
                   <div className="w-50">
                     <div className="d-flex flex-column">
-                      <span className="NormalTextSizing">فیلم :</span>
+                      <span className="NormalTextSizing">فیلم <RedStar> *</RedStar>:</span>
                       {item?.src === "" ? (
                         <>
                           <LABELIMAGEUPLOAD htmlFor="MediaVideo">
@@ -340,7 +372,7 @@ export default function EditHonors({
                             onChange={(e) =>
                               handleFileChange(e, index, setMedia, media)
                             }
-                            required
+                            
                           />
                         </>
                       ) : (
@@ -406,7 +438,7 @@ export default function EditHonors({
 
                     <div className="d-flex flex-column">
                       <span className="mt-2 NormalTextSizing">
-                        پوستر فیلم :
+                        پوستر فیلم <RedStar> *</RedStar>:
                       </span>
                       {item.poster ? (
                         <>
@@ -514,7 +546,7 @@ export default function EditHonors({
                         htmlFor="TypeVideo"
                         style={{ whiteSpace: "nowrap" }}
                       >
-                        عنوان :
+                        عنوان <RedStar> *</RedStar>:
                       </label>
                       <input
                         id="TypeVideo"
@@ -529,7 +561,7 @@ export default function EditHonors({
                             )
                           )
                         }
-                        required
+                        
                       />
                     </ResponsiveDivInputs>
 
@@ -539,7 +571,7 @@ export default function EditHonors({
                         htmlFor="DisVideo"
                         style={{ whiteSpace: "nowrap" }}
                       >
-                        توضیحات :
+                        توضیحات <RedStar> *</RedStar>:
                       </label>
                       <input
                         id="DisVideo"
@@ -556,7 +588,7 @@ export default function EditHonors({
                             )
                           )
                         }
-                        required
+                        
                       />
                     </ResponsiveDivInputs>
                     <BUTTONSSTYLE>

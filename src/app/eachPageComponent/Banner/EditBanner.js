@@ -8,6 +8,7 @@ import { bannerEdit, bannerDeleted, uploadFile } from "@/app/Store/thunks";
 import ConfirmModal from "@/app/BaseComponent/ConfirmingModal";
 import ErrorModal from "@/app/BaseComponent/ErrorModal";
 import AreYouShureModal from "@/app/BaseComponent/AreYouSureModal";
+import toast from "react-hot-toast";
 
 const TEXTFIELD = styled(TextField)`
   .MuiInputBase-input {
@@ -113,6 +114,12 @@ const BUTTONSSTYLE = styled.div`
   }
 `;
 
+const RedStar = styled.span`
+  color: #e91e63;
+  padding-left: 2px;
+  padding-right: 2px;
+`;
+
 export default function EditHonors({
   setUpdateData,
   editedHonor,
@@ -135,6 +142,16 @@ export default function EditHonors({
   const closeModal2 = () => setOpenModal2(false);
   const closeModal3 = () => setOpenModal3(false);
   const closeModal4 = () => setOpenModal4(false);
+
+  const validateForm = () => {
+    // Main fields
+    if (!bannerTitle.trim())
+      return { valid: false, message: "لطفا عنوان را وارد کنید" };
+    if (!bannerImage)
+      return { valid: false, message: "لطفا یک عکس انتخاب کنید" };
+
+    return { valid: true };
+  };
 
   useEffect(() => {
     if (editedHonor) {
@@ -191,6 +208,12 @@ export default function EditHonors({
 
   const areYouShureFunction = (e) => {
     e.preventDefault();
+    const result = validateForm();
+
+    if (!result.valid) {
+      toast.error(result.message);
+      return;
+    }
     setOpenModal(true);
   };
 
@@ -224,7 +247,7 @@ export default function EditHonors({
     } catch (error) {
       setOpenModal3(true);
       console.error("Error submitting data:", error);
-    }finally {
+    } finally {
       setUpdateData(true);
     }
   };
@@ -235,7 +258,7 @@ export default function EditHonors({
         <MainDivSection className="container">
           <ResponsiveDivInputs className="d-flex flex-row gap-2 align-items-center">
             <p style={{ whiteSpace: "nowrap" }} className="seeOrderFont">
-              عنوان :
+              عنوان <RedStar> *</RedStar>:
             </p>
             <TEXTFIELD
               label="عنوان"

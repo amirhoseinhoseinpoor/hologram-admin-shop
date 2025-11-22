@@ -628,7 +628,7 @@ export default function EditHonors({
           label="ایا مقاله مهم و در صفحه اصلی است"
         />
 
-        <div>
+        <div className="w-100">
           <Editor
             apiKey="3akk9p7jow7ksa3txzom0c8qr4e59rtg6xy1fzvux8vysqs0" // Replace with your TinyMCE API key
             value={content}
