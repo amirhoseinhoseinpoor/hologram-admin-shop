@@ -163,6 +163,21 @@ export default function HonorsMainComponent({ toggleShow }) {
     fechData();
   }, [dispatch, updateData]);
 
+  const validatePriority = (items) => {
+    const trueItems = items.filter((item) => item.priority === true);
+
+    if (trueItems.length >= 3) {
+      return {
+        valid: false,
+        list: trueItems,
+        message:
+          "حداقل ۳ آیتم دارای اولویت فعال هستند. لطفا آن‌ها را غیرفعال کنید.",
+      };
+    }
+
+    return { valid: true };
+  };
+
   const handleDelete = async (e) => {
     e.preventDefault();
     setOpenModal4(false);
@@ -228,7 +243,7 @@ export default function HonorsMainComponent({ toggleShow }) {
               onClick={handleCancelEdit}
               className="NormalTextSizing text-decoration-underline textHeaderStyle d-flex align-items-center"
             >
-              مدیریت مقالات {`>`} ویرایش 
+              مدیریت مقالات {`>`} ویرایش
             </div>
           </>
         )}
@@ -351,6 +366,7 @@ export default function HonorsMainComponent({ toggleShow }) {
         <>
           <div>
             <AddBlogs
+              dataCome={dataCome}
               setActiveKey={setActiveKey}
               setUpdateData={setUpdateData}
             />
@@ -360,6 +376,7 @@ export default function HonorsMainComponent({ toggleShow }) {
       {editedHonor && (
         <>
           <EditBlogs
+            dataCome={dataCome}
             setUpdateData={setUpdateData}
             editedHonor={editedHonor}
             handleCancelEdit={handleCancelEdit}

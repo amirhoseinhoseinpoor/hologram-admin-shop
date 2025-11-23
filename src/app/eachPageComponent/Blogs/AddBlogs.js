@@ -147,18 +147,21 @@ const RedStar = styled.span`
   padding-right: 2px;
 `;
 
-export default function AddHonors({ setActiveKey, setUpdateData }) {
+export default function AddHonors({ setActiveKey, setUpdateData, dataCome }) {
   const dispatch = useDispatch();
 
   const [content, setContent] = useState("");
   const [bannerTitle, setBannerTitle] = useState("");
   const [blogTime, setBlogTime] = useState("");
   const [blogType, setBlogType] = useState("");
+
   const [bannerTags, setBannerTags] = useState("");
   const [bannerImage, setBannerImage] = useState(null);
   const [notify, setNotify] = useState(false);
   const [posetives, setposetives] = useState("");
   const [negetive, setnegetive] = useState("");
+  const [disableButton, setDisableButton] = useState(false);
+  const [textnotify, setTextnotify] = useState(null);
   // product
   const [productTitle, setproductTitle] = useState("");
   const [productSrc, setproductSrc] = useState("");
@@ -172,6 +175,42 @@ export default function AddHonors({ setActiveKey, setUpdateData }) {
   const closeModal = () => setOpenModal(false);
   const closeModal2 = () => setOpenModal2(false);
   const closeModal3 = () => setOpenModal3(false);
+
+  const validatePriority = (items) => {
+    console.log(items);
+
+    const trueItems = items.filter((item) => item?.content?.priority === true);
+    console.log(trueItems);
+
+    if (trueItems.length >= 3) {
+      return {
+        valid: false,
+        list: trueItems,
+        message:
+          "حداقل ۳ آیتم دارای اولویت فعال هستند. لطفا آن‌ها را غیرفعال کنید.",
+      };
+    }
+
+    return { valid: true };
+  };
+
+  useEffect(() => {
+    const result = validatePriority(dataCome);
+
+    if (!result.valid) {
+      // Build readable list for user
+      const msgLines = result.list
+        .map((i) => `\n ${i?.content?.title} (کد: ${i.code})`)
+        .join("\n");
+
+      setTextnotify(`برای اضافه کردن مقاله به مقالات مهم ابتدا یکی از مقالات زیر را از اولویت در بیاورید:\n${msgLines}`);
+
+      setDisableButton(true);
+      return;
+    }
+
+    setDisableButton(false);
+  }, [dataCome]);
 
   const validateForm = () => {
     // Main fields
@@ -584,7 +623,13 @@ export default function AddHonors({ setActiveKey, setUpdateData }) {
                   </>
                 )}
               </div>
+              <div className="mt-2">
+                <pre style={{ whiteSpace: "pre-wrap", direction: "rtl" }}>
+                  {textnotify}
+                </pre>
+              </div>
               <FORMCONTROLLABEL
+                disabled={disableButton}
                 className="mt-2 p-0 m-0"
                 sx={{ fontFamily: "unset" }}
                 control={
@@ -808,7 +853,7 @@ export default function AddHonors({ setActiveKey, setUpdateData }) {
         <AreYouShureModal
           open={openModal}
           onClose={closeModal}
-          text={"ایا از اضافه کردن بلاگ مطمعن هستید"}
+          text={"ایا از اضافه کردن بلاگ مطمئن هستید"}
           func={handleSubmit}
         />
         <ConfirmModal
