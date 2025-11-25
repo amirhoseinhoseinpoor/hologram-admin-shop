@@ -26,6 +26,7 @@ import ErrorModal from "@/app/BaseComponent/ErrorModal";
 //redux import
 import { useDispatch } from "react-redux";
 import { blogsList } from "@/app/Store/thunks";
+import { blogsDeleted } from "@/app/Store/thunks";
 
 const HeadermakeOrder = styled.div`
   padding: 10px;
@@ -163,29 +164,16 @@ export default function HonorsMainComponent({ toggleShow }) {
     fechData();
   }, [dispatch, updateData]);
 
-  const validatePriority = (items) => {
-    const trueItems = items.filter((item) => item.priority === true);
-
-    if (trueItems.length >= 3) {
-      return {
-        valid: false,
-        list: trueItems,
-        message:
-          "حداقل ۳ آیتم دارای اولویت فعال هستند. لطفا آن‌ها را غیرفعال کنید.",
-      };
-    }
-
-    return { valid: true };
-  };
 
   const handleDelete = async (e) => {
     e.preventDefault();
     setOpenModal4(false);
     try {
       const deleteVideo = await dispatch(
-        blogsDeleted({ code: editedHonor.code })
+        blogsDeleted({ code: indexDeleted })
       );
       if (deleteVideo.payload.message === "Success") {
+        setUpdateData(true);
         setOpenModal2(true);
         closeModalOnTimeout();
       } else {

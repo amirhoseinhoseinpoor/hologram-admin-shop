@@ -153,7 +153,7 @@ export default function AddHonors({ setActiveKey, setUpdateData }) {
       ).unwrap();
 
       // Construct the valid image URL based on your backend API response
-      const imageUrl = `http://176.120.16.221:7000/system/download/${fileId}`;
+      const imageUrl = `${process.env.NEXT_PUBLIC_BACK_END_SERVER}/system/download/${fileId}`;
 
       // Ensure the image URL is valid and log it for debugging purposes
       console.log("Uploaded image URL:", imageUrl);

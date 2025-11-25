@@ -193,7 +193,7 @@ export default function EditHonors({
       const fileId = await dispatch(
         uploadFile({ file, tag, type, isPublic })
       ).unwrap();
-      const imageUrl = `http://176.120.16.221:7000/system/download/${fileId}`;
+      const imageUrl = `${process.env.NEXT_PUBLIC_BACK_END_SERVER}/system/download/${fileId}`;
       const editor = tinymce.activeEditor;
       editor.insertContent(`<img src="${imageUrl}" alt="Image" />`);
     } catch (error) {
