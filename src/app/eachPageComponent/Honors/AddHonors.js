@@ -10,6 +10,7 @@ import ErrorModal from "@/app/BaseComponent/ErrorModal";
 import ConfirmModal from "@/app/BaseComponent/ConfirmingModal";
 import styled from "styled-components";
 import { Box } from "@mui/material";
+import toast from "react-hot-toast";
 
 const DELETEUPLODEDIMAGE = styled.button`
   position: absolute;
@@ -94,7 +95,13 @@ const LABELIMAGEUPLOAD = styled.label`
   width: fit-content;
 `;
 
-export default function AddHonors({ setActiveKey , setUpdateData }) {
+const RedStar = styled.span`
+  color: #e91e63;
+  padding-left: 2px;
+  padding-right: 2px;
+`;
+
+export default function AddHonors({ setActiveKey, setUpdateData }) {
   const dispatch = useDispatch();
 
   const [content, setContent] = useState("");
@@ -110,6 +117,16 @@ export default function AddHonors({ setActiveKey , setUpdateData }) {
   const closeModal = () => setOpenModal(false);
   const closeModal2 = () => setOpenModal2(false);
   const closeModal3 = () => setOpenModal3(false);
+
+  const validateForm = () => {
+    // Main fields
+    if (!bannerTitle.trim())
+      return { valid: false, message: "لطفا عنوان را وارد کنید" };
+    if (!bannerImage)
+      return { valid: false, message: "لطفا یک عکس انتخاب کنید" };
+
+    return { valid: true };
+  };
 
   const handleEditorChange = (newContent) => {
     setContent(newContent);
@@ -136,7 +153,7 @@ export default function AddHonors({ setActiveKey , setUpdateData }) {
       ).unwrap();
 
       // Construct the valid image URL based on your backend API response
-      const imageUrl = `http://176.120.16.221:7000/system/download/${fileId}`;
+      const imageUrl = `${process.env.NEXT_PUBLIC_BACK_END_SERVER}/system/download/${fileId}`;
 
       // Ensure the image URL is valid and log it for debugging purposes
       console.log("Uploaded image URL:", imageUrl);
@@ -173,6 +190,14 @@ export default function AddHonors({ setActiveKey , setUpdateData }) {
 
   const areYouShureFunction = (e) => {
     e.preventDefault();
+
+    const result = validateForm();
+
+    if (!result.valid) {
+      toast.error(result.message);
+      return;
+    }
+
     setOpenModal(true);
   };
 
@@ -205,7 +230,7 @@ export default function AddHonors({ setActiveKey , setUpdateData }) {
     } catch (error) {
       setOpenModal3(true);
       console.error("Error submitting data:", error);
-    }finally{
+    } finally {
       setUpdateData(true);
     }
   };
@@ -222,7 +247,7 @@ export default function AddHonors({ setActiveKey , setUpdateData }) {
                 className="mt-2 seeOrderFont"
                 htmlFor="bannerTitle"
               >
-                تایتل :
+                عنوان<RedStar> *</RedStar> :
               </label>
               <input
                 className="w-100"
@@ -384,13 +409,14 @@ export default function AddHonors({ setActiveKey , setUpdateData }) {
         </div>
 
         <BUTTONSSTYLE className="d-flex flex-row mt-3 mb-3 justify-content-around">
-          <button
-            className="confirmButtonStyle"
-            type="submit"
-          >
-            تایید
+          <button className="confirmButtonStyle" type="submit">
+            ذخیره
           </button>
-          <button className="cancelButtonStyle" type="button" onClick={() => setActiveKey('editUserPage')}>
+          <button
+            className="cancelButtonStyle"
+            type="button"
+            onClick={() => setActiveKey("editUserPage")}
+          >
             انصراف
           </button>
         </BUTTONSSTYLE>

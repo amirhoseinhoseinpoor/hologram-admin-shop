@@ -8,6 +8,7 @@ import { honorsDeleted, uploadFile, honorsEdit } from "@/app/Store/thunks";
 import ErrorModal from "@/app/BaseComponent/ErrorModal";
 import AreYouShureModal from "@/app/BaseComponent/AreYouSureModal";
 import ConfirmModal from "@/app/BaseComponent/ConfirmingModal";
+import toast from "react-hot-toast";
 
 const BUTTONSSTYLE = styled.div`
   display: flex;
@@ -116,6 +117,12 @@ const TEXTFIELD = styled(TextField)`
   }
 `;
 
+const RedStar = styled.span`
+  color: #e91e63;
+  padding-left: 2px;
+  padding-right: 2px;
+`;
+
 export default function EditHonors({
   setUpdateData,
   editedHonor,
@@ -149,6 +156,16 @@ export default function EditHonors({
     }
   }, [editedHonor]);
 
+  const validateForm = () => {
+    // Main fields
+    if (!bannerTitle.trim())
+      return { valid: false, message: "لطفا عنوان را وارد کنید" };
+    if (!bannerImage)
+      return { valid: false, message: "لطفا یک عکس انتخاب کنید" };
+
+    return { valid: true };
+  };
+
   const handleEditorChange = (newContent) => {
     setContent(newContent); // Update content state
   };
@@ -171,7 +188,7 @@ export default function EditHonors({
       const fileId = await dispatch(
         uploadFile({ file, tag, type, isPublic })
       ).unwrap();
-      const imageUrl = `http://176.120.16.221:7000/system/download/${fileId}`;
+      const imageUrl = `${process.env.NEXT_PUBLIC_BACK_END_SERVER}/system/download/${fileId}`;
       const editor = tinymce.activeEditor;
       editor.insertContent(`<img src="${imageUrl}" alt="Image" />`);
     } catch (error) {
@@ -217,6 +234,13 @@ export default function EditHonors({
 
   const areYouShureFunction = (e) => {
     e.preventDefault();
+    const result = validateForm();
+
+    if (!result.valid) {
+      toast.error(result.message);
+      return;
+    }
+
     setOpenModal(true);
   };
 
@@ -251,7 +275,7 @@ export default function EditHonors({
     } catch (error) {
       setOpenModal3(true);
       console.error("Error submitting data:", error);
-    }finally{
+    } finally {
       setUpdateData(true);
     }
   };
@@ -264,7 +288,7 @@ export default function EditHonors({
           <div className="inputMainDiv me-3 w-50">
             <div className="d-flex flex-row gap-2 align-items-center">
               <p style={{ whiteSpace: "nowrap" }} className="seeOrderFont">
-                عنوان :
+                عنوان <RedStar> * </RedStar>:
               </p>
               <TEXTFIELD
                 label="عنوان"

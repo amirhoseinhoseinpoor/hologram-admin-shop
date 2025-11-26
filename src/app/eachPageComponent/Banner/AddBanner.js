@@ -10,6 +10,7 @@ import ErrorModal from "@/app/BaseComponent/ErrorModal";
 import AreYouShureModal from "@/app/BaseComponent/AreYouSureModal";
 import styled from "styled-components";
 import { Box } from "@mui/material";
+import toast from "react-hot-toast";
 
 const BOX = styled(Box)`
   width: 100%;
@@ -97,7 +98,13 @@ const BUTTONSSTYLE = styled.div`
   }
 `;
 
-export default function AddHonors({ setActiveKey , setUpdateData }) {
+const RedStar = styled.span`
+  color: #e91e63;
+  padding-left: 2px;
+  padding-right: 2px;
+`;
+
+export default function AddHonors({ setActiveKey, setUpdateData }) {
   const dispatch = useDispatch();
 
   const [bannerTitle, setBannerTitle] = useState("");
@@ -142,8 +149,24 @@ export default function AddHonors({ setActiveKey , setUpdateData }) {
     }
   };
 
+  const validateForm = () => {
+    // Main fields
+    if (!bannerTitle.trim())
+      return { valid: false, message: "لطفا عنوان را وارد کنید" };
+    if (!bannerImage)
+      return { valid: false, message: "لطفا یک عکس انتخاب کنید" };
+
+    return { valid: true };
+  };
+
   const areYouShureFunction = (e) => {
     e.preventDefault();
+    const result = validateForm();
+
+    if (!result.valid) {
+      toast.error(result.message);
+      return;
+    }
     setOpenModal(true);
   };
 
@@ -166,7 +189,6 @@ export default function AddHonors({ setActiveKey , setUpdateData }) {
       link: bannerLink,
     };
 
-
     try {
       const fetchData = await dispatch(bannerpot(formData)).unwrap();
       if (fetchData) {
@@ -176,7 +198,7 @@ export default function AddHonors({ setActiveKey , setUpdateData }) {
     } catch (error) {
       setOpenModal3(true);
       console.error("Error submitting data:", error);
-    }finally {
+    } finally {
       setUpdateData(true);
     }
   };
@@ -192,7 +214,7 @@ export default function AddHonors({ setActiveKey , setUpdateData }) {
                 htmlFor="bannerTitle"
                 style={{ whiteSpace: "nowrap" }}
               >
-                عنوان:{" "}
+                عنوان: <RedStar> *</RedStar>
               </label>
               <input
                 className="w-100"
@@ -321,7 +343,7 @@ export default function AddHonors({ setActiveKey , setUpdateData }) {
 
         <BUTTONSSTYLE className="d-flex flex-row mt-3 mb-3 justify-content-around">
           <button className="confirmButtonStyle" type="submit">
-            اضافه کردن بنر
+            ذخیره
           </button>
 
           <button

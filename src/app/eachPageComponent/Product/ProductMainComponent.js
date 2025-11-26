@@ -28,7 +28,7 @@ import SearchIcon from "@mui/icons-material/Search";
 const NavDropDown = styled(NavDropdown)`
   .dropdown-menu {
     border: 1px solid gray;
-    width: 230px;
+    width: 150px;
     padding: 12px;
     margin-top: 3px;
     border-radius: 4px;
@@ -164,6 +164,9 @@ export default function HonorsMainComponent({ toggleShow }) {
   const [searchTerm, setSearchTerm] = useState("");
   const [filteredOrders, setFilteredOrders] = useState([]);
 
+  console.log(filteredOrders);
+  
+
   const [currentPage, setCurrentPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
 
@@ -191,7 +194,7 @@ export default function HonorsMainComponent({ toggleShow }) {
       setCurrentPage(dataResponse?.page);
     } catch (error) {
       console.error(error);
-    }finally {
+    } finally {
       setDataUpdated(false);
     }
   };
@@ -208,7 +211,7 @@ export default function HonorsMainComponent({ toggleShow }) {
     setEditedHonor(null);
   };
 
-  const areYouShureFunction = (product) => {    
+  const areYouShureFunction = (product) => {
     setDataForDelete(product);
     setOpenModal(true);
   };
@@ -270,7 +273,7 @@ export default function HonorsMainComponent({ toggleShow }) {
         <div>
           {activekey === "editUserPage" && !editedHonor && (
             <>
-              <div className="NormalTextSizing text-decoration-underline textHeaderStyle d-flex align-items-center">
+              <div className="NormalTextSizing textHeaderStyle d-flex align-items-center">
                 مدیریت محصولات
               </div>
             </>
@@ -282,7 +285,7 @@ export default function HonorsMainComponent({ toggleShow }) {
                 onClick={() => setActiveKey("editUserPage")}
                 className="text-decoration-underline NormalTextSizing textHeaderStyle d-flex align-items-center"
               >
-                مدیریت محصولات
+                مدیریت محصولات {`>`} اضافه کردن
               </div>
             </>
           )}
@@ -293,7 +296,7 @@ export default function HonorsMainComponent({ toggleShow }) {
                 onClick={handleCancelEdit}
                 className="NormalTextSizing text-decoration-underline textHeaderStyle d-flex align-items-center"
               >
-                مدیریت محصولات
+                مدیریت محصولات {`>`} ویرایش
               </div>
             </>
           )}
@@ -374,13 +377,20 @@ export default function HonorsMainComponent({ toggleShow }) {
                           filteredOrders?.map((product, index) => (
                             <tr key={index}>
                               <td>
-                                {product && product.info?.imgData?.[0]?.src && (
+                                {product && product.info?.imgData?.[0]?.src && product.info?.imgData?.[0]?.type == 1  ? (
                                   <ProductCard>
                                     <ImageWrapper
                                       component="img"
                                       src={`${process.env.NEXT_PUBLIC_BACK_END_SERVER}/system/download/${product.info.imgData[0].src}`}
                                     />
                                   </ProductCard>
+                                ) : (
+                                  <>
+                                    <ImageWrapper
+                                      component="img"
+                                      src={`/HomeImages/360_F_470299797_UD0eoVMMSUbHCcNJCdv2t8B2g1GVqYgs.jpg`}
+                                    />
+                                  </>
                                 )}
                               </td>
                               <td>{product.name}</td>
@@ -521,7 +531,10 @@ export default function HonorsMainComponent({ toggleShow }) {
 
       {activekey === "addUser" && !editedHonor && (
         <>
-          <AddProduct setDataUpdated={setDataUpdated} setActiveKey={setActiveKey}/>
+          <AddProduct
+            setDataUpdated={setDataUpdated}
+            setActiveKey={setActiveKey}
+          />
         </>
       )}
       {editedHonor && (

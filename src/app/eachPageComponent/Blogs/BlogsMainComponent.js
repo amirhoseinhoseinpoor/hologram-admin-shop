@@ -26,6 +26,7 @@ import ErrorModal from "@/app/BaseComponent/ErrorModal";
 //redux import
 import { useDispatch } from "react-redux";
 import { blogsList } from "@/app/Store/thunks";
+import { blogsDeleted } from "@/app/Store/thunks";
 
 const HeadermakeOrder = styled.div`
   padding: 10px;
@@ -163,14 +164,16 @@ export default function HonorsMainComponent({ toggleShow }) {
     fechData();
   }, [dispatch, updateData]);
 
+
   const handleDelete = async (e) => {
     e.preventDefault();
     setOpenModal4(false);
     try {
       const deleteVideo = await dispatch(
-        blogsDeleted({ code: editedHonor.code })
+        blogsDeleted({ code: indexDeleted })
       );
       if (deleteVideo.payload.message === "Success") {
+        setUpdateData(true);
         setOpenModal2(true);
         closeModalOnTimeout();
       } else {
@@ -205,8 +208,8 @@ export default function HonorsMainComponent({ toggleShow }) {
         </div>
         {activekey === "editUserPage" && !editedHonor && (
           <>
-            <div className="NormalTextSizing text-decoration-underline textHeaderStyle d-flex align-items-center">
-              ویرایش مقالات
+            <div className="NormalTextSizing textHeaderStyle d-flex align-items-center">
+              مدیریت مقالات
             </div>
           </>
         )}
@@ -217,7 +220,7 @@ export default function HonorsMainComponent({ toggleShow }) {
               onClick={() => setActiveKey("editUserPage")}
               className="NormalTextSizing text-decoration-underline textHeaderStyle d-flex align-items-center"
             >
-              افزودن مقالات
+              مدیریت مقالات {`>`} اضافه کردن
             </div>
           </>
         )}
@@ -228,7 +231,7 @@ export default function HonorsMainComponent({ toggleShow }) {
               onClick={handleCancelEdit}
               className="NormalTextSizing text-decoration-underline textHeaderStyle d-flex align-items-center"
             >
-              مقالات
+              مدیریت مقالات {`>`} ویرایش
             </div>
           </>
         )}
@@ -351,6 +354,7 @@ export default function HonorsMainComponent({ toggleShow }) {
         <>
           <div>
             <AddBlogs
+              dataCome={dataCome}
               setActiveKey={setActiveKey}
               setUpdateData={setUpdateData}
             />
@@ -360,6 +364,7 @@ export default function HonorsMainComponent({ toggleShow }) {
       {editedHonor && (
         <>
           <EditBlogs
+            dataCome={dataCome}
             setUpdateData={setUpdateData}
             editedHonor={editedHonor}
             handleCancelEdit={handleCancelEdit}

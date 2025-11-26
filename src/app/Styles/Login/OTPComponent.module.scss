@@ -9,6 +9,29 @@
   // background-color: #fff;
 }
 
+.handelLoginError {
+  border-radius: 4px;
+  background-color: #ff4f3f;
+  padding: 8px;
+  color: white;
+  text-align: center;
+  margin-bottom: 15px;
+}
+
+.activeButton {
+  background-color: #5695f6;
+  cursor: pointer;
+}
+.activeButton :hover {
+  background-color: #3e73d3;
+  border-radius: 4px;
+}
+
+.disabledButton {
+  background-color: #868686;
+  cursor: not-allowed;
+}
+
 .otpForm {
   display: flex;
   flex-direction: column;
@@ -52,15 +75,16 @@
 // }
 
 .verifyButton {
-  background-color: #4a90e2;
+  
   color: #fff;
-  border: none;
-  border-radius: 5px;
   padding: 10px 20px;
   font-size: 16px;
-  cursor: pointer;
-  transition: background-color 0.3s;
-  margin-bottom: 10px;
+  // cursor: pointer;
+  // transition: background-color 0.3s;
+  // margin-bottom: 10px;
+
+  border-radius: 4px;
+  border: none;
 }
 .resendButton {
   background-color: transparent;
@@ -70,9 +94,9 @@
   text-decoration: underline;
 }
 
-.verifyButton:hover {
-  background-color: #357ab7;
-}
+// .verifyButton:hover {
+//   background-color: #357ab7;
+// }
 
 // .resendButton:disabled {
 //   background-color: #ccc;
@@ -90,7 +114,6 @@
   .otpInput {
     width: 38px;
     height: 38px;
-   margin: 0 4px;
-
+    margin: 0 4px;
   }
 }

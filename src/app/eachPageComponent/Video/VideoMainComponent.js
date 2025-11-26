@@ -206,8 +206,8 @@ export default function HonorsMainComponent({ toggleShow }) {
         </div>
         {activekey === "editUserPage" && !editedHonor && (
           <>
-            <div className="NormalTextSizing text-decoration-underline textHeaderStyle d-flex align-items-center">
-              ویرایش ویدیو
+            <div className="NormalTextSizing textHeaderStyle d-flex align-items-center">
+              مدیریت ویدیو
             </div>
           </>
         )}
@@ -218,7 +218,7 @@ export default function HonorsMainComponent({ toggleShow }) {
               onClick={() => setActiveKey("editUserPage")}
               className="NormalTextSizing text-decoration-underline textHeaderStyle d-flex align-items-center"
             >
-              ویدیو
+              مدیریت ویدیو {`>`} اضافه کردن
             </div>
           </>
         )}
@@ -229,7 +229,7 @@ export default function HonorsMainComponent({ toggleShow }) {
               onClick={handleCancelEdit}
               className="NormalTextSizing text-decoration-underline textHeaderStyle d-flex align-items-center"
             >
-              ویدیو
+              مدیریت ویدیو {`>`} ویرایش 
             </div>
           </>
         )}

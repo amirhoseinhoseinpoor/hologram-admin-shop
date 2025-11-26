@@ -16,6 +16,7 @@ import ConfirmModal from "@/app/BaseComponent/ConfirmingModal";
 import { Modal, Box } from "@mui/material";
 import CustomCloseButton from "@/app/BaseComponent/CustomCloseButton";
 import { fixTitleSize } from "@/app/utils/fixTitleSize";
+import toast from "react-hot-toast";
 
 // Styled Components
 const DivAdjustColorDivs = styled.div`
@@ -99,9 +100,9 @@ const ButtonAddSection = styled.button`
 `;
 
 const BOX = styled(Box)`
-  max-width: 350px;
+  max-width: 100%;
   width: 100%;
-  max-height: 200px;
+  /* max-height: 200px; */
   border-radius: 4px;
 `;
 
@@ -292,6 +293,12 @@ const SelectStyle = styled.select`
   }
 `;
 
+const RedStar = styled.span`
+  color: #e91e63;
+  padding-left: 2px;
+  padding-right: 2px;
+`;
+
 export default function AddHonors({ setDataUpdated, setActiveKey }) {
   const dispatch = useDispatch();
 
@@ -302,7 +309,6 @@ export default function AddHonors({ setDataUpdated, setActiveKey }) {
   const [subtitle, setSubtitle] = useState("");
   const [subtitleCompelete, setSubtitleCompelete] = useState("");
   const [dynamicSections, setDynamicSections] = useState([]);
-  console.log(dynamicSections);
 
   const [imgData, setImgData] = useState([{ src: "", type: "1", poster: "" }]);
   const [media, setMedia] = useState([
@@ -312,6 +318,8 @@ export default function AddHonors({ setDataUpdated, setActiveKey }) {
   const [filedOrder, setFiledOrder] = useState([
     { type: "text", name: "", dropDownOP: [] },
   ]);
+
+  console.log(filedOrder);
 
   const [headerCome, setHeaderCome] = useState([]);
   const [availableItems, setAvailableItems] = useState([]);
@@ -416,40 +424,190 @@ export default function AddHonors({ setDataUpdated, setActiveKey }) {
   const [newSectionName, setNewSectionName] = useState("");
   const [newSectionType, setNewSectionType] = useState("text");
 
-  useEffect(() => {
-    const isFilled =
-      name.trim() !== "" &&
-      title.trim() !== "" &&
-      subtitle.trim() !== "" &&
-      subtitleCompelete.trim() !== "" &&
-      dynamicSections.length > 0 &&
-      imgData.some((img) => img.src !== "") &&
-      media.some(
-        (item) =>
-          item.title.trim() !== "" &&
-          item.description.trim() !== "" &&
-          item.src !== "" &&
-          item.poster !== ""
-      ) &&
-      filedOrder.some(
-        (item) =>
-          item.name.trim() !== "" &&
-          item.type.trim() !== "" &&
-          item?.dropDownOP?.length > 0
-      );
+  const validateForm = () => {
+    // Main fields
+    if (!name.trim()) return { valid: false, message: "محصول خود را انتخاب کنید" };
+    if (!title.trim())
+      return { valid: false, message: "فیلد شرح مختصر را پر کنید" };
+    if (!subtitle.trim())
+      return { valid: false, message: "فیلد توضیحات را پر کنید" };
+    if (!subtitleCompelete.trim())
+      return { valid: false, message: "فیلد توضیحات تکمیلی را پر کنید" };
 
-    // Update the disableConfirm state based on the check
-    setDisableConfirm(!isFilled);
-  }, [
-    name,
-    title,
-    subtitle,
-    subtitleCompelete,
-    dynamicSections,
-    imgData,
-    media,
-    filedOrder,
-  ]);
+    // Dynamic Sections — require at least one section and at least one item per section
+    if (!Array.isArray(dynamicSections) || dynamicSections.length === 0) {
+      return { valid: false, message: "حداقل یک مشخصه محصول را اضافه کنید" };
+    }
+
+    for (let i = 0; i < dynamicSections.length; i++) {
+      const section = dynamicSections[i];
+
+      // sectionName
+      if (!section.sectionName || !section.sectionName.trim()) {
+        return { valid: false, message: `نام بخش شماره ${i + 1} را وارد کنید` };
+      }
+
+      // items must exist
+      if (!Array.isArray(section.items) || section.items.length === 0) {
+        return {
+          valid: false,
+          message: `حداقل یک آیتم برای بخش ${section.sectionName} اضافه کنید`,
+        };
+      }
+
+      if (section.type === "text") {
+        for (let j = 0; j < section.items.length; j++) {
+          if (!section.items[j].name || !section.items[j].name.trim()) {
+            return {
+              valid: false,
+              message: `فیلد متن در بخش ${section.sectionName} را پر کنید`,
+            };
+          }
+        }
+      }
+
+      if (section.type === "image") {
+        for (let j = 0; j < section.items.length; j++) {
+          const item = section.items[j];
+
+          if (!item.name || !item.name.trim()) {
+            return {
+              valid: false,
+              message: `نام تصویر در بخش ${section.sectionName} را وارد کنید`,
+            };
+          }
+
+          if (!item.src) {
+            return {
+              valid: false,
+              message: `تصویر در بخش ${section.sectionName} را آپلود کنید`,
+            };
+          }
+        }
+      }
+    }
+
+    // imgData
+    if (!imgData.some((img) => img.src)) {
+      return { valid: false, message: "حداقل یک تصویر اصلی انتخاب کنید" };
+    }
+
+    // Media
+    for (let m = 0; m < media.length; m++) {
+      const item = media[m];
+      if (!item.title.trim())
+        return { valid: false, message: "عنوان بخش مدیا را وارد کنید" };
+      if (!item.description.trim())
+        return { valid: false, message: "توضیحات بخش مدیا را وارد کنید" };
+      if (!item.src)
+        return { valid: false, message: "فایل بخش مدیا را انتخاب کنید" };
+      if (!item.poster)
+        return { valid: false, message: "پوستر بخش مدیا را انتخاب کنید" };
+    }
+
+    // FiledOrder
+    for (let i = 0; i < filedOrder.length; i++) {
+      const field = filedOrder[i];
+
+      if (!field.name.trim()) {
+        return {
+          valid: false,
+          message: `نام فیلد شماره ${i + 1} را وارد کنید`,
+        };
+      }
+
+      if (field.type === "dropDown") {
+        if (field.dropDownOP.length === 0) {
+          return {
+            valid: false,
+            message: `گزینه‌های فیلد ${field.name} را وارد کنید`,
+          };
+        }
+
+        for (let j = 0; j < field.dropDownOP.length; j++) {
+          if (!field.dropDownOP[j].text.trim()) {
+            return {
+              valid: false,
+              message: `متن گزینه‌ها در فیلد ${field.name} را وارد کنید`,
+            };
+          }
+        }
+      }
+    }
+
+    return { valid: true };
+  };
+
+  // useEffect(() => {
+  //   const isDynamicSectionsValid = dynamicSections.every((section) => {
+  //     // Section name must be filled
+  //     if (!section.sectionName || section.sectionName.trim() === "")
+  //       return false;
+
+  //     // If section type is text → all names must be filled
+  //     if (section.type === "text") {
+  //       return section.items.every(
+  //         (item) => item.name && item.name.trim() !== ""
+  //       );
+  //     }
+
+  //     // If section type is image → name + src must be filled
+  //     if (section.type === "image") {
+  //       return section.items.every(
+  //         (item) =>
+  //           item.name && item.name.trim() !== "" && item.src && item.src !== ""
+  //       );
+  //     }
+
+  //     return false; // safety
+  //   });
+
+  //   const isFiledOrderValid = filedOrder.every((field) => {
+  //     if (!field.name || field.name.trim() === "") return false;
+
+  //     if (field.type === "text") {
+  //       return true;
+  //     }
+
+  //     if (field.type === "dropDown") {
+  //       return (
+  //         Array.isArray(field.dropDownOP) &&
+  //         field.dropDownOP.length > 0 &&
+  //         field.dropDownOP.every((op) => op.text && op.text.trim() !== "")
+  //       );
+  //     }
+
+  //     return false;
+  //   });
+
+  //   const isFilled =
+  //     name.trim() !== "" &&
+  //     title.trim() !== "" &&
+  //     subtitle.trim() !== "" &&
+  //     subtitleCompelete.trim() !== "" &&
+  //     isDynamicSectionsValid &&
+  //     imgData.some((img) => img.src !== "") &&
+  //     media.some(
+  //       (item) =>
+  //         item.title.trim() !== "" &&
+  //         item.description.trim() !== "" &&
+  //         item.src !== "" &&
+  //         item.poster !== ""
+  //     ) &&
+  //     isFiledOrderValid;
+
+  //   // Update the disableConfirm state based on the check
+  //   setDisableConfirm(!isFilled);
+  // }, [
+  //   name,
+  //   title,
+  //   subtitle,
+  //   subtitleCompelete,
+  //   dynamicSections,
+  //   imgData,
+  //   media,
+  //   filedOrder,
+  // ]);
 
   const handleAddSectionForm = (e) => {
     e.preventDefault();
@@ -575,6 +733,30 @@ export default function AddHonors({ setDataUpdated, setActiveKey }) {
     }
   };
 
+  const handleVideoChangeMedia = (e, index) => {
+    const file = e.target.files[0];
+    if (!file) return;
+
+    const url = URL.createObjectURL(file);
+
+    setMedia((prev) =>
+      prev.map((m, i) => (i === index ? { ...m, src: file, srcUrl: url } : m))
+    );
+  };
+
+  const handlePosterChangeMedia = (e, index) => {
+    const file = e.target.files[0];
+    if (!file) return;
+
+    const url = URL.createObjectURL(file);
+
+    setMedia((prev) =>
+      prev.map((m, i) =>
+        i === index ? { ...m, poster: file, posterUrl: url } : m
+      )
+    );
+  };
+
   // Handlers to Add/Remove ImgData and Media Items
   const handleAddImgData = () => {
     setImgData([...imgData, { src: "", type: "1", poster: "" }]);
@@ -608,6 +790,13 @@ export default function AddHonors({ setDataUpdated, setActiveKey }) {
   // Handle Form Submission with Confirmation Modal
   const areYouShureFunction = (e) => {
     e.preventDefault();
+    const result = validateForm();
+
+    if (!result.valid) {
+      toast.error(result.message);
+      return;
+    }
+
     setOpenModal(true);
   };
 
@@ -780,7 +969,7 @@ export default function AddHonors({ setDataUpdated, setActiveKey }) {
         setDynamicSections([]);
         setImgData([{ src: "", type: "1", poster: "" }]);
         setMedia([{ title: "", description: "", src: "", poster: "" }]);
-        setFiledOrder([{ type: "", name: "", dropDownOP: "" }]);
+        setFiledOrder([{ type: "", name: "", dropDownOP: [] }]); // FIXED
       }
     } catch (error) {
       console.error("Error creating product:", error);
@@ -802,7 +991,7 @@ export default function AddHonors({ setDataUpdated, setActiveKey }) {
             className="seeOrderFont"
             htmlFor="productSelect"
           >
-            انتخاب محصول :
+            انتخاب محصول <RedStar>*</RedStar>:
           </label>
           <SelectWidth
             id="productSelect"
@@ -819,7 +1008,7 @@ export default function AddHonors({ setDataUpdated, setActiveKey }) {
                 setName("");
               }
             }}
-            required
+            
           >
             <option value="" disabled>
               انتخاب کنید
@@ -839,7 +1028,7 @@ export default function AddHonors({ setDataUpdated, setActiveKey }) {
             className="seeOrderFont"
             htmlFor="bannerDate"
           >
-            شرح مختصر :
+            شرح مختصر <RedStar>*</RedStar>:
           </label>
           <input
             type="text"
@@ -848,7 +1037,7 @@ export default function AddHonors({ setDataUpdated, setActiveKey }) {
             placeholder="حداکثر 100 کلمه"
             value={title}
             onChange={(e) => setTitle(e.target.value)}
-            required
+            
           />
         </div>
 
@@ -859,7 +1048,7 @@ export default function AddHonors({ setDataUpdated, setActiveKey }) {
             className="seeOrderFont"
             htmlFor="bannerTags"
           >
-            توضیحات :
+            توضیحات <RedStar>*</RedStar>:
           </label>
           <input
             type="text"
@@ -867,7 +1056,7 @@ export default function AddHonors({ setDataUpdated, setActiveKey }) {
             className="w-100 form-control"
             value={subtitle}
             onChange={(e) => setSubtitle(e.target.value)}
-            required
+            
           />
         </div>
 
@@ -878,7 +1067,7 @@ export default function AddHonors({ setDataUpdated, setActiveKey }) {
             className="seeOrderFont"
             htmlFor="DiscriptionCompelete"
           >
-            توضیحات تکمیلی :
+            توضیحات تکمیلی <RedStar>*</RedStar>:
           </label>
           <textarea
             type="text"
@@ -886,7 +1075,7 @@ export default function AddHonors({ setDataUpdated, setActiveKey }) {
             className="w-100 form-control"
             value={subtitleCompelete}
             onChange={(e) => setSubtitleCompelete(e.target.value)}
-            required
+            
           />
         </div>
 
@@ -952,7 +1141,7 @@ export default function AddHonors({ setDataUpdated, setActiveKey }) {
                       value={newSectionType}
                       onChange={(e) => setNewSectionType(e.target.value)}
                       className="w-100"
-                      required
+                      
                     >
                       <option value="text">متن</option>
                       <option value="image">تصویر</option>
@@ -1059,7 +1248,7 @@ export default function AddHonors({ setDataUpdated, setActiveKey }) {
                           onChange={(e) =>
                             handleSectionNameChange(e, sectionIndex)
                           }
-                          required
+                          
                           className="form-control "
                         />
                       </div>
@@ -1109,7 +1298,7 @@ export default function AddHonors({ setDataUpdated, setActiveKey }) {
                               htmlFor="ItemInsideName"
                               style={{ whiteSpace: "nowrap" }}
                             >
-                              نام ایتم :
+                              نام ایتم <RedStar>*</RedStar>:
                             </label>
                             <input
                               type="text"
@@ -1120,7 +1309,7 @@ export default function AddHonors({ setDataUpdated, setActiveKey }) {
                                 handleItemNameChange(e, sectionIndex, itemIndex)
                               }
                               className="flex-grow-1 form-control"
-                              required
+                              
                             />
                           </div>
                           <div>
@@ -1242,16 +1431,16 @@ export default function AddHonors({ setDataUpdated, setActiveKey }) {
                       <DivHeaderInfoMedia className="d-flex justify-content-between">
                         <SelectStyle
                           value={item.type}
-                          onChange={(e) =>
+                          onChange={(e) => {
                             setImgData(
                               imgData.map((img, iIdx) =>
                                 iIdx === index
-                                  ? { ...img, type: e.target.value }
+                                  ? { ...img, type: e.target.value, src: "" }
                                   : img
                               )
-                            )
-                          }
-                          required
+                            );
+                          }}
+                          
                         >
                           <option value={1}>عکس</option>
                           <option value={2}>فیلم</option>
@@ -1269,8 +1458,16 @@ export default function AddHonors({ setDataUpdated, setActiveKey }) {
                       <div className="p-2">
                         <div className="d-flex flex-column w-100">
                           <span className="mb-1 NormalTextSizing">
-                            {item?.type == 1 && <>عکس</>}
-                            {item?.type == 2 && <>فیلم</>}
+                            {item?.type == 1 && (
+                              <>
+                                عکس<RedStar>*</RedStar>
+                              </>
+                            )}
+                            {item?.type == 2 && (
+                              <>
+                                فیلم<RedStar>*</RedStar>
+                              </>
+                            )}
                           </span>
                           {item?.src === "" ? (
                             <>
@@ -1301,25 +1498,36 @@ export default function AddHonors({ setDataUpdated, setActiveKey }) {
                                       />
                                     </svg>
                                   </div>
-                                  <p
-                                    className={`colorTheInputFile discription`}
-                                  >
-                                    بارگذاری فایل .png یا .jpg
-                                  </p>
-                                  <p
-                                    className={`colorTheInputFile discription`}
-                                  >
-                                    یا فیلم mp4
-                                  </p>
+                                  {item.type == 1 ? (
+                                    <>
+                                      <p
+                                        className={`colorTheInputFile discription`}
+                                      >
+                                        بارگذاری فایل .png یا .jpg
+                                      </p>
+                                    </>
+                                  ) : (
+                                    <>
+                                      <p
+                                        className={`colorTheInputFile discription`}
+                                      >
+                                        فیلم mp4
+                                      </p>
+                                    </>
+                                  )}
                                 </div>
                               </label>
                               <input
                                 type="file"
                                 className="d-none"
                                 id={`ImageVideoForProduct-${index}`}
-                                accept={`${process.env.NEXT_PUBLIC_INPUT_IMAGE_AND_VIDEO_FORMAT}`}
+                                accept={
+                                  item.type == 1
+                                    ? `${process.env.NEXT_PUBLIC_INPUT_IMAGE_FORMAT}`
+                                    : `${process.env.NEXT_PUBLIC_INPUT_VIDEO_FORMAT}`
+                                }
                                 onChange={(e) => handleImgDataChange(e, index)}
-                                required
+                                
                               />
                             </>
                           ) : (
@@ -1356,7 +1564,7 @@ export default function AddHonors({ setDataUpdated, setActiveKey }) {
                         {item.type === "2" && (
                           <div className="d-flex flex-column w-100">
                             <span className="mb-1 NormalTextSizing">
-                              پوستر فیلم :
+                              پوستر فیلم <RedStar>*</RedStar>:
                             </span>
                             {item?.poster === "" ? (
                               <>
@@ -1405,7 +1613,7 @@ export default function AddHonors({ setDataUpdated, setActiveKey }) {
                                   id={`posterFilm-${index}`}
                                   accept={`${process.env.NEXT_PUBLIC_INPUT_IMAGE_FORMAT}`}
                                   onChange={(e) => handlePosterChange(e, index)}
-                                  required
+                                  
                                 />
                               </>
                             ) : (
@@ -1485,8 +1693,10 @@ export default function AddHonors({ setDataUpdated, setActiveKey }) {
                             className="w-50"
                           >
                             <div className="d-flex flex-column">
-                              <span className="NormalTextSizing">فیلم :</span>
-                              {item?.src === "" ? (
+                              <span className="NormalTextSizing">
+                                فیلم <RedStar>*</RedStar>:
+                              </span>
+                              {!item?.src && (
                                 <>
                                   <label
                                     className="labelInsteadOfInput"
@@ -1523,24 +1733,29 @@ export default function AddHonors({ setDataUpdated, setActiveKey }) {
                                       </p>
                                     </div>
                                   </label>
-                                  <input
-                                    type="file"
-                                    className="d-none"
-                                    id={`MediaVideo-${index}`}
-                                    accept={`${process.env.NEXT_PUBLIC_INPUT_VIDEO_FORMAT}`}
-                                    onChange={(e) =>
-                                      setMedia(
-                                        media.map((m, iIdx) =>
-                                          iIdx === index
-                                            ? { ...m, src: e.target.files[0] }
-                                            : m
-                                        )
-                                      )
-                                    }
-                                    required
-                                  />
                                 </>
-                              ) : (
+                              )}
+                              <input
+                                type="file"
+                                className="d-none"
+                                id={`MediaVideo-${index}`}
+                                accept={`${process.env.NEXT_PUBLIC_INPUT_VIDEO_FORMAT}`}
+                                // onChange={(e) =>
+                                //   setMedia(
+                                //     media.map((m, iIdx) =>
+                                //       iIdx === index
+                                //         ? { ...m, src: e.target.files[0] }
+                                //         : m
+                                //     )
+                                //   )
+                                // }
+                                onChange={(e) =>
+                                  handleVideoChangeMedia(e, index)
+                                }
+                                
+                              />
+
+                              {item.src && (
                                 <>
                                   <div
                                     className="d-flex flex-column"
@@ -1548,7 +1763,7 @@ export default function AddHonors({ setDataUpdated, setActiveKey }) {
                                   >
                                     <BOX
                                       component="video"
-                                      src={URL.createObjectURL(item.src)}
+                                      src={item.srcUrl}
                                       controls
                                     />
                                   </div>
@@ -1558,9 +1773,9 @@ export default function AddHonors({ setDataUpdated, setActiveKey }) {
 
                             <div className="d-flex flex-column">
                               <span className="NormalTextSizing">
-                                پوستر فیلم :
+                                پوستر فیلم <RedStar>*</RedStar>:
                               </span>
-                              {item?.poster === "" ? (
+                              {!item?.poster && (
                                 <>
                                   <label
                                     className="labelInsteadOfInput"
@@ -1601,27 +1816,32 @@ export default function AddHonors({ setDataUpdated, setActiveKey }) {
                                       </p>
                                     </div>
                                   </label>
-                                  <input
-                                    type="file"
-                                    className="d-none"
-                                    id={`PosterVideo-${index}`}
-                                    accept={`${process.env.NEXT_PUBLIC_INPUT_IMAGE_FORMAT}`}
-                                    onChange={(e) =>
-                                      setMedia(
-                                        media.map((m, iIdx) =>
-                                          iIdx === index
-                                            ? {
-                                                ...m,
-                                                poster: e.target.files[0],
-                                              }
-                                            : m
-                                        )
-                                      )
-                                    }
-                                    required
-                                  />
                                 </>
-                              ) : (
+                              )}
+                              <input
+                                type="file"
+                                className="d-none"
+                                id={`PosterVideo-${index}`}
+                                accept={`${process.env.NEXT_PUBLIC_INPUT_IMAGE_FORMAT}`}
+                                // onChange={(e) =>
+                                //   setMedia(
+                                //     media.map((m, iIdx) =>
+                                //       iIdx === index
+                                //         ? {
+                                //             ...m,
+                                //             poster: e.target.files[0],
+                                //           }
+                                //         : m
+                                //     )
+                                //   )
+                                // }
+                                onChange={(e) =>
+                                  handlePosterChangeMedia(e, index)
+                                }
+                                
+                              />
+
+                              {item?.poster && (
                                 <>
                                   <div
                                     className="d-flex flex-column"
@@ -1629,7 +1849,7 @@ export default function AddHonors({ setDataUpdated, setActiveKey }) {
                                   >
                                     <BOX
                                       component="img"
-                                      src={URL.createObjectURL(item.poster)}
+                                      src={item.posterUrl}
                                       alt="PosterImage"
                                     />
                                   </div>
@@ -1644,7 +1864,7 @@ export default function AddHonors({ setDataUpdated, setActiveKey }) {
                                 htmlFor="OnvanFilm"
                                 className="NormalTextSizing"
                               >
-                                عنوان
+                                عنوان<RedStar>*</RedStar>
                               </label>
                               <input
                                 id="OnvanFilm"
@@ -1661,7 +1881,7 @@ export default function AddHonors({ setDataUpdated, setActiveKey }) {
                                     )
                                   )
                                 }
-                                required
+                                
                                 className="form-control"
                               />
                             </div>
@@ -1670,7 +1890,7 @@ export default function AddHonors({ setDataUpdated, setActiveKey }) {
                                 htmlFor="OnvanFilm"
                                 className="NormalTextSizing"
                               >
-                                توضیحات
+                                توضیحات<RedStar>*</RedStar>
                               </label>
                               <textarea
                                 style={{ height: "120px" }}
@@ -1686,7 +1906,7 @@ export default function AddHonors({ setDataUpdated, setActiveKey }) {
                                     )
                                   )
                                 }
-                                required
+                                
                                 className="form-control"
                               />
                             </div>
@@ -1748,7 +1968,7 @@ export default function AddHonors({ setDataUpdated, setActiveKey }) {
                             )
                           )
                         }
-                        required
+                        
                         className="mt-2 mb-1 w-50"
                       >
                         <option value="text">متن</option>
@@ -1768,7 +1988,7 @@ export default function AddHonors({ setDataUpdated, setActiveKey }) {
                             )
                           )
                         }
-                        required
+                        
                         className="form-control"
                       />
                       <ButtonCancelOrder
@@ -1824,7 +2044,7 @@ export default function AddHonors({ setDataUpdated, setActiveKey }) {
                                   ].text = e.target.value;
                                   setFiledOrder(updatedFiledOrder);
                                 }}
-                                required
+                                
                                 style={{ width: "60%" }}
                                 className="form-control"
                               />
@@ -1867,17 +2087,17 @@ export default function AddHonors({ setDataUpdated, setActiveKey }) {
         )}
 
         {/* Submit Button */}
-        <div className="d-flex flex-row align-items-center justify-content-between">
+        <div className="d-flex flex-row align-items-center justify-content-around">
           <button
             type="submit"
             className="mt-3 mb-3 text-white px-4 py-2 rounded"
-            disabled={disableConfirm}
+            // disabled={disableConfirm}
             style={{
-              backgroundColor: disableConfirm ? "lightgray" : "#43A047",
-              cursor: disableConfirm ? "not-allowed" : "pointer",
+              backgroundColor: "#43A047",
+              // cursor: disableConfirm ? "not-allowed" : "pointer",
             }}
           >
-            اضافه کردن محصول
+            ذخیره
           </button>
           <ButtonCancelOrder
             type="button"

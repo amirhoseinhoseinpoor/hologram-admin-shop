@@ -27,7 +27,7 @@ const NavBarInsideDiv = styled.div`
 const NavDropDown = styled(NavDropdown)`
   .dropdown-menu {
     border: 1px solid gray;
-    width: 230px;
+    width: 150px;
     padding: 12px;
     margin-top: 3px;
     border-radius: 4px;

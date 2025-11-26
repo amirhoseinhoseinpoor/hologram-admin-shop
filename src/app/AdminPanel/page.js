@@ -30,6 +30,7 @@ import PersonIcon from "@mui/icons-material/Person";
 import ArrowDropDownIcon from "@mui/icons-material/ArrowDropDown";
 import AccessibilityIcon from "@mui/icons-material/Accessibility";
 import { Box } from "@mui/material";
+import ShowVersionServer from "../Components/ShowVersionServer.js";
 
 // import components
 const DefineUser = lazy(() =>
@@ -120,7 +121,7 @@ const AccessibilityMainComponent = dynamic(
 const AdminPanel = () => {
   const permission = useSelector(permissions);
 
-  const [activeTab, setActiveTab] = useState("Product");
+  const [activeTab, setActiveTab] = useState("Orders");
   const [visibility, setVisibility] = useState({});
 
   const tabs = [
@@ -184,6 +185,13 @@ const AdminPanel = () => {
       title: "سطح دسترسی ها",
       icon: <AccessibilityIcon />,
     },
+    {
+      id: "versionTab",
+      isDecorative: true,
+      title: (
+        <ShowVersionServer />
+      ),
+    },
   ];
 
   // Filter only functional tabs based on permissions
@@ -192,7 +200,6 @@ const AdminPanel = () => {
       tab.isDecorative ||
       permission?.some((permission) => permission.htmlId === tab.id)
   );
-
 
   // Function to close a specific off-canvas
   const handleClose = (key) => {
@@ -207,7 +214,9 @@ const AdminPanel = () => {
   return (
     <section className={` ${style.adminPanel}`}>
       <aside className={`${style.sidebar} d-lg-flex d-none me-2 my-2`}>
-        <h4 className={`${style.titleStyleHeader} title`}>
+        <h4
+          className={`${style.titleStyleHeader} title d-flex flex-column justify-content-center gap-2 align-items-center`}
+        >
           <Box
             component="img"
             sx={{
@@ -251,7 +260,7 @@ const AdminPanel = () => {
         </Tabs>
       </aside>
 
-      <div className={`${style.content}`}>
+      <div className={`${style.content} mb-3`}>
         <div className="w-100 ">
           <Navbar.Offcanvas
             placement="end"
@@ -264,11 +273,11 @@ const AdminPanel = () => {
               className={`${style.offcanvasheader} ${style.nextoffcanvas} ${style.offcanvasHeaderResponsive} justify-content-between position-relative`}
               closeButton={false}
             >
-              <Offcanvas.Title className="me-2">
+              <Offcanvas.Title className="me-2 w-100 h-100">
                 <Box
                   component="img"
                   sx={{
-                    width: "40px",
+                    width: "50px",
                     height: "100%",
                     objectFit: "cover",
                   }}
@@ -505,5 +514,5 @@ const AdminPanel = () => {
 };
 
 AdminPanel.displayName = "AdminPanel";
-Hoc(AdminPanel);
-export default AdminPanel;
+
+export default Hoc(AdminPanel);
