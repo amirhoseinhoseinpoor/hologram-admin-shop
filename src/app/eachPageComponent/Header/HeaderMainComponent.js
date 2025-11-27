@@ -12,8 +12,23 @@ import ConfirmModal from "@/app/BaseComponent/ConfirmingModal";
 import ErrorModal from "@/app/BaseComponent/ErrorModal";
 import AreYouShureModal from "@/app/BaseComponent/AreYouSureModal";
 import CloseIcon from "@mui/icons-material/Close";
-import { useDrag, useDrop, DndProvider } from "react-dnd";
-import { HTML5Backend } from "react-dnd-html5-backend";
+
+// dnd-kit imports
+import {
+  DndContext,
+  PointerSensor,
+  useSensor,
+  useSensors,
+  closestCenter,
+  DragOverlay,
+} from "@dnd-kit/core";
+import {
+  SortableContext,
+  useSortable,
+  arrayMove,
+  verticalListSortingStrategy,
+} from "@dnd-kit/sortable";
+import { CSS } from "@dnd-kit/utilities";
 
 // Global styles to set box-sizing
 const GlobalStyle = createGlobalStyle`
@@ -22,7 +37,7 @@ const GlobalStyle = createGlobalStyle`
   }
 `;
 
-// Styled components
+/* ------------------ your existing styled-components (unchanged) ------------------ */
 const MainTitleDiv = styled.div`
   margin-bottom: 20px;
   display: flex;
@@ -101,21 +116,10 @@ const RemoveButtonStyle = styled.button`
   cursor: pointer;
 `;
 
-// حذف حاشیه از لیست‌های اصلی و زیر لیست‌ها
 const HeaderListWrapper = styled.ul`
   list-style-type: none;
   padding-left: 0;
 `;
-
-// const HeaderItem = styled.li`
-//   padding: 15px;
-//   margin-bottom: 20px; /* افزایش فاصله بین جعبه‌ها */
-//   background-color: #f9f9f9;
-//   border: 1px solid #ddd;
-//   border-radius: 8px;
-//   box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
-//   position: relative;
-// `;
 
 const HeaderItem = styled.li`
   padding: 15px;
@@ -127,17 +131,9 @@ const HeaderItem = styled.li`
   position: relative;
   cursor: grab;
   user-select: none;
-
-  ${(props) =>
-    props.isDragging &&
-    css`
-      cursor: grabbing;
-    `}
 `;
 
-
 const SubItemList = styled.ul`
- 
   padding-right: 20px;
   list-style-type: none;
 `;
@@ -172,62 +168,87 @@ const AddSubItemContainer = styled.div`
   }
 `;
 
-const ItemTypes = {
-  HEADER: "header",
-  SUBITEM: "subitem",
-};
+/* ------------------ utilities (kept from your original) ------------------ */
 
-// Utility function for swapping items
-const moveItemInArray = (array, fromIndex, toIndex) => {
-  const updatedArray = [...array];
-  const [movedItem] = updatedArray.splice(fromIndex, 1);
-  updatedArray.splice(toIndex, 0, movedItem);
-  return updatedArray;
-};
-
-// Utility function to deeply clone the header data
 const deepClone = (obj) => JSON.parse(JSON.stringify(obj));
 
-// Helper functions to manipulate nested data
 const getItemByPath = (data, path) => {
-  return path.reduce((acc, index) => {
-    if (!acc || !acc.subItems) return undefined;
-    return acc.subItems[index];
-  }, { subItems: data });
+  if (!Array.isArray(path) || path.length === 0) return undefined;
+  let current = { subItems: data }; // virtual parent
+  for (let i = 0; i < path.length; i++) {
+    const idx = path[i];
+    if (
+      !current ||
+      !Array.isArray(current.subItems) ||
+      typeof idx !== "number"
+    ) {
+      return undefined;
+    }
+    current = current.subItems[idx];
+    if (typeof current === "undefined") return undefined;
+  }
+  return current;
 };
 
 const removeItemByPath = (data, path) => {
   const newData = deepClone(data);
+  if (!path || path.length === 0) return newData;
+
   if (path.length === 1) {
     newData.splice(path[0], 1);
-  } else {
-    const parentPath = path.slice(0, -1);
-    const parent = getItemByPath(newData, parentPath);
-    if (parent && parent.subItems) {
-      parent.subItems.splice(path[path.length - 1], 1);
-    }
+    return newData;
   }
+
+  const parentPath = path.slice(0, -1);
+  const parent = getItemByPath(newData, parentPath);
+  if (!parent || !Array.isArray(parent.subItems)) return newData;
+  parent.subItems.splice(path[path.length - 1], 1);
   return newData;
 };
 
 const insertItemByPath = (data, path, item) => {
   const newData = deepClone(data);
+  if (!path || path.length === 0) {
+    newData.push(item);
+    return newData;
+  }
+
+  const last = path[path.length - 1];
+  if (last === "append") {
+    const parentPath = path.slice(0, -1);
+    if (parentPath.length === 0) {
+      newData.push(item);
+      return newData;
+    }
+    const parent = getItemByPath(newData, parentPath);
+    if (!parent) return newData;
+    if (!Array.isArray(parent.subItems)) parent.subItems = [];
+    parent.subItems.push(item);
+    return newData;
+  }
+
   if (path.length === 1) {
-    newData.splice(path[0], 0, item);
+    const idx = path[0];
+    const i = Math.max(0, Math.min(idx, newData.length)); // clamp
+    newData.splice(i, 0, item);
+    return newData;
   } else {
     const parentPath = path.slice(0, -1);
+    const insertIndex = path[path.length - 1];
     const parent = getItemByPath(newData, parentPath);
-    if (parent && parent.subItems) {
-      parent.subItems.splice(path[path.length - 1], 0, item);
-    }
+    if (!parent) return newData;
+    if (!Array.isArray(parent.subItems)) parent.subItems = [];
+    const i = Math.max(0, Math.min(insertIndex, parent.subItems.length));
+    parent.subItems.splice(i, 0, item);
+    return newData;
   }
-  return newData;
 };
 
-// Ensure all items have subItems arrays
 const ensureSubItems = (items) => {
-  items.forEach(item => {
-    if (!item.subItems) {
+  if (!Array.isArray(items)) return;
+  items.forEach((item) => {
+    if (!item) return;
+    if (!Array.isArray(item.subItems)) {
       item.subItems = [];
     }
     if (item.subItems.length > 0) {
@@ -236,62 +257,6 @@ const ensureSubItems = (items) => {
   });
 };
 
-// Drag-and-drop wrapper for header items
-const DraggableHeaderItem = ({ children, index, moveHeader }) => {
-  const ref = useRef(null);
-
-  const [, drag] = useDrag({
-    type: ItemTypes.HEADER,
-    item: { index },
-  });
-
-  const [, drop] = useDrop({
-    accept: ItemTypes.HEADER,
-    hover: (draggedItem) => {
-      if (draggedItem.index !== index) {
-        moveHeader(draggedItem.index, index);
-        draggedItem.index = index;
-      }
-    },
-  });
-
-  drag(drop(ref));
-
-  return <div ref={ref}>{children}</div>;
-};
-
-// Drag-and-drop wrapper for sub-items
-const DraggableSubItem = ({ children, path, moveSubItem }) => {
-  const ref = useRef(null);
-
-  const [, drag] = useDrag({
-    type: ItemTypes.SUBITEM,
-    item: { path },
-  });
-
-  const [, drop] = useDrop({
-    accept: ItemTypes.SUBITEM,
-    drop: (draggedItem) => {
-      const draggedPath = draggedItem.path;
-      if (
-        draggedPath.length === path.length &&
-        draggedPath.every((val, idx) => val === path[idx])
-      ) {
-        return; // Prevent dropping on itself
-      }
-      if (isDescendant(draggedPath, path)) {
-        return; // Prevent dropping on its own descendant
-      }
-      moveSubItem(draggedPath, path);
-    },
-  });
-
-  drag(drop(ref));
-
-  return <div ref={ref}>{children}</div>;
-};
-
-// Helper function to check if toPath is a descendant of fromPath
 const isDescendant = (fromPath, toPath) => {
   if (toPath.length < fromPath.length) return false;
   for (let i = 0; i < fromPath.length; i++) {
@@ -300,22 +265,332 @@ const isDescendant = (fromPath, toPath) => {
   return true;
 };
 
+/* ------------------ dnd-kit sortables + UI wiring ------------------ */
+
+function SortableWrapper({ id, children, item, depth = 0 }) {
+  // useSortable from dnd-kit
+  const {
+    attributes,
+    listeners,
+    setNodeRef,
+    transform,
+    transition,
+    isDragging,
+  } = useSortable({ id });
+
+  const style = {
+    transform: CSS.Transform.toString(transform),
+    transition,
+    opacity: isDragging ? 0.5 : 1,
+  };
+
+  return (
+    <div ref={setNodeRef} data-id={id} style={style}>
+      {React.cloneElement(children, {
+        dndAttributes: attributes,
+        dndListeners: listeners,
+        depth,
+      })}
+    </div>
+  );
+}
+
+function SortableItem({
+  item,
+  depth,
+  onAddSub,
+  onRemove,
+  renderChildren,
+  dndAttributes,
+  dndListeners,
+  // new props for inline add + drop indicator:
+  newSubItemMap,
+  setNewSubItemMap,
+  confirmAddSubItem,
+  dropIndicatorForThis,
+}) {
+  // helper to update inline inputs
+  const handleInlineChange = (field, value) => {
+    setNewSubItemMap((m) => ({
+      ...m,
+      [item.id]: { ...(m[item.id] || {}), [field]: value },
+    }));
+  };
+
+  const isAdding = Boolean(newSubItemMap && newSubItemMap[item.id]);
+
+  // drop indicator visuals:
+  const showBeforeLine = dropIndicatorForThis === "before";
+  const showAfterLine = dropIndicatorForThis === "after";
+  const showInside = dropIndicatorForThis === "inside";
+
+  if (depth === 0) {
+    // header style
+    return (
+      <div style={{ position: "relative" }}>
+        {showBeforeLine && (
+          <div
+            style={{
+              height: 4,
+              background: "#2f86ff",
+              margin: "-6px 0 6px 0",
+              borderRadius: 2,
+            }}
+          />
+        )}
+        <HeaderItem
+          style={
+            showInside
+              ? { boxShadow: "0 0 0 3px rgba(47,134,255,0.06)" }
+              : undefined
+          }
+        >
+          <div className="d-flex flex-row align-items-center gap-1">
+            <div style={{ display: "flex", gap: 8, alignItems: "center" }}>
+              {/* drag handle */}
+              <div
+                {...dndListeners}
+                {...dndAttributes}
+                style={{ cursor: "grab", padding: 4 }}
+              >
+                ≡
+              </div>
+
+              <StrongText className="NormalTextSizing">{item.title}</StrongText>
+            </div>
+
+            <div style={{ marginLeft: "auto", display: "flex", gap: 8 }}>
+              <Button
+                type="button"
+                className="me-1"
+                style={{
+                  backgroundImage: "unset",
+                  backgroundColor: "unset",
+                  color: "#43A047",
+                }}
+                $secondary
+                onClick={() => onAddSub(item)}
+              >
+                <AddCircleIcon />
+              </Button>
+              <RemoveButtonStyle onClick={() => onRemove(item)}>
+                <DeleteIcon className="text-danger" />
+              </RemoveButtonStyle>
+            </div>
+          </div>
+
+          {/* Inline add input for this item */}
+          {isAdding && (
+            <AddSubItemContainer
+              className="container"
+              style={{ marginTop: 12 }}
+            >
+              <InputField
+                className="addSubItemInput"
+                type="text"
+                name="title"
+                placeholder="عنوان ساب ایتم"
+                value={newSubItemMap[item.id]?.title || ""}
+                onChange={(e) => handleInlineChange("title", e.target.value)}
+              />
+              <InputField
+                className="addSubItemInput"
+                type="text"
+                name="link"
+                placeholder="لینک ساب ایتم"
+                value={newSubItemMap[item.id]?.link || ""}
+                onChange={(e) => handleInlineChange("link", e.target.value)}
+              />
+              <div className="d-flex flex-row align-items-center">
+                <Button
+                  type="button"
+                  $secondary
+                  onClick={() => confirmAddSubItem(item.id)}
+                  style={{ whiteSpace: "nowrap" }}
+                >
+                  اضافه کردن
+                </Button>
+                <Button
+                  type="button"
+                  style={{
+                    backgroundImage: "unset",
+                    backgroundColor: "unset",
+                    color: "#e53935",
+                  }}
+                  onClick={() =>
+                    setNewSubItemMap((m) => {
+                      const n = { ...m };
+                      delete n[item.id];
+                      return n;
+                    })
+                  }
+                >
+                  <CloseIcon className="text-danger" />
+                </Button>
+              </div>
+            </AddSubItemContainer>
+          )}
+
+          {/* nested */}
+          <SubItemList>
+            {item.subItems &&
+              item.subItems.length > 0 &&
+              renderChildren(item.subItems, depth + 1)}
+          </SubItemList>
+        </HeaderItem>
+        {showAfterLine && (
+          <div
+            style={{
+              height: 4,
+              background: "#2f86ff",
+              margin: "6px 0 -6px 0",
+              borderRadius: 2,
+            }}
+          />
+        )}
+      </div>
+    );
+  } else {
+    // sub item style
+    return (
+      <div style={{ position: "relative" }}>
+        {showBeforeLine && (
+          <div
+            style={{
+              height: 4,
+              background: "#2f86ff",
+              margin: "-6px 0 6px 0",
+              borderRadius: 2,
+            }}
+          />
+        )}
+        <SubItem
+          style={
+            showInside
+              ? { boxShadow: "0 0 0 3px rgba(47,134,255,0.04)" }
+              : undefined
+          }
+        >
+          <div className="d-flex flex-row align-items-center justify-content-between p-2">
+            <div className="d-flex flex-row align-items-center gap-1">
+              <div
+                {...dndListeners}
+                {...dndAttributes}
+                style={{ cursor: "grab", padding: 4 }}
+              >
+                ≡
+              </div>
+              <StrongText className="NormalTextSizing">{item.title}</StrongText>
+              <Button
+                type="button"
+                style={{
+                  backgroundImage: "unset",
+                  backgroundColor: "unset",
+                  color: "#43A047",
+                }}
+                className="me-1"
+                $secondary
+                onClick={() => onAddSub(item)}
+              >
+                <AddCircleIcon />
+              </Button>
+            </div>
+            <RemoveButtonStyle onClick={() => onRemove(item)}>
+              <DeleteIcon className="text-danger" />
+            </RemoveButtonStyle>
+          </div>
+
+          {/* Inline add input for subitem */}
+          {isAdding && (
+            <AddSubItemContainer className="container">
+              <InputField
+                className="addSubItemInput"
+                type="text"
+                name="title"
+                placeholder="عنوان ساب ایتم"
+                value={newSubItemMap[item.id]?.title || ""}
+                onChange={(e) => handleInlineChange("title", e.target.value)}
+              />
+              <InputField
+                className="addSubItemInput"
+                type="text"
+                name="link"
+                placeholder="لینک ساب ایتم"
+                value={newSubItemMap[item.id]?.link || ""}
+                onChange={(e) => handleInlineChange("link", e.target.value)}
+              />
+              <div className="d-flex flex-row align-items-center">
+                <Button
+                  type="button"
+                  $secondary
+                  onClick={() => confirmAddSubItem(item.id)}
+                  style={{ whiteSpace: "nowrap" }}
+                >
+                  اضافه کردن
+                </Button>
+                <Button
+                  type="button"
+                  style={{
+                    backgroundImage: "unset",
+                    backgroundColor: "unset",
+                    color: "#e53935",
+                  }}
+                  onClick={() =>
+                    setNewSubItemMap((m) => {
+                      const n = { ...m };
+                      delete n[item.id];
+                      return n;
+                    })
+                  }
+                >
+                  <CloseIcon className="text-danger" />
+                </Button>
+              </div>
+            </AddSubItemContainer>
+          )}
+
+          {/* nested */}
+          {item.subItems &&
+            item.subItems.length > 0 &&
+            renderChildren(item.subItems, depth + 1)}
+        </SubItem>
+        {showAfterLine && (
+          <div
+            style={{
+              height: 4,
+              background: "#2f86ff",
+              margin: "6px 0 -6px 0",
+              borderRadius: 2,
+            }}
+          />
+        )}
+      </div>
+    );
+  }
+}
+
+/* ------------------ Main component (your existing props and logic preserved) ------------------ */
+
 export default function HeaderMainComponent({ toggleShow }) {
   const dispatch = useDispatch();
 
   const [headerData, setHeaderData] = useState([]);
   const [newItem, setNewItem] = useState({ title: "", link: "", subItems: [] });
   const [newSubItem, setNewSubItem] = useState({ title: "", link: "" });
-  const [addSubItemPath, setAddSubItemPath] = useState(null); // Path where to show add sub-item input
-  const [isRemovingHeader, setIsRemovingHeader] = useState(false); // Track if removing a header or sub-item
+  // we keep newSubItemMap (map parentId -> object) for inline add inputs per item
+  const [newSubItemMap, setNewSubItemMap] = useState({});
+  const [addSubItemPath, setAddSubItemPath] = useState(null);
+  const [isRemovingHeader, setIsRemovingHeader] = useState(false);
 
   const [openModal, setOpenModal] = useState(false);
   const [openModal2, setOpenModal2] = useState(false);
   const [openModal3, setOpenModal3] = useState(false);
 
-  const [selectedPath, setSelectedPath] = useState([]); // Store the selected sub-item path
+  const [selectedPath, setSelectedPath] = useState([]);
 
-  // Fetch header data from API on mount
+  // dnd state
+  const [dropIndicator, setDropIndicator] = useState(null); // { id, position: 'before'|'inside'|'after' }
+
   useEffect(() => {
     const fetchData = async () => {
       try {
@@ -332,25 +607,22 @@ export default function HeaderMainComponent({ toggleShow }) {
     fetchData();
   }, [dispatch]);
 
-  // Handle input changes for new header item
   const handleInputChange = (e) => {
     const { name, value } = e.target;
     setNewItem((prev) => ({ ...prev, [name]: value }));
   };
 
-  // Handle input changes for new sub-item
   const handleSubInputChange = (e) => {
     const { name, value } = e.target;
     setNewSubItem((prev) => {
-      if (prev[name] === value) return prev; // Avoid unnecessary state updates
+      if (prev[name] === value) return prev;
       return { ...prev, [name]: value };
     });
   };
 
-  // Add new header item
   const addItem = () => {
     if (newItem.title && newItem.link) {
-      const newHeader = { ...newItem, id: Date.now(), subItems: [] };
+      const newHeader = { ...newItem, id: Date.now().toString(), subItems: [] };
       setHeaderData((prev) => [...prev, newHeader]);
       setNewItem({ title: "", link: "", subItems: [] });
     } else {
@@ -358,48 +630,48 @@ export default function HeaderMainComponent({ toggleShow }) {
     }
   };
 
-  // Open modal for sub-item or header removal
   const openRemoveModal = (path, isHeader) => {
-    setSelectedPath(path); // Store the sub-item or header path
-    setIsRemovingHeader(isHeader); // Track if we are removing a header or sub-item
-    setOpenModal(true); // Open modal
-    setAddSubItemPath(null); // Close any open add sub-item inputs
+    setSelectedPath(path);
+    setIsRemovingHeader(isHeader);
+    setOpenModal(true);
+    setAddSubItemPath(null);
   };
 
-  // Close modals
   const closeModalHandler = () => setOpenModal(false);
   const closeModal2Handler = () => setOpenModal2(false);
   const closeModal3Handler = () => setOpenModal3(false);
 
-  // Close confirm modal after timeout
   function closeModalOnTimeout() {
     setTimeout(() => {
       setOpenModal3(false);
     }, 3000);
   }
 
-  // Confirm sub-item or header removal
   const confirmRemove = () => {
     if (isRemovingHeader) {
-      removeItem(selectedPath[0]); // Remove header
+      removeItem(selectedPath[0]);
     } else {
-      removeSubItem(selectedPath); // Remove sub-item
+      removeSubItem(selectedPath);
     }
-    closeModalHandler(); // Close the modal
+    closeModalHandler();
   };
 
-  // Set addSubItemPath for adding sub-items
   const selectHeaderForSubItem = (index) => {
-    setAddSubItemPath([index]);
+    // show inline input under this header
+    const id = headerData[index].id;
+    setNewSubItemMap((m) => ({ ...m, [id]: { title: "", link: "" } }));
     setNewSubItem({ title: "", link: "" });
   };
 
   const selectSubItemForSubItem = (path) => {
-    setAddSubItemPath(path);
+    // show inline input under the sub-item with that path
+    const target = getItemByPath(headerData, path);
+    if (!target) return;
+    setNewSubItemMap((m) => ({ ...m, [target.id]: { title: "", link: "" } }));
     setNewSubItem({ title: "", link: "" });
   };
 
-  // Add new sub-item to the selected header or sub-item
+  // old addSubItem kept for compatibility, but confirmAddSubItem will be used by inline inputs
   const addSubItem = (path) => {
     if (newSubItem.title && newSubItem.link) {
       const updatedHeader = deepClone(headerData);
@@ -416,7 +688,11 @@ export default function HeaderMainComponent({ toggleShow }) {
         target.subItems = [];
       }
 
-      target.subItems.push({ ...newSubItem, id: Date.now(), subItems: [] });
+      target.subItems.push({
+        ...newSubItem,
+        id: Date.now().toString(),
+        subItems: [],
+      });
 
       setHeaderData(updatedHeader);
       setNewSubItem({ title: "", link: "" });
@@ -426,17 +702,64 @@ export default function HeaderMainComponent({ toggleShow }) {
     }
   };
 
-  // Remove a header item
+  // confirmAddSubItem used by inline inputs
+  const confirmAddSubItem = (parentId) => {
+    const payload = newSubItemMap[parentId];
+    if (!payload || !payload.title || !payload.link) {
+      setOpenModal2(true);
+      return;
+    }
+    // find parent by id (we already have function below to find by id)
+    const found = (function findById(list, id) {
+      for (let i = 0; i < list.length; i++) {
+        if (String(list[i].id) === String(id))
+          return { node: list[i], path: [i] };
+        if (list[i].subItems && list[i].subItems.length) {
+          const subFound = (function inner(sublist, id, basePath) {
+            for (let j = 0; j < sublist.length; j++) {
+              if (String(sublist[j].id) === String(id))
+                return { node: sublist[j], path: [...basePath, j] };
+              if (sublist[j].subItems && sublist[j].subItems.length) {
+                const deeper = inner(sublist[j].subItems, id, [...basePath, j]);
+                if (deeper) return deeper;
+              }
+            }
+            return null;
+          })(list[i].subItems, parentId, [i]);
+          if (subFound) return subFound;
+        }
+      }
+      return null;
+    })(headerData, parentId);
+
+    if (!found) return;
+    const newNode = {
+      id: Date.now().toString(),
+      title: payload.title,
+      link: payload.link,
+      subItems: [],
+    };
+    const newTree = insertItemByPath(
+      headerData,
+      [...found.path, "append"],
+      newNode
+    );
+    setHeaderData(newTree);
+    setNewSubItemMap((m) => {
+      const n = { ...m };
+      delete n[parentId];
+      return n;
+    });
+  };
+
   const removeItem = (index) => {
     setHeaderData((prev) => removeItemByPath(prev, [index]));
   };
 
-  // Remove a sub-item using the path
   const removeSubItem = (path) => {
     setHeaderData((prev) => removeItemByPath(prev, path));
   };
 
-  // Submit the header data to the API
   const submitHeaderData = async () => {
     try {
       const finalDataSending = {
@@ -452,294 +775,350 @@ export default function HeaderMainComponent({ toggleShow }) {
     }
   };
 
-  // Move header items
-  const moveHeader = (fromIndex, toIndex) => {
-    setHeaderData((prev) => moveItemInArray(prev, fromIndex, toIndex));
+  // **************** dnd-kit logic starts here ****************
+
+  // helper: find node by id and return { node, path, index }
+  const findNodeById = (tree, id) => {
+    const stack = [{ list: tree, path: [] }];
+    while (stack.length) {
+      const { list, path } = stack.shift();
+      for (let i = 0; i < list.length; i++) {
+        const node = list[i];
+        const curPath = [...path, i];
+        if (String(node.id) === String(id)) {
+          return { node, path: curPath, index: i };
+        }
+        if (node.subItems && node.subItems.length) {
+          stack.push({ list: node.subItems, path: curPath });
+        }
+      }
+    }
+    return null;
   };
 
-  // Move sub-items
-  const moveSubItem = (fromPath, toPath) => {
-    if (
-      fromPath.length === 0 ||
-      toPath.length === 0 ||
-      isDescendant(fromPath, toPath)
-    )
-      return;
+  // move logic using your existing helpers
+  const moveNode = (fromPath, toPath) => {
+    if (!Array.isArray(fromPath) || !Array.isArray(toPath)) return;
+    if (isDescendant(fromPath, toPath)) return;
 
-    const updatedHeaders = deepClone(headerData);
-
-    // Get the item to move
-    const itemToMove = getItemByPath(updatedHeaders, fromPath);
+    const current = deepClone(headerData);
+    const itemToMove = getItemByPath(current, fromPath);
     if (!itemToMove) return;
 
-    // Remove the item from fromPath
-    const updatedAfterRemoval = removeItemByPath(updatedHeaders, fromPath);
-
-    // Insert the item at toPath
-    const updatedAfterInsertion = insertItemByPath(updatedAfterRemoval, toPath, itemToMove);
-
-    setHeaderData(updatedAfterInsertion);
+    const afterRemoval = removeItemByPath(current, fromPath);
+    const afterInsert = insertItemByPath(afterRemoval, toPath, itemToMove);
+    ensureSubItems(afterInsert);
+    setHeaderData(afterInsert);
   };
 
-  const RenderSubItems = (subItems, parentPath) => {
-    return subItems.map((subItem, subIndex) => {
-      if (!subItem) return null; // Prevent rendering undefined items
-      const newPath = [...parentPath, subIndex];
-      const isAddSubItem =
-        addSubItemPath &&
-        addSubItemPath.length === newPath.length &&
-        addSubItemPath.every((val, idx) => val === newPath[idx]);
+  // sensors
+  const sensors = useSensors(useSensor(PointerSensor));
 
-      return (
-        <DraggableSubItem
-          key={subItem.id}
-          path={newPath}
-          moveSubItem={moveSubItem}
-        >
-          <SubItem>
-            <div className="d-flex flex-row align-items-center justify-content-between p-2">
-              <div className="d-flex flex-row align-items-center gap-1">
-                <StrongText className="NormalTextSizing">
-                  {subItem.title}
-                </StrongText>
-                <Button
-                  type="button"
-                  style={{
-                    backgroundImage: "unset",
-                    backgroundColor: "unset",
-                    color: "#43A047",
+  // pendingDrop ref (set on dragOver, applied on dragEnd)
+  const pendingDrop = useRef(null);
+  const activeIdRef = useRef(null);
+
+  const handleDragStart = (event) => {
+    activeIdRef.current = event.active.id;
+  };
+
+  const handleDragOver = (event) => {
+    const { active, over } = event;
+    if (!over || !active) {
+      setDropIndicator(null);
+      return;
+    }
+    if (String(active.id) === String(over.id)) {
+      setDropIndicator(null);
+      return;
+    }
+
+    const dragged = findNodeById(headerData, active.id);
+    const hovered = findNodeById(headerData, over.id);
+    if (!dragged || !hovered) {
+      setDropIndicator(null);
+      return;
+    }
+
+    // get bounding rect of the hovered DOM element
+    const el = document.querySelector(`[data-id='${over.id}']`);
+    if (!el) {
+      setDropIndicator(null);
+      return;
+    }
+    const rect = el.getBoundingClientRect();
+    const pointerY = event.pointerY ?? rect.top + rect.height / 2;
+    const relativeY = pointerY - rect.top;
+    const height = rect.height;
+
+    // Wider drop zones: top 40% => before, bottom 40% => after, middle 20% => inside
+    let position;
+    if (relativeY < height * 0.4) position = "before";
+    else if (relativeY > height * 0.6) position = "after";
+    else position = "inside";
+
+    // determine insertPath corresponding to that position
+    let insertPath;
+    // Determine insert position based on pointer
+    if (relativeY < height * 0.4) {
+      // insert before hovered
+      const parentPath = hovered.path.slice(0, -1);
+      insertPath = [...parentPath, hovered.index];
+    } else if (relativeY > height * 0.6) {
+      // insert after hovered
+      const parentPath = hovered.path.slice(0, -1);
+      insertPath = [...parentPath, hovered.index + 1];
+    } else {
+      // middle: for now, just treat as after (no auto-nest)
+      const parentPath = hovered.path.slice(0, -1);
+      insertPath = [...parentPath, hovered.index + 1];
+    }
+
+    // prevent invalid move into own descendant
+    if (isDescendant(dragged.path, insertPath)) {
+      setDropIndicator(null);
+      pendingDrop.current = null;
+      return;
+    }
+
+    // set pending drop and a visual dropIndicator
+    pendingDrop.current = { from: dragged.path, to: insertPath };
+    setDropIndicator({ id: over.id, position });
+  };
+
+  const handleDragEnd = (event) => {
+    const { active, over } = event;
+    activeIdRef.current = null;
+    setDropIndicator(null);
+
+    if (pendingDrop.current) {
+      const { from, to } = pendingDrop.current;
+      pendingDrop.current = null;
+
+      // ignore no-op
+      if (JSON.stringify(from) === JSON.stringify(to)) return;
+
+      moveNode(from, to);
+      return;
+    }
+
+    // fallback: reorder inside same parent when drop on sibling without hover computed
+    if (over && active.id !== over.id) {
+      const dragged = findNodeById(headerData, active.id);
+      const hovered = findNodeById(headerData, over.id);
+      if (dragged && hovered) {
+        const fromParent = dragged.path.slice(0, -1);
+        const toParent = hovered.path.slice(0, -1);
+        if (JSON.stringify(fromParent) === JSON.stringify(toParent)) {
+          // same parent, reorder
+          const parent =
+            fromParent.length === 0
+              ? headerData
+              : getItemByPath(headerData, fromParent);
+          const arr = deepClone(parent.subItems ?? parent);
+          const item = arr.splice(dragged.index, 1)[0];
+          arr.splice(hovered.index, 0, item);
+
+          // apply result by re-inserting into tree
+          if (fromParent.length === 0) {
+            setHeaderData(arr);
+          } else {
+            const newTree = deepClone(headerData);
+            const p = getItemByPath(newTree, fromParent);
+            if (p) p.subItems = arr;
+            setHeaderData(newTree);
+          }
+        }
+      }
+    }
+  };
+
+  // ---------------- recursive render: wraps each children-level in SortableContext ----------------
+  const renderSubItems = (subItems, parentPath = []) => {
+    if (!Array.isArray(subItems) || subItems.length === 0) return null;
+    const ids = subItems.map((s) => String(s.id));
+
+    return (
+      <SubItemList>
+        <SortableContext items={ids} strategy={verticalListSortingStrategy}>
+          {subItems.map((subItem, subIndex) => {
+            const curPath = [...parentPath, subIndex];
+            const idStr = String(subItem.id);
+            const indicatorForThis =
+              dropIndicator && String(dropIndicator.id) === idStr
+                ? dropIndicator.position
+                : null;
+
+            return (
+              <SortableWrapper
+                key={idStr}
+                id={idStr}
+                item={subItem}
+                depth={parentPath.length + 1}
+              >
+                <SortableItem
+                  item={subItem}
+                  depth={parentPath.length + 1}
+                  onAddSub={() => {
+                    // show inline input for this subitem
+                    setNewSubItemMap((m) => ({
+                      ...m,
+                      [subItem.id]: { title: "", link: "" },
+                    }));
                   }}
-                  className="me-1"
-                  $secondary
-                  onClick={() => selectSubItemForSubItem(newPath)}
-                >
-                  <AddCircleIcon />
-                </Button>
-              </div>
-              <RemoveButtonStyle onClick={() => openRemoveModal(newPath, false)}>
-                <DeleteIcon className="text-danger" />
-              </RemoveButtonStyle>
-            </div>
-
-            {/* Render add sub-item input below this sub-item if path matches */}
-            {isAddSubItem && (
-              <AddSubItemContainer className="container">
-                <InputField
-                  className="addSubItemInput"
-                  type="text"
-                  name="title"
-                  placeholder="عنوان ساب ایتم"
-                  value={newSubItem.title}
-                  onChange={handleSubInputChange}
+                  onRemove={() => openRemoveModal(curPath, false)}
+                  renderChildren={(children, depth) =>
+                    renderSubItems(children, curPath)
+                  }
+                  dndAttributes={{}}
+                  dndListeners={{}}
+                  newSubItemMap={newSubItemMap}
+                  setNewSubItemMap={setNewSubItemMap}
+                  confirmAddSubItem={confirmAddSubItem}
+                  dropIndicatorForThis={indicatorForThis}
                 />
-                <InputField
-                  className="addSubItemInput"
-                  type="text"
-                  name="link"
-                  placeholder="لینک ساب ایتم"
-                  value={newSubItem.link}
-                  onChange={handleSubInputChange}
-                />
-                <div className="d-flex flex-row align-items-center">
-                  <Button
-                    type="button"
-                    $secondary
-                    onClick={() => addSubItem(newPath)}
-                    style={{ whiteSpace: "nowrap" }}
-                  >
-                    اضافه کردن
-                  </Button>
-                  <Button
-                    type="button"
-                    style={{
-                      backgroundImage: "unset",
-                      backgroundColor: "unset",
-                      color: "#e53935",
-                    }}
-                    onClick={() => setAddSubItemPath(null)}
-                  >
-                    <CloseIcon className="text-danger" />
-                  </Button>
-                </div>
-              </AddSubItemContainer>
-            )}
-
-            {/* Render nested sub-items recursively */}
-            {subItem.subItems && subItem.subItems.length > 0 && RenderSubItems(subItem.subItems, newPath)}
-          </SubItem>
-        </DraggableSubItem>
-      );
-    });
+              </SortableWrapper>
+            );
+          })}
+        </SortableContext>
+      </SubItemList>
+    );
   };
+
+  // render top-level headers
+  const topLevelIds = headerData.map((h) => String(h.id));
 
   return (
     <>
-      <DndProvider backend={HTML5Backend}>
-        <GlobalStyle />
-        <HeadermakeOrder className="d-flex flex-row mb-3 justify-content-between">
-          <div className="d-block d-lg-none">
-            <NavBarToggleBurgerButton func={() => toggleShow("main")} />
-          </div>
-          <div className="NormalTextSizing text-decoration-underline textHeaderStyle d-flex align-items-center">
-            ساخت هدر
-          </div>
-          <ProfileComponent colorGet={"#191919"} />
-        </HeadermakeOrder>
-        <Container>
-          {/* Input for new header item */}
-          <MainTitleDiv>
-            <div className="firstTwoInput">
-              <InputField
-                type="text"
-                name="title"
-                placeholder="عنوان هدر"
-                value={newItem.title}
-                onChange={handleInputChange}
-              />
-              <InputField
-                type="text"
-                name="link"
-                placeholder="لینک هدر"
-                value={newItem.link}
-                onChange={handleInputChange}
-              />
-            </div>
+      <GlobalStyle />
+      <HeadermakeOrder className="d-flex flex-row mb-3 justify-content-between">
+        <div className="d-block d-lg-none">
+          <NavBarToggleBurgerButton func={() => toggleShow("main")} />
+        </div>
+        <div className="NormalTextSizing text-decoration-underline textHeaderStyle d-flex align-items-center">
+          ساخت هدر
+        </div>
+        <ProfileComponent colorGet={"#191919"} />
+      </HeadermakeOrder>
 
-            <Button
-              type="button"
-              className="me-2 buttonMainHeaderCreate"
-              $secondary
-              onClick={addItem}
-            >
-              اضافه کردن هدر اصلی
-            </Button>
-          </MainTitleDiv>
-
-          {/* Render the current header structure */}
-          <div>
-            {headerData.length > 0 ? (
-              <HeaderListWrapper>
-                {headerData.map((item, index) => (
-                  <DraggableHeaderItem
-                    key={item.id}
-                    index={index}
-                    moveHeader={moveHeader}
-                  >
-                    <HeaderItem>
-                      <div className="d-flex flex-row align-items-center gap-1">
-                        <StrongText className="NormalTextSizing">
-                          {item.title}
-                        </StrongText>
-                        <Button
-                          type="button"
-                          className="me-1"
-                          style={{
-                            backgroundImage: "unset",
-                            backgroundColor: "unset",
-                            color: "#43A047",
-                          }}
-                          $secondary
-                          onClick={() => selectHeaderForSubItem(index)}
-                        >
-                          <AddCircleIcon />
-                        </Button>
-                        <RemoveButtonStyle
-                          onClick={() => openRemoveModal([index], true)}
-                        >
-                          <DeleteIcon className="text-danger" />
-                        </RemoveButtonStyle>
-                      </div>
-
-                      {/* Render sub-items */}
-                      <SubItemList>
-                        {item.subItems && item.subItems.length > 0 && RenderSubItems(item.subItems, [index])}
-                      </SubItemList>
-
-                      {/* Render add sub-item input below this header if path matches */}
-                      {addSubItemPath &&
-                        addSubItemPath.length === 1 &&
-                        addSubItemPath[0] === index && (
-                          <AddSubItemContainer>
-                            <InputField
-                              className="addSubItemInput"
-                              type="text"
-                              name="title"
-                              placeholder="عنوان ساب ایتم"
-                              value={newSubItem.title}
-                              onChange={handleSubInputChange}
-                            />
-                            <InputField
-                              className="addSubItemInput"
-                              type="text"
-                              name="link"
-                              placeholder="لینک ساب ایتم"
-                              value={newSubItem.link}
-                              onChange={handleSubInputChange}
-                            />
-                            <div className="d-flex flex-row align-items-center">
-                              <Button
-                                type="button"
-                                style={{ whiteSpace: "nowrap" }}
-                                $secondary
-                                onClick={() => addSubItem([index])}
-                              >
-                                اضافه کردن
-                              </Button>
-                              <Button
-                                type="button"
-                                style={{
-                                  backgroundImage: "unset",
-                                  backgroundColor: "unset",
-                                  color: "#e53935",
-                                }}
-                                onClick={() => setAddSubItemPath(null)}
-                              >
-                                <CloseIcon className="text-danger" />
-                              </Button>
-                            </div>
-                          </AddSubItemContainer>
-                        )}
-                    </HeaderItem>
-                  </DraggableHeaderItem>
-                ))}
-              </HeaderListWrapper>
-            ) : (
-              <p>هدر خود را بسازید</p>
-            )}
+      <Container>
+        <MainTitleDiv>
+          <div className="firstTwoInput">
+            <InputField
+              type="text"
+              name="title"
+              placeholder="عنوان هدر"
+              value={newItem.title}
+              onChange={handleInputChange}
+            />
+            <InputField
+              type="text"
+              name="link"
+              placeholder="لینک هدر"
+              value={newItem.link}
+              onChange={handleInputChange}
+            />
           </div>
 
-          {/* Submit Button */}
           <Button
             type="button"
+            className="me-2 buttonMainHeaderCreate"
             $secondary
-            onClick={submitHeaderData}
-            style={{ marginTop: "20px" }}
+            onClick={addItem}
           >
-            تایید هدر
+            اضافه کردن هدر اصلی
           </Button>
+        </MainTitleDiv>
 
-          {/* Modal for confirming header or sub-item removal */}
-          <AreYouShureModal
-            open={openModal}
-            onClose={closeModalHandler}
-            func={confirmRemove}
-            text={`از حذف ${
-              isRemovingHeader ? "هدر" : "ساب ایتم"
-            } مطمئن هستید؟`}
-          />
+        <div>
+          {headerData.length > 0 ? (
+            <DndContext
+              sensors={sensors}
+              collisionDetection={closestCenter}
+              onDragStart={handleDragStart}
+              onDragOver={handleDragOver}
+              onDragEnd={handleDragEnd}
+            >
+              <HeaderListWrapper>
+                <SortableContext
+                  items={topLevelIds}
+                  strategy={verticalListSortingStrategy}
+                >
+                  {headerData.map((item, index) => {
+                    const idStr = String(item.id);
+                    const indicatorForThis =
+                      dropIndicator && String(dropIndicator.id) === idStr
+                        ? dropIndicator.position
+                        : null;
 
-          <ErrorModal
-            open={openModal2}
-            onClose={closeModal2Handler}
-            text={"لطفا تایتل و لینک را وارد کنید"}
-          />
-          <ConfirmModal
-            open={openModal3}
-            onClose={closeModal3Handler}
-            text={"هدر با موفقیت تغییر یافت"}
-          />
-        </Container>
-      </DndProvider>
+                    return (
+                      <SortableWrapper
+                        key={idStr}
+                        id={idStr}
+                        item={item}
+                        depth={0}
+                      >
+                        <SortableItem
+                          item={item}
+                          depth={0}
+                          onAddSub={() => {
+                            // show inline input for top-level header
+                            setNewSubItemMap((m) => ({
+                              ...m,
+                              [item.id]: { title: "", link: "" },
+                            }));
+                          }}
+                          onRemove={() => openRemoveModal([index], true)}
+                          renderChildren={(children) =>
+                            renderSubItems(children, [index])
+                          }
+                          dndAttributes={{}}
+                          dndListeners={{}}
+                          newSubItemMap={newSubItemMap}
+                          setNewSubItemMap={setNewSubItemMap}
+                          confirmAddSubItem={confirmAddSubItem}
+                          dropIndicatorForThis={indicatorForThis}
+                        />
+                      </SortableWrapper>
+                    );
+                  })}
+                </SortableContext>
+              </HeaderListWrapper>
+
+              <DragOverlay>{/* optional overlay while dragging */}</DragOverlay>
+            </DndContext>
+          ) : (
+            <p>هدر خود را بسازید</p>
+          )}
+        </div>
+
+        <Button
+          type="button"
+          $secondary
+          onClick={submitHeaderData}
+          style={{ marginTop: "20px" }}
+        >
+          تایید هدر
+        </Button>
+
+        <AreYouShureModal
+          open={openModal}
+          onClose={closeModalHandler}
+          func={confirmRemove}
+          text={`از حذف ${isRemovingHeader ? "هدر" : "ساب ایتم"} مطمئن هستید؟`}
+        />
+
+        <ErrorModal
+          open={openModal2}
+          onClose={closeModal2Handler}
+          text={"لطفا تایتل و لینک را وارد کنید"}
+        />
+        <ConfirmModal
+          open={openModal3}
+          onClose={closeModal3Handler}
+          text={"هدر با موفقیت تغییر یافت"}
+        />
+      </Container>
     </>
   );
 }

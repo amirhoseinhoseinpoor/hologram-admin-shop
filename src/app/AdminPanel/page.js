@@ -31,6 +31,7 @@ import ArrowDropDownIcon from "@mui/icons-material/ArrowDropDown";
 import AccessibilityIcon from "@mui/icons-material/Accessibility";
 import { Box } from "@mui/material";
 import ShowVersionServer from "../Components/ShowVersionServer.js";
+import SoftLoader from "../BaseComponent/SoftLoader.js";
 
 // import components
 const DefineUser = lazy(() =>
@@ -49,7 +50,7 @@ const DoshbordMainComponent = dynamic(
   () => import("../eachPageComponent/Doshbord/DoshbordMainComponent.js"),
   {
     ssr: false,
-    loading: () => <p>Loading...</p>,
+    loading: () => <SoftLoader />,
   }
 );
 
@@ -57,7 +58,7 @@ const OrderMainComponent = dynamic(
   () => import("../eachPageComponent/Orders/OrderMainComponent.js"),
   {
     ssr: false,
-    loading: () => <p>Loading...</p>,
+    loading: () => <SoftLoader />,
   }
 );
 
@@ -65,7 +66,7 @@ const ExhibitionMainComponent = dynamic(
   () => import("../eachPageComponent/Exhibition/ExhibitionMainComponent.js"),
   {
     ssr: false,
-    loading: () => <p>Loading...</p>,
+    loading: () => <SoftLoader />,
   }
 );
 
@@ -73,7 +74,7 @@ const BlogsMainComponent = dynamic(
   () => import("../eachPageComponent/Blogs/BlogsMainComponent.js"),
   {
     ssr: false,
-    loading: () => <p>Loading...</p>,
+    loading: () => <SoftLoader />,
   }
 );
 
@@ -81,7 +82,7 @@ const VideoMainComponent = dynamic(
   () => import("../eachPageComponent/Video/VideoMainComponent.js"),
   {
     ssr: false,
-    loading: () => <p>Loading...</p>,
+   loading: () => <SoftLoader />,
   }
 );
 
@@ -89,7 +90,7 @@ const ProductMainComponent = dynamic(
   () => import("../eachPageComponent/Product/ProductMainComponent.js"),
   {
     ssr: false,
-    loading: () => <p>Loading...</p>,
+    loading: () => <SoftLoader />,
   }
 );
 
@@ -97,7 +98,7 @@ const BannerMainComponent = dynamic(
   () => import("../eachPageComponent/Banner/BannerMainComponent.js"),
   {
     ssr: false,
-    loading: () => <p>Loading...</p>,
+    loading: () => <SoftLoader />,
   }
 );
 
@@ -105,7 +106,7 @@ const HeaderMainComponent = dynamic(
   () => import("../eachPageComponent/Header/HeaderMainComponent.js"),
   {
     ssr: false,
-    loading: () => <p>Loading...</p>,
+    loading: () => <SoftLoader />,
   }
 );
 
@@ -114,7 +115,7 @@ const AccessibilityMainComponent = dynamic(
     import("../eachPageComponent/Accessibility/AccessibilityMainComponent.js"),
   {
     ssr: false,
-    loading: () => <p>Loading...</p>,
+    loading: () => <SoftLoader />,
   }
 );
 
@@ -469,7 +470,7 @@ const AdminPanel = () => {
         )}
         {activeTab === "Honors" && (
           <div className={style.tabContent}>
-            <Suspense fallback={<div>loading...</div>}>
+            <Suspense fallback={<SoftLoader />}>
               <HonorsMainComponent toggleShow={toggleShow} />
             </Suspense>
           </div>
@@ -491,14 +492,14 @@ const AdminPanel = () => {
         )}
         {activeTab === "defineUser" && (
           <div className={style.tabContent}>
-            <Suspense fallback={<div>Loading...</div>}>
+            <Suspense fallback={<SoftLoader />}>
               <DefineUser toggleShow={toggleShow} />
             </Suspense>
           </div>
         )}
         {activeTab === "customerUser" && (
           <div className={style.tabContent}>
-            <Suspense fallback={<div>Loading...</div>}>
+            <Suspense fallback={<SoftLoader />}>
               <CustomerUser toggleShow={toggleShow} />
             </Suspense>
           </div>

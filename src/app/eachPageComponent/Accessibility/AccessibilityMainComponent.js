@@ -74,7 +74,9 @@ const AddRoleButton = styled.button`
 `;
 
 const ModalHimselfStyle = styled(Modal)`
-  overflow-y: scroll;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 `;
 
 const StyledTable = styled.table`
@@ -127,9 +129,15 @@ const HeaderModalShowAccessMainDiv = styled.div`
   background-color: rgb(225, 223, 223);
   border-top-right-radius: 10px;
   border-top-left-radius: 10px;
-  .HeaderModalShowAccess {
-    padding: 10px;
-  }
+  padding: 10px;
+
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+
+  position: sticky;
+  top: 0;
+  z-index: 10;
 `;
 
 const modalStyle = {
@@ -137,10 +145,14 @@ const modalStyle = {
   top: "50%",
   left: "50%",
   transform: "translate(-50%, -50%)",
-  width: 400,
+  width: 450,
+  maxHeight: "80vh", // important!
   bgcolor: "background.paper",
   boxShadow: 24,
-  borderRadius: 2,
+  borderRadius: 8,
+  display: "flex",
+  flexDirection: "column",
+  overflow: "hidden",
 };
 
 const NavDropDown = styled(NavDropdown)`
@@ -234,6 +246,109 @@ const FixTablePlace = styled.div`
   .SeeAccessButtom {
     cursor: pointer;
     color: #43a047;
+  }
+`;
+
+const ModalContainer = styled(Box)`
+  width: 450px;
+  max-width: 90%;
+  background: #ffffff;
+  border-radius: 14px;
+  overflow: hidden;
+  box-shadow: 0px 8px 30px rgba(0, 0, 0, 0.15);
+  animation: fadeIn 0.25s ease-out;
+  max-height: 80vh;
+  display: flex;
+  flex-direction: column;
+
+  @keyframes fadeIn {
+    from {
+      opacity: 0;
+      transform: translate(-50%, -48%);
+    }
+    to {
+      opacity: 1;
+      transform: translate(-50%, -50%);
+    }
+  }
+`;
+
+const ModalHeader = styled.div`
+  background: #f5f5f5;
+  padding: 15px 20px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+
+  p {
+    margin: 0;
+    font-size: 1rem;
+    font-weight: bold;
+  }
+`;
+const PermissionTag = styled.div`
+  background: #f3f4f6;
+  padding: 10px 14px;
+  width: 100%;
+  border-radius: 9px;
+  border: 1px solid #e2e3e5;
+  text-align: right;
+  font-size: 0.88rem;
+  transition: 0.2s;
+
+  &:hover {
+    background: #eaecef;
+  }
+`;
+
+const CheckboxRow = styled.label`
+  width: 100%;
+  background: #fafafa;
+  border: 1px solid #e0e0e0;
+  border-radius: 8px;
+  padding: 10px 12px;
+  display: flex;
+  gap: 10px;
+  align-items: center;
+  transition: 0.2s;
+
+  &:hover {
+    background: #f0f0f0;
+  }
+`;
+
+const ModalFooter = styled.div`
+  background: #f5f5f5;
+  padding: 12px 16px;
+  display: flex;
+  justify-content: space-between;
+
+  .confirm {
+    background: #43a047;
+    border: none;
+    padding: 8px 20px;
+    border-radius: 6px;
+    color: white;
+    cursor: pointer;
+    transition: 0.2s;
+
+    &:hover {
+      background: #388e3c;
+    }
+  }
+
+  .cancel {
+    border: 1px solid #e91e63;
+    color: #e91e63;
+    background: white;
+    padding: 8px 20px;
+    border-radius: 6px;
+    cursor: pointer;
+    transition: 0.2s;
+
+    &:hover {
+      background: #ffe7ef;
+    }
   }
 `;
 
@@ -484,7 +599,10 @@ export default function Accessibility({ toggleShow }) {
                   />
                 </div>
 
-                <div className="d-flex flex-column gap-2 justify-content-center align-items-center p-3">
+                <div
+                  className="d-flex flex-column gap-2 justify-content-center align-items-center p-3"
+                  style={{ flex: 1, overflowY: "auto" }}
+                >
                   {[1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12].map((value) => (
                     <BorderStyleAccessbility
                       key={value}
@@ -539,7 +657,7 @@ export default function Accessibility({ toggleShow }) {
           <div>
             <FixTablePlace className="table table-striped">
               <p className="me-2 NormalTextSizing mb-2 pTagForStyle">
-               سطح دسترسی ها
+                سطح دسترسی ها
               </p>
 
               <table className="table table-striped tabelStyle">
@@ -572,73 +690,64 @@ export default function Accessibility({ toggleShow }) {
                           <ModalHimselfStyle
                             open={modalPermision === index}
                             onClose={handleCloseModal}
-                            aria-labelledby="modal-modal-title"
-                            aria-describedby="modal-modal-description"
                           >
-                            <Box sx={modalStyle}>
-                              <HeaderModalShowAccessMainDiv className="d-flex flex-row justify-content-between align-items-center">
-                                <p className="NormalTextSizing HeaderModalShowAccess">
-                                  دسترسی ها
-                                </p>
+                            <ModalContainer sx={modalStyle}>
+                              <ModalHeader>
+                                <p>دسترسی‌ها</p>
                                 <CustomCloseButton
                                   onClick={handleCloseModal}
-                                  color={`#e91e63`}
+                                  color="#e91e63"
                                 />
-                              </HeaderModalShowAccessMainDiv>
-                              <div className="d-flex flex-column gap-2 justify-content-center align-items-center p-3">
-                                {item?.permissions?.map((eachPer, index) => (
-                                  <SeeAccessTableStyle
-                                    key={index}
-                                    className="NormalTextSizing"
-                                  >
+                              </ModalHeader>
+
+                              <div
+                                className="p-3 d-flex flex-column gap-2"
+                                style={{
+                                  flex: 1,
+                                  overflowY: "auto",
+                                }}
+                              >
+                                {item?.permissions?.map((eachPer, i) => (
+                                  <PermissionTag key={i}>
                                     {eachPer?.permission?.name}
-                                  </SeeAccessTableStyle>
+                                  </PermissionTag>
                                 ))}
                               </div>
-                            </Box>
+                            </ModalContainer>
                           </ModalHimselfStyle>
                         </div>
                       </td>
 
                       <td>
                         <ModalHimselfStyle
-                          open={modalchangeAccess === index || false}
+                          open={modalchangeAccess === index}
                           onClose={handleclosemodalChangeAccess}
-                          aria-labelledby="modal-modal-title"
-                          aria-describedby="modal-modal-description"
                         >
-                          <Box sx={modalStyle}>
-                            <HeaderModalShowAccessMainDiv className="d-flex flex-row justify-content-between align-items-center">
-                              <p className="NormalTextSizing HeaderModalShowAccess">
-                                ویرایش
-                              </p>
-                              <p className="NormalTextSizing HeaderModalShowAccess">
-                                {item.name}
-                              </p>
-
+                          <ModalContainer sx={modalStyle}>
+                            <ModalHeader>
+                              <p>ویرایش </p>
+                              <p>{item.name}</p>
                               <CustomCloseButton
                                 onClick={handleclosemodalChangeAccess}
-                                color={`#e91e63`}
+                                color="#e91e63"
                               />
-                            </HeaderModalShowAccessMainDiv>
-                            <div className="d-flex flex-column gap-2 justify-content-center align-items-center p-3">
-                              {/* {item?.permissions?.map((eachPer, index) => (
-                              <p key={index} className="NormalTextSizing">
-                                {eachPer?.permission?.name}
-                              </p>
-                            ))} */}
+                            </ModalHeader>
 
+                            <div
+                              className="p-3 d-flex flex-column gap-2"
+                              style={{
+                                flex: 1,
+                                overflowY: "auto",
+                              }}
+                            >
                               {[1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12].map(
                                 (value) => (
-                                  <BorderStyleAccessbility
-                                    key={value}
-                                    className="d-flex flex-row align-items-center gap-2"
-                                  >
+                                  <CheckboxRow key={value}>
                                     <input
                                       type="checkbox"
                                       value={value}
                                       onChange={handleChange}
-                                      checked={selectedValues.includes(value)} // Prefill based on selected values
+                                      checked={selectedValues.includes(value)}
                                     />
                                     <div>
                                       {value === 1 && "داشبورد"}
@@ -647,42 +756,34 @@ export default function Accessibility({ toggleShow }) {
                                       {value === 4 && "ساخت هدر"}
                                       {value === 5 && "مقالات"}
                                       {value === 6 && "افتخارات"}
-                                      {value === 7 && "نمایشگاه ها"}
+                                      {value === 7 && "نمایشگاه‌ها"}
                                       {value === 8 && "بنر"}
                                       {value === 9 && "ویدیو"}
                                       {value === 10 && "کاربر سیستم"}
                                       {value === 11 && "کاربر سایت"}
-                                      {value === 12 && "سطح دسترسی ها"}
+                                      {value === 12 && "سطح دسترسی‌ها"}
                                     </div>
-                                  </BorderStyleAccessbility>
+                                  </CheckboxRow>
                                 )
                               )}
                             </div>
-                            <BUTTONSSTYLE>
-                              <div className="editRole">
-                                <div className="d-flex flex-row pt-2 pb-2 justify-content-around">
-                                  <button
-                                    className="NormalTextSizing confirmButtonStyle"
-                                    type="button"
-                                    onClick={handleUpdatePermissionRole}
-                                  >
-                                    {loadingUpdateAccess ? (
-                                      <LoadingCss />
-                                    ) : (
-                                      "ذخیره"
-                                    )}
-                                  </button>
-                                  <button
-                                    className="NormalTextSizing cancelButtonStyle"
-                                    type="button"
-                                    onClick={handleclosemodalChangeAccess}
-                                  >
-                                    انصراف
-                                  </button>
-                                </div>
-                              </div>
-                            </BUTTONSSTYLE>
-                          </Box>
+
+                            <ModalFooter>
+                              <button
+                                className="confirm"
+                                onClick={handleUpdatePermissionRole}
+                              >
+                                {loadingUpdateAccess ? <LoadingCss /> : "ذخیره"}
+                              </button>
+
+                              <button
+                                className="cancel"
+                                onClick={handleclosemodalChangeAccess}
+                              >
+                                انصراف
+                              </button>
+                            </ModalFooter>
+                          </ModalContainer>
                         </ModalHimselfStyle>
 
                         <NavDropDown
