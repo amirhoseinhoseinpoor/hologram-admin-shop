@@ -341,7 +341,7 @@ function EditUserBtnfunction({
           <>
             <MoreHorizIcon
               style={{
-                color: "#191919",
+                color: "#282e3f",
                 cursor: "pointer",
                 fontSize: "28px",
                 cursor: "pointer",
