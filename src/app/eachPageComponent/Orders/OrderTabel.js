@@ -273,7 +273,7 @@ export default function OrderTabelDesctop({
                       <>
                         <MoreHorizIcon
                           style={{
-                            color: "#191919",
+                            color: "#282e3f",
                             cursor: "pointer",
                             fontSize: "28px",
                             cursor: "pointer",
@@ -467,7 +467,7 @@ export default function OrderTabelDesctop({
                       <>
                         <MoreHorizIcon
                           style={{
-                            color: "#191919",
+                            color: "#282e3f",
                             cursor: "pointer",
                             fontSize: "28px",
                             cursor: "pointer",

@@ -184,7 +184,7 @@ const NavTabs = styled(Tabs)`
   border-bottom: none;
   gap: 10px;
   width: 100%;
-  border-bottom: 1px solid #191919;
+  border-bottom: 1px solid #282e3f;
 
   .nav-item {
     border-radius: 10px !important;
@@ -193,19 +193,19 @@ const NavTabs = styled(Tabs)`
     }
   }
   .nav-link {
-    border: 1px solid #191919;
+    border: 1px solid #282e3f;
     border-radius: 10px !important;
-    color: #191919;
+    color: #282e3f;
     width: 100%;
     padding: 5px 11px;
     position: relative;
     cursor: pointer;
   }
   .nav-link:hover {
-    border: 1px solid #191919 !important;
+    border: 1px solid #282e3f !important;
   }
   .nav-link.active {
-    background-image: linear-gradient(195deg, #42424a 0%, #191919 100%);
+    background-image: linear-gradient(195deg, #46506a 0%, #282e3f 100%);
     color: white;
     border: none !important;
     border-radius: 10px;

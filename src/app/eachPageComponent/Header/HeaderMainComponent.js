@@ -93,7 +93,7 @@ const Button = styled.button`
   padding: 10px 20px;
   background-image: ${(props) => {
     if (props.$secondary)
-      return "linear-gradient(195deg, #42424a 0%, #191919 100%)";
+      return "linear-gradient(195deg, #46506a 0%, #282e3f 100%)";
     return "#28a745";
   }};
 
@@ -998,7 +998,7 @@ export default function HeaderMainComponent({ toggleShow }) {
         <div className="NormalTextSizing text-decoration-underline textHeaderStyle d-flex align-items-center">
           ساخت هدر
         </div>
-        <ProfileComponent colorGet={"#191919"} />
+        <ProfileComponent colorGet={"#282e3f"} />
       </HeadermakeOrder>
 
       <Container>

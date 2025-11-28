@@ -209,7 +209,7 @@ export default function MakeOrder({
         >
           بازگشت به سفارشات
         </div>
-        <ProfileComponent colorGet={"#191919"} />
+        <ProfileComponent colorGet={"#282e3f"} />
       </HeadermakeOrder>
 
       <div className="container">

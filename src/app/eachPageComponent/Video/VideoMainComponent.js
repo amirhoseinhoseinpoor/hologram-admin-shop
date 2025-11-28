@@ -233,7 +233,7 @@ export default function HonorsMainComponent({ toggleShow }) {
             </div>
           </>
         )}
-        <ProfileComponent colorGet={"#191919"} />
+        <ProfileComponent colorGet={"#282e3f"} />
       </HeadermakeOrder>
       {/* tabs */}
 

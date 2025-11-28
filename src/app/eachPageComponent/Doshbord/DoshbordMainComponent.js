@@ -49,7 +49,7 @@ export default function DoshbordMainComponent({ toggleShow }) {
         <div className="NormalTextSizing text-decoration-underline textHeaderStyle d-flex align-items-center">
           داشبورد
         </div>
-        <ProfileComponent colorGet={"#191919"} />
+        <ProfileComponent colorGet={"#282e3f"} />
       </HeadermakeOrder>
       <Box sx={{ p: 2 }}>
         <CardResponssive className="mb-3">

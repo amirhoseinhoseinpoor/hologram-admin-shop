@@ -224,7 +224,7 @@ const FixTablePlace = styled.div`
       top: -55px;
       border-radius: 10px;
       padding: 18px 12px;
-      background-image: linear-gradient(195deg, #42424a 0%, #191919 100%);
+      background-image: linear-gradient(195deg, #46506a 0%, #282e3f 100%);
       color: white;
     }
     .tabelStyle {
@@ -541,7 +541,7 @@ export default function Accessibility({ toggleShow }) {
           <NavBarToggleBurgerButton func={() => toggleShow("main")} />
         </div>
 
-        <ProfileComponent colorGet={"#191919"} />
+        <ProfileComponent colorGet={"#282e3f"} />
       </HeadermakeOrder>
 
       <div className="container">
@@ -791,7 +791,7 @@ export default function Accessibility({ toggleShow }) {
                             <>
                               <MoreHorizIcon
                                 style={{
-                                  color: "#191919",
+                                  color: "#282e3f",
                                   cursor: "pointer",
                                   fontSize: "28px",
                                   cursor: "pointer",

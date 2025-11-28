@@ -581,7 +581,7 @@ export default function StepTwoComponent({
                                       }}
                                     >
                                       <ArrowDownwardIcon
-                                        style={{ color: "#191919" }}
+                                        style={{ color: "#282e3f" }}
                                       />
                                     </button>
                                   </>

@@ -101,7 +101,7 @@ const FixTablePlace = styled.div`
       top: -55px;
       border-radius: 10px;
       padding: 18px 12px;
-      background-image: linear-gradient(195deg, #42424a 0%, #191919 100%);
+      background-image: linear-gradient(195deg, #46506a 0%, #282e3f 100%);
       color: white;
     }
     .tabelStyle {
@@ -202,7 +202,7 @@ export default function CustomerUserTabel({ toggleShow }) {
         <div className="NormalTextSizing text-decoration-underline textHeaderStyle d-flex align-items-center">
           مدیریت کاربر
         </div>
-        <ProfileComponent colorGet={"#191919"} />
+        <ProfileComponent colorGet={"#282e3f"} />
       </HeadermakeOrder>
 
       {/* Filter Container */}
