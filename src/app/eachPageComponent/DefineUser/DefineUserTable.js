@@ -145,6 +145,65 @@ const SelectFilter = styled.select`
   cursor: pointer;
 `;
 
+const ModalHimselfStyle = styled(Modal)`
+  display: flex;
+  align-items: center;
+  justify-content: center;
+`;
+
+const ModalContainer = styled(Box)`
+  width: 450px;
+  max-width: 90%;
+  background: #ffffff;
+  border-radius: 14px;
+  overflow: hidden;
+  box-shadow: 0px 8px 30px rgba(0, 0, 0, 0.15);
+  animation: fadeIn 0.25s ease-out;
+  max-height: 80vh;
+  display: flex;
+  flex-direction: column;
+
+  @keyframes fadeIn {
+    from {
+      opacity: 0;
+      transform: translate(-50%, -48%);
+    }
+    to {
+      opacity: 1;
+      transform: translate(-50%, -50%);
+    }
+  }
+`;
+
+const ModalHeader = styled.div`
+  background: #f5f5f5;
+  padding: 15px 20px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+
+  p {
+    margin: 0;
+    font-size: 1rem;
+    font-weight: bold;
+  }
+`;
+
+const PermissionTag = styled.div`
+  background: #f3f4f6;
+  padding: 10px 14px;
+  width: 100%;
+  border-radius: 9px;
+  border: 1px solid #e2e3e5;
+  text-align: right;
+  font-size: 0.88rem;
+  transition: 0.2s;
+
+  &:hover {
+    background: #eaecef;
+  }
+`;
+
 const SeeAccessTableStyle = styled.p`
   /* border-top: 1px solid gray; */
   width: 100%;
@@ -157,10 +216,14 @@ const modalStyle = {
   top: "50%",
   left: "50%",
   transform: "translate(-50%, -50%)",
-  width: 400,
+  width: 450,
+  maxHeight: "80vh", // important!
   bgcolor: "background.paper",
   boxShadow: 24,
-  borderRadius: 2,
+  borderRadius: 8,
+  display: "flex",
+  flexDirection: "column",
+  overflow: "hidden",
 };
 
 export default function DefineUser({ toggleShow }) {
@@ -328,14 +391,14 @@ export default function DefineUser({ toggleShow }) {
                             مشاهده
                           </p>
 
-                          <Modal
+                          <ModalHimselfStyle
                             open={modalPermision === index}
                             onClose={handleCloseModal}
                             aria-labelledby="modal-modal-title"
                             aria-describedby="modal-modal-description"
                           >
-                            <Box sx={modalStyle}>
-                              <HeaderModalShowAccessMainDiv className="d-flex flex-row justify-content-between align-items-center">
+                            <ModalContainer sx={modalStyle}>
+                              <ModalHeader>
                                 <p className="NormalTextSizing HeaderModalShowAccess">
                                   دسترسی ها
                                 </p>
@@ -343,8 +406,15 @@ export default function DefineUser({ toggleShow }) {
                                   onClick={handleCloseModal}
                                   color={`#e91e63`}
                                 />
-                              </HeaderModalShowAccessMainDiv>
-                              <div className="d-flex flex-column gap-2 justify-content-center align-items-center p-3">
+                              </ModalHeader>
+                              {/* <HeaderModalShowAccessMainDiv className="d-flex flex-row justify-content-between align-items-center"></HeaderModalShowAccessMainDiv> */}
+                              <div
+                                style={{
+                                  flex: 1,
+                                  overflowY: "auto",
+                                }}
+                                className="d-flex flex-column gap-2 justify-content-center align-items-center p-3"
+                              >
                                 {/* {item?.permissions?.map((eachPer, index) => (
                                   <p key={index} className="NormalTextSizing">
                                     {eachPer?.permission?.name}
@@ -352,17 +422,17 @@ export default function DefineUser({ toggleShow }) {
                                 ))} */}
                                 <div className="d-flex flex-column gap-2 justify-content-center align-items-center w-100">
                                   {item.userRoles?.map((item, index) => (
-                                    <SeeAccessTableStyle
+                                    <PermissionTag
                                       key={index}
                                       className="NormalTextSizing"
                                     >
                                       {item.role.name}
-                                    </SeeAccessTableStyle>
+                                    </PermissionTag>
                                   ))}
                                 </div>
                               </div>
-                            </Box>
-                          </Modal>
+                            </ModalContainer>
+                          </ModalHimselfStyle>
                         </td>
                         <td>
                           <div className="d-flex flex-row justify-content-center">
