@@ -10,6 +10,7 @@ import CustomCloseButton from "@/app/BaseComponent/CustomCloseButton";
 import ConfirmingModal from "@/app/BaseComponent/ConfirmingModal";
 import ErrorModal from "@/app/BaseComponent/ErrorModal";
 import ProfileComponent from "@/app/BaseComponent/ProfileComponent";
+import EmptyState from "@/app/BaseComponent/EmptyState";
 import { Skeleton } from "@mui/material";
 import SearchIcon from "@mui/icons-material/Search";
 import styled from "styled-components";
@@ -543,9 +544,13 @@ export default function DefineUser({ toggleShow }) {
           {/* no user found */}
           {!trackLoading && filteredUsers && filteredUsers.length === 0 && (
             <div className="container mt-4">
-              <p className="NormalTextSizing text-center">
-                هیچ کاربری یافت نشد.
-              </p>
+              <EmptyState
+                illustrationUrl="/illustrations/empty-users.svg"
+                title="هیچ کاربر مدیریتی یافت نشد"
+                description="کاربران مدیر و ادمین خود را با استفاده از دکمه بالا اضافه کنید."
+                variant="table"
+                illustrationHeight="200px"
+              />
             </div>
           )}
         </>

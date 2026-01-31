@@ -15,6 +15,7 @@ import styled from "styled-components";
 import { formatPersianDate } from "@/app/utils/persionDateUtils";
 import PreviewIcon from "@mui/icons-material/Preview";
 import DeleteIcon from "@mui/icons-material/Delete";
+import CreateIcon from "@mui/icons-material/Create";
 
 // import baseComponents
 import ProfileComponent from "@/app/BaseComponent/ProfileComponent";
@@ -22,6 +23,7 @@ import NavBarToggleBurgerButton from "@/app/BaseComponent/NavBarToggleBurgerButt
 import AreYouShureModal from "@/app/BaseComponent/AreYouSureModal";
 import ConfirmingModal from "@/app/BaseComponent/ConfirmingModal";
 import ErrorModal from "@/app/BaseComponent/ErrorModal";
+import EmptyState from "@/app/BaseComponent/EmptyState";
 
 //redux import
 import { useDispatch } from "react-redux";
@@ -342,7 +344,15 @@ export default function HonorsMainComponent({ toggleShow }) {
                     </React.Fragment>
                   ))
                 ) : (
-                  <TYPOGRAPHY variant="body2">No data available</TYPOGRAPHY>
+                  <EmptyState
+                    illustrationUrl="/illustrations/empty-blogs.svg"
+                    title="هیچ مقاله‌ای یافت نشد"
+                    description="مقاله جدید بنویسید و با مخاطبان خود به اشتراک بگذارید."
+                    actionButtonText="نوشتن مقاله جدید"
+                    actionButtonIcon={<CreateIcon />}
+                    onActionClick={() => setActiveKey("addUser")}
+                    variant="grid"
+                  />
                 )}
               </>
             )}

@@ -1,0 +1,20 @@
+<svg width="400" height="300" viewBox="0 0 400 300" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <!-- Image/Banner illustration -->
+  <circle cx="200" cy="150" r="120" fill="#f0f0f0"/>
+
+  <!-- Frame/Banner -->
+  <rect x="130" y="90" width="140" height="120" rx="8" fill="white" stroke="#66bb6a" stroke-width="3"/>
+
+  <!-- Mountain image placeholder -->
+  <path d="M145 165 L170 135 L195 155 L220 125 L245 145 L255 160 L255 195 L145 195 Z" fill="#66bb6a" opacity="0.3"/>
+
+  <!-- Sun/Circle in image -->
+  <circle cx="230" cy="110" r="12" fill="#66bb6a" opacity="0.5"/>
+
+  <!-- Image icon indicator -->
+  <rect x="145" y="175" width="30" height="20" rx="3" fill="#66bb6a" opacity="0.4"/>
+
+  <!-- Decorative sparkles -->
+  <path d="M120 75 L122 80 L127 82 L122 84 L120 89 L118 84 L113 82 L118 80 Z" fill="#66bb6a" opacity="0.4"/>
+  <path d="M275 100 L277 105 L282 107 L277 109 L275 114 L273 109 L268 107 L273 105 Z" fill="#66bb6a" opacity="0.3"/>
+</svg>

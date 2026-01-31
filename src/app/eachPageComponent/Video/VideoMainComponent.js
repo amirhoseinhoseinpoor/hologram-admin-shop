@@ -18,6 +18,7 @@ import {
 import styled from "styled-components";
 import PreviewIcon from "@mui/icons-material/Preview";
 import DeleteIcon from "@mui/icons-material/Delete";
+import VideoCallIcon from "@mui/icons-material/VideoCall";
 
 // improt base component
 import ProfileComponent from "@/app/BaseComponent/ProfileComponent";
@@ -25,6 +26,7 @@ import NavBarToggleBurgerButton from "@/app/BaseComponent/NavBarToggleBurgerButt
 import AreYouShureModal from "@/app/BaseComponent/AreYouSureModal";
 import ConfirmingModal from "@/app/BaseComponent/ConfirmingModal";
 import ErrorModal from "@/app/BaseComponent/ErrorModal";
+import EmptyState from "@/app/BaseComponent/EmptyState";
 
 const HeadermakeOrder = styled.div`
   padding: 10px;
@@ -355,7 +357,15 @@ export default function HonorsMainComponent({ toggleShow }) {
                     </React.Fragment>
                   ))
                 ) : (
-                  <TYPOGRAPHY variant="body2">در حال حاضر دیتایی وجود ندارد</TYPOGRAPHY>
+                  <EmptyState
+                    illustrationUrl="/illustrations/empty-videos.svg"
+                    title="هیچ ویدئویی یافت نشد"
+                    description="ویدئوهای آموزشی یا تبلیغاتی خود را اضافه کنید."
+                    actionButtonText="افزودن ویدئو جدید"
+                    actionButtonIcon={<VideoCallIcon />}
+                    onActionClick={() => setActiveKey("addUser")}
+                    variant="grid"
+                  />
                 )}
               </>
             )}

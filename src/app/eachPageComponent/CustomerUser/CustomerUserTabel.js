@@ -9,6 +9,7 @@ import NavBarToggleBurgerButton from "@/app/BaseComponent/NavBarToggleBurgerButt
 import ConfirmingModal from "@/app/BaseComponent/ConfirmingModal";
 import ErrorModal from "@/app/BaseComponent/ErrorModal";
 import ProfileComponent from "@/app/BaseComponent/ProfileComponent";
+import EmptyState from "@/app/BaseComponent/EmptyState";
 import { Skeleton } from "@mui/material";
 import SearchIcon from "@mui/icons-material/Search";
 import styled from "styled-components";
@@ -363,9 +364,13 @@ export default function CustomerUserTabel({ toggleShow }) {
           {/* no user found */}
           {!trackLoading && filteredUsers && filteredUsers.length === 0 && (
             <div className="container mt-4">
-              <p className="NormalTextSizing text-center">
-                هیچ کاربری یافت نشد.
-              </p>
+              <EmptyState
+                illustrationUrl="/illustrations/empty-users.svg"
+                title="هیچ کاربری یافت نشد"
+                description="کاربران مشتری شما اینجا نمایش داده می‌شوند."
+                variant="table"
+                illustrationHeight="200px"
+              />
             </div>
           )}
         </>

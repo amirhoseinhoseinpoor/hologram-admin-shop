@@ -14,6 +14,7 @@ import {
 import styled from "styled-components";
 import PreviewIcon from "@mui/icons-material/Preview";
 import DeleteIcon from "@mui/icons-material/Delete";
+import EventIcon from "@mui/icons-material/Event";
 
 // import base component
 import ProfileComponent from "@/app/BaseComponent/ProfileComponent";
@@ -21,6 +22,7 @@ import NavBarToggleBurgerButton from "@/app/BaseComponent/NavBarToggleBurgerButt
 import AreYouShureModal from "@/app/BaseComponent/AreYouSureModal";
 import ConfirmingModal from "@/app/BaseComponent/ConfirmingModal";
 import ErrorModal from "@/app/BaseComponent/ErrorModal";
+import EmptyState from "@/app/BaseComponent/EmptyState";
 
 //redux import
 import { useDispatch } from "react-redux";
@@ -334,7 +336,15 @@ export default function HonorsMainComponent({ toggleShow }) {
                     </React.Fragment>
                   ))
                 ) : (
-                  <TYPOGRAPHY variant="body2">No data available</TYPOGRAPHY>
+                  <EmptyState
+                    illustrationUrl="/illustrations/empty-exhibition.svg"
+                    title="هیچ نمایشگاهی یافت نشد"
+                    description="نمایشگاه‌های خود را اضافه و مدیریت کنید."
+                    actionButtonText="افزودن نمایشگاه جدید"
+                    actionButtonIcon={<EventIcon />}
+                    onActionClick={() => setActiveKey("addUser")}
+                    variant="grid"
+                  />
                 )}
               </>
             )}

@@ -1,0 +1,28 @@
+<svg width="400" height="300" viewBox="0 0 400 300" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <!-- Orders/Receipt illustration -->
+  <circle cx="200" cy="150" r="120" fill="#f0f0f0"/>
+
+  <!-- Receipt paper -->
+  <path d="M145 70 L255 70 L255 230 L250 225 L245 230 L240 225 L235 230 L230 225 L225 230 L220 225 L215 230 L210 225 L205 230 L200 225 L195 230 L190 225 L185 230 L180 225 L175 230 L170 225 L165 230 L160 225 L155 230 L150 225 L145 230 Z" fill="white" stroke="#66bb6a" stroke-width="2"/>
+
+  <!-- Receipt lines -->
+  <line x1="160" y1="95" x2="240" y2="95" stroke="#66bb6a" stroke-width="3" stroke-linecap="round" opacity="0.6"/>
+  <line x1="160" y1="115" x2="220" y2="115" stroke="#66bb6a" stroke-width="2" stroke-linecap="round" opacity="0.3"/>
+  <line x1="160" y1="130" x2="230" y2="130" stroke="#66bb6a" stroke-width="2" stroke-linecap="round" opacity="0.3"/>
+  <line x1="160" y1="145" x2="215" y2="145" stroke="#66bb6a" stroke-width="2" stroke-linecap="round" opacity="0.3"/>
+  <line x1="160" y1="160" x2="225" y2="160" stroke="#66bb6a" stroke-width="2" stroke-linecap="round" opacity="0.3"/>
+
+  <!-- Dotted line separator -->
+  <line x1="155" y1="180" x2="245" y2="180" stroke="#66bb6a" stroke-width="1" stroke-dasharray="3 3" opacity="0.4"/>
+
+  <!-- Total line (thicker) -->
+  <line x1="160" y1="200" x2="240" y2="200" stroke="#66bb6a" stroke-width="3" stroke-linecap="round" opacity="0.7"/>
+
+  <!-- Checkmark icon -->
+  <circle cx="200" cy="90" r="15" fill="#66bb6a" opacity="0.15"/>
+  <path d="M193 90 L198 95 L207 86" stroke="#66bb6a" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" fill="none" opacity="0.6"/>
+
+  <!-- Decorative -->
+  <circle cx="270" cy="100" r="3" fill="#66bb6a" opacity="0.3"/>
+  <circle cx="130" cy="150" r="4" fill="#66bb6a" opacity="0.3"/>
+</svg>
