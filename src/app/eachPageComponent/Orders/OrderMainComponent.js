@@ -29,6 +29,7 @@ import AreYouShureModal from "@/app/BaseComponent/AreYouSureModal";
 // Import components
 import OrderTabel from "./OrderTabel";
 import Pagination from "@/app/BaseComponent/Pagination";
+import EmptyState from "@/app/BaseComponent/EmptyState";
 
 // Styled Components
 const FixTablePlace = styled.div`
@@ -490,9 +491,13 @@ export default function OrderMainComponent({ toggleShow }) {
                       />
                     </>
                   ) : (
-                    <p className="me-2 NormalTextSizing mb-2">
-                      هیچ سفارشی یافت نشد.
-                    </p>
+                    <EmptyState
+                      illustrationUrl="/illustrations/empty-orders.svg"
+                      title="هیچ سفارشی یافت نشد"
+                      description="سفارشات مشتریان شما اینجا نمایش داده می‌شود."
+                      variant="table"
+                      illustrationHeight="200px"
+                    />
                   )}
                 </>
               )}

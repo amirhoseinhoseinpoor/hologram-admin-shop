@@ -19,6 +19,7 @@ import {
 import styled from "styled-components";
 import PreviewIcon from "@mui/icons-material/Preview";
 import DeleteIcon from "@mui/icons-material/Delete";
+import AddPhotoAlternateIcon from "@mui/icons-material/AddPhotoAlternate";
 
 // improt base component
 import ProfileComponent from "@/app/BaseComponent/ProfileComponent";
@@ -27,6 +28,7 @@ import { formatPersianDate } from "@/app/utils/persionDateUtils";
 import AreYouShureModal from "@/app/BaseComponent/AreYouSureModal";
 import ConfirmingModal from "@/app/BaseComponent/ConfirmingModal";
 import ErrorModal from "@/app/BaseComponent/ErrorModal";
+import EmptyState from "@/app/BaseComponent/EmptyState";
 
 const HeadermakeOrder = styled.div`
   padding: 10px;
@@ -335,7 +337,15 @@ export default function HonorsMainComponent({ toggleShow }) {
                     </React.Fragment>
                   ))
                 ) : (
-                  <TYPOGRAPHY variant="body2">در حال حاضر دیتایی موجود نمیباشد</TYPOGRAPHY>
+                  <EmptyState
+                    illustrationUrl="/illustrations/empty-banners.svg"
+                    title="هیچ بنری یافت نشد"
+                    description="بنر جدید اضافه کنید تا در صفحه اصلی نمایش داده شود."
+                    actionButtonText="افزودن بنر جدید"
+                    actionButtonIcon={<AddPhotoAlternateIcon />}
+                    onActionClick={() => setActiveKey("addUser")}
+                    variant="grid"
+                  />
                 )}
               </>
             )}

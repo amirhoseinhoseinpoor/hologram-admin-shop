@@ -1,0 +1,24 @@
+<svg width="400" height="300" viewBox="0 0 400 300" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <!-- Video/Media illustration -->
+  <circle cx="200" cy="150" r="120" fill="#f0f0f0"/>
+
+  <!-- Video screen -->
+  <rect x="120" y="95" width="160" height="110" rx="8" fill="white" stroke="#66bb6a" stroke-width="3"/>
+
+  <!-- Play button -->
+  <circle cx="200" cy="150" r="30" fill="#66bb6a" opacity="0.8"/>
+  <path d="M190 135 L190 165 L215 150 Z" fill="white"/>
+
+  <!-- Video camera icon -->
+  <path d="M135 120 L165 120 L165 145 L135 145 Z" fill="#66bb6a" opacity="0.2" rx="3"/>
+  <circle cx="145" cy="127" r="3" fill="#66bb6a" opacity="0.4"/>
+
+  <!-- Camera stand/tripod at bottom -->
+  <rect x="195" y="205" width="10" height="15" fill="#66bb6a" opacity="0.5"/>
+  <line x1="180" y1="220" x2="220" y2="220" stroke="#66bb6a" stroke-width="3" stroke-linecap="round" opacity="0.5"/>
+
+  <!-- Decorative elements -->
+  <circle cx="290" cy="100" r="4" fill="#66bb6a" opacity="0.3"/>
+  <circle cx="110" cy="180" r="3" fill="#66bb6a" opacity="0.3"/>
+  <path d="M285 170 L287 175 L292 177 L287 179 L285 184 L283 179 L278 177 L283 175 Z" fill="#66bb6a" opacity="0.3"/>
+</svg>

@@ -11,6 +11,7 @@ import ConfirmingModal from "@/app/BaseComponent/ConfirmingModal";
 import ErrorModal from "@/app/BaseComponent/ErrorModal";
 import NavBarToggleBurgerButton from "@/app/BaseComponent/NavBarToggleBurgerButton";
 import Pagination from "@/app/BaseComponent/Pagination";
+import EmptyState from "@/app/BaseComponent/EmptyState";
 //redux import
 import { useSelector, useDispatch } from "react-redux";
 import { list } from "../../Store/thunks.js";
@@ -21,6 +22,7 @@ import { Card, CardMedia, Typography, Skeleton } from "@mui/material";
 import MoreHorizIcon from "@mui/icons-material/MoreHoriz";
 import DeleteIcon from "@mui/icons-material/Delete";
 import EditIcon from "@mui/icons-material/Edit";
+import AddIcon from "@mui/icons-material/Add";
 import { NavDropdown } from "react-bootstrap";
 import styled from "styled-components";
 import SearchIcon from "@mui/icons-material/Search";
@@ -477,9 +479,15 @@ export default function HonorsMainComponent({ toggleShow }) {
                 </>
               ) : (
                 <>
-                  <p className="me-2 NormalTextSizing mb-2">
-                    هیچ سفارشی یافت نشد.
-                  </p>
+                  <EmptyState
+                    illustrationUrl="/illustrations/empty-products.svg"
+                    title="هیچ محصولی یافت نشد"
+                    description="در حال حاضر محصولی برای نمایش وجود ندارد. محصول جدید اضافه کنید."
+                    actionButtonText="افزودن محصول جدید"
+                    actionButtonIcon={<AddIcon />}
+                    onActionClick={() => setActiveKey("addUser")}
+                    variant="grid"
+                  />
                 </>
               )}
             </>
