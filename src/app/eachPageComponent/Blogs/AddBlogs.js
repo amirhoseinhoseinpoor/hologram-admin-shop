@@ -141,10 +141,49 @@ const FORMCONTROLLABEL = styled(FormControlLabel)`
 import { useDispatch } from "react-redux";
 import { uploadFile } from "@/app/Store/thunks";
 import { blogspot } from "@/app/Store/thunks";
+import { prodNameAndNav } from "@/app/Store/thunks";
 const RedStar = styled.span`
   color: #e91e63;
   padding-left: 2px;
   padding-right: 2px;
+`;
+
+const SelectWidth = styled.select`
+  flex: 1;
+  border: 1px solid #c4c4c4;
+  border-radius: 4px;
+  padding: 8px 10px;
+  font-family: unset;
+  font-size: 14px;
+  background: #fff;
+  &:focus {
+    outline: none;
+    border-color: #1976d2;
+  }
+`;
+
+const LinkModeToggle = styled.div`
+  display: flex;
+  gap: 0.5rem;
+  margin-bottom: 0.75rem;
+
+  button {
+    padding: 5px 14px;
+    border-radius: 20px;
+    border: 1px solid #c4c4c4;
+    font-family: unset;
+    font-size: 13px;
+    cursor: pointer;
+    transition: 140ms ease;
+    background: #f5f5f5;
+    color: #555;
+
+    &.active {
+      background: #1976d2;
+      color: #fff;
+      border-color: #1976d2;
+    }
+  }
 `;
 
 export default function AddHonors({ setActiveKey, setUpdateData, dataCome }) {
@@ -166,6 +205,10 @@ export default function AddHonors({ setActiveKey, setUpdateData, dataCome }) {
   const [productTitle, setproductTitle] = useState("");
   const [productSrc, setproductSrc] = useState("");
   const [productLink, setproductLink] = useState("");
+  // product link mode: "select" | "manual"
+  const [linkMode, setLinkMode] = useState("select");
+  const [productsList, setProductsList] = useState([]);
+  const [selectedProductId, setSelectedProductId] = useState("");
 
   // modal state
   const [openModal, setOpenModal] = useState(false);
@@ -203,7 +246,9 @@ export default function AddHonors({ setActiveKey, setUpdateData, dataCome }) {
         .map((i) => `\n ${i?.content?.title} (کد: ${i.code})`)
         .join("\n");
 
-      setTextnotify(`برای اضافه کردن مقاله به مقالات مهم ابتدا یکی از مقالات زیر را از اولویت در بیاورید:\n${msgLines}`);
+      setTextnotify(
+        `برای اضافه کردن مقاله به مقالات مهم ابتدا یکی از مقالات زیر را از اولویت در بیاورید:\n${msgLines}`,
+      );
 
       setDisableButton(true);
       return;
@@ -211,6 +256,13 @@ export default function AddHonors({ setActiveKey, setUpdateData, dataCome }) {
 
     setDisableButton(false);
   }, [dataCome]);
+
+  useEffect(() => {
+    dispatch(prodNameAndNav())
+      .unwrap()
+      .then((data) => setProductsList(data || []))
+      .catch(() => {});
+  }, [dispatch]);
 
   const validateForm = () => {
     // Main fields
@@ -296,7 +348,7 @@ export default function AddHonors({ setActiveKey, setUpdateData, dataCome }) {
     try {
       // Upload the file using your thunk
       const fileId = await dispatch(
-        uploadFile({ file, tag, type, isPublic })
+        uploadFile({ file, tag, type, isPublic }),
       ).unwrap();
 
       // Construct the valid image URL based on your backend API response
@@ -324,7 +376,7 @@ export default function AddHonors({ setActiveKey, setUpdateData, dataCome }) {
     try {
       // Dispatch the uploadFile thunk
       const fileId = await dispatch(
-        uploadFile({ file, tag, type, isPublic })
+        uploadFile({ file, tag, type, isPublic }),
       ).unwrap();
 
       // Get the URL of the uploaded image
@@ -344,7 +396,7 @@ export default function AddHonors({ setActiveKey, setUpdateData, dataCome }) {
     try {
       // Dispatch the uploadFile thunk
       const fileId = await dispatch(
-        uploadFile({ file, tag, type, isPublic })
+        uploadFile({ file, tag, type, isPublic }),
       ).unwrap();
 
       // Get the URL of the uploaded image
@@ -644,7 +696,7 @@ export default function AddHonors({ setActiveKey, setUpdateData, dataCome }) {
         <BorderDiv className="mt-4">
           <p className="QASize text-center mb-4 mt-0">محصول داخل مقاله</p>
           <GridBorderDiv>
-            <div className="d-flex flex-row align-items-center gap-2 ">
+            <div className="d-flex flex-column  gap-2 ">
               <label
                 style={{ whiteSpace: "nowrap" }}
                 className="mt-2 seeOrderFont"
@@ -660,21 +712,73 @@ export default function AddHonors({ setActiveKey, setUpdateData, dataCome }) {
               />
             </div>
 
-            <div className="d-flex flex-row align-items-center gap-2 ">
-              <label
-                style={{ whiteSpace: "nowrap" }}
-                className="mt-2 seeOrderFont"
-                htmlFor="prductLink"
-              >
-                لینک محصول<RedStar> *</RedStar> :
-              </label>
-              <TEXTFIELD
-                fullWidth
-                id="prductLink"
-                label="لینک محصول"
-                value={productLink}
-                onChange={handleProductLinkChange}
-              />
+            <div className="d-flex flex-column gap-1">
+              <div className="d-flex flex-row gap-2 ">
+                <label
+                  style={{ whiteSpace: "nowrap" }}
+                  className="seeOrderFont mt-1"
+                >
+                  لینک محصول<RedStar> *</RedStar> :
+                </label>
+                <LinkModeToggle>
+                  <button
+                    type="button"
+                    className={linkMode === "select" ? "active" : ""}
+                    onClick={() => {
+                      setLinkMode("select");
+                      setproductLink("");
+                      setSelectedProductId("");
+                    }}
+                  >
+                    انتخاب از محصولات
+                  </button>
+                  <button
+                    type="button"
+                    className={linkMode === "manual" ? "active" : ""}
+                    onClick={() => {
+                      setLinkMode("manual");
+                      setSelectedProductId("");
+                      setproductLink("");
+                    }}
+                  >
+                    وارد کردن لینک
+                  </button>
+                </LinkModeToggle>
+              </div>
+              {linkMode === "select" ? (
+                <SelectWidth
+                  value={selectedProductId}
+                  onChange={(e) => {
+                    const selected = productsList.find(
+                      (p) => p.navId === e.target.value,
+                    );
+                    setSelectedProductId(e.target.value);
+                    setproductLink(selected ? `/product/${selected.name}` : "");
+                  }}
+                >
+                  <option value="" disabled>
+                    انتخاب محصول
+                  </option>
+                  {productsList.map((p, i) => (
+                    <option key={i} value={p.navId}>
+                      {p.name}
+                    </option>
+                  ))}
+                </SelectWidth>
+              ) : (
+                <TEXTFIELD
+                  fullWidth
+                  id="prductLink"
+                  label="لینک محصول"
+                  value={productLink}
+                  onChange={handleProductLinkChange}
+                />
+              )}
+              {productLink && (
+                <span style={{ fontSize: 12, color: "#666", direction: "ltr" }}>
+                  {productLink}
+                </span>
+              )}
             </div>
 
             <div>
