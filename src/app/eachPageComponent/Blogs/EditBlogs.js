@@ -795,7 +795,17 @@ export default function EditHonors({
                       (p) => p.navId === e.target.value,
                     );
                     setSelectedProductId(e.target.value);
-                    setproductLink(selected ? `/product/${selected.name}` : "");
+                    if (selected) {
+                      // name format: "محصولات - Category - ProductName"
+                      // URL format:  "/Category/ProductName"
+                      const urlPath = selected.name
+                        .replace(/^محصولات\s*-\s*/, "")
+                        .split(" - ")
+                        .join("/");
+                      setproductLink(`/${urlPath}`);
+                    } else {
+                      setproductLink("");
+                    }
                   }}
                 >
                   <option value="" disabled>
