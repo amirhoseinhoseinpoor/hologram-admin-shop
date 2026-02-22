@@ -1808,6 +1808,63 @@ export const deleteOrder = createAsyncThunk(
 // );
 // end banner
 
+// start contact
+export const getContactList = createAsyncThunk(
+  "contact/getContactList",
+  async (_, thunkAPI) => {
+    const state = thunkAPI.getState();
+    const token = state.auth.token.token;
+    try {
+      const response = await axios.get(
+        `${process.env.NEXT_PUBLIC_BACK_END_SERVER}/contact/list`,
+        { headers: { Authorization: token ? `Bearer ${token}` : "" } }
+      );
+      return response.data;
+    } catch (error) {
+      if (error.response && error.response.status === 400) {
+        return thunkAPI.rejectWithValue("خطا در دریافت پیام‌ها");
+      }
+      return thunkAPI.rejectWithValue("مشکلی به وجود امده لطفا بعدا تلاش کنید");
+    }
+  }
+);
+
+export const markContactRead = createAsyncThunk(
+  "contact/markContactRead",
+  async ({ code, isRead }, thunkAPI) => {
+    const state = thunkAPI.getState();
+    const token = state.auth.token.token;
+    try {
+      const response = await axios.patch(
+        `${process.env.NEXT_PUBLIC_BACK_END_SERVER}/contact/${code}`,
+        { isRead },
+        { headers: { Authorization: token ? `Bearer ${token}` : "" } }
+      );
+      return response.data;
+    } catch (error) {
+      return thunkAPI.rejectWithValue("مشکلی به وجود امده لطفا بعدا تلاش کنید");
+    }
+  }
+);
+
+export const deleteContact = createAsyncThunk(
+  "contact/deleteContact",
+  async (code, thunkAPI) => {
+    const state = thunkAPI.getState();
+    const token = state.auth.token.token;
+    try {
+      const response = await axios.delete(
+        `${process.env.NEXT_PUBLIC_BACK_END_SERVER}/contact/${code}`,
+        { headers: { Authorization: token ? `Bearer ${token}` : "" } }
+      );
+      return response.data;
+    } catch (error) {
+      return thunkAPI.rejectWithValue("مشکلی به وجود امده لطفا بعدا تلاش کنید");
+    }
+  }
+);
+// end contact
+
 export const logout = createAsyncThunk("auth/logout", async () => {
   try {
     await axios.post("/api/logout"); // Assuming logout endpoint exists

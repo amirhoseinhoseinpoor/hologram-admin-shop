@@ -29,6 +29,7 @@ import SettingsIcon from "@mui/icons-material/Settings";
 import PersonIcon from "@mui/icons-material/Person";
 import ArrowDropDownIcon from "@mui/icons-material/ArrowDropDown";
 import AccessibilityIcon from "@mui/icons-material/Accessibility";
+import MailOutlineIcon from "@mui/icons-material/MailOutline";
 import { Box } from "@mui/material";
 import ShowVersionServer from "../Components/ShowVersionServer.js";
 import SoftLoader from "../BaseComponent/SoftLoader.js";
@@ -119,6 +120,14 @@ const AccessibilityMainComponent = dynamic(
   }
 );
 
+const ContactMainComponent = dynamic(
+  () => import("../eachPageComponent/ContactUs/ContactMainComponent.js"),
+  {
+    ssr: false,
+    loading: () => <SoftLoader />,
+  }
+);
+
 const AdminPanel = () => {
   const permission = useSelector(permissions);
 
@@ -185,6 +194,12 @@ const AdminPanel = () => {
       style: "pe-2",
       title: "سطح دسترسی ها",
       icon: <AccessibilityIcon />,
+    },
+    {
+      id: "ContactUs",
+      style: "pe-2",
+      title: "تماس با ما",
+      icon: <MailOutlineIcon />,
     },
     {
       id: "versionTab",
@@ -507,6 +522,11 @@ const AdminPanel = () => {
         {activeTab === "Accessibility" && (
           <div className={style.tabContent}>
             <AccessibilityMainComponent toggleShow={toggleShow} />
+          </div>
+        )}
+        {activeTab === "ContactUs" && (
+          <div className={style.tabContent}>
+            <ContactMainComponent toggleShow={toggleShow} />
           </div>
         )}
       </div>

@@ -603,7 +603,7 @@ export default function Accessibility({ toggleShow }) {
                   className="d-flex flex-column gap-2 justify-content-center align-items-center p-3"
                   style={{ flex: 1, overflowY: "auto" }}
                 >
-                  {[1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12].map((value) => (
+                  {[1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12 , 13].map((value) => (
                     <BorderStyleAccessbility
                       key={value}
                       className="d-flex flex-row align-items-center gap-2"
@@ -626,6 +626,7 @@ export default function Accessibility({ toggleShow }) {
                         {value === 10 && "کاربر سیستم"}
                         {value === 11 && "کاربر سایت"}
                         {value === 12 && "سطح دسترسی ها"}
+                        {value === 13 && "تماس با ما"}
                       </div>
                     </BorderStyleAccessbility>
                   ))}
@@ -740,7 +741,7 @@ export default function Accessibility({ toggleShow }) {
                                 overflowY: "auto",
                               }}
                             >
-                              {[1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12].map(
+                              {[1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12 ,13].map(
                                 (value) => (
                                   <CheckboxRow key={value}>
                                     <input
@@ -762,6 +763,7 @@ export default function Accessibility({ toggleShow }) {
                                       {value === 10 && "کاربر سیستم"}
                                       {value === 11 && "کاربر سایت"}
                                       {value === 12 && "سطح دسترسی‌ها"}
+                                      {value === 13 && "تماس با ما"}
                                     </div>
                                   </CheckboxRow>
                                 )
