@@ -1,24 +1,61 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import { Box } from "@mui/material";
 import styled from "styled-components";
 import { useDispatch } from "react-redux";
-import { uploadFile } from "@/app/Store/thunks";
-import { videoEdit } from "@/app/Store/thunks";
-import { HomePageVideoDeleted } from "@/app/Store/thunks";
-// import modals
+import { uploadFile, videoEdit } from "@/app/Store/thunks";
 import ConfirmModal from "@/app/BaseComponent/ConfirmingModal";
 import ErrorModal from "@/app/BaseComponent/ErrorModal";
 import AreYouShureModal from "@/app/BaseComponent/AreYouSureModal";
 import toast from "react-hot-toast";
+import DeleteIcon from "@mui/icons-material/Delete";
 
-const LABELIMAGEUPLOAD = styled.label`
-  /* border: 1px solid #c0c0c0;
-  border-radius: 4px;
-  padding: 10px;
+const BorderInputBox = styled.div`
+  padding: 1.25rem;
+  border: 1px solid rgba(0, 0, 0, 0.05);
+  border-radius: 14px;
+  background: #ffffff;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.06);
+`;
+
+const BOX = styled(Box)`
   width: 100%;
+  border-radius: 8px;
+  overflow: hidden;
+  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.08);
+`;
+
+const BUTTONSSTYLE = styled.div`
   display: flex;
-  justify-content: center;
-  align-items: center; */
+  width: 100%;
+  .confirmButtonStyle,
+  .cancelButtonStyle {
+    font-size: 14px;
+    padding: 10px 32px;
+    border-radius: 10px;
+    font-weight: 500;
+    transition: 160ms ease;
+  }
+  .confirmButtonStyle {
+    background: #43a047;
+    color: #fff;
+    border: none;
+    &:hover { background: #3a8c3e; transform: translateY(-1px); }
+  }
+  .cancelButtonStyle {
+    background: #fafafa;
+    border: 1px solid #d0d0d0;
+    color: #444;
+    &:hover { background: #f0f0f0; border-color: #bdbdbd; transform: translateY(-1px); }
+  }
+`;
+
+const RedStar = styled.span`
+  color: #e91e63;
+  padding-left: 2px;
+  padding-right: 2px;
+`;
+
+const UploadZone = styled.label`
   border: 1px dashed #c8c8c8;
   border-radius: 10px;
   padding: 16px;
@@ -29,627 +66,311 @@ const LABELIMAGEUPLOAD = styled.label`
   justify-content: center;
   align-items: center;
   transition: 150ms ease;
-
-  &:hover {
-    border-color: #9a9a9a;
-    background: #fafafa;
-  }
+  &:hover { border-color: #9a9a9a; background: #fafafa; }
 `;
 
-const HeaderSection = styled.div`
-  /* border-bottom: 2px solid #c0c0c0;
-  background-color: rgb(225, 223, 223);
-  border-radius: 4px;
-  padding: 10px; */
-    border-bottom: 1px solid #e4e4e4;
-  background-color: #f7f7f7;
-  padding: 12px 16px;
-  border-radius: 10px 10px 0 0;
-
-  button {
-    background: #43a047;
-    border: none;
-    color: #fff;
-    padding: 6px 18px;
-    font-size: 14px;
-    border-radius: 8px;
-    transition: 160ms ease;
-
-    &:hover {
-      background: #3b8b3f;
-      transform: translateY(-1px);
-    }
-  }
-`;
-
-const BOX = styled(Box)`
-   width: 100%;
-   /* width: 180px; */
-  border-radius: 8px;
+const PreviewWrapper = styled.div`
+  position: relative;
+  width: 100%;
+  border-radius: 10px;
   overflow: hidden;
-  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.08);
 `;
 
-const BorderInputBox = styled.div`
- padding: 1.25rem;
-  border: 1px solid rgba(0, 0, 0, 0.05);
-  border-radius: 14px;
-  background: #ffffff;
-  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.06);
-  gap: 1rem;
-`;
-
-const ResponsiveDivInputs = styled.div`
-  width: 100%;
-  @media (max-width: 768px) {
-    width: 100%;
-  }
-`;
-
-const BUTTONSSTYLE = styled.div`
+const RemoveBtn = styled.button`
+  position: absolute;
+  top: 6px;
+  left: 6px;
+  background: rgba(220, 53, 69, 0.85);
+  border: none;
+  border-radius: 50%;
+  width: 30px;
+  height: 30px;
   display: flex;
-  width: 100%;
-
-  .confirmButtonStyle,
-  .cancelButtonStyle {
-    font-size: 14px;
-    padding: 10px 32px;
-    border-radius: 10px;
-    font-weight: 500;
-    transition: 160ms ease;
-  }
-
-  .confirmButtonStyle {
-    background: #43a047;
-    color: #fff;
-    border: none;
-
-    &:hover {
-      background: #3a8c3e;
-      transform: translateY(-1px);
-    }
-  }
-
-  .cancelButtonStyle {
-    background: #fafafa;
-    border: 1px solid #d0d0d0;
-    color: #444;
-
-    &:hover {
-      background: #f0f0f0;
-      border-color: #bdbdbd;
-      transform: translateY(-1px);
-    }
-  }
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  z-index: 10;
+  transition: 150ms ease;
+  padding: 0;
+  &:hover { background: rgba(176, 0, 32, 0.95); transform: scale(1.1); }
+  svg { font-size: 16px; color: #fff; }
 `;
 
-const RedStar = styled.span`
-  color: #e91e63;
-  padding-left: 2px;
-  padding-right: 2px;
-`;
+const UploadIcon = () => (
+  <svg width={21} height={21} viewBox="0 0 18 18" fill="none" xmlns="http://www.w3.org/2000/svg">
+    <path d="M2.25 11.25C2.25 13.3713 2.25 14.432 2.90901 15.091C3.56802 15.75 4.62868 15.75 6.75 15.75H11.25C13.3713 15.75 14.432 15.75 15.091 15.091C15.75 14.432 15.75 13.3713 15.75 11.25" stroke="#404040" strokeLinecap="round" strokeLinejoin="round" />
+    <path d="M9 12V2.25M9 2.25L12 5.53125M9 2.25L6 5.53125" stroke="#404040" strokeLinecap="round" strokeLinejoin="round" />
+  </svg>
+);
 
-
-export default function EditHonors({
-  setUpdateData,
-  editedHonor,
-  handleCancelEdit,
-  setEditedHonor,
-}) {
+export default function EditVideo({ setUpdateData, editedHonor, handleCancelEdit }) {
   const dispatch = useDispatch();
 
-  const [media, setMedia] = useState([
-    { title: "", description: "", src: "", poster: "" },
-  ]);
+  // text fields
+  const [title, setTitle] = useState("");
+  const [description, setDescription] = useState("");
 
-  const [objectUrls, setObjectUrls] = useState({});
-  const [posterObjectUrls, setPosterObjectUrls] = useState({});
+  // video: either a server filename string, a new File object, or null (cleared)
+  const [videoSrc, setVideoSrc] = useState(null);    // string (server) | File | null
+  const [videoPreview, setVideoPreview] = useState(null); // object URL for new file
 
-  // modal state
-  const [openModal, setOpenModal] = useState(false);
-  const [openModal2, setOpenModal2] = useState(false);
-  const [openModal3, setOpenModal3] = useState(false);
-  const [openModal4, setOpenModal4] = useState(false);
-  // Close modal
-  const closeModal = () => setOpenModal(false);
-  const closeModal2 = () => setOpenModal2(false);
-  const closeModal3 = () => setOpenModal3(false);
-  const closeModal4 = () => setOpenModal4(false);
+  // poster: same pattern
+  const [posterSrc, setPosterSrc] = useState(null);
+  const [posterPreview, setPosterPreview] = useState(null);
 
+  const videoInputRef = useRef(null);
+  const posterInputRef = useRef(null);
 
-    const validateForm = () => {
-    // Media
-    for (let m = 0; m < media.length; m++) {
-      const item = media[m];
-      if (!item.title.trim())
-        return { valid: false, message: "عنوان  مدیا را وارد کنید" };
-      if (!item.description.trim())
-        return { valid: false, message: "توضیحات  مدیا را وارد کنید" };
-      if (!item.src)
-        return { valid: false, message: "فایل  مدیا را انتخاب کنید" };
-      if (!item.poster)
-        return { valid: false, message: "پوستر  مدیا را انتخاب کنید" };
-    }
-
-    return { valid: true };
-  };
+  const [openModal, setOpenModal] = useState(false);   // confirm save
+  const [openModal2, setOpenModal2] = useState(false);  // success
+  const [openModal3, setOpenModal3] = useState(false);  // error
 
   useEffect(() => {
-    if (editedHonor) {
-      // Set the media based on the edited honor
-      setMedia([editedHonor.media]); // Wrap editedHonor in an array
+    if (editedHonor?.media) {
+      setTitle(editedHonor.media.title || "");
+      setDescription(editedHonor.media.description || "");
+      setVideoSrc(editedHonor.media.src || null);
+      setPosterSrc(editedHonor.media.poster || null);
+      setVideoPreview(null);
+      setPosterPreview(null);
     }
   }, [editedHonor]);
 
-  const handleFileChange = (e, index, setFunction, state) => {
+  /* ── video handlers ── */
+  const handleVideoChange = (e) => {
     const file = e.target.files[0];
-    const objectUrl = URL.createObjectURL(file);
-
-    const updatedState = state.map((item, i) =>
-      i === index ? { ...item, src: file } : item
-    );
-    setFunction(updatedState);
-    setObjectUrls((prev) => ({
-      ...prev,
-      [index]: objectUrl,
-    }));
+    if (!file) return;
+    if (videoPreview) URL.revokeObjectURL(videoPreview);
+    setVideoSrc(file);
+    setVideoPreview(URL.createObjectURL(file));
+    e.target.value = "";
   };
 
-  const handleFileChangePoster = (e, index, setFunction, state) => {
+  const handleRemoveVideo = () => {
+    if (videoPreview) URL.revokeObjectURL(videoPreview);
+    setVideoSrc(null);
+    setVideoPreview(null);
+    if (videoInputRef.current) videoInputRef.current.value = "";
+  };
+
+  /* ── poster handlers ── */
+  const handlePosterChange = (e) => {
     const file = e.target.files[0];
-    const objectUrl = URL.createObjectURL(file);
-
-    const updatedState = state.map((item, i) =>
-      i === index ? { ...item, poster: file } : item
-    );
-    setFunction(updatedState);
-    setPosterObjectUrls((prev) => ({
-      ...prev,
-      [index]: objectUrl,
-    }));
+    if (!file) return;
+    if (posterPreview) URL.revokeObjectURL(posterPreview);
+    setPosterSrc(file);
+    setPosterPreview(URL.createObjectURL(file));
+    e.target.value = "";
   };
 
-  const handleAddMedia = () => {
-    setMedia([...media, { title: "", description: "", src: "", poster: "" }]);
+  const handleRemovePoster = () => {
+    if (posterPreview) URL.revokeObjectURL(posterPreview);
+    setPosterSrc(null);
+    setPosterPreview(null);
+    if (posterInputRef.current) posterInputRef.current.value = "";
   };
 
-  const handleRemoveMedia = (index) => {
-    setMedia(media.filter((_, i) => i !== index));
+  /* ── validation ── */
+  const validateForm = () => {
+    if (!title.trim()) return { valid: false, message: "عنوان را وارد کنید" };
+    if (!description.trim()) return { valid: false, message: "توضیحات را وارد کنید" };
+    if (!videoSrc) return { valid: false, message: "فایل ویدیو را انتخاب کنید" };
+    if (!posterSrc) return { valid: false, message: "پوستر ویدیو را انتخاب کنید" };
+    return { valid: true };
   };
 
-  const handleDelete = async (e) => {
-    e.preventDefault();
-    setOpenModal4(false);
-    try {
-      const deleteVideo = await dispatch(
-        HomePageVideoDeleted({ code: editedHonor.code })
-      );
-      if (deleteVideo.payload.message === "Success") {
-        setOpenModal2(true);
-        closeModalOnTimeout();
-      } else {
-        setOpenModal3(true);
-      }
-    } catch (error) {
-      console.error("Error deleting product:", error);
-    }
-  };
-
-  const areYouShureFunction = (e) => {
+  const handleSubmitClick = (e) => {
     e.preventDefault();
     const result = validateForm();
-
-    if (!result.valid) {
-      toast.error(result.message);
-      return;
-    }
+    if (!result.valid) { toast.error(result.message); return; }
     setOpenModal(true);
   };
 
-  const areYouShureFunction2 = (e) => {
-    e.preventDefault();
-    setOpenModal4(true);
-  };
-
-  function closeModalOnTimeout() {
-    setTimeout(() => {
-      setOpenModal2(false);
-      handleCancelEdit();
-    }, 3000);
-  }
-
+  /* ── save ── */
   const handleSubmit = async (e) => {
     e.preventDefault();
     setOpenModal(false);
     try {
-      await Promise.all(
-        media.map(async (item) => {
-          let updatedItem = { ...item };
+      let finalSrc = videoSrc;
+      let finalPoster = posterSrc;
 
-          // Upload src (video) if it's a file object
-          if (item.src && typeof item.src === "object") {
-            const tag = "homePageVideo";
-            const type = 2;
-            const isPublic = true;
-            const fileIdSrc = await dispatch(
-              uploadFile({ file: item.src, tag, type, isPublic })
-            ).unwrap();
-            updatedItem.src = fileIdSrc; // Update src with the file ID
-          }
+      // upload new video if file object
+      if (videoSrc instanceof File) {
+        finalSrc = await dispatch(
+          uploadFile({ file: videoSrc, tag: "homePageVideo", type: 2, isPublic: true })
+        ).unwrap();
+      }
 
-          // Upload poster if it's a file object
-          if (item.poster && typeof item.poster === "object") {
-            const tag = "homePageVideoPoster";
-            const type = 1;
-            const isPublic = true;
-            const fileIdPoster = await dispatch(
-              uploadFile({ file: item.poster, tag, type, isPublic })
-            ).unwrap();
-            updatedItem.poster = fileIdPoster; // Update poster with the file ID
-          }
+      // upload new poster if file object
+      if (posterSrc instanceof File) {
+        finalPoster = await dispatch(
+          uploadFile({ file: posterSrc, tag: "homePageVideoPoster", type: 1, isPublic: true })
+        ).unwrap();
+      }
 
-          const finalMedia = {
-            media: updatedItem,
-          };
+      await dispatch(videoEdit({
+        media: { media: { title, description, src: finalSrc, poster: finalPoster } },
+        code: editedHonor.code,
+      }));
 
-          await dispatch(
-            videoEdit({
-              media: finalMedia,
-              code: editedHonor.code,
-            })
-          );
-        })
-      );
+      setUpdateData(true);
       setOpenModal2(true);
-      closeModalOnTimeout();
+      setTimeout(() => { setOpenModal2(false); handleCancelEdit(); }, 3000);
     } catch (error) {
       setOpenModal3(true);
-      console.error("Error creating product:", error);
-    }finally{
-      setUpdateData(true);
+      console.error("Error editing video:", error);
     }
+  };
+
+  /* ── render helpers ── */
+  const renderVideoSlot = () => {
+    // new file selected
+    if (videoPreview) {
+      return (
+        <PreviewWrapper>
+          <BOX component="video" src={videoPreview} controls />
+          <RemoveBtn type="button" onClick={handleRemoveVideo}><DeleteIcon /></RemoveBtn>
+        </PreviewWrapper>
+      );
+    }
+    // existing server file (string)
+    if (videoSrc && typeof videoSrc === "string") {
+      return (
+        <PreviewWrapper>
+          <BOX
+            component="video"
+            src={`${process.env.NEXT_PUBLIC_BACK_END_SERVER}/system/download/${videoSrc}`}
+            controls
+          />
+          <RemoveBtn type="button" onClick={handleRemoveVideo}><DeleteIcon /></RemoveBtn>
+        </PreviewWrapper>
+      );
+    }
+    // empty — show upload zone
+    return (
+      <>
+        <UploadZone htmlFor="editVideoSrc">
+          <div className="d-flex flex-column align-items-center text-center p-1">
+            <UploadIcon />
+            <p className="colorTheInputFile discription mt-1">فیلم mp4</p>
+          </div>
+        </UploadZone>
+        <input
+          ref={videoInputRef}
+          className="d-none"
+          id="editVideoSrc"
+          type="file"
+          accept={`${process.env.NEXT_PUBLIC_INPUT_VIDEO_FORMAT}`}
+          onChange={handleVideoChange}
+        />
+      </>
+    );
+  };
+
+  const renderPosterSlot = () => {
+    if (posterPreview) {
+      return (
+        <PreviewWrapper>
+          <BOX component="img" src={posterPreview} alt="poster" />
+          <RemoveBtn type="button" onClick={handleRemovePoster}><DeleteIcon /></RemoveBtn>
+        </PreviewWrapper>
+      );
+    }
+    if (posterSrc && typeof posterSrc === "string") {
+      return (
+        <PreviewWrapper>
+          <BOX
+            component="img"
+            src={`${process.env.NEXT_PUBLIC_BACK_END_SERVER}/system/download/${posterSrc}`}
+            alt="poster"
+          />
+          <RemoveBtn type="button" onClick={handleRemovePoster}><DeleteIcon /></RemoveBtn>
+        </PreviewWrapper>
+      );
+    }
+    return (
+      <>
+        <UploadZone htmlFor="editVideoPoster">
+          <div className="d-flex flex-column align-items-center text-center p-1">
+            <UploadIcon />
+            <p className="colorTheInputFile discription mt-1">بارگذاری فایل .png یا .jpg</p>
+            <p className="colorTheInputFile discription">حداکثر تا 5 مگابایت</p>
+          </div>
+        </UploadZone>
+        <input
+          ref={posterInputRef}
+          className="d-none"
+          id="editVideoPoster"
+          type="file"
+          accept={`${process.env.NEXT_PUBLIC_INPUT_IMAGE_FORMAT}`}
+          onChange={handlePosterChange}
+        />
+      </>
+    );
   };
 
   return (
     <div className="mt-3 container">
-      <form onSubmit={areYouShureFunction}>
-        <BorderInputBox className="mt-3">
-          <HeaderSection>
-            <div className="d-flex justify-content-end">
-              <button
-                style={{ backgroundColor: "#43A047" }}
-                type="button"
-                onClick={handleAddMedia}
-              >
-                اضافه کردن
-              </button>
-            </div>
-          </HeaderSection>
-          <div className="container">
-            {media.map((item, index) => (
-              <div className="mt-2" key={index}>
-                <div className="d-flex flex-row gap-3 align-items-center">
-                  <div className="w-50">
-                    <div className="d-flex flex-column">
-                      <span className="NormalTextSizing">فیلم <RedStar> *</RedStar>:</span>
-                      {item?.src === "" ? (
-                        <>
-                          <LABELIMAGEUPLOAD htmlFor="MediaVideo">
-                            <div className="d-flex flex-column text-center p-1">
-                              <div>
-                                <svg
-                                  width={21}
-                                  height={21}
-                                  viewBox="0 0 18 18"
-                                  fill="none"
-                                  xmlns="http://www.w3.org/2000/svg"
-                                >
-                                  <path
-                                    d="M2.25 11.25C2.25 13.3713 2.25 14.432 2.90901 15.091C3.56802 15.75 4.62868 15.75 6.75 15.75H11.25C13.3713 15.75 14.432 15.75 15.091 15.091C15.75 14.432 15.75 13.3713 15.75 11.25"
-                                    stroke="#404040"
-                                    strokeLinecap="round"
-                                    strokeLinejoin="round"
-                                  />
-                                  <path
-                                    d="M9 12V2.25M9 2.25L12 5.53125M9 2.25L6 5.53125"
-                                    stroke="#404040"
-                                    strokeLinecap="round"
-                                    strokeLinejoin="round"
-                                  />
-                                </svg>
-                              </div>
+      <form onSubmit={handleSubmitClick}>
+        <BorderInputBox>
+          <div className="d-flex flex-row gap-3 align-items-start">
 
-                              <p className={`colorTheInputFile discription`}>
-                                فیلم mp4
-                              </p>
-                            </div>
-                          </LABELIMAGEUPLOAD>
-                          <input
-                            className="d-none"
-                            id="MediaVideo"
-                            accept={`${process.env.NEXT_PUBLIC_INPUT_VIDEO_FORMAT}`}
-                            type="file"
-                            onChange={(e) =>
-                              handleFileChange(e, index, setMedia, media)
-                            }
-                            
-                          />
-                        </>
-                      ) : (
-                        <>
-                          <div
-                            className="d-flex flex-column"
-                            style={{ width: "fit-content" }}
-                          >
-                            {objectUrls[index] && (
-                              <BOX
-                                // onClick={() => handleOpen(logo)}
-                                component="video"
-                                src={objectUrls[index]}
-                                controls
-                              />
-                            )}
-                            {item.src && !objectUrls[index] && (
-                              <BOX
-                                // onClick={() => handleOpen(logo)}
-                                component="video"
-                                src={`${process.env.NEXT_PUBLIC_BACK_END_SERVER}/system/download/${item.src}`}
-                                controls
-                              />
-                            )}
-                          </div>
-                        </>
-                      )}
-
-                      {/* <div className="d-flex flex-row flex-wrap align-items-center gap-2">
-                  <input
-                    type="file"
-                    onChange={(e) =>
-                      handleFileChange(e, index, setMedia, media)
-                    }
-                  />
-                  {item.src && !objectUrls[index] && (
-                    <Box
-                      component="video"
-                      src={`${process.env.NEXT_PUBLIC_BACK_END_SERVER}/system/download/${item.src}`}
-                      sx={{
-                        width: "140px",
-                        maxHeight: "100%",
-                        borderRadius: "2px",
-                      }}
-                      controls
-                    />
-                  )}
-
-                  {objectUrls[index] && (
-                    <Box
-                      component="video"
-                      src={objectUrls[index]}
-                      sx={{
-                        width: "140px",
-                        maxHeight: "100%",
-                        borderRadius: "2px",
-                      }}
-                      controls
-                    />
-                  )}
-                </div> */}
-                    </div>
-
-                    <div className="d-flex flex-column">
-                      <span className="mt-2 NormalTextSizing">
-                        پوستر فیلم <RedStar> *</RedStar>:
-                      </span>
-                      {item.poster ? (
-                        <>
-                          <div
-                            className="d-flex flex-column"
-                            style={{ width: "fit-content" }}
-                          >
-                            {posterObjectUrls[index] && (
-                              <BOX
-                                // onClick={() => handleOpen(logo)}
-                                component="img"
-                                src={posterObjectUrls[index] || ""}
-                                alt="BlogProductImage"
-                              />
-                            )}
-                            {item.poster && !posterObjectUrls[index] && (
-                              <BOX
-                                component="img"
-                                src={`${process.env.NEXT_PUBLIC_BACK_END_SERVER}/system/download/${item.poster}`}
-                              />
-                            )}
-                          </div>
-                        </>
-                      ) : (
-                        <>
-                          <LABELIMAGEUPLOAD
-                            className="VodeoDisSizing mb-1"
-                            htmlFor="ProductImage"
-                          >
-                            <div className="d-flex flex-column text-center p-1">
-                              <div>
-                                <svg
-                                  width={21}
-                                  height={21}
-                                  viewBox="0 0 18 18"
-                                  fill="none"
-                                  xmlns="http://www.w3.org/2000/svg"
-                                >
-                                  <path
-                                    d="M2.25 11.25C2.25 13.3713 2.25 14.432 2.90901 15.091C3.56802 15.75 4.62868 15.75 6.75 15.75H11.25C13.3713 15.75 14.432 15.75 15.091 15.091C15.75 14.432 15.75 13.3713 15.75 11.25"
-                                    stroke="#404040"
-                                    strokeLinecap="round"
-                                    strokeLinejoin="round"
-                                  />
-                                  <path
-                                    d="M9 12V2.25M9 2.25L12 5.53125M9 2.25L6 5.53125"
-                                    stroke="#404040"
-                                    strokeLinecap="round"
-                                    strokeLinejoin="round"
-                                  />
-                                </svg>
-                              </div>
-                              <p className={`colorTheInputFile discription`}>
-                                بارگذاری فایل .png یا .jpg
-                              </p>
-                            </div>
-                          </LABELIMAGEUPLOAD>
-                          <input
-                            className="d-none"
-                            type="file"
-                            id="ProductImage"
-                            onChange={(e) =>
-                              handleFileChangePoster(e, index, setMedia, media)
-                            }
-                          />
-                        </>
-                      )}
-                      {/* <div className="d-flex flex-row flex-wrap align-items-center gap-2">
-                  <input
-                    type="file"
-                    onChange={(e) =>
-                      handleFileChangePoster(e, index, setMedia, media)
-                    }
-                  />
-                  {item.poster && !posterObjectUrls[index] && (
-                    <Box
-                      component="img"
-                      src={`${process.env.NEXT_PUBLIC_BACK_END_SERVER}/system/download/${item.poster}`}
-                      sx={{
-                        width: "140px",
-                        maxHeight: "100%",
-                        borderRadius: "2px",
-                      }}
-                    />
-                  )}
-
-                  {posterObjectUrls[index] && (
-                    <Box
-                      component="img"
-                      src={posterObjectUrls[index]}
-                      sx={{
-                        width: "140px",
-                        maxHeight: "100%",
-                        borderRadius: "2px",
-                      }}
-                    />
-                  )}
-                </div> */}
-                    </div>
-                  </div>
-                  <div className="d-flex flex-column flex-wrap w-50">
-                    <ResponsiveDivInputs className="d-flex flex-column mt-2">
-                      <label
-                        className="NormalTextSizing"
-                        htmlFor="TypeVideo"
-                        style={{ whiteSpace: "nowrap" }}
-                      >
-                        عنوان <RedStar> *</RedStar>:
-                      </label>
-                      <input
-                        id="TypeVideo"
-                        className="w-100"
-                        type="text"
-                        placeholder="عنوان"
-                        value={item.title} // Use item.title instead of media.title
-                        onChange={(e) =>
-                          setMedia(
-                            media.map((m, i) =>
-                              i === index ? { ...m, title: e.target.value } : m
-                            )
-                          )
-                        }
-                        
-                      />
-                    </ResponsiveDivInputs>
-
-                    <ResponsiveDivInputs className="d-flex flex-column mt-2">
-                      <label
-                        className="NormalTextSizing"
-                        htmlFor="DisVideo"
-                        style={{ whiteSpace: "nowrap" }}
-                      >
-                        توضیحات <RedStar> *</RedStar>:
-                      </label>
-                      <input
-                        id="DisVideo"
-                        className="w-100"
-                        type="text"
-                        placeholder="توضیحات"
-                        value={item.description} // Use item.description instead of media.description
-                        onChange={(e) =>
-                          setMedia(
-                            media.map((m, i) =>
-                              i === index
-                                ? { ...m, description: e.target.value }
-                                : m
-                            )
-                          )
-                        }
-                        
-                      />
-                    </ResponsiveDivInputs>
-                    <BUTTONSSTYLE>
-                      <button
-                        className="mt-2 cancelButtonStyle"
-                        type="button"
-                        onClick={() => handleRemoveMedia(index)}
-                      >
-                        حذف
-                      </button>
-                    </BUTTONSSTYLE>
-                  </div>
-                </div>
+            {/* Left: video + poster */}
+            <div className="w-50">
+              <div className="d-flex flex-column mb-3">
+                <span className="mb-1 NormalTextSizing">فیلم <RedStar>*</RedStar>:</span>
+                {renderVideoSlot()}
               </div>
-            ))}
+
+              <div className="d-flex flex-column">
+                <span className="mb-1 NormalTextSizing">پوستر فیلم <RedStar>*</RedStar>:</span>
+                {renderPosterSlot()}
+              </div>
+            </div>
+
+            {/* Right: title + description */}
+            <div className="w-50 d-flex flex-column gap-3 mt-2">
+              <div className="d-flex flex-column">
+                <label className="NormalTextSizing mb-1" htmlFor="editVideoTitle">
+                  عنوان <RedStar>*</RedStar>:
+                </label>
+                <input
+                  id="editVideoTitle"
+                  className="w-100"
+                  type="text"
+                  placeholder="عنوان"
+                  value={title}
+                  onChange={(e) => setTitle(e.target.value)}
+                />
+              </div>
+              <div className="d-flex flex-column">
+                <label className="NormalTextSizing mb-1" htmlFor="editVideoDesc">
+                  توضیحات <RedStar>*</RedStar>:
+                </label>
+                <input
+                  id="editVideoDesc"
+                  className="w-100"
+                  type="text"
+                  placeholder="توضیحات"
+                  value={description}
+                  onChange={(e) => setDescription(e.target.value)}
+                />
+              </div>
+            </div>
+
           </div>
         </BorderInputBox>
 
-        <BUTTONSSTYLE className="d-flex flex-row">
+        <BUTTONSSTYLE>
           <div className="d-flex flex-row mt-3 mb-3 gap-3 justify-content-around w-100">
-            <button type="submit" className="confirmButtonStyle">
-              ذخیره
-            </button>
-            <button className="cancelButtonStyle" onClick={handleCancelEdit}>
-              انصراف
-            </button>
+            <button type="submit" className="confirmButtonStyle">ذخیره</button>
+            <button type="button" className="cancelButtonStyle" onClick={handleCancelEdit}>انصراف</button>
           </div>
-          {/* <div>
-            <button
-              className="mt-2 mb-2 deleteButtonStyle"
-              type="button"
-              onClick={areYouShureFunction2}
-            >
-              حذف ویدیو
-            </button>
-          </div> */}
         </BUTTONSSTYLE>
 
-        {/* modal  */}
-        <AreYouShureModal
-          open={openModal}
-          onClose={closeModal}
-          text={"ایا از ویرایش ویدیو مطمعن هستید"}
-          func={handleSubmit}
-        />
-        <AreYouShureModal
-          open={openModal4}
-          onClose={closeModal4}
-          text={"ایا از حذف ویدیو مطمعن هستید"}
-          func={handleDelete}
-        />
-        <ConfirmModal
-          open={openModal2}
-          onClose={closeModal2}
-          text={"عملیات با موفقیت انجام شد"}
-        />
-        <ErrorModal
-          open={openModal3}
-          onClose={closeModal3}
-          text={"خطا از لاگین بودن خود اطمینان حاصل فرمایید"}
-        />
+        <AreYouShureModal open={openModal} onClose={() => setOpenModal(false)} text={"آیا از ویرایش ویدیو مطمئن هستید؟"} func={handleSubmit} />
+        <ConfirmModal open={openModal2} onClose={() => setOpenModal2(false)} text={"عملیات با موفقیت انجام شد"} />
+        <ErrorModal open={openModal3} onClose={() => setOpenModal3(false)} text={"خطا در انجام عملیات"} />
       </form>
     </div>
   );
