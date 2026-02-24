@@ -168,6 +168,22 @@ const AddSubItemContainer = styled.div`
   }
 `;
 
+const LinkModeTogglePill = styled.button`
+  padding: 5px 12px;
+  font-size: 13px;
+  border-radius: 20px;
+  border: 1.5px solid #282e3f;
+  color: #282e3f;
+  cursor: pointer;
+  background-color: ${(props) => (props.$active ? "#282e3f" : "transparent")};
+  color: ${(props) => (props.$active ? "#fff" : "#282e3f !important")};
+  transition: background-color 150ms, color 150ms;
+  white-space: nowrap;
+  &:hover {
+    background-color: ${(props) => (props.$active ? "#3a4560" : "#f0f0f0")};
+  }
+`;
+
 /* ------------------ utilities (kept from your original) ------------------ */
 
 const deepClone = (obj) => JSON.parse(JSON.stringify(obj));
@@ -311,10 +327,19 @@ function SortableItem({
 }) {
   // helper to update inline inputs
   const handleInlineChange = (field, value) => {
-    setNewSubItemMap((m) => ({
-      ...m,
-      [item.id]: { ...(m[item.id] || {}), [field]: value },
-    }));
+    setNewSubItemMap((m) => {
+      const current = m[item.id] || {};
+      const updated = { ...current, [field]: value };
+      if (field === "title" && (current.linkMode ?? "auto") === "auto") {
+        const parentLink = item.link || "";
+        const prefix =
+          parentLink && parentLink.startsWith("/") && parentLink !== "/"
+            ? parentLink
+            : "";
+        updated.link = `${prefix}/${value}`;
+      }
+      return { ...m, [item.id]: updated };
+    });
   };
 
   const isAdding = Boolean(newSubItemMap && newSubItemMap[item.id]);
@@ -399,8 +424,30 @@ function SortableItem({
                 name="link"
                 placeholder="لینک ساب ایتم"
                 value={newSubItemMap[item.id]?.link || ""}
+                readOnly={(newSubItemMap[item.id]?.linkMode ?? "auto") === "auto"}
+                style={
+                  (newSubItemMap[item.id]?.linkMode ?? "auto") === "auto"
+                    ? { backgroundColor: "#f5f5f5", color: "#888" }
+                    : {}
+                }
                 onChange={(e) => handleInlineChange("link", e.target.value)}
               />
+              <div className="d-flex flex-row gap-1 align-items-center">
+                <LinkModeTogglePill
+                  type="button"
+                  $active={(newSubItemMap[item.id]?.linkMode ?? "auto") === "auto"}
+                  onClick={() => handleInlineChange("linkMode", "auto")}
+                >
+                  خودکار
+                </LinkModeTogglePill>
+                <LinkModeTogglePill
+                  type="button"
+                  $active={newSubItemMap[item.id]?.linkMode === "manual"}
+                  onClick={() => handleInlineChange("linkMode", "manual")}
+                >
+                  دستی
+                </LinkModeTogglePill>
+              </div>
               <div className="d-flex flex-row align-items-center">
                 <Button
                   type="button"
@@ -517,8 +564,30 @@ function SortableItem({
                 name="link"
                 placeholder="لینک ساب ایتم"
                 value={newSubItemMap[item.id]?.link || ""}
+                readOnly={(newSubItemMap[item.id]?.linkMode ?? "auto") === "auto"}
+                style={
+                  (newSubItemMap[item.id]?.linkMode ?? "auto") === "auto"
+                    ? { backgroundColor: "#f5f5f5", color: "#888" }
+                    : {}
+                }
                 onChange={(e) => handleInlineChange("link", e.target.value)}
               />
+              <div className="d-flex flex-row gap-1 align-items-center">
+                <LinkModeTogglePill
+                  type="button"
+                  $active={(newSubItemMap[item.id]?.linkMode ?? "auto") === "auto"}
+                  onClick={() => handleInlineChange("linkMode", "auto")}
+                >
+                  خودکار
+                </LinkModeTogglePill>
+                <LinkModeTogglePill
+                  type="button"
+                  $active={newSubItemMap[item.id]?.linkMode === "manual"}
+                  onClick={() => handleInlineChange("linkMode", "manual")}
+                >
+                  دستی
+                </LinkModeTogglePill>
+              </div>
               <div className="d-flex flex-row align-items-center">
                 <Button
                   type="button"
@@ -576,6 +645,7 @@ export default function HeaderMainComponent({ toggleShow }) {
 
   const [headerData, setHeaderData] = useState([]);
   const [newItem, setNewItem] = useState({ title: "", link: "", subItems: [] });
+  const [newItemLinkMode, setNewItemLinkMode] = useState("auto");
   const [newSubItem, setNewSubItem] = useState({ title: "", link: "" });
   // we keep newSubItemMap (map parentId -> object) for inline add inputs per item
   const [newSubItemMap, setNewSubItemMap] = useState({});
@@ -585,6 +655,7 @@ export default function HeaderMainComponent({ toggleShow }) {
   const [openModal, setOpenModal] = useState(false);
   const [openModal2, setOpenModal2] = useState(false);
   const [openModal3, setOpenModal3] = useState(false);
+  const [openConfirmSubmit, setOpenConfirmSubmit] = useState(false);
 
   const [selectedPath, setSelectedPath] = useState([]);
 
@@ -609,7 +680,20 @@ export default function HeaderMainComponent({ toggleShow }) {
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
-    setNewItem((prev) => ({ ...prev, [name]: value }));
+    setNewItem((prev) => {
+      const updated = { ...prev, [name]: value };
+      if (name === "title" && newItemLinkMode === "auto") {
+        updated.link = `/${value}`;
+      }
+      return updated;
+    });
+  };
+
+  const handleNewItemLinkModeChange = (mode) => {
+    setNewItemLinkMode(mode);
+    if (mode === "auto") {
+      setNewItem((prev) => ({ ...prev, link: `/${prev.title}` }));
+    }
   };
 
   const handleSubInputChange = (e) => {
@@ -622,9 +706,10 @@ export default function HeaderMainComponent({ toggleShow }) {
 
   const addItem = () => {
     if (newItem.title && newItem.link) {
-      const newHeader = { ...newItem, id: Date.now().toString(), subItems: [] };
+      const newHeader = { ...newItem, id: Date.now(), subItems: [] };
       setHeaderData((prev) => [...prev, newHeader]);
       setNewItem({ title: "", link: "", subItems: [] });
+      setNewItemLinkMode("auto");
     } else {
       setOpenModal2(true);
     }
@@ -659,7 +744,7 @@ export default function HeaderMainComponent({ toggleShow }) {
   const selectHeaderForSubItem = (index) => {
     // show inline input under this header
     const id = headerData[index].id;
-    setNewSubItemMap((m) => ({ ...m, [id]: { title: "", link: "" } }));
+    setNewSubItemMap((m) => ({ ...m, [id]: { title: "", link: "", linkMode: "auto" } }));
     setNewSubItem({ title: "", link: "" });
   };
 
@@ -667,7 +752,7 @@ export default function HeaderMainComponent({ toggleShow }) {
     // show inline input under the sub-item with that path
     const target = getItemByPath(headerData, path);
     if (!target) return;
-    setNewSubItemMap((m) => ({ ...m, [target.id]: { title: "", link: "" } }));
+    setNewSubItemMap((m) => ({ ...m, [target.id]: { title: "", link: "", linkMode: "auto" } }));
     setNewSubItem({ title: "", link: "" });
   };
 
@@ -690,7 +775,7 @@ export default function HeaderMainComponent({ toggleShow }) {
 
       target.subItems.push({
         ...newSubItem,
-        id: Date.now().toString(),
+        id: Date.now(),
         subItems: [],
       });
 
@@ -734,7 +819,7 @@ export default function HeaderMainComponent({ toggleShow }) {
 
     if (!found) return;
     const newNode = {
-      id: Date.now().toString(),
+      id: Date.now(),
       title: payload.title,
       link: payload.link,
       subItems: [],
@@ -963,7 +1048,7 @@ export default function HeaderMainComponent({ toggleShow }) {
                     // show inline input for this subitem
                     setNewSubItemMap((m) => ({
                       ...m,
-                      [subItem.id]: { title: "", link: "" },
+                      [subItem.id]: { title: "", link: "", linkMode: "auto" },
                     }));
                   }}
                   onRemove={() => openRemoveModal(curPath, false)}
@@ -1016,8 +1101,27 @@ export default function HeaderMainComponent({ toggleShow }) {
               name="link"
               placeholder="لینک هدر"
               value={newItem.link}
+              readOnly={newItemLinkMode === "auto"}
+              style={newItemLinkMode === "auto" ? { backgroundColor: "#f5f5f5", color: "#888" } : {}}
               onChange={handleInputChange}
             />
+          </div>
+
+          <div className="d-flex flex-row gap-1 align-items-center" style={{ margin: "0 8px" }}>
+            <LinkModeTogglePill
+              type="button"
+              $active={newItemLinkMode === "auto"}
+              onClick={() => handleNewItemLinkModeChange("auto")}
+            >
+              لینک خودکار
+            </LinkModeTogglePill>
+            <LinkModeTogglePill
+              type="button"
+              $active={newItemLinkMode === "manual"}
+              onClick={() => handleNewItemLinkModeChange("manual")}
+            >
+              دستی
+            </LinkModeTogglePill>
           </div>
 
           <Button
@@ -1065,7 +1169,7 @@ export default function HeaderMainComponent({ toggleShow }) {
                             // show inline input for top-level header
                             setNewSubItemMap((m) => ({
                               ...m,
-                              [item.id]: { title: "", link: "" },
+                              [item.id]: { title: "", link: "", linkMode: "auto" },
                             }));
                           }}
                           onRemove={() => openRemoveModal([index], true)}
@@ -1095,7 +1199,7 @@ export default function HeaderMainComponent({ toggleShow }) {
         <Button
           type="button"
           $secondary
-          onClick={submitHeaderData}
+          onClick={() => setOpenConfirmSubmit(true)}
           style={{ marginTop: "20px" }}
         >
           تایید هدر
@@ -1106,6 +1210,13 @@ export default function HeaderMainComponent({ toggleShow }) {
           onClose={closeModalHandler}
           func={confirmRemove}
           text={`از حذف ${isRemovingHeader ? "هدر" : "ساب ایتم"} مطمئن هستید؟`}
+        />
+
+        <AreYouShureModal
+          open={openConfirmSubmit}
+          onClose={() => setOpenConfirmSubmit(false)}
+          func={() => { submitHeaderData(); setOpenConfirmSubmit(false); }}
+          text="از ذخیره تغییرات هدر مطمئن هستید؟"
         />
 
         <ErrorModal
