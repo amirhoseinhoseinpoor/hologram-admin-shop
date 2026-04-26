@@ -55,8 +55,6 @@ export default function SteponeComponent({
   const [bothFactor, setBothFactor] = useState(null);
   const [loading, setLoading] = useState(false);
 
-  console.log(finalFactor);
-
   const [formData, setFormData] = useState({
     feature: "",
     color: "",
@@ -77,9 +75,6 @@ export default function SteponeComponent({
   const [dynamicForm, setDynamicForm] = useState({});
   const [prodFiled, setProdFiled] = useState([]);
   const [hasDynamicFields, setHasDynamicFields] = useState(false);
-
-  console.log(dynamicForm);
-  console.log(prodFiled);
 
   useEffect(() => {
     if (step > 1) {

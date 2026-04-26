@@ -35,10 +35,8 @@ export const login = createAsyncThunk(
         }
       );
 
-      console.log(token);
-      
 
-      // console.log(gettingRole.data);
+
 
       return {
         token,
@@ -165,7 +163,7 @@ export const deleteRole = createAsyncThunk(
   async ({id}, thunkAPI) => {
     const state = thunkAPI.getState();
     const token = state.auth.token.token;
-    console.log(id);
+
     
 
     try {
@@ -221,7 +219,6 @@ export const addUser = createAsyncThunk(
         }
       );
       const signUpSattus = response.data.message;
-      console.log(signUpSattus);
       return signUpSattus;
     } catch (error) {
       if (error.response && error.response.status === 400) {
@@ -272,7 +269,6 @@ export const editUser = createAsyncThunk(
     { code, firstName, lastName, username, active, domain, roleIds },
     thunkAPI
   ) => {
-    console.log(roleIds);
 
     const state = thunkAPI.getState();
     const token = state.auth.token.token;
@@ -382,12 +378,12 @@ export const uploadFile = createAsyncThunk(
     const token = state.auth.token.token;
 
     try {
-      // Create a FormData object
       const formData = new FormData();
-      formData.append("files", file);
       formData.append("tag", tag);
-      formData.append("type", type);
-      formData.append("isPublic", isPublic);
+      formData.append("type", String(type));  // Convert to string
+      formData.append("isPublic", String(isPublic));  // Convert to string
+      formData.append("files", file);
+
 
       const response = await axios.post(
         `${process.env.NEXT_PUBLIC_BACK_END_SERVER}/system/upload`,
@@ -395,13 +391,13 @@ export const uploadFile = createAsyncThunk(
         {
           headers: {
             Authorization: token ? `Bearer ${token}` : "",
-            "Content-Type": "multipart/form-data",
           },
         }
       );
 
       return response.data[0].fileName;
     } catch (error) {
+      console.error("Upload error:", error.response?.data || error.message);
       if (error.response && error.response.status === 400) {
         return thunkAPI.rejectWithValue("ارور سمت من");
       } else {
@@ -589,10 +585,6 @@ export const deleted = createAsyncThunk(
       );
 
       const listOfDelete = response2.data;
-
-      console.log(listOfDelete);
-      
-
       listOfDelete.map((item) => {
         const responseDelete = axios.delete(
           `${process.env.NEXT_PUBLIC_BACK_END_SERVER}/system/download/${item.fileName}`,
@@ -612,9 +604,6 @@ export const deleted = createAsyncThunk(
           },
         }
       );
-
-      console.log(responseDelete);
-      
 
       const response = await axios.delete(
         `${process.env.NEXT_PUBLIC_BACK_END_SERVER}/product/${code}`,
@@ -741,7 +730,6 @@ export const HomePageVideoDeleted = createAsyncThunk(
         }
       );
       const data = response.data;
-      console.log(data);
 
       return data;
     } catch (error) {
@@ -1091,7 +1079,6 @@ export const bannerDeleted = createAsyncThunk(
         }
       );
       const data = response.data;
-      console.log(data);
 
       return data;
     } catch (error) {

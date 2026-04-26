@@ -366,7 +366,7 @@ export default function EditHonors({
 
   const handleImageUpload = async (blobInfo, success, failure) => {
     const file = blobInfo.blob();
-    const tag = "editorImageBlogs";
+    const tag = "blogMainSrc";
     const type = 1;
     const isPublic = true;
 
@@ -414,7 +414,7 @@ export default function EditHonors({
 
   const handleProductSrcChange = async (event) => {
     const file = event.target.files[0]; // Get the selected file
-    const tag = "blogProductSrc";
+    const tag = "blogMainSrc";
     const type = 1; // Adjust based on your backend logic
     const isPublic = true;
 

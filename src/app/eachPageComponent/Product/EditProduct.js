@@ -356,7 +356,7 @@ export default function EditHonors({
   setEditedHonor,
   setDataUpdated,
 }) {
-  // console.log(editedHonor);
+
 
   const dispatch = useDispatch();
 
@@ -365,14 +365,14 @@ export default function EditHonors({
   const [availableItems, setAvailableItems] = useState([]);
   const [usedNavIds, setUsedNavIds] = useState([]);
 
-  // console.log(editedHonor);
+
 
   const [name, setName] = useState("");
   const [title, setTitle] = useState("");
   const [subtitle, setSubtitle] = useState("");
   const [subtitleCompelete, setSubtitleCompelete] = useState("");
   const [imgData, setImgData] = useState([{ src: "", type: "1", poster: "" }]);
-  console.log(imgData);
+
 
   const [media, setMedia] = useState([
     { title: "", description: "", src: "", poster: "" },
@@ -688,40 +688,6 @@ export default function EditHonors({
     return { valid: true };
   };
 
-  // useEffect(() => {
-  //   const isFilled =
-  //     name.trim() !== "" &&
-  //     title.trim() !== "" &&
-  //     subtitle.trim() !== "" &&
-  //     subtitleCompelete.trim() !== "" &&
-  //     dynamicSections.length > 0 &&
-  //     imgData.some((img) => img.src !== "") &&
-  //     media.some(
-  //       (item) =>
-  //         item.title.trim() !== "" &&
-  //         item.description.trim() !== "" &&
-  //         item.src !== "" &&
-  //         item.poster !== ""
-  //     ) &&
-  //     filedOrder.some(
-  //       (item) =>
-  //         item.name.trim() !== "" &&
-  //         item.type.trim() !== "" &&
-  //         item?.dropDownOP?.length > 0
-  //     );
-
-  //   // Update the disableConfirm state based on the check
-  //   setDisableConfirm(!isFilled);
-  // }, [
-  //   name,
-  //   title,
-  //   subtitle,
-  //   subtitleCompelete,
-  //   dynamicSections,
-  //   imgData,
-  //   media,
-  //   filedOrder,
-  // ]);
 
   useEffect(() => {
     return () => {
@@ -1118,7 +1084,7 @@ export default function EditHonors({
         filedOrder,
       };
 
-      // console.log(productData);
+   
 
       // Dispatch the final product submission
       const dataConfirmComing = await dispatch(

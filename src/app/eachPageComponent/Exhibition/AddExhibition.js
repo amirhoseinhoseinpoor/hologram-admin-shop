@@ -143,7 +143,7 @@ export default function AddHonors({ setActiveKey, setUpdateData }) {
 
   const handleImageUpload = async (blobInfo, success, failure) => {
     const file = blobInfo.blob(); // Get the image blob from TinyMCE
-    const tag = "editorImageExhibition";
+    const tag = "exhibitionMainImage";
     const type = 1; // Adjust based on your backend logic
     const isPublic = true;
 
@@ -171,7 +171,7 @@ export default function AddHonors({ setActiveKey, setUpdateData }) {
   // Handle file input change
   const handleBannerImageUpload = async (event) => {
     const file = event.target.files[0]; // Get the selected file
-    const tag = "bannerImage";
+    const tag = "exhibitionMainImage";
     const type = 1; // Adjust based on your backend logic
     const isPublic = true;
 

@@ -171,6 +171,7 @@ export default function HonorsMainComponent({ toggleShow }) {
     setOpenModal4(false);
     try {
       const deleteVideo = await dispatch(bannerDeleted({ code: indexDeleted }));
+      
       if (deleteVideo.payload.message === "Success") {
         setUpdateData(true);
         setOpenModal2(true);

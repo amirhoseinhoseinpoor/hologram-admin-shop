@@ -165,8 +165,6 @@ export default function HonorsMainComponent({ toggleShow }) {
   const [trackLoadingProduct, setTrackLoadingProduct] = useState(false);
   const [searchTerm, setSearchTerm] = useState("");
   const [filteredOrders, setFilteredOrders] = useState([]);
-
-  console.log(filteredOrders);
   
 
   const [currentPage, setCurrentPage] = useState(1);
@@ -184,8 +182,6 @@ export default function HonorsMainComponent({ toggleShow }) {
   const closeModal3 = () => setOpenModal3(false);
 
   const datacome = useSelector(productListData);
-
-  // console.log(datacome);
 
   const normalizeString = (str) => str.replace(/\s+/g, "").toLowerCase();
 

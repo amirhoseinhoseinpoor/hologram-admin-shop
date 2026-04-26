@@ -28,6 +28,7 @@ import EmptyState from "@/app/BaseComponent/EmptyState";
 import { useDispatch } from "react-redux";
 import { exhibitionList } from "@/app/Store/thunks";
 import { formatPersianDate } from "@/app/utils/persionDateUtils";
+import { exhibitionDeleted } from "@/app/Store/thunks";
 
 const HeadermakeOrder = styled.div`
   padding: 10px;

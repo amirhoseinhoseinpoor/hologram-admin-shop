@@ -54,7 +54,6 @@ export default function StepTwoComponent({
   const [isZoomModalOpen, setIsZoomModalOpen] = useState(false);
   const [loading, setLoading] = useState(false);
   const [loadingDocConfirm, setLoadingDocConfirm] = useState([]);
-  console.log(loadingDocConfirm);
 
   const [loadingDocReject, setLoadingDocReject] = useState([]);
   const [imageUrls, setImageUrls] = useState({});

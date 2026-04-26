@@ -180,7 +180,7 @@ export default function EditHonors({
 
   const handleImageUpload = async (blobInfo, success, failure) => {
     const file = blobInfo.blob();
-    const tag = "editorImageHonors";
+    const tag = "honorImage";
     const type = 1;
     const isPublic = true;
 

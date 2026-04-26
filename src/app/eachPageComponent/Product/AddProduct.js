@@ -319,7 +319,6 @@ export default function AddHonors({ setDataUpdated, setActiveKey }) {
     { type: "text", name: "", dropDownOP: [] },
   ]);
 
-  console.log(filedOrder);
 
   const [headerCome, setHeaderCome] = useState([]);
   const [availableItems, setAvailableItems] = useState([]);
