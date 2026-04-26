@@ -537,76 +537,7 @@ export default function AddHonors({ setDataUpdated, setActiveKey }) {
     return { valid: true };
   };
 
-  // useEffect(() => {
-  //   const isDynamicSectionsValid = dynamicSections.every((section) => {
-  //     // Section name must be filled
-  //     if (!section.sectionName || section.sectionName.trim() === "")
-  //       return false;
-
-  //     // If section type is text → all names must be filled
-  //     if (section.type === "text") {
-  //       return section.items.every(
-  //         (item) => item.name && item.name.trim() !== ""
-  //       );
-  //     }
-
-  //     // If section type is image → name + src must be filled
-  //     if (section.type === "image") {
-  //       return section.items.every(
-  //         (item) =>
-  //           item.name && item.name.trim() !== "" && item.src && item.src !== ""
-  //       );
-  //     }
-
-  //     return false; // safety
-  //   });
-
-  //   const isFiledOrderValid = filedOrder.every((field) => {
-  //     if (!field.name || field.name.trim() === "") return false;
-
-  //     if (field.type === "text") {
-  //       return true;
-  //     }
-
-  //     if (field.type === "dropDown") {
-  //       return (
-  //         Array.isArray(field.dropDownOP) &&
-  //         field.dropDownOP.length > 0 &&
-  //         field.dropDownOP.every((op) => op.text && op.text.trim() !== "")
-  //       );
-  //     }
-
-  //     return false;
-  //   });
-
-  //   const isFilled =
-  //     name.trim() !== "" &&
-  //     title.trim() !== "" &&
-  //     subtitle.trim() !== "" &&
-  //     subtitleCompelete.trim() !== "" &&
-  //     isDynamicSectionsValid &&
-  //     imgData.some((img) => img.src !== "") &&
-  //     media.some(
-  //       (item) =>
-  //         item.title.trim() !== "" &&
-  //         item.description.trim() !== "" &&
-  //         item.src !== "" &&
-  //         item.poster !== ""
-  //     ) &&
-  //     isFiledOrderValid;
-
-  //   // Update the disableConfirm state based on the check
-  //   setDisableConfirm(!isFilled);
-  // }, [
-  //   name,
-  //   title,
-  //   subtitle,
-  //   subtitleCompelete,
-  //   dynamicSections,
-  //   imgData,
-  //   media,
-  //   filedOrder,
-  // ]);
+ 
 
   const handleAddSectionForm = (e) => {
     e.preventDefault();
