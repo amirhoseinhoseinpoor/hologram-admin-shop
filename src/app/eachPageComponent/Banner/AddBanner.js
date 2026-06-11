@@ -151,8 +151,8 @@ export default function AddHonors({ setActiveKey, setUpdateData }) {
 
   const validateForm = () => {
     // Main fields
-    if (!bannerTitle.trim())
-      return { valid: false, message: "لطفا عنوان را وارد کنید" };
+    // if (!bannerTitle.trim())
+    //   return { valid: false, message: "لطفا عنوان را وارد کنید" };
     if (!bannerImage)
       return { valid: false, message: "لطفا یک عکس انتخاب کنید" };
 
@@ -184,7 +184,7 @@ export default function AddHonors({ setActiveKey, setUpdateData }) {
 
     // Construct the data to be sent to the backend
     const formData = {
-      title: bannerTitle,
+      title: bannerTitle || "",
       src: bannerImage,
       link: bannerLink,
     };
@@ -214,7 +214,7 @@ export default function AddHonors({ setActiveKey, setUpdateData }) {
                 htmlFor="bannerTitle"
                 style={{ whiteSpace: "nowrap" }}
               >
-                عنوان: <RedStar> *</RedStar>
+                عنوان: 
               </label>
               <input
                 className="w-100"

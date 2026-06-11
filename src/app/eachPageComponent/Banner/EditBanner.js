@@ -145,8 +145,8 @@ export default function EditHonors({
 
   const validateForm = () => {
     // Main fields
-    if (!bannerTitle.trim())
-      return { valid: false, message: "لطفا عنوان را وارد کنید" };
+    // if (!bannerTitle.trim())
+    //   return { valid: false, message: "لطفا عنوان را وارد کنید" };
     if (!bannerImage)
       return { valid: false, message: "لطفا یک عکس انتخاب کنید" };
 
@@ -234,7 +234,7 @@ export default function EditHonors({
     setOpenModal(false);
 
     const formData = {
-      title: bannerTitle,
+      title: bannerTitle || "",
       src: bannerImage,
       link: bannerLink,
     };
@@ -258,7 +258,7 @@ export default function EditHonors({
         <MainDivSection className="container">
           <ResponsiveDivInputs className="d-flex flex-row gap-2 align-items-center">
             <p style={{ whiteSpace: "nowrap" }} className="seeOrderFont">
-              عنوان <RedStar> *</RedStar>:
+              عنوان :
             </p>
             <TEXTFIELD
               label="عنوان"
