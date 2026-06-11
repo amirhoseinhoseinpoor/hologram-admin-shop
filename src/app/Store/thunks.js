@@ -454,7 +454,7 @@ export const productpot = createAsyncThunk(
         {
           headers: {
             Authorization: token ? `Bearer ${token}` : "",
-            "Content-Type": "application/json",
+            
           },
         }
       );
@@ -484,7 +484,7 @@ export const productEdit = createAsyncThunk(
         {
           headers: {
             Authorization: token ? `Bearer ${token}` : "",
-            "Content-Type": "application/json",
+            
           },
         }
       );
@@ -665,7 +665,7 @@ export const videopot = createAsyncThunk(
         {
           headers: {
             Authorization: token ? `Bearer ${token}` : "",
-            "Content-Type": "application/json",
+            
           },
         }
       );
@@ -695,7 +695,7 @@ export const videoEdit = createAsyncThunk(
         {
           headers: {
             Authorization: token ? `Bearer ${token}` : "",
-            "Content-Type": "application/json",
+            
           },
         }
       );
@@ -782,7 +782,7 @@ export const honorspot = createAsyncThunk(
         {
           headers: {
             Authorization: token ? `Bearer ${token}` : "",
-            "Content-Type": "application/json",
+            
           },
         }
       );
@@ -812,7 +812,7 @@ export const honorsEdit = createAsyncThunk(
         {
           headers: {
             Authorization: token ? `Bearer ${token}` : "",
-            "Content-Type": "application/json",
+            
           },
         }
       );
@@ -897,7 +897,7 @@ export const exhibitionpot = createAsyncThunk(
         {
           headers: {
             Authorization: token ? `Bearer ${token}` : "",
-            "Content-Type": "application/json",
+            
           },
         }
       );
@@ -927,7 +927,7 @@ export const exhibitionEdit = createAsyncThunk(
         {
           headers: {
             Authorization: token ? `Bearer ${token}` : "",
-            "Content-Type": "application/json",
+            
           },
         }
       );
@@ -1014,7 +1014,7 @@ export const bannerpot = createAsyncThunk(
         {
           headers: {
             Authorization: token ? `Bearer ${token}` : "",
-            "Content-Type": "application/json",
+            
           },
         }
       );
@@ -1044,7 +1044,7 @@ export const bannerEdit = createAsyncThunk(
         {
           headers: {
             Authorization: token ? `Bearer ${token}` : "",
-            "Content-Type": "application/json",
+            
           },
         }
       );
@@ -1130,7 +1130,7 @@ export const headerEdit = createAsyncThunk(
         {
           headers: {
             Authorization: token ? `Bearer ${token}` : "",
-            "Content-Type": "application/json",
+            
           },
         }
       );
@@ -1186,7 +1186,7 @@ export const blogspot = createAsyncThunk(
         {
           headers: {
             Authorization: token ? `Bearer ${token}` : "",
-            "Content-Type": "application/json",
+            
           },
         }
       );
@@ -1216,7 +1216,7 @@ export const blogsEdit = createAsyncThunk(
         {
           headers: {
             Authorization: token ? `Bearer ${token}` : "",
-            "Content-Type": "application/json",
+            
           },
         }
       );
