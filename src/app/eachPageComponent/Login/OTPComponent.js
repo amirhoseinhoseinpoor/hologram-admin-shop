@@ -10,8 +10,9 @@ export default function OTPInput({
   onVerifyOtp,
   resendOtp,
   setIsOtpSent,
+  otpResetKey,
 }) {
-  const [otp, setOtp] = useState(["", "", "", ""]); // Array for 4-digit OTP
+  const [otp, setOtp] = useState(["", "", "", "", "", ""]);
   const [timer, setTimer] = useState(120); // Timer set for 2 minutes (120 seconds)
   const inputRefs = useRef([]); // Array of refs for input elements
   const [isButtonDisabled, setIsButtonDisabled] = useState(true);
@@ -21,11 +22,25 @@ export default function OTPInput({
     setIsButtonDisabled(otp.some((d) => d === ""));
   }, [otp]);
 
+  useEffect(() => {
+    setTimer(120);
+  }, [otpResetKey]);
+
   const handleKeyDown = (index, e) => {
     // If Backspace pressed on an empty field, move to previous
     if (e.key === "Backspace" && otp[index] === "" && index > 0) {
       e.preventDefault();
       inputRefs.current[index - 1].focus();
+    }
+  };
+
+  const handleResend = async () => {
+    const success = await resendOtp();
+
+    if (success) {
+      setTimer(120);
+      setOtp(["", "", "", ""]);
+      inputRefs.current[0]?.focus();
     }
   };
 
@@ -103,7 +118,6 @@ export default function OTPInput({
               key={index}
               type="text"
               inputMode="numeric"
-              
               onChange={(e) => handleChange(index, e.target.value)}
               onKeyDown={(e) => handleKeyDown(index, e)}
               maxLength="1"
@@ -130,7 +144,7 @@ export default function OTPInput({
               <button
                 type="button"
                 className={`${style.resendButton} QASize`}
-                onClick={resendOtp}
+                onClick={handleResend}
               >
                 تلاش مجدد
               </button>

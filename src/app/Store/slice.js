@@ -2,6 +2,8 @@ import { createSlice } from "@reduxjs/toolkit";
 import {
   login,
   logout,
+  sendAdminLoginOtp,
+  verifyAdminLoginOtp,
   Adduser,
   list,
   homePageVideo,
@@ -21,6 +23,11 @@ const authinitialState = {
   email: null,
   gender: null,
   permissions: null,
+
+  // OTP login
+  otpSent: false,
+  otpUsername: null,
+
   signUpSattus: null,
   loading: false,
   error: null,
@@ -46,13 +53,35 @@ const authSlice = createSlice({
   },
   extraReducers: (builder) => {
     builder
-      .addCase(login.pending, (state) => {
+      .addCase(sendAdminLoginOtp.pending, (state) => {
         state.loading = true;
         state.error = null;
       })
-      .addCase(login.fulfilled, (state, action) => {
+
+      .addCase(sendAdminLoginOtp.fulfilled, (state, action) => {
         state.loading = false;
-        state.token = action.payload;
+        state.error = null;
+
+        state.otpSent = true;
+        state.otpUsername = action.payload.username;
+      })
+
+      .addCase(sendAdminLoginOtp.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.payload || action.error.message;
+      })
+
+      .addCase(verifyAdminLoginOtp.pending, (state) => {
+        state.loading = true;
+        state.error = null;
+      })
+
+      .addCase(verifyAdminLoginOtp.fulfilled, (state, action) => {
+        state.loading = false;
+        state.error = null;
+
+        state.token = action.payload.token;
+
         state.firstName = action.payload.firstName;
         state.lastName = action.payload.lastName;
         state.phoneNumber = action.payload.phoneNumber;
@@ -60,10 +89,14 @@ const authSlice = createSlice({
         state.gender = action.payload.gender;
         state.permissions = action.payload.permissions;
         state.email = action.payload.email;
+
+        state.otpSent = false;
+        state.otpUsername = null;
       })
-      .addCase(login.rejected, (state, action) => {
+
+      .addCase(verifyAdminLoginOtp.rejected, (state, action) => {
         state.loading = false;
-        state.error = action.error.message;
+        state.error = action.payload || action.error.message;
       })
       .addCase(logout.pending, (state) => {
         state.loading = true;
@@ -73,9 +106,9 @@ const authSlice = createSlice({
         state.loading = false;
         state.token = null;
       })
-      .addCase(logout.rejected, (state) => {
+      .addCase(logout.rejected, (state, action) => {
         state.loading = false;
-        state.error = action.payload || "Login failed";
+        state.error = action.payload || "Logout failed";
       });
   },
 });
@@ -92,6 +125,8 @@ export const permissions = (state) => state.auth.permissions;
 export const { resetToken } = authSlice.actions;
 export const { setUserData } = authSlice.actions;
 export const signUpSattus = (state) => state.auth.signUpSattus;
+export const otpSent = (state) => state.auth.otpSent;
+export const otpUsername = (state) => state.auth.otpUsername;
 export const loading = (state) => state.auth.loading;
 export const error = (state) => state.auth.error;
 
