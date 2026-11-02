@@ -1,6 +1,9 @@
 "use client";
 
-import React, { useState, useEffect } from "react";
+import { PrimaryButton } from "@/app/BaseComponent/Buttons";
+import { SearchInputMainDiv } from "@/app/BaseComponent/SearchField";
+import { HeadermakeOrder } from "@/app/BaseComponent/PageHeader";
+import { useState, useEffect } from "react";
 
 import AddProduct from "./AddProduct";
 import EditProduct from "./EditProduct";
@@ -14,11 +17,10 @@ import Pagination from "@/app/BaseComponent/Pagination";
 import EmptyState from "@/app/BaseComponent/EmptyState";
 //redux import
 import { useSelector, useDispatch } from "react-redux";
-import { list } from "../../Store/thunks.js";
+import { list, deleted } from "../../Store/thunks.js";
 import { productListData } from "@/app/Store/slice";
-import { deleted } from "../../Store/thunks.js";
 // improt styles
-import { Card, CardMedia, Typography, Skeleton } from "@mui/material";
+import { Card, CardMedia, Skeleton } from "@mui/material";
 import MoreHorizIcon from "@mui/icons-material/MoreHoriz";
 import DeleteIcon from "@mui/icons-material/Delete";
 import EditIcon from "@mui/icons-material/Edit";
@@ -29,12 +31,12 @@ import SearchIcon from "@mui/icons-material/Search";
 
 const NavDropDown = styled(NavDropdown)`
   .dropdown-menu {
-    border: 1px solid gray;
+    border: 1px solid var(--c-border);
     width: 150px;
     padding: 12px;
     margin-top: 3px;
     border-radius: 4px;
-    box-shadow: 1px 1px 5px gray;
+    box-shadow: var(--shadow-md);
   }
   .dropdown-toggle::after {
     display: none;
@@ -49,51 +51,22 @@ const NavBarInsideDiv = styled.div`
   /* border-bottom: 1.4px solid #e1e5ea; */
 `;
 
-const HeadermakeOrder = styled.div`
-  padding: 10px;
-  color: white;
-  background-color: rgb(225, 223, 223);
-  border-radius: 4px;
-  margin: 7px 15px;
-  .textHeaderStyle {
-    color: black;
-  }
-  @media (max-width: 980px) {
-    .textHeaderStyle {
-      color: black;
-    }
-  }
-`;
-
-const SearchInputMainDiv = styled.div`
-  width: 50%;
-  .inputSreachStyle {
-    font-size: 15px;
-    width: 100%;
-    padding: 4px;
-  }
-  .SearchIconStyle {
-    position: absolute;
-    transform: translate(50%, -50%);
-    left: 0;
-    top: 50%;
-  }
-`;
-
 const FixTablePlace = styled.div`
   position: relative;
-  margin-top: 60px;
+  overflow: hidden;
+  background: var(--c-surface);
+  border: 1px solid var(--c-border);
+  border-radius: var(--r-md);
+  box-shadow: var(--shadow-sm);
   .fixingTabel {
-    position: absolute;
-    transform: translate(-50%, 50%);
-    left: 50%;
-    width: 94%;
-    top: -55px;
-    border-radius: 10px;
-    padding: 18px 12px;
-    background-image: linear-gradient(195deg, #46506a 0%, #282e3f 100%);
-    color: white;
-  }
+      padding: 16px 20px;
+      margin: 0 !important;
+      font-size: 15px;
+      font-weight: 600;
+      color: var(--c-ink);
+      background-color: var(--c-surface);
+      border-bottom: 1px solid var(--c-border);
+    }
 `;
 
 const StyledTable = styled.table`
@@ -114,8 +87,7 @@ const StyledTable = styled.table`
     vertical-align: middle;
   }
   th {
-    background-color: #f2f2f2;
-    padding-top: 55px;
+    background-color: #f9fafb;
   }
 `;
 
@@ -133,27 +105,7 @@ const ImageWrapper = styled(CardMedia)`
   object-fit: cover;
 `;
 
-const CARD = styled(Card)`
-  background-color: white !important;
-  color: black !important;
-  border: 1px solid #ddd;
-  box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
-  display: flex;
-  flex-direction: column;
-  .MuiCardContent-root {
-    .titleHonors {
-      font-size: 20px;
-      font-weight: 500;
-    }
-  }
-  .css-46bh2p-MuiCardContent-root:last-child {
-    padding-bottom: 10px;
-  }
-`;
-
-const ButtonColor = styled.button`
-  background-image: linear-gradient(195deg, #66bb6a 0%, #43a047 100%);
-`;
+const ButtonColor = PrimaryButton;
 
 export default function HonorsMainComponent({ toggleShow }) {
   const dispatch = useDispatch();
@@ -162,10 +114,9 @@ export default function HonorsMainComponent({ toggleShow }) {
   const [activekey, setActiveKey] = useState("editUserPage");
 
   const [dataUpdated, setDataUpdated] = useState(false);
-  const [trackLoadingProduct, setTrackLoadingProduct] = useState(false);
+  const [trackLoadingProduct] = useState(false);
   const [searchTerm, setSearchTerm] = useState("");
   const [filteredOrders, setFilteredOrders] = useState([]);
-  
 
   const [currentPage, setCurrentPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
@@ -200,10 +151,6 @@ export default function HonorsMainComponent({ toggleShow }) {
   useEffect(() => {
     fetchData(currentPage);
   }, [dataUpdated, currentPage, dispatch]);
-
-  const handleEditProduct = (product) => {
-    setEditedHonor(product);
-  };
 
   const handleCancelEdit = () => {
     setEditedHonor(null);
@@ -245,7 +192,7 @@ export default function HonorsMainComponent({ toggleShow }) {
     setOpenModal(false);
     try {
       const deleteProduct = await dispatch(
-        deleted({ code: dataForDelete.code, name: dataForDelete.name })
+        deleted({ code: dataForDelete.code, name: dataForDelete.name }),
       );
 
       if (deleteProduct.payload.message === "Success") {
@@ -299,7 +246,7 @@ export default function HonorsMainComponent({ toggleShow }) {
             </>
           )}
         </div>
-        <ProfileComponent colorGet={"#282e3f"} />
+        <ProfileComponent />
       </HeadermakeOrder>
 
       <div className="d-flex justify-content-end ms-3">
@@ -318,27 +265,12 @@ export default function HonorsMainComponent({ toggleShow }) {
                 <SearchIcon className="SearchIconStyle" />
               </SearchInputMainDiv>
               <ButtonColor onClick={() => setActiveKey("addUser")}>
+                <AddIcon />
                 افزودن محصول
               </ButtonColor>
             </div>
           </>
         )}
-        {/* {activekey === "addUser" && !editedHonor && (
-          <>
-            <div>
-              <ButtonColor onClick={() => setActiveKey("editUserPage")}>
-                ویرایش محصولات
-              </ButtonColor>
-            </div>
-          </>
-        )} */}
-        {/* {editedHonor && (
-          <>
-            <div>
-              <ButtonColor onClick={handleCancelEdit}>محصولات</ButtonColor>
-            </div>
-          </>
-        )} */}
       </div>
 
       {activekey === "editUserPage" && !editedHonor && (
@@ -375,7 +307,9 @@ export default function HonorsMainComponent({ toggleShow }) {
                           filteredOrders?.map((product, index) => (
                             <tr key={index}>
                               <td>
-                                {product && product.info?.imgData?.[0]?.src && product.info?.imgData?.[0]?.type == 1  ? (
+                                {product &&
+                                product.info?.imgData?.[0]?.src &&
+                                product.info?.imgData?.[0]?.type == 1 ? (
                                   <ProductCard>
                                     <ImageWrapper
                                       component="img"
@@ -395,7 +329,7 @@ export default function HonorsMainComponent({ toggleShow }) {
                               <td className="d-none d-lg-table-cell">
                                 <p
                                   style={{
-                                    color: "#43A047",
+                                    color: "var(--c-primary)",
                                     cursor: "pointer",
                                   }}
                                   className="text-decoration-underline"
@@ -412,10 +346,9 @@ export default function HonorsMainComponent({ toggleShow }) {
                                     <>
                                       <MoreHorizIcon
                                         style={{
-                                          color: "#282e3f",
+                                          color: "var(--c-ink)",
                                           cursor: "pointer",
                                           fontSize: "28px",
-                                          cursor: "pointer",
                                         }}
                                       />
                                     </>
@@ -433,7 +366,7 @@ export default function HonorsMainComponent({ toggleShow }) {
                                       }}
                                       className="d-flex flex-row gap-2 align-items-center pb-2"
                                     >
-                                      <div style={{ color: "#F3802C" }}>
+                                      <div style={{ color: "var(--c-warning)" }}>
                                         <EditIcon className="subitem" />
                                       </div>
                                       <p className="VodeoDisSizing  text-end">
@@ -450,7 +383,7 @@ export default function HonorsMainComponent({ toggleShow }) {
                                       }}
                                       className="d-flex flex-row gap-2 align-items-center mt-2"
                                     >
-                                      <div style={{ color: "#F3802C" }}>
+                                      <div style={{ color: "var(--c-warning)" }}>
                                         <DeleteIcon className="text-danger subitem" />
                                       </div>
                                       <p className="VodeoDisSizing text-end">
@@ -491,48 +424,6 @@ export default function HonorsMainComponent({ toggleShow }) {
         </>
       )}
 
-      {/* {activekey === "editUserPage" && !editedHonor && (
-        <>
-          <GridbaseDiv className="mt-3 container" style={{ cursor: "pointer" }}>
-            {datacome &&
-              datacome.map((data, index) => (
-                <div key={index}>
-                  <CARD
-                    onClick={() => {
-                      setEditedHonor(data);
-                    }}
-                  >
-                    {data.info.imgData && (
-                      <CardMedia
-                        component="img"
-                        src={`${process.env.NEXT_PUBLIC_BACK_END_SERVER}/system/download/${data.info.imgData[0].src}`}
-                        sx={{
-                          width: "100%",
-                          maxHeight: "100%",
-                          borderRadius: "2px",
-                        }}
-                      />
-                    )}
-
-                    <CardContent className="d-flex flex-column justify-content-around">
-                      <TYPOGRAPHY className="titleHonors">
-                        {data.name}
-                      </TYPOGRAPHY>
-                      <div className="d-flex flex-row gap-2">
-                        <p>کد محصول :</p>
-                        <TYPOGRAPHY className="dateHonors">
-                          {data.code}
-                        </TYPOGRAPHY>
-                      </div>
-                    </CardContent>
-                  </CARD>
-                </div>
-              ))}
-           
-          </GridbaseDiv>
-        </>
-      )} */}
-
       {activekey === "addUser" && !editedHonor && (
         <>
           <AddProduct
@@ -555,7 +446,7 @@ export default function HonorsMainComponent({ toggleShow }) {
       <AreYouShureModal
         open={openModal}
         onClose={closeModal}
-        text={"ایا از حذف محصول مطمعن هستید"}
+        text={"آیا از حذف محصول مطمئن هستید؟"}
         func={handleDelete}
       />
       <ConfirmingModal
@@ -566,7 +457,7 @@ export default function HonorsMainComponent({ toggleShow }) {
       <ErrorModal
         open={openModal3}
         onClose={closeModal3}
-        text={"خطا از لاگین بودن خود اطمینان حاصل فرمایید"}
+        text={"خطا در انجام عملیات، لطفاً دوباره تلاش کنید"}
       />
     </section>
   );

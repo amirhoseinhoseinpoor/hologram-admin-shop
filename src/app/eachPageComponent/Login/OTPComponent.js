@@ -1,8 +1,10 @@
 "use client";
 
-import React, { useState, useEffect, useRef } from "react";
+import { useState, useEffect, useRef } from "react";
 import style from "../../Styles/Login/OTPComponent.module.scss"; // Assuming you have a CSS module for styling
 import { Box } from "@mui/material";
+
+const OTP_LENGTH = 6;
 
 export default function OTPInput({
   errorMessage,
@@ -11,8 +13,9 @@ export default function OTPInput({
   resendOtp,
   setIsOtpSent,
   otpResetKey,
+  loading = false,
 }) {
-  const [otp, setOtp] = useState(["", "", "", "", "", ""]);
+  const [otp, setOtp] = useState(Array(OTP_LENGTH).fill(""));
   const [timer, setTimer] = useState(120); // Timer set for 2 minutes (120 seconds)
   const inputRefs = useRef([]); // Array of refs for input elements
   const [isButtonDisabled, setIsButtonDisabled] = useState(true);
@@ -24,6 +27,8 @@ export default function OTPInput({
 
   useEffect(() => {
     setTimer(120);
+    setOtp(Array(OTP_LENGTH).fill(""));
+    inputRefs.current[0]?.focus();
   }, [otpResetKey]);
 
   const handleKeyDown = (index, e) => {
@@ -39,7 +44,7 @@ export default function OTPInput({
 
     if (success) {
       setTimer(120);
-      setOtp(["", "", "", ""]);
+      setOtp(Array(OTP_LENGTH).fill(""));
       inputRefs.current[0]?.focus();
     }
   };
@@ -157,9 +162,9 @@ export default function OTPInput({
           className={`${style.verifyButton} ${
             isButtonDisabled ? style.disabledButton : style.activeButton
           }`}
-          disabled={isButtonDisabled}
+          disabled={isButtonDisabled || loading}
         >
-          تایید
+          {loading ? <div className={style.loader}></div> : "تایید"}
         </button>
       </form>
     </div>

@@ -1,5 +1,5 @@
 "use client";
-import React, { useEffect, useState, useCallback } from "react";
+import { useEffect, useState, useCallback } from "react";
 import { useDispatch } from "react-redux";
 import {
   getContactList,
@@ -41,7 +41,8 @@ const PageWrapper = styled.div`
 
 // Dark gradient hero bar — same gradient as sidebar / Orders header
 const HeroBar = styled.div`
-  background-image: linear-gradient(195deg, #46506a 0%, #282e3f 100%);
+  background-image: none;
+    background-color: var(--c-primary);
   border-radius: 12px;
   margin: 12px 12px 0;
   padding: 18px 20px 22px;
@@ -130,8 +131,13 @@ const RefreshBtn = styled.button`
   transition: 150ms;
   font-weight: 500;
 
-  &:hover { background: rgba(255, 255, 255, 0.2); }
-  &:disabled { opacity: 0.5; cursor: not-allowed; }
+  &:hover {
+    background: rgba(255, 255, 255, 0.2);
+  }
+  &:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+  }
 `;
 
 const StatsGrid = styled.div`
@@ -194,13 +200,15 @@ const FilterBtn = styled.button`
   transition: 160ms;
   border: none;
   background: ${({ $active }) =>
-    $active ? "linear-gradient(195deg, #46506a 0%, #282e3f 100%)" : "#f0f2f5"};
+    $active ? "var(--c-primary)" : "#f0f2f5"};
   /* !important to override the global .tabContent button { color: #fff } */
   color: ${({ $active }) => ($active ? "#fff" : "#3a3a3a")} !important;
 
   &:hover {
     background: ${({ $active }) =>
-      $active ? "linear-gradient(195deg, #46506a 0%, #282e3f 100%)" : "#e4e7ed"};
+      $active
+        ? "var(--c-primary)"
+        : "#e4e7ed"};
     color: ${({ $active }) => ($active ? "#fff" : "#111")} !important;
   }
 `;
@@ -217,7 +225,7 @@ const CountBadge = styled.span`
   font-weight: 700;
   /* when on active (dark) button: semi-transparent white; when inactive (light) button: solid color */
   background: ${({ $orange, $onActive }) =>
-    $orange ? "#ff6f00" : $onActive ? "rgba(255,255,255,0.25)" : "#282e3f"};
+    $orange ? "#ff6f00" : $onActive ? "rgba(255,255,255,0.25)" : "var(--c-ink)"};
   color: #fff !important;
 `;
 
@@ -246,8 +254,13 @@ const ListPane = styled.div`
   scrollbar-width: thin;
   scrollbar-color: #d0d0d0 transparent;
 
-  &::-webkit-scrollbar { width: 4px; }
-  &::-webkit-scrollbar-thumb { background: #d0d0d0; border-radius: 4px; }
+  &::-webkit-scrollbar {
+    width: 4px;
+  }
+  &::-webkit-scrollbar-thumb {
+    background: #d0d0d0;
+    border-radius: 4px;
+  }
 
   @media (max-width: 768px) {
     width: 100%;
@@ -276,10 +289,13 @@ const MsgRow = styled.div`
   border-radius: 10px;
   border: 1.5px solid
     ${({ $active, $unread }) =>
-      $active ? "#282e3f" : $unread ? "#90caf9" : "rgba(0,0,0,0.07)"};
+      $active ? "var(--c-ink)" : $unread ? "#90caf9" : "rgba(0,0,0,0.07)"};
   padding: 10px 12px;
   cursor: pointer;
-  transition: box-shadow 140ms, border-color 140ms, background 140ms;
+  transition:
+    box-shadow 140ms,
+    border-color 140ms,
+    background 140ms;
   position: relative;
   overflow: hidden;
   animation: ${fadeSlideIn} 220ms ease both;
@@ -309,7 +325,7 @@ const MsgRow = styled.div`
 
   &:hover {
     box-shadow: 0 2px 10px rgba(0, 0, 0, 0.09);
-    border-color: ${({ $active }) => ($active ? "#282e3f" : "#90caf9")};
+    border-color: ${({ $active }) => ($active ? "var(--c-ink)" : "#90caf9")};
   }
 `;
 
@@ -387,7 +403,7 @@ const ReadBadge = styled.span`
   white-space: nowrap;
   background: ${({ $read }) =>
     $read
-      ? "linear-gradient(135deg, #43a047, #2e7d32)"
+      ? "linear-gradient(135deg, var(--c-primary), #2e7d32)"
       : "linear-gradient(135deg, #fb8c00, #e65100)"};
   color: #fff;
   box-shadow: ${({ $read }) =>
@@ -410,8 +426,8 @@ const MetaChip = styled.span`
   gap: 5px;
   font-size: 12.5px;
   color: #555;
-  background: rgba(0,0,0,0.04);
-  border: 1px solid rgba(0,0,0,0.07);
+  background: rgba(0, 0, 0, 0.04);
+  border: 1px solid rgba(0, 0, 0, 0.07);
   border-radius: 8px;
   padding: 4px 10px;
   direction: ltr;
@@ -505,8 +521,8 @@ const ActBtn = styled.button`
       $variant === "primary"
         ? "0 6px 18px rgba(57, 73, 171, 0.45)"
         : $variant === "danger"
-        ? "0 6px 18px rgba(229, 57, 53, 0.45)"
-        : "0 4px 10px rgba(0,0,0,0.12)"};
+          ? "0 6px 18px rgba(229, 57, 53, 0.45)"
+          : "0 4px 10px rgba(0,0,0,0.12)"};
     filter: brightness(1.08);
   }
 
@@ -527,7 +543,10 @@ const EmptyDetailPlaceholder = styled.div`
   text-align: center;
   padding: 40px;
 
-  p { font-size: 13px; margin: 0; }
+  p {
+    font-size: 13px;
+    margin: 0;
+  }
 `;
 
 const EmptyListState = styled.div`
@@ -539,7 +558,10 @@ const EmptyListState = styled.div`
   color: #c8c8c8;
   text-align: center;
 
-  p { font-size: 13px; margin: 0; }
+  p {
+    font-size: 13px;
+    margin: 0;
+  }
 `;
 
 // ─── Skeleton ─────────────────────────────────────────────────────────────────
@@ -564,49 +586,122 @@ const SkRow = styled.div`
 
 const IconMail = () => (
   <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
-    <path d="M20 4H4C2.9 4 2 4.9 2 6V18C2 19.1 2.9 20 4 20H20C21.1 20 22 19.1 22 18V6C22 4.9 21.1 4 20 4Z" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"/>
-    <path d="M22 6L12 13L2 6" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"/>
+    <path
+      d="M20 4H4C2.9 4 2 4.9 2 6V18C2 19.1 2.9 20 4 20H20C21.1 20 22 19.1 22 18V6C22 4.9 21.1 4 20 4Z"
+      stroke="currentColor"
+      strokeWidth="1.8"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+    />
+    <path
+      d="M22 6L12 13L2 6"
+      stroke="currentColor"
+      strokeWidth="1.8"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+    />
   </svg>
 );
 
 const IconPhone = () => (
   <svg width="12" height="12" viewBox="0 0 24 24" fill="none">
-    <path d="M22 16.92v3a2 2 0 01-2.18 2 19.79 19.79 0 01-8.63-3.07A19.5 19.5 0 013.9 11.5 19.79 19.79 0 01.87 2.86 2 2 0 012.84 1h3a2 2 0 012 1.72c.127.96.362 1.903.7 2.81a2 2 0 01-.45 2.11L7.09 8.64a16 16 0 006.29 6.29l.96-1a2 2 0 012.11-.45c.907.338 1.85.573 2.81.7A2 2 0 0122 16.92z" stroke="currentColor" strokeWidth="1.7" strokeLinecap="round" strokeLinejoin="round"/>
+    <path
+      d="M22 16.92v3a2 2 0 01-2.18 2 19.79 19.79 0 01-8.63-3.07A19.5 19.5 0 013.9 11.5 19.79 19.79 0 01.87 2.86 2 2 0 012.84 1h3a2 2 0 012 1.72c.127.96.362 1.903.7 2.81a2 2 0 01-.45 2.11L7.09 8.64a16 16 0 006.29 6.29l.96-1a2 2 0 012.11-.45c.907.338 1.85.573 2.81.7A2 2 0 0122 16.92z"
+      stroke="currentColor"
+      strokeWidth="1.7"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+    />
   </svg>
 );
 
 const IconCalendar = () => (
   <svg width="12" height="12" viewBox="0 0 24 24" fill="none">
-    <rect x="3" y="4" width="18" height="18" rx="2" stroke="currentColor" strokeWidth="1.7"/>
-    <path d="M16 2v4M8 2v4M3 10h18" stroke="currentColor" strokeWidth="1.7" strokeLinecap="round"/>
+    <rect
+      x="3"
+      y="4"
+      width="18"
+      height="18"
+      rx="2"
+      stroke="currentColor"
+      strokeWidth="1.7"
+    />
+    <path
+      d="M16 2v4M8 2v4M3 10h18"
+      stroke="currentColor"
+      strokeWidth="1.7"
+      strokeLinecap="round"
+    />
   </svg>
 );
 
 const IconRefresh = () => (
   <svg width="13" height="13" viewBox="0 0 24 24" fill="none">
-    <path d="M23 4v6h-6" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-    <path d="M20.49 15a9 9 0 11-2.12-9.36L23 10" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+    <path
+      d="M23 4v6h-6"
+      stroke="currentColor"
+      strokeWidth="2"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+    />
+    <path
+      d="M20.49 15a9 9 0 11-2.12-9.36L23 10"
+      stroke="currentColor"
+      strokeWidth="2"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+    />
   </svg>
 );
 
 const IconTrash = () => (
   <svg width="15" height="15" viewBox="0 0 24 24" fill="none">
-    <polyline points="3 6 5 6 21 6" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-    <path d="M19 6l-1 14a2 2 0 01-2 2H8a2 2 0 01-2-2L5 6" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-    <path d="M10 11v6M14 11v6M9 6V4a1 1 0 011-1h4a1 1 0 011 1v2" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+    <polyline
+      points="3 6 5 6 21 6"
+      stroke="currentColor"
+      strokeWidth="2"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+    />
+    <path
+      d="M19 6l-1 14a2 2 0 01-2 2H8a2 2 0 01-2-2L5 6"
+      stroke="currentColor"
+      strokeWidth="2"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+    />
+    <path
+      d="M10 11v6M14 11v6M9 6V4a1 1 0 011-1h4a1 1 0 011 1v2"
+      stroke="currentColor"
+      strokeWidth="2"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+    />
   </svg>
 );
 
 const IconEye = () => (
   <svg width="15" height="15" viewBox="0 0 24 24" fill="none">
-    <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-    <circle cx="12" cy="12" r="3" stroke="currentColor" strokeWidth="2"/>
+    <path
+      d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"
+      stroke="currentColor"
+      strokeWidth="2"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+    />
+    <circle cx="12" cy="12" r="3" stroke="currentColor" strokeWidth="2" />
   </svg>
 );
 
 const IconEyeOff = () => (
   <svg width="15" height="15" viewBox="0 0 24 24" fill="none">
-    <path d="M17.94 17.94A10.07 10.07 0 0112 20c-7 0-11-8-11-8a18.45 18.45 0 015.06-5.94M9.9 4.24A9.12 9.12 0 0112 4c7 0 11 8 11 8a18.5 18.5 0 01-2.16 3.19m-6.72-1.07a3 3 0 11-4.24-4.24M1 1l22 22" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+    <path
+      d="M17.94 17.94A10.07 10.07 0 0112 20c-7 0-11-8-11-8a18.45 18.45 0 015.06-5.94M9.9 4.24A9.12 9.12 0 0112 4c7 0 11 8 11 8a18.5 18.5 0 01-2.16 3.19m-6.72-1.07a3 3 0 11-4.24-4.24M1 1l22 22"
+      stroke="currentColor"
+      strokeWidth="2"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+    />
   </svg>
 );
 
@@ -667,10 +762,12 @@ export default function ContactMainComponent({ toggleShow }) {
     setSelected(msg);
     if (!msg.isRead) {
       try {
-        await dispatch(markContactRead({ code: msg.code, isRead: true })).unwrap();
+        await dispatch(
+          markContactRead({ code: msg.code, isRead: true }),
+        ).unwrap();
         const updated = { ...msg, isRead: true };
         setMessages((prev) =>
-          prev.map((m) => (m.code === msg.code ? updated : m))
+          prev.map((m) => (m.code === msg.code ? updated : m)),
         );
         setSelected(updated);
       } catch {
@@ -684,11 +781,11 @@ export default function ContactMainComponent({ toggleShow }) {
     const newIsRead = !selected.isRead;
     try {
       await dispatch(
-        markContactRead({ code: selected.code, isRead: newIsRead })
+        markContactRead({ code: selected.code, isRead: newIsRead }),
       ).unwrap();
       const updated = { ...selected, isRead: newIsRead };
       setMessages((prev) =>
-        prev.map((m) => (m.code === selected.code ? updated : m))
+        prev.map((m) => (m.code === selected.code ? updated : m)),
       );
       setSelected(updated);
     } catch {
@@ -767,10 +864,15 @@ export default function ContactMainComponent({ toggleShow }) {
       {/* ── Filter toolbar ── */}
       <Toolbar>
         <FilterGroup>
-          <FilterBtn $active={filter === "all"} onClick={() => setFilter("all")}>
+          <FilterBtn
+            $active={filter === "all"}
+            onClick={() => setFilter("all")}
+          >
             همه
             {messages.length > 0 && (
-              <CountBadge $onActive={filter === "all"}>{messages.length}</CountBadge>
+              <CountBadge $onActive={filter === "all"}>
+                {messages.length}
+              </CountBadge>
             )}
           </FilterBtn>
           <FilterBtn
@@ -779,7 +881,9 @@ export default function ContactMainComponent({ toggleShow }) {
           >
             خوانده‌نشده
             {unreadCount > 0 && (
-              <CountBadge $orange $onActive={filter === "unread"}>{unreadCount}</CountBadge>
+              <CountBadge $orange $onActive={filter === "unread"}>
+                {unreadCount}
+              </CountBadge>
             )}
           </FilterBtn>
           <FilterBtn
@@ -801,7 +905,13 @@ export default function ContactMainComponent({ toggleShow }) {
                 <div className="d-flex align-items-center gap-2 mb-2">
                   <div
                     className="sk"
-                    style={{ width: 36, height: 36, borderRadius: "50%", flexShrink: 0, marginBottom: 0 }}
+                    style={{
+                      width: 36,
+                      height: 36,
+                      borderRadius: "50%",
+                      flexShrink: 0,
+                      marginBottom: 0,
+                    }}
                   />
                   <div style={{ flex: 1 }}>
                     <div className="sk" style={{ width: "55%" }} />
@@ -816,8 +926,20 @@ export default function ContactMainComponent({ toggleShow }) {
           {!loading && filtered.length === 0 && (
             <EmptyListState>
               <svg width="44" height="44" viewBox="0 0 24 24" fill="none">
-                <path d="M20 4H4C2.9 4 2 4.9 2 6V18C2 19.1 2.9 20 4 20H20C21.1 20 22 19.1 22 18V6C22 4.9 21.1 4 20 4Z" stroke="#d0d0d0" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
-                <path d="M22 6L12 13L2 6" stroke="#d0d0d0" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
+                <path
+                  d="M20 4H4C2.9 4 2 4.9 2 6V18C2 19.1 2.9 20 4 20H20C21.1 20 22 19.1 22 18V6C22 4.9 21.1 4 20 4Z"
+                  stroke="#d0d0d0"
+                  strokeWidth="1.5"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                />
+                <path
+                  d="M22 6L12 13L2 6"
+                  stroke="#d0d0d0"
+                  strokeWidth="1.5"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                />
               </svg>
               <p>
                 {filter === "all"
@@ -836,7 +958,10 @@ export default function ContactMainComponent({ toggleShow }) {
                 onClick={() => handleSelect(msg)}
               >
                 <RowTop>
-                  <div className="d-flex align-items-center gap-2" style={{ overflow: "hidden", flex: 1 }}>
+                  <div
+                    className="d-flex align-items-center gap-2"
+                    style={{ overflow: "hidden", flex: 1 }}
+                  >
                     <AvatarCircle $unread={!msg.isRead}>
                       {getInitial(msg.name)}
                     </AvatarCircle>
@@ -853,12 +978,21 @@ export default function ContactMainComponent({ toggleShow }) {
                       >
                         {msg.name}
                       </div>
-                      <div style={{ fontSize: 10, color: "#888", direction: "ltr" }}>
+                      <div
+                        style={{
+                          fontSize: 10,
+                          color: "#888",
+                          direction: "ltr",
+                        }}
+                      >
                         {msg.phone}
                       </div>
                     </div>
                   </div>
-                  <div className="d-flex align-items-center gap-1" style={{ flexShrink: 0 }}>
+                  <div
+                    className="d-flex align-items-center gap-1"
+                    style={{ flexShrink: 0 }}
+                  >
                     {!msg.isRead && <UnreadDot />}
                     <RowDate>{formatDate(msg.date)}</RowDate>
                   </div>
@@ -873,8 +1007,20 @@ export default function ContactMainComponent({ toggleShow }) {
           {!selected ? (
             <EmptyDetailPlaceholder>
               <svg width="52" height="52" viewBox="0 0 24 24" fill="none">
-                <path d="M20 4H4C2.9 4 2 4.9 2 6V18C2 19.1 2.9 20 4 20H20C21.1 20 22 19.1 22 18V6C22 4.9 21.1 4 20 4Z" stroke="#d8d8d8" strokeWidth="1.4" strokeLinecap="round" strokeLinejoin="round"/>
-                <path d="M22 6L12 13L2 6" stroke="#d8d8d8" strokeWidth="1.4" strokeLinecap="round" strokeLinejoin="round"/>
+                <path
+                  d="M20 4H4C2.9 4 2 4.9 2 6V18C2 19.1 2.9 20 4 20H20C21.1 20 22 19.1 22 18V6C22 4.9 21.1 4 20 4Z"
+                  stroke="#d8d8d8"
+                  strokeWidth="1.4"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                />
+                <path
+                  d="M22 6L12 13L2 6"
+                  stroke="#d8d8d8"
+                  strokeWidth="1.4"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                />
               </svg>
               <p>یک پیام را از لیست انتخاب کنید</p>
             </EmptyDetailPlaceholder>
@@ -907,9 +1053,13 @@ export default function ContactMainComponent({ toggleShow }) {
               <DetailActions>
                 <ActBtn $variant="primary" onClick={handleToggleRead}>
                   {selected.isRead ? (
-                    <><IconEyeOff /> علامت‌گذاری به‌عنوان خوانده‌نشده</>
+                    <>
+                      <IconEyeOff /> علامت‌گذاری به‌عنوان خوانده‌نشده
+                    </>
                   ) : (
-                    <><IconEye /> علامت‌گذاری به‌عنوان خوانده‌شده</>
+                    <>
+                      <IconEye /> علامت‌گذاری به‌عنوان خوانده‌شده
+                    </>
                   )}
                 </ActBtn>
                 <ActBtn $variant="danger" onClick={handleDeleteRequest}>

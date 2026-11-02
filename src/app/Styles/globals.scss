@@ -5,7 +5,6 @@
 }
 body {
   overflow: visible !important;
-  background-color: white;
   position: relative;
   height: 100%;
   line-height: normal;
@@ -138,12 +137,6 @@ button{
   .smallest{
     font-size: 12px;
   }
-  p {
-    font-size: 18px;
-  }
-  span {
-    font-size: 18px;
-  }
   .title {
     font-size: 20px;
     font-weight: 600;
@@ -184,12 +177,6 @@ button{
 }
 .subitem{
   font-size: 14px;
-}
-p {
-  font-size: 16.5px;
-}
-span {
-  font-size: 16.5px;
 }
 .title {
   font-size: 16px !important;

@@ -1,6 +1,6 @@
 "use client";
-import React, { useState, useEffect } from "react";
-import { Modal, Button } from "react-bootstrap";
+import { useState, useEffect } from "react";
+import { Modal, Button, NavDropdown } from "react-bootstrap";
 import styled from "styled-components";
 // import redux
 import { useDispatch } from "react-redux";
@@ -12,7 +12,6 @@ import {
 } from "@/app/Store/thunks";
 // import base component
 import AreYouShureModal from "@/app/BaseComponent/AreYouSureModal";
-import { NavDropdown } from "react-bootstrap";
 import MoreHorizIcon from "@mui/icons-material/MoreHoriz";
 import EditIcon from "@mui/icons-material/Edit";
 import LoadingCss from "@/app/BaseComponent/LoadingCss";
@@ -21,12 +20,12 @@ import LockIcon from "@mui/icons-material/Lock";
 
 const NavDropDown = styled(NavDropdown)`
   .dropdown-menu {
-    border: 1px solid gray;
+    border: 1px solid var(--c-border);
     width: 150px;
     padding: 12px;
     margin-top: 3px;
     border-radius: 4px;
-    box-shadow: 1px 1px 5px gray;
+    box-shadow: var(--shadow-md);
   }
   .dropdown-toggle::after {
     display: none;
@@ -74,18 +73,6 @@ const EditUserModal = styled(Modal)`
   }
 `;
 
-const DeleteButtonStyle = styled.button`
-  border: none;
-  padding: 3px 5px !important;
-  background-color: unset !important;
-  border-radius: 4px;
-  color: red !important;
-
-  @media (max-width: 768px) {
-    padding: 3px 3px !important;
-  }
-`;
-
 const RoleDivGridStyle = styled.div`
   display: grid;
   grid-template-columns: repeat(3, 1fr);
@@ -109,12 +96,12 @@ const BUTTONSSTYLE = styled.div`
   }
 
   .confirmButtonStyle {
-    background: #43a047;
+    background: var(--c-primary);
     color: #fff;
     border: none;
 
     &:hover {
-      background: #3a8c3e;
+      background: var(--c-primary-600);
       transform: translateY(-1px);
     }
   }
@@ -239,7 +226,7 @@ function EditUserBtnfunction({
       setLoadingDelete(true);
 
       const deleteUserApiCall = await dispatch(
-        deleteUser({ code: deleteCode })
+        deleteUser({ code: deleteCode }),
       ).unwrap();
 
       setOpenModal(false);
@@ -270,7 +257,7 @@ function EditUserBtnfunction({
           active: factorType,
           domain: whereLogin,
           roleIds: selectedValues,
-        })
+        }),
       ).unwrap();
 
       if (sendingEditUser.statusCode == 200) {
@@ -296,7 +283,7 @@ function EditUserBtnfunction({
       setLoadingConfirmEdit(true);
 
       const SendingEditUserAPI = await dispatch(
-        editUserPassword({ code: userData?.code, password: secondPassword })
+        editUserPassword({ code: userData?.code, password: secondPassword }),
       );
 
       if (SendingEditUserAPI.statusCode == 200) {
@@ -341,10 +328,9 @@ function EditUserBtnfunction({
           <>
             <MoreHorizIcon
               style={{
-                color: "#282e3f",
+                color: "var(--c-ink)",
                 cursor: "pointer",
                 fontSize: "28px",
-                cursor: "pointer",
               }}
             />
           </>
@@ -360,7 +346,7 @@ function EditUserBtnfunction({
             }}
             className="d-flex flex-row gap-2 align-items-center pb-1"
           >
-            <div style={{ color: "#F3802C" }}>
+            <div style={{ color: "var(--c-warning)" }}>
               <EditIcon className="subitem" />
             </div>
             <p className="NormalTextSizing text-end">ویرایش</p>
@@ -374,7 +360,7 @@ function EditUserBtnfunction({
             }}
             className="d-flex flex-row gap-2 align-items-center pb-1 pt-1"
           >
-            <div style={{ color: "#F3802C" }}>
+            <div style={{ color: "var(--c-warning)" }}>
               <LockIcon className="subitem" />
             </div>
             <p className="NormalTextSizing text-end">تغییر رمز</p>
@@ -387,7 +373,7 @@ function EditUserBtnfunction({
             }}
             className="d-flex flex-row gap-2 align-items-center mt-2"
           >
-            <div style={{ color: "#F3802C" }}>
+            <div style={{ color: "var(--c-warning)" }}>
               <DeleteIcon className="text-danger subitem" />
             </div>
             <p className="NormalTextSizing text-end">
@@ -407,7 +393,7 @@ function EditUserBtnfunction({
             <>
               <p
                 className="d-flex justify-content-center mb-2"
-                style={{ color: "#e91e63" }}
+                style={{ color: "var(--c-danger)" }}
               >
                 {error}
               </p>
@@ -419,7 +405,7 @@ function EditUserBtnfunction({
                 نام
               </label>
               <input
-                style={{ border: hasError ? "1.2px solid #FF4F3F" : "" }}
+                style={{ border: hasError ? "1.2px solid var(--c-danger)" : "" }}
                 type="text"
                 id="firstName"
                 className="form-control"
@@ -435,7 +421,7 @@ function EditUserBtnfunction({
                 نام خانوادگی
               </label>
               <input
-                style={{ border: hasError ? "1.2px solid #FF4F3F" : "" }}
+                style={{ border: hasError ? "1.2px solid var(--c-danger)" : "" }}
                 type="text"
                 id="lastName"
                 className="form-control"
@@ -451,7 +437,7 @@ function EditUserBtnfunction({
                 شماره همراه
               </label>
               <input
-                style={{ border: hasError ? "1.2px solid #FF4F3F" : "" }}
+                style={{ border: hasError ? "1.2px solid var(--c-danger)" : "" }}
                 type="number"
                 id="username"
                 className="form-control"
@@ -468,7 +454,7 @@ function EditUserBtnfunction({
               </label>
               <select
                 style={{
-                  border: hasError ? "1.2px solid #FF4F3F" : "",
+                  border: hasError ? "1.2px solid var(--c-danger)" : "",
                   boxShadow: "unset",
                 }}
                 id="factorType"
@@ -492,7 +478,7 @@ function EditUserBtnfunction({
                 onChange={handleDomainChange}
                 className="form-select mb-2"
                 style={{
-                  border: hasError ? "1.2px solid #FF4F3F" : "",
+                  border: hasError ? "1.2px solid var(--c-danger)" : "",
                   boxShadow: "unset",
                 }}
               >
@@ -501,23 +487,6 @@ function EditUserBtnfunction({
               </select>
             </div>
 
-            {/* <div className="form-group">
-              <label className="mb-1 me-1" htmlFor="rolesChange">
-                دسترسی
-              </label>
-              <select
-                id="rolesChange"
-                value={rolesChange}
-                name="rolesChange"
-                onChange={handleRoleChange}
-                className="form-select mb-2"
-                style={{ boxShadow: "unset" }}
-              >
-                <option value="1">مدیر</option>
-                <option value="2">ادمین</option>
-                <option value="3">مشتری</option>
-              </select>
-            </div> */}
             {hideAcceseebility && (
               <div className="form-group">
                 <label className="mb-1 me-1">سطح دسترسی</label>
@@ -529,7 +498,7 @@ function EditUserBtnfunction({
                     >
                       <input
                         style={{
-                          border: hasError ? "1.2px solid #FF4F3F" : "",
+                          border: hasError ? "1.2px solid var(--c-danger)" : "",
                         }}
                         type="checkbox"
                         value={item.id}
@@ -552,12 +521,6 @@ function EditUserBtnfunction({
                 >
                   {loadingConfirmEdit ? <LoadingCss /> : "ذخیره"}
                 </Button>
-                {/* <DeleteButtonStyle
-                type="button"
-                
-              >
-                {loadingDelete ? <LoadingCss /> : "حذف اکانت"}
-              </DeleteButtonStyle> */}
               </BUTTONSSTYLE>
             </div>
           </form>
@@ -577,7 +540,7 @@ function EditUserBtnfunction({
             <>
               <p
                 className="d-flex justify-content-center mb-2"
-                style={{ color: "#e91e63" }}
+                style={{ color: "var(--c-danger)" }}
               >
                 {error}
               </p>
@@ -592,7 +555,7 @@ function EditUserBtnfunction({
                 پسورد جدید
               </label>
               <input
-                style={{ border: hasError ? "1.2px solid #FF4F3F" : "" }}
+                style={{ border: hasError ? "1.2px solid var(--c-danger)" : "" }}
                 type="password"
                 id="firstPassword"
                 className="form-control NormalTextSizing"
@@ -611,7 +574,7 @@ function EditUserBtnfunction({
                 تایید پسورد
               </label>
               <input
-                style={{ border: hasError ? "1.2px solid #FF4F3F" : "" }}
+                style={{ border: hasError ? "1.2px solid var(--c-danger)" : "" }}
                 type="password"
                 id="secondPassword"
                 className="form-control NormalTextSizing"
@@ -648,7 +611,7 @@ function EditUserBtnfunction({
       <AreYouShureModal
         open={openModal}
         onClose={closeModal}
-        text={"ایا از حذف کاربر مطمئن هستید"}
+        text={"آیا از حذف کاربر مطمئن هستید؟"}
         func={handleDeleteUser}
       />
     </>

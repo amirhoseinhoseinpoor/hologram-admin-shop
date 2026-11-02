@@ -1,6 +1,8 @@
 "use client";
 
-import React, { useEffect, useState } from "react";
+import { SearchInputMainDiv } from "@/app/BaseComponent/SearchField";
+import { HeadermakeOrder } from "@/app/BaseComponent/PageHeader";
+import { useEffect, useState } from "react";
 // import redux
 import { useDispatch } from "react-redux";
 import { getuser } from "@/app/Store/thunks";
@@ -11,73 +13,29 @@ import ConfirmingModal from "@/app/BaseComponent/ConfirmingModal";
 import ErrorModal from "@/app/BaseComponent/ErrorModal";
 import ProfileComponent from "@/app/BaseComponent/ProfileComponent";
 import EmptyState from "@/app/BaseComponent/EmptyState";
-import { Skeleton } from "@mui/material";
+import { Skeleton, Modal, Box } from "@mui/material";
 import SearchIcon from "@mui/icons-material/Search";
 import styled from "styled-components";
 // import components
 import AddUserBtn from "../DefineUser/AddUserBtn";
 import EditUserBtnfunction from "./EditUserBtn";
-import { Modal, Box } from "@mui/material";
-
-const HeadermakeOrder = styled.div`
-  padding: 10px;
-  color: white;
-  background-color: rgb(225, 223, 223);
-  border-radius: 4px;
-  margin: 7px 15px;
-  .textHeaderStyle {
-    color: black;
-  }
-
-  @media (max-width: 980px) {
-    .textHeaderStyle {
-    }
-  }
-`;
-
-const ResponsiveDiv = styled.div`
-  display: flex;
-  flex-direction: row;
-  align-items: center;
-  gap: 10px;
-
-  @media (max-width: 768px) {
-    flex-direction: column;
-  }
-`;
-
-const SearchInputMainDiv = styled.div`
-  width: 50%;
-  position: relative;
-  .inputSreachStyle {
-    font-size: 15px;
-    width: 100%;
-    padding: 4px;
-  }
-  .SearchIconStyle {
-    position: absolute;
-    transform: translate(50%, -50%);
-    left: 0;
-    top: 50%;
-    pointer-events: none;
-    color: gray;
-  }
-`;
 
 const MAINTABELSTYLE = styled.div`
-  border: 1.5px solid gray;
-  padding: 7px;
-  border-radius: 4px;
+  border: 1px solid var(--c-border);
+  padding: 12px;
+  border-radius: var(--r-md);
+  background: var(--c-surface);
+  box-shadow: var(--shadow-sm);
   margin-bottom: 10px;
 
   .eachTabelStyle {
     display: grid;
     grid-template-columns: repeat(2, 1fr);
     grid-gap: 10px;
-    border-bottom: 1px solid #ccc;
+    border-bottom: 1px solid var(--c-border);
     text-align: center;
     p {
-      background-color: #f1f1f1;
+      background-color: #f9fafb;
       padding: 12px 0px;
       border-radius: 4px;
       display: flex;
@@ -95,17 +53,19 @@ const MAINTABELSTYLE = styled.div`
 const FixTablePlace = styled.div`
   @media (min-width: 980px) {
     position: relative;
-    margin-top: 60px;
+    overflow: hidden;
+    background: var(--c-surface);
+    border: 1px solid var(--c-border);
+    border-radius: var(--r-md);
+    box-shadow: var(--shadow-sm);
     .pTagForStyle {
-      position: absolute;
-      transform: translate(-50%, 50%);
-      left: 50%;
-      width: 94%;
-      top: -55px;
-      border-radius: 10px;
-      padding: 18px 12px;
-      background-image: linear-gradient(195deg, #46506a 0%, #282e3f 100%);
-      color: white;
+      padding: 16px 20px;
+      margin: 0 !important;
+      font-size: 15px;
+      font-weight: 600;
+      color: var(--c-ink);
+      background-color: var(--c-surface);
+      border-bottom: 1px solid var(--c-border);
     }
     .tabelStyle {
       border-collapse: separate;
@@ -118,32 +78,23 @@ const FixTablePlace = styled.div`
         text-align: center;
       }
       th {
-        padding-top: 55px;
       }
     }
   }
 
   .SeeAccessButtom {
     cursor: pointer;
-    color: #43a047;
+    color: var(--c-primary);
   }
 `;
 
 const HeaderModalShowAccessMainDiv = styled.div`
-  background-color: rgb(225, 223, 223);
+  background-color: #f3f4f6;
   border-top-right-radius: 10px;
   border-top-left-radius: 10px;
   .HeaderModalShowAccess {
     padding: 10px;
   }
-`;
-
-const SelectFilter = styled.select`
-  padding: 6px 10px;
-  font-size: 15px;
-  border: 1px solid #ccc;
-  border-radius: 4px;
-  cursor: pointer;
 `;
 
 const ModalHimselfStyle = styled(Modal)`
@@ -205,13 +156,6 @@ const PermissionTag = styled.div`
   }
 `;
 
-const SeeAccessTableStyle = styled.p`
-  /* border-top: 1px solid gray; */
-  width: 100%;
-  /* text-align: center; */
-  padding-top: 3px;
-`;
-
 const modalStyle = {
   position: "absolute",
   top: "50%",
@@ -238,7 +182,6 @@ export default function DefineUser({ toggleShow }) {
   // filter states
   const [searchTerm, setSearchTerm] = useState("");
   const [filteredUsers, setFilteredUsers] = useState(null);
-  console.log(filteredUsers);
 
   // loading
   const [trackLoading, setTrackLoading] = useState(false);
@@ -308,11 +251,11 @@ export default function DefineUser({ toggleShow }) {
         <div className="NormalTextSizing text-decoration-underline textHeaderStyle d-flex align-items-center">
           مدیریت کاربر
         </div>
-        <ProfileComponent colorGet={"#282e3f"} />
+        <ProfileComponent />
       </HeadermakeOrder>
 
-      {/* Filter Container */}
-      <div className="container mt-4 mb-4 d-flex flex-row gap-3 align-items-center">
+      {/* toolbar: search + add */}
+      <div className="d-flex flex-row flex-wrap gap-3 align-items-center justify-content-between mb-4">
         <SearchInputMainDiv>
           <input
             className="inputSreachStyle"
@@ -323,18 +266,6 @@ export default function DefineUser({ toggleShow }) {
           />
           <SearchIcon className="SearchIconStyle" />
         </SearchInputMainDiv>
-
-        {/* domain filter */}
-        {/* <SelectFilter
-          value={selectedDomain}
-          onChange={(e) => setSelectedDomain(e.target.value)}
-        >
-          <option value="2">کاربرهای ادمین</option>
-          <option value="1">کاربرهای سایت</option>
-        </SelectFilter> */}
-      </div>
-      {/* add user */}
-      <div className="d-flex justify-content-end  mb-3 container">
         <AddUserBtn
           setDataUpdated={setDataUpdated}
           setConfirmModal={() => setOpenModal2(true)}
@@ -405,10 +336,9 @@ export default function DefineUser({ toggleShow }) {
                                 </p>
                                 <CustomCloseButton
                                   onClick={handleCloseModal}
-                                  color={`#e91e63`}
+                                  color={`var(--c-danger)`}
                                 />
                               </ModalHeader>
-                              {/* <HeaderModalShowAccessMainDiv className="d-flex flex-row justify-content-between align-items-center"></HeaderModalShowAccessMainDiv> */}
                               <div
                                 style={{
                                   flex: 1,
@@ -416,11 +346,6 @@ export default function DefineUser({ toggleShow }) {
                                 }}
                                 className="d-flex flex-column gap-2 justify-content-center align-items-center p-3"
                               >
-                                {/* {item?.permissions?.map((eachPer, index) => (
-                                  <p key={index} className="NormalTextSizing">
-                                    {eachPer?.permission?.name}
-                                  </p>
-                                ))} */}
                                 <div className="d-flex flex-column gap-2 justify-content-center align-items-center w-100">
                                   {item.userRoles?.map((item, index) => (
                                     <PermissionTag
@@ -491,7 +416,7 @@ export default function DefineUser({ toggleShow }) {
 
                       <div className="SecondValueTabel NormalTextSizing">
                         <div
-                          style={{ cursor: "pointer", color: "#43a047" }}
+                          style={{ cursor: "pointer", color: "var(--c-primary)" }}
                           onClick={() => setModalPermisionRe(idx)}
                         >
                           مشاهده
@@ -508,8 +433,8 @@ export default function DefineUser({ toggleShow }) {
                                 دسترسی ها
                               </p>
                               <CustomCloseButton
-                                onClick={handleCloseModal}
-                                color={`#e91e63`}
+                                onClick={handleCloseModalRe}
+                                color={`var(--c-danger)`}
                               />
                             </HeaderModalShowAccessMainDiv>
                             <div className="d-flex flex-column gap-2 justify-content-center align-items-center p-3">
@@ -565,7 +490,7 @@ export default function DefineUser({ toggleShow }) {
       <ErrorModal
         open={openModal3}
         onClose={closeModal3}
-        text={"خطا در انجام عملیات"}
+        text={"خطا در انجام عملیات، لطفاً دوباره تلاش کنید"}
       />
     </section>
   );

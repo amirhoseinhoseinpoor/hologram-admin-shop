@@ -1,6 +1,8 @@
 "use client";
 
-import React, { useEffect, useState } from "react";
+import { SearchInputMainDiv } from "@/app/BaseComponent/SearchField";
+import { HeadermakeOrder } from "@/app/BaseComponent/PageHeader";
+import { useEffect, useState } from "react";
 // import redux
 import { useDispatch } from "react-redux";
 import { getuser } from "@/app/Store/thunks";
@@ -17,65 +19,22 @@ import styled from "styled-components";
 import EditUserBtnfunction from "./EditUserBtn";
 import AddUserBtn from "./AddUserBtn";
 
-const HeadermakeOrder = styled.div`
-  padding: 10px;
-  color: white;
-  background-color: rgb(225, 223, 223);
-  border-radius: 4px;
-  margin: 7px 15px;
-  .textHeaderStyle {
-    color: black;
-  }
-
-  @media (max-width: 980px) {
-    .textHeaderStyle {
-    }
-  }
-`;
-
-const ResponsiveDiv = styled.div`
-  display: flex;
-  flex-direction: row;
-  align-items: center;
-  gap: 10px;
-
-  @media (max-width: 768px) {
-    flex-direction: column;
-  }
-`;
-
-const SearchInputMainDiv = styled.div`
-  width: 50%;
-  position: relative;
-  .inputSreachStyle {
-    font-size: 15px;
-    width: 100%;
-    padding: 4px;
-  }
-  .SearchIconStyle {
-    position: absolute;
-    transform: translate(50%, -50%);
-    left: 0;
-    top: 50%;
-    pointer-events: none;
-    color: gray;
-  }
-`;
-
 const MAINTABELSTYLE = styled.div`
-  border: 1.5px solid gray;
-  padding: 7px;
-  border-radius: 4px;
+  border: 1px solid var(--c-border);
+  padding: 12px;
+  border-radius: var(--r-md);
+  background: var(--c-surface);
+  box-shadow: var(--shadow-sm);
   margin-bottom: 10px;
 
   .eachTabelStyle {
     display: grid;
     grid-template-columns: repeat(2, 1fr);
     grid-gap: 10px;
-    border-bottom: 1px solid #ccc;
+    border-bottom: 1px solid var(--c-border);
     text-align: center;
     p {
-      background-color: #f1f1f1;
+      background-color: #f9fafb;
       padding: 12px 0px;
       border-radius: 4px;
       display: flex;
@@ -93,17 +52,19 @@ const MAINTABELSTYLE = styled.div`
 const FixTablePlace = styled.div`
   @media (min-width: 980px) {
     position: relative;
-    margin-top: 60px;
+    overflow: hidden;
+    background: var(--c-surface);
+    border: 1px solid var(--c-border);
+    border-radius: var(--r-md);
+    box-shadow: var(--shadow-sm);
     .pTagForStyle {
-      position: absolute;
-      transform: translate(-50%, 50%);
-      left: 50%;
-      width: 94%;
-      top: -55px;
-      border-radius: 10px;
-      padding: 18px 12px;
-      background-image: linear-gradient(195deg, #46506a 0%, #282e3f 100%);
-      color: white;
+      padding: 16px 20px;
+      margin: 0 !important;
+      font-size: 15px;
+      font-weight: 600;
+      color: var(--c-ink);
+      background-color: var(--c-surface);
+      border-bottom: 1px solid var(--c-border);
     }
     .tabelStyle {
       border-collapse: separate;
@@ -115,18 +76,9 @@ const FixTablePlace = styled.div`
         text-align: center;
       }
       th {
-        padding-top: 55px;
       }
     }
   }
-`;
-
-const SelectFilter = styled.select`
-  padding: 6px 10px;
-  font-size: 15px;
-  border: 1px solid #ccc;
-  border-radius: 4px;
-  cursor: pointer;
 `;
 
 export default function CustomerUserTabel({ toggleShow }) {
@@ -203,11 +155,11 @@ export default function CustomerUserTabel({ toggleShow }) {
         <div className="NormalTextSizing text-decoration-underline textHeaderStyle d-flex align-items-center">
           مدیریت کاربر
         </div>
-        <ProfileComponent colorGet={"#282e3f"} />
+        <ProfileComponent />
       </HeadermakeOrder>
 
-      {/* Filter Container */}
-      <div className="container mt-4 mb-4 d-flex flex-row gap-3 align-items-center">
+      {/* toolbar: search + add */}
+      <div className="d-flex flex-row flex-wrap gap-3 align-items-center justify-content-between mb-4">
         <SearchInputMainDiv>
           <input
             className="inputSreachStyle"
@@ -218,18 +170,6 @@ export default function CustomerUserTabel({ toggleShow }) {
           />
           <SearchIcon className="SearchIconStyle" />
         </SearchInputMainDiv>
-
-        {/* domain filter */}
-        {/* <SelectFilter
-          value={selectedDomain}
-          onChange={(e) => setSelectedDomain(e.target.value)}
-        >
-          <option value="2">کاربرهای ادمین</option>
-          <option value="1">کاربرهای سایت</option>
-        </SelectFilter> */}
-      </div>
-      {/* add user */}
-      <div className="d-flex justify-content-end  mb-3 container">
         <AddUserBtn
           closeModalOnTimeout={() => closeModalOnTimeout()}
           setDataUpdated={setDataUpdated}
@@ -265,26 +205,17 @@ export default function CustomerUserTabel({ toggleShow }) {
                       <th>نام خانوادگی</th>
                       <th>شماره همراه</th>
                       <th>وضعیت</th>
-                      {/* <th>نوع دسترسی</th>
-                      <th>دسترسی</th> */}
                       <th>عملیات</th>
                     </tr>
                   </thead>
                   <tbody>
                     {filteredUsers.map((item, index) => (
                       <tr key={index}>
-                        <td>{++index}</td>
+                        <td>{index + 1}</td>
                         <td>{item.firstName}</td>
                         <td>{item.lastName}</td>
                         <td>{item.username}</td>
                         <td>{item.active ? "فعال" : "غیرفعال"}</td>
-                        {/* <td>{item.domain === 1 ? "سایت" : "سایت و ادمین"}</td>
-                        <td>
-                          {item.userRoles[0]?.role?.name === "admin" && "ادمین"}
-                          {item.userRoles[0]?.role?.name === "master" && "مدیر"}
-                          {item.userRoles[0]?.role?.name === "customer" &&
-                            "مشتری"}
-                        </td> */}
                         <td>
                           <div className="d-flex flex-row justify-content-center">
                             <EditUserBtnfunction
@@ -385,7 +316,7 @@ export default function CustomerUserTabel({ toggleShow }) {
       <ErrorModal
         open={openModal3}
         onClose={closeModal3}
-        text={"خطا در انجام عملیات"}
+        text={"خطا در انجام عملیات، لطفاً دوباره تلاش کنید"}
       />
     </section>
   );

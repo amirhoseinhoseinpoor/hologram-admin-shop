@@ -1,6 +1,5 @@
 "use client";
 
-import React from "react";
 import { Typography } from "@mui/material";
 import styled from "styled-components";
 import PropTypes from "prop-types";
@@ -10,29 +9,29 @@ const EmptyStateContainer = styled.div`
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  padding: ${props => props.$variant === 'table' ? '40px 20px' : '60px 20px'};
-  min-height: ${props => props.$variant === 'table' ? '300px' : '400px'};
+  padding: ${(props) =>
+    props.$variant === "table" ? "40px 20px" : "60px 20px"};
+  min-height: ${(props) => (props.$variant === "table" ? "300px" : "400px")};
   width: 100%;
-  max-width: ${props => props.$maxWidth || '600px'};
-  margin: 40px auto;
-  position: relative;
-  left: 50%;
-  transform: translateX(-50%);
+  max-width: ${(props) => props.$maxWidth || "600px"};
+  margin: 32px auto;
+  grid-column: 1 / -1;
 
-  background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
-  border-radius: 20px;
-  box-shadow: 0px 10px 30px rgba(0, 0, 0, 0.1);
+  background: var(--c-surface);
+  border: 1px dashed var(--c-border-strong);
+  border-radius: var(--r-md);
+  box-shadow: none;
 
-  animation: fadeIn 0.6s ease-in-out;
+  animation: fadeIn 0.4s ease-out;
 
   @keyframes fadeIn {
     from {
       opacity: 0;
-      transform: translateX(-50%) translateY(20px);
+      transform: translateY(12px);
     }
     to {
       opacity: 1;
-      transform: translateX(-50%) translateY(0);
+      transform: translateY(0);
     }
   }
 
@@ -44,9 +43,9 @@ const EmptyStateContainer = styled.div`
 `;
 
 const IllustrationWrapper = styled.div`
-  width: ${props => props.$width || '100%'};
+  width: ${(props) => props.$width || "100%"};
   max-width: 400px;
-  height: ${props => props.$height || '250px'};
+  height: ${(props) => props.$height || "250px"};
   margin-bottom: 30px;
 
   img {
@@ -57,7 +56,8 @@ const IllustrationWrapper = styled.div`
   }
 
   @keyframes float {
-    0%, 100% {
+    0%,
+    100% {
       transform: translateY(0px);
     }
     50% {
@@ -66,7 +66,8 @@ const IllustrationWrapper = styled.div`
   }
 
   @media (max-width: 768px) {
-    height: ${props => props.$height ? `calc(${props.$height} * 0.8)` : '200px'};
+    height: ${(props) =>
+      props.$height ? `calc(${props.$height} * 0.8)` : "200px"};
     margin-bottom: 20px;
   }
 `;
@@ -82,21 +83,21 @@ const ContentWrapper = styled.div`
 
 const Title = styled(Typography)`
   font-family: unset !important;
-  font-size: 24px !important;
+  font-size: 20px !important;
   font-weight: 600 !important;
-  color: #2c3e50 !important;
+  color: var(--c-ink) !important;
   margin-bottom: 12px !important;
   direction: rtl;
 
   @media (max-width: 768px) {
-    font-size: 20px !important;
+    font-size: 18px !important;
   }
 `;
 
 const Description = styled(Typography)`
   font-family: unset !important;
   font-size: 16px !important;
-  color: #7f8c8d !important;
+  color: var(--c-muted) !important;
   line-height: 1.6 !important;
   max-width: 450px;
   margin: 0 auto;
@@ -111,23 +112,23 @@ const ActionButton = styled.button`
   display: inline-flex;
   align-items: center;
   gap: 8px;
-  padding: 12px 30px;
+  padding: 10px 24px;
 
-  background-image: linear-gradient(195deg, #66bb6a 0%, #43a047 100%);
+  background-color: var(--c-primary);
   color: white;
   border: none;
-  border-radius: 8px;
-  font-size: 16px;
+  border-radius: var(--r-sm);
+  font-size: 14px;
   font-weight: 500;
   cursor: pointer;
 
-  box-shadow: 0px 4px 12px rgba(102, 187, 106, 0.4);
+  box-shadow: var(--shadow-sm);
   transition: all 0.3s ease;
 
   &:hover {
     transform: translateY(-2px);
-    box-shadow: 0px 6px 16px rgba(102, 187, 106, 0.5);
-    background-image: linear-gradient(195deg, #43a047 0%, #66bb6a 100%);
+    box-shadow: var(--shadow-md);
+    background-color: var(--c-primary-600);
   }
 
   &:active {
@@ -161,13 +162,20 @@ const EmptyState = ({
       className={className}
       style={containerStyle}
     >
-      <IllustrationWrapper $height={illustrationHeight} $width={illustrationWidth}>
+      <IllustrationWrapper
+        $height={illustrationHeight}
+        $width={illustrationWidth}
+      >
+        {/* static SVG illustrations from /public – next/image adds nothing here */}
+        {/* eslint-disable-next-line @next/next/no-img-element */}
         <img src={illustrationUrl} alt={title} />
       </IllustrationWrapper>
 
       <ContentWrapper>
         <Title variant="h5">{title}</Title>
-        {description && <Description variant="body1">{description}</Description>}
+        {description && (
+          <Description variant="body1">{description}</Description>
+        )}
       </ContentWrapper>
 
       {actionButtonText && onActionClick && (
@@ -190,7 +198,7 @@ EmptyState.propTypes = {
   illustrationHeight: PropTypes.string,
   illustrationWidth: PropTypes.string,
   maxWidth: PropTypes.string,
-  variant: PropTypes.oneOf(['grid', 'table']),
+  variant: PropTypes.oneOf(["grid", "table"]),
   className: PropTypes.string,
   containerStyle: PropTypes.object,
 };

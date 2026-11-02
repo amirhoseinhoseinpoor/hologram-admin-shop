@@ -1,5 +1,6 @@
 "use client";
 
+import { HeadermakeOrder } from "@/app/BaseComponent/PageHeader";
 import React, { useState, useEffect, useRef } from "react";
 import { useDispatch } from "react-redux";
 import { HeaderList, headerEdit } from "@/app/Store/thunks";
@@ -25,7 +26,6 @@ import {
 import {
   SortableContext,
   useSortable,
-  arrayMove,
   verticalListSortingStrategy,
 } from "@dnd-kit/sortable";
 import { CSS } from "@dnd-kit/utilities";
@@ -67,21 +67,6 @@ const Container = styled.div`
   padding: 20px;
 `;
 
-const HeadermakeOrder = styled.div`
-  padding: 10px;
-  color: white;
-  background-color: rgb(225, 223, 223);
-  border-radius: 4px;
-  .textHeaderStyle {
-    color: black;
-  }
-
-  @media (max-width: 980px) {
-    .textHeaderStyle {
-    }
-  }
-`;
-
 const InputField = styled.input`
   padding: 10px;
   width: 36%;
@@ -90,22 +75,40 @@ const InputField = styled.input`
 `;
 
 const Button = styled.button`
-  padding: 10px 20px;
-  background-image: ${(props) => {
-    if (props.$secondary)
-      return "linear-gradient(195deg, #46506a 0%, #282e3f 100%)";
-    return "#28a745";
-  }};
-
-  color: #fff;
-  border: none;
-  border-radius: 5px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  min-height: 40px;
+  padding: 0 18px;
+  font-size: 14px;
+  font-weight: 600;
+  white-space: nowrap;
+  color: ${(p) => (p.$secondary ? "var(--c-text)" : "#fff")} !important;
+  background-color: ${(p) =>
+    p.$danger
+      ? "var(--c-danger)"
+      : p.$secondary
+        ? "var(--c-surface)"
+        : "var(--c-primary)"} !important;
+  border: 1px solid
+    ${(p) =>
+      p.$danger
+        ? "var(--c-danger)"
+        : p.$secondary
+          ? "var(--c-border-strong)"
+          : "var(--c-primary)"} !important;
+  border-radius: var(--r-sm);
   cursor: pointer;
-  margin-left: ${(props) =>
-    props.$danger || props.$secondary ? "10px" : "0px"};
+  transition: background-color 0.15s ease;
 
   &:hover {
-    opacity: 0.9;
+    background-color: ${(p) =>
+      p.$danger
+        ? "var(--c-danger-600)"
+        : p.$secondary
+          ? "#f3f4f6"
+          : "var(--c-primary-600)"} !important;
   }
 `;
 
@@ -172,15 +175,16 @@ const LinkModeTogglePill = styled.button`
   padding: 5px 12px;
   font-size: 13px;
   border-radius: 20px;
-  border: 1.5px solid #282e3f;
-  color: #282e3f;
+  border: 1px solid ${(props) => (props.$active ? "var(--c-primary)" : "var(--c-border-strong)")};
   cursor: pointer;
-  background-color: ${(props) => (props.$active ? "#282e3f" : "transparent")};
-  color: ${(props) => (props.$active ? "#fff" : "#282e3f !important")};
-  transition: background-color 150ms, color 150ms;
+  background-color: ${(props) => (props.$active ? "var(--c-primary)" : "var(--c-surface)")};
+  color: ${(props) => (props.$active ? "#fff" : "var(--c-text)")} !important;
+  transition:
+    background-color 150ms,
+    color 150ms;
   white-space: nowrap;
   &:hover {
-    background-color: ${(props) => (props.$active ? "#3a4560" : "#f0f0f0")};
+    background-color: ${(props) => (props.$active ? "var(--c-primary-600)" : "#f3f4f6")};
   }
 `;
 
@@ -391,7 +395,7 @@ function SortableItem({
                 style={{
                   backgroundImage: "unset",
                   backgroundColor: "unset",
-                  color: "#43A047",
+                  color: "var(--c-primary)",
                 }}
                 $secondary
                 onClick={() => onAddSub(item)}
@@ -424,7 +428,9 @@ function SortableItem({
                 name="link"
                 placeholder="لینک ساب ایتم"
                 value={newSubItemMap[item.id]?.link || ""}
-                readOnly={(newSubItemMap[item.id]?.linkMode ?? "auto") === "auto"}
+                readOnly={
+                  (newSubItemMap[item.id]?.linkMode ?? "auto") === "auto"
+                }
                 style={
                   (newSubItemMap[item.id]?.linkMode ?? "auto") === "auto"
                     ? { backgroundColor: "#f5f5f5", color: "#888" }
@@ -435,7 +441,9 @@ function SortableItem({
               <div className="d-flex flex-row gap-1 align-items-center">
                 <LinkModeTogglePill
                   type="button"
-                  $active={(newSubItemMap[item.id]?.linkMode ?? "auto") === "auto"}
+                  $active={
+                    (newSubItemMap[item.id]?.linkMode ?? "auto") === "auto"
+                  }
                   onClick={() => handleInlineChange("linkMode", "auto")}
                 >
                   خودکار
@@ -533,7 +541,7 @@ function SortableItem({
                 style={{
                   backgroundImage: "unset",
                   backgroundColor: "unset",
-                  color: "#43A047",
+                  color: "var(--c-primary)",
                 }}
                 className="me-1"
                 $secondary
@@ -564,7 +572,9 @@ function SortableItem({
                 name="link"
                 placeholder="لینک ساب ایتم"
                 value={newSubItemMap[item.id]?.link || ""}
-                readOnly={(newSubItemMap[item.id]?.linkMode ?? "auto") === "auto"}
+                readOnly={
+                  (newSubItemMap[item.id]?.linkMode ?? "auto") === "auto"
+                }
                 style={
                   (newSubItemMap[item.id]?.linkMode ?? "auto") === "auto"
                     ? { backgroundColor: "#f5f5f5", color: "#888" }
@@ -575,7 +585,9 @@ function SortableItem({
               <div className="d-flex flex-row gap-1 align-items-center">
                 <LinkModeTogglePill
                   type="button"
-                  $active={(newSubItemMap[item.id]?.linkMode ?? "auto") === "auto"}
+                  $active={
+                    (newSubItemMap[item.id]?.linkMode ?? "auto") === "auto"
+                  }
                   onClick={() => handleInlineChange("linkMode", "auto")}
                 >
                   خودکار
@@ -646,10 +658,9 @@ export default function HeaderMainComponent({ toggleShow }) {
   const [headerData, setHeaderData] = useState([]);
   const [newItem, setNewItem] = useState({ title: "", link: "", subItems: [] });
   const [newItemLinkMode, setNewItemLinkMode] = useState("auto");
-  const [newSubItem, setNewSubItem] = useState({ title: "", link: "" });
   // we keep newSubItemMap (map parentId -> object) for inline add inputs per item
   const [newSubItemMap, setNewSubItemMap] = useState({});
-  const [addSubItemPath, setAddSubItemPath] = useState(null);
+  const [, setAddSubItemPath] = useState(null);
   const [isRemovingHeader, setIsRemovingHeader] = useState(false);
 
   const [openModal, setOpenModal] = useState(false);
@@ -660,7 +671,7 @@ export default function HeaderMainComponent({ toggleShow }) {
   const [selectedPath, setSelectedPath] = useState([]);
 
   // dnd state
-  const [dropIndicator, setDropIndicator] = useState(null); // { id, position: 'before'|'inside'|'after' }
+  const [dropIndicator, setDropIndicator] = useState(null);
 
   useEffect(() => {
     const fetchData = async () => {
@@ -694,14 +705,6 @@ export default function HeaderMainComponent({ toggleShow }) {
     if (mode === "auto") {
       setNewItem((prev) => ({ ...prev, link: `/${prev.title}` }));
     }
-  };
-
-  const handleSubInputChange = (e) => {
-    const { name, value } = e.target;
-    setNewSubItem((prev) => {
-      if (prev[name] === value) return prev;
-      return { ...prev, [name]: value };
-    });
   };
 
   const addItem = () => {
@@ -741,51 +744,7 @@ export default function HeaderMainComponent({ toggleShow }) {
     closeModalHandler();
   };
 
-  const selectHeaderForSubItem = (index) => {
-    // show inline input under this header
-    const id = headerData[index].id;
-    setNewSubItemMap((m) => ({ ...m, [id]: { title: "", link: "", linkMode: "auto" } }));
-    setNewSubItem({ title: "", link: "" });
-  };
-
-  const selectSubItemForSubItem = (path) => {
-    // show inline input under the sub-item with that path
-    const target = getItemByPath(headerData, path);
-    if (!target) return;
-    setNewSubItemMap((m) => ({ ...m, [target.id]: { title: "", link: "", linkMode: "auto" } }));
-    setNewSubItem({ title: "", link: "" });
-  };
-
   // old addSubItem kept for compatibility, but confirmAddSubItem will be used by inline inputs
-  const addSubItem = (path) => {
-    if (newSubItem.title && newSubItem.link) {
-      const updatedHeader = deepClone(headerData);
-      let target = updatedHeader[path[0]];
-
-      for (let i = 1; i < path.length; i++) {
-        if (!target.subItems) {
-          target.subItems = [];
-        }
-        target = target.subItems[path[i]];
-      }
-
-      if (!target.subItems) {
-        target.subItems = [];
-      }
-
-      target.subItems.push({
-        ...newSubItem,
-        id: Date.now(),
-        subItems: [],
-      });
-
-      setHeaderData(updatedHeader);
-      setNewSubItem({ title: "", link: "" });
-      setAddSubItemPath(null);
-    } else {
-      setOpenModal2(true);
-    }
-  };
 
   // confirmAddSubItem used by inline inputs
   const confirmAddSubItem = (parentId) => {
@@ -827,7 +786,7 @@ export default function HeaderMainComponent({ toggleShow }) {
     const newTree = insertItemByPath(
       headerData,
       [...found.path, "append"],
-      newNode
+      newNode,
     );
     setHeaderData(newTree);
     setNewSubItemMap((m) => {
@@ -936,7 +895,6 @@ export default function HeaderMainComponent({ toggleShow }) {
     const relativeY = pointerY - rect.top;
     const height = rect.height;
 
-    // Wider drop zones: top 40% => before, bottom 40% => after, middle 20% => inside
     let position;
     if (relativeY < height * 0.4) position = "before";
     else if (relativeY > height * 0.6) position = "after";
@@ -1083,7 +1041,7 @@ export default function HeaderMainComponent({ toggleShow }) {
         <div className="NormalTextSizing text-decoration-underline textHeaderStyle d-flex align-items-center">
           ساخت هدر
         </div>
-        <ProfileComponent colorGet={"#282e3f"} />
+        <ProfileComponent />
       </HeadermakeOrder>
 
       <Container>
@@ -1102,12 +1060,19 @@ export default function HeaderMainComponent({ toggleShow }) {
               placeholder="لینک هدر"
               value={newItem.link}
               readOnly={newItemLinkMode === "auto"}
-              style={newItemLinkMode === "auto" ? { backgroundColor: "#f5f5f5", color: "#888" } : {}}
+              style={
+                newItemLinkMode === "auto"
+                  ? { backgroundColor: "#f5f5f5", color: "#888" }
+                  : {}
+              }
               onChange={handleInputChange}
             />
           </div>
 
-          <div className="d-flex flex-row gap-1 align-items-center" style={{ margin: "0 8px" }}>
+          <div
+            className="d-flex flex-row gap-1 align-items-center"
+            style={{ margin: "0 8px" }}
+          >
             <LinkModeTogglePill
               type="button"
               $active={newItemLinkMode === "auto"}
@@ -1169,7 +1134,11 @@ export default function HeaderMainComponent({ toggleShow }) {
                             // show inline input for top-level header
                             setNewSubItemMap((m) => ({
                               ...m,
-                              [item.id]: { title: "", link: "", linkMode: "auto" },
+                              [item.id]: {
+                                title: "",
+                                link: "",
+                                linkMode: "auto",
+                              },
                             }));
                           }}
                           onRemove={() => openRemoveModal([index], true)}
@@ -1215,14 +1184,17 @@ export default function HeaderMainComponent({ toggleShow }) {
         <AreYouShureModal
           open={openConfirmSubmit}
           onClose={() => setOpenConfirmSubmit(false)}
-          func={() => { submitHeaderData(); setOpenConfirmSubmit(false); }}
+          func={() => {
+            submitHeaderData();
+            setOpenConfirmSubmit(false);
+          }}
           text="از ذخیره تغییرات هدر مطمئن هستید؟"
         />
 
         <ErrorModal
           open={openModal2}
           onClose={closeModal2Handler}
-          text={"لطفا تایتل و لینک را وارد کنید"}
+          text={"لطفاً عنوان و لینک را وارد کنید"}
         />
         <ConfirmModal
           open={openModal3}

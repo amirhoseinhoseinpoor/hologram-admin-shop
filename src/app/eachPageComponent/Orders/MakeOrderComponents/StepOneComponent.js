@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from "react";
+import { useState, useEffect } from "react";
 import style from "../../../Styles/MakeOrderStyle/StepOneStyle.module.scss";
 import { Box } from "@mui/system";
 // import basecomponent
@@ -19,7 +19,6 @@ import {
 } from "@/app/Store/thunks";
 // improt icons
 import FolderZipIcon from "@mui/icons-material/FolderZip";
-import DoneIcon from "@mui/icons-material/Done";
 import PictureAsPdfIcon from "@mui/icons-material/PictureAsPdf";
 
 export default function SteponeComponent({
@@ -43,9 +42,8 @@ export default function SteponeComponent({
 
   const handleCloseZoomModal = () => setZoomModal(false);
 
-  // const [inputFields, setInputFields] = useState([{ title: "", price: "" }]);
   const [disablenextStep, setDisableNextStep] = useState(true);
-  const [statusTraking, setStatusTraking] = useState(false);
+  const [, setStatusTraking] = useState(false);
   const [moveForward, setMoveForward] = useState(false);
   const [factorType, setFactorType] = useState("");
   const [paymentType, setPatmentType] = useState("");
@@ -86,7 +84,7 @@ export default function SteponeComponent({
     const gettingImageFactor = async () => {
       if (reqComment?.paymentImage) {
         const returnFactor = await dispatch(
-          fetchPrivateImage({ filename: reqComment?.paymentImage })
+          fetchPrivateImage({ filename: reqComment?.paymentImage }),
         ).unwrap();
         setLogo({
           imageUrl: returnFactor || null,
@@ -97,7 +95,7 @@ export default function SteponeComponent({
       }
       if (payment?.finalPayment) {
         const returnFactor = await dispatch(
-          fetchPrivateImage({ filename: payment?.finalPayment })
+          fetchPrivateImage({ filename: payment?.finalPayment }),
         ).unwrap();
         setFinalFactor({
           imageUrl: returnFactor || null,
@@ -141,7 +139,7 @@ export default function SteponeComponent({
             dropDownOP:
               field.type === "dropDown" ? field.dropDownOP : undefined,
           })),
-        }))
+        })),
       );
 
       const initialDynamicForm = {};
@@ -153,7 +151,6 @@ export default function SteponeComponent({
         });
       });
 
-      // setDynamicForm(initialDynamicForm);
       setHasDynamicFields(true);
       setStatusTraking(true);
     } else if (typeof data === "object" && data !== null) {
@@ -299,8 +296,8 @@ export default function SteponeComponent({
         prod.filedOrder.every(
           (field) =>
             dynamicForm[prod.code] &&
-            dynamicForm[prod.code][field.name]?.trim() !== ""
-        )
+            dynamicForm[prod.code][field.name]?.trim() !== "",
+        ),
       );
       setDisableNextStep(!dynamicFilled);
     } else {
@@ -349,7 +346,7 @@ export default function SteponeComponent({
       const selectedOption = selectedProduct.filedOrder.find(
         (field) =>
           field.name === name &&
-          field.dropDownOP.some((op) => op.text === value)
+          field.dropDownOP.some((op) => op.text === value),
       );
 
       // If the option has isChecked = true, show the related input field
@@ -392,25 +389,26 @@ export default function SteponeComponent({
     if (data) {
       if (Array.isArray(data)) {
         const initialDynamicForm = {};
-  
+
         // Iterate through the products
         data.forEach((prod) => {
           initialDynamicForm[prod.code] = {}; // Initialize the product code in dynamicForm
-  
+
           // Iterate through each field of the product
           prod.filedOrder.forEach((field) => {
-            initialDynamicForm[prod.code][field.name] = field.value || "";  // Prefill field value
-  
+            initialDynamicForm[prod.code][field.name] = field.value || ""; // Prefill field value
+
             // Check for 'Other' fields (dropVal) and prefill the '_custom' field if necessary
             if (field.dropVal) {
-              initialDynamicForm[prod.code][`${field.name}_custom`] = field.dropVal;  // Prefill custom value if available
+              initialDynamicForm[prod.code][`${field.name}_custom`] =
+                field.dropVal; // Prefill custom value if available
             } else {
-              initialDynamicForm[prod.code][`${field.name}_custom`] = "";  // Empty custom if 'Other' isn't selected
+              initialDynamicForm[prod.code][`${field.name}_custom`] = ""; // Empty custom if 'Other' isn't selected
             }
           });
         });
-  
-        setDynamicForm(initialDynamicForm);  // Set the prefilled dynamic form
+
+        setDynamicForm(initialDynamicForm); // Set the prefilled dynamic form
       }
     }
   }, [data]);
@@ -422,7 +420,7 @@ export default function SteponeComponent({
       let updatedInformation;
       let uploadFinalFactor;
       let updatedFinalFactor;
-  
+
       if (information?.paymentImage) {
         uploadFactor = await dispatch(
           uploadFile({
@@ -430,9 +428,9 @@ export default function SteponeComponent({
             tag: "factor",
             type: 1,
             isPublic: false,
-          })
+          }),
         ).unwrap();
-  
+
         updatedInformation = {
           paymentImage: uploadFactor,
           docInfo: information.docInfo,
@@ -452,9 +450,9 @@ export default function SteponeComponent({
             tag: "finalFactor",
             type: 1,
             isPublic: false,
-          })
+          }),
         ).unwrap();
-  
+
         updatedFinalFactor = {
           finalPayment: uploadFinalFactor,
           finalPaymentType: information.finalPaymentType,
@@ -465,9 +463,9 @@ export default function SteponeComponent({
           finalPaymentType: reqComment?.finalPaymentType,
         };
       }
-  
+
       let dataToSend = {};
-  
+
       if (hasDynamicFields && prodFiled.length > 0) {
         // Construct products data with name, code, and dynamic fields including type and options
         const productsData = prodFiled.map((prod) => ({
@@ -478,46 +476,45 @@ export default function SteponeComponent({
             type: field.type,
             dropDownOP:
               field.type === "dropDown" ? field.dropDownOP : undefined,
-            value: dynamicForm[prod.code]?.[field.name] || "",  // Keep default value if available
-            dropVal:
-              dynamicForm[prod.code]?.[`${field.name}_custom`] || "", // Send the custom value if filled
+            value: dynamicForm[prod.code]?.[field.name] || "", // Keep default value if available
+            dropVal: dynamicForm[prod.code]?.[`${field.name}_custom`] || "", // Send the custom value if filled
           })),
         }));
-  
+
         dataToSend = { request: productsData };
       } else {
         // Only static form data
         dataToSend = { request: { ...formData } };
       }
-  
+
       const resultAction = await dispatch(
-        updateFirstStep({ code, dataToSend })
+        updateFirstStep({ code, dataToSend }),
       );
-  
+
       // Send updatedInformation with the second API call
       const uploadDocumentUser = await dispatch(
-        requestAdminCommnet({ code, reqComment: updatedInformation })
+        requestAdminCommnet({ code, reqComment: updatedInformation }),
       );
-  
+
       const uploadPaymentLastStep = await dispatch(
-        paymentStepData({ code, payment: updatedFinalFactor })
+        paymentStepData({ code, payment: updatedFinalFactor }),
       );
-  
+
       if (
         resultAction.payload.message == "Success" &&
         uploadDocumentUser.payload.message == "Success" &&
         uploadPaymentLastStep.payload.message == "Success"
       ) {
         const increaseStepOrder = await dispatch(
-          increaseStep({ code, step: 2 })
+          increaseStep({ code, step: 2 }),
         );
-  
+
         if (increaseStepOrder.payload.message == "Success") {
           setNavStep(2);
           setStep(2);
         }
       }
-  
+
       setLoading(false);
     } catch (error) {
       console.error("Error uploading file:", error);
@@ -525,7 +522,6 @@ export default function SteponeComponent({
       setLoading(false);
     }
   };
-  
 
   return (
     <div className="container">
@@ -621,7 +617,7 @@ export default function SteponeComponent({
                           {item?.dropDownOP?.some(
                             (op) =>
                               op.isChecked &&
-                              dynamicForm[inProd.code]?.[item.name] === op.text
+                              dynamicForm[inProd.code]?.[item.name] === op.text,
                           ) && (
                             <input
                               type="text"
@@ -1001,7 +997,7 @@ export default function SteponeComponent({
                       const date = new Date();
                       downloadImage(
                         logo.imageUrl,
-                        `${date.toISOString()}.${logo?.paymentImageType}`
+                        `${date.toISOString()}.${logo?.paymentImageType}`,
                       );
                     }
                   }}
@@ -1024,31 +1020,31 @@ export default function SteponeComponent({
                       >
                         <path
                           d="M10.5 2.98828C8.835 2.82328 7.16 2.73828 5.49 2.73828C4.5 2.73828 3.51 2.78828 2.52 2.88828L1.5 2.98828"
-                          stroke="#FF4F3F"
+                          stroke="#dc2626"
                           strokeLinecap="round"
                           strokeLinejoin="round"
                         />
                         <path
                           d="M4.25 2.485L4.36 1.83C4.44 1.355 4.5 1 5.345 1H6.655C7.5 1 7.565 1.375 7.64 1.835L7.75 2.485"
-                          stroke="#FF4F3F"
+                          stroke="#dc2626"
                           strokeLinecap="round"
                           strokeLinejoin="round"
                         />
                         <path
                           d="M9.4252 4.57031L9.1002 9.60531C9.0452 10.3903 9.0002 11.0003 7.6052 11.0003H4.3952C3.0002 11.0003 2.9552 10.3903 2.9002 9.60531L2.5752 4.57031"
-                          stroke="#FF4F3F"
+                          stroke="#dc2626"
                           strokeLinecap="round"
                           strokeLinejoin="round"
                         />
                         <path
                           d="M5.16504 8.25H6.83004"
-                          stroke="#FF4F3F"
+                          stroke="#dc2626"
                           strokeLinecap="round"
                           strokeLinejoin="round"
                         />
                         <path
                           d="M4.75 6.25H7.25"
-                          stroke="#FF4F3F"
+                          stroke="#dc2626"
                           strokeLinecap="round"
                           strokeLinejoin="round"
                         />
@@ -1066,10 +1062,8 @@ export default function SteponeComponent({
                       const date = new Date();
                       downloadImage(
                         logo.imageUrl,
-                        `${date.toISOString()}.${logo?.finalPaymentType}`
+                        `${date.toISOString()}.${logo?.paymentImageType}`,
                       );
-                    } else {
-                      handleImageClick(index, fileObj.file);
                     }
                   }}
                 >
@@ -1091,31 +1085,31 @@ export default function SteponeComponent({
                       >
                         <path
                           d="M10.5 2.98828C8.835 2.82328 7.16 2.73828 5.49 2.73828C4.5 2.73828 3.51 2.78828 2.52 2.88828L1.5 2.98828"
-                          stroke="#FF4F3F"
+                          stroke="#dc2626"
                           strokeLinecap="round"
                           strokeLinejoin="round"
                         />
                         <path
                           d="M4.25 2.485L4.36 1.83C4.44 1.355 4.5 1 5.345 1H6.655C7.5 1 7.565 1.375 7.64 1.835L7.75 2.485"
-                          stroke="#FF4F3F"
+                          stroke="#dc2626"
                           strokeLinecap="round"
                           strokeLinejoin="round"
                         />
                         <path
                           d="M9.4252 4.57031L9.1002 9.60531C9.0452 10.3903 9.0002 11.0003 7.6052 11.0003H4.3952C3.0002 11.0003 2.9552 10.3903 2.9002 9.60531L2.5752 4.57031"
-                          stroke="#FF4F3F"
+                          stroke="#dc2626"
                           strokeLinecap="round"
                           strokeLinejoin="round"
                         />
                         <path
                           d="M5.16504 8.25H6.83004"
-                          stroke="#FF4F3F"
+                          stroke="#dc2626"
                           strokeLinecap="round"
                           strokeLinejoin="round"
                         />
                         <path
                           d="M4.75 6.25H7.25"
-                          stroke="#FF4F3F"
+                          stroke="#dc2626"
                           strokeLinecap="round"
                           strokeLinejoin="round"
                         />
@@ -1147,31 +1141,31 @@ export default function SteponeComponent({
                     >
                       <path
                         d="M10.5 2.98828C8.835 2.82328 7.16 2.73828 5.49 2.73828C4.5 2.73828 3.51 2.78828 2.52 2.88828L1.5 2.98828"
-                        stroke="#FF4F3F"
+                        stroke="#dc2626"
                         strokeLinecap="round"
                         strokeLinejoin="round"
                       />
                       <path
                         d="M4.25 2.485L4.36 1.83C4.44 1.355 4.5 1 5.345 1H6.655C7.5 1 7.565 1.375 7.64 1.835L7.75 2.485"
-                        stroke="#FF4F3F"
+                        stroke="#dc2626"
                         strokeLinecap="round"
                         strokeLinejoin="round"
                       />
                       <path
                         d="M9.4252 4.57031L9.1002 9.60531C9.0452 10.3903 9.0002 11.0003 7.6052 11.0003H4.3952C3.0002 11.0003 2.9552 10.3903 2.9002 9.60531L2.5752 4.57031"
-                        stroke="#FF4F3F"
+                        stroke="#dc2626"
                         strokeLinecap="round"
                         strokeLinejoin="round"
                       />
                       <path
                         d="M5.16504 8.25H6.83004"
-                        stroke="#FF4F3F"
+                        stroke="#dc2626"
                         strokeLinecap="round"
                         strokeLinejoin="round"
                       />
                       <path
                         d="M4.75 6.25H7.25"
-                        stroke="#FF4F3F"
+                        stroke="#dc2626"
                         strokeLinecap="round"
                         strokeLinejoin="round"
                       />
@@ -1245,7 +1239,7 @@ export default function SteponeComponent({
                       const date = new Date();
                       downloadImage(
                         finalFactor.imageUrl,
-                        `${date.toISOString()}.${finalFactor?.finalPaymentType}`
+                        `${date.toISOString()}.${finalFactor?.finalPaymentType}`,
                       );
                     }
                   }}
@@ -1268,31 +1262,31 @@ export default function SteponeComponent({
                       >
                         <path
                           d="M10.5 2.98828C8.835 2.82328 7.16 2.73828 5.49 2.73828C4.5 2.73828 3.51 2.78828 2.52 2.88828L1.5 2.98828"
-                          stroke="#FF4F3F"
+                          stroke="#dc2626"
                           strokeLinecap="round"
                           strokeLinejoin="round"
                         />
                         <path
                           d="M4.25 2.485L4.36 1.83C4.44 1.355 4.5 1 5.345 1H6.655C7.5 1 7.565 1.375 7.64 1.835L7.75 2.485"
-                          stroke="#FF4F3F"
+                          stroke="#dc2626"
                           strokeLinecap="round"
                           strokeLinejoin="round"
                         />
                         <path
                           d="M9.4252 4.57031L9.1002 9.60531C9.0452 10.3903 9.0002 11.0003 7.6052 11.0003H4.3952C3.0002 11.0003 2.9552 10.3903 2.9002 9.60531L2.5752 4.57031"
-                          stroke="#FF4F3F"
+                          stroke="#dc2626"
                           strokeLinecap="round"
                           strokeLinejoin="round"
                         />
                         <path
                           d="M5.16504 8.25H6.83004"
-                          stroke="#FF4F3F"
+                          stroke="#dc2626"
                           strokeLinecap="round"
                           strokeLinejoin="round"
                         />
                         <path
                           d="M4.75 6.25H7.25"
-                          stroke="#FF4F3F"
+                          stroke="#dc2626"
                           strokeLinecap="round"
                           strokeLinejoin="round"
                         />
@@ -1310,10 +1304,8 @@ export default function SteponeComponent({
                       const date = new Date();
                       downloadImage(
                         finalFactor.imageUrl,
-                        `${date.toISOString()}.${finalFactor?.finalPaymentType}`
+                        `${date.toISOString()}.${finalFactor?.finalPaymentType}`,
                       );
-                    } else {
-                      handleImageClick(index, fileObj.file);
                     }
                   }}
                 >
@@ -1335,31 +1327,31 @@ export default function SteponeComponent({
                       >
                         <path
                           d="M10.5 2.98828C8.835 2.82328 7.16 2.73828 5.49 2.73828C4.5 2.73828 3.51 2.78828 2.52 2.88828L1.5 2.98828"
-                          stroke="#FF4F3F"
+                          stroke="#dc2626"
                           strokeLinecap="round"
                           strokeLinejoin="round"
                         />
                         <path
                           d="M4.25 2.485L4.36 1.83C4.44 1.355 4.5 1 5.345 1H6.655C7.5 1 7.565 1.375 7.64 1.835L7.75 2.485"
-                          stroke="#FF4F3F"
+                          stroke="#dc2626"
                           strokeLinecap="round"
                           strokeLinejoin="round"
                         />
                         <path
                           d="M9.4252 4.57031L9.1002 9.60531C9.0452 10.3903 9.0002 11.0003 7.6052 11.0003H4.3952C3.0002 11.0003 2.9552 10.3903 2.9002 9.60531L2.5752 4.57031"
-                          stroke="#FF4F3F"
+                          stroke="#dc2626"
                           strokeLinecap="round"
                           strokeLinejoin="round"
                         />
                         <path
                           d="M5.16504 8.25H6.83004"
-                          stroke="#FF4F3F"
+                          stroke="#dc2626"
                           strokeLinecap="round"
                           strokeLinejoin="round"
                         />
                         <path
                           d="M4.75 6.25H7.25"
-                          stroke="#FF4F3F"
+                          stroke="#dc2626"
                           strokeLinecap="round"
                           strokeLinejoin="round"
                         />
@@ -1391,31 +1383,31 @@ export default function SteponeComponent({
                     >
                       <path
                         d="M10.5 2.98828C8.835 2.82328 7.16 2.73828 5.49 2.73828C4.5 2.73828 3.51 2.78828 2.52 2.88828L1.5 2.98828"
-                        stroke="#FF4F3F"
+                        stroke="#dc2626"
                         strokeLinecap="round"
                         strokeLinejoin="round"
                       />
                       <path
                         d="M4.25 2.485L4.36 1.83C4.44 1.355 4.5 1 5.345 1H6.655C7.5 1 7.565 1.375 7.64 1.835L7.75 2.485"
-                        stroke="#FF4F3F"
+                        stroke="#dc2626"
                         strokeLinecap="round"
                         strokeLinejoin="round"
                       />
                       <path
                         d="M9.4252 4.57031L9.1002 9.60531C9.0452 10.3903 9.0002 11.0003 7.6052 11.0003H4.3952C3.0002 11.0003 2.9552 10.3903 2.9002 9.60531L2.5752 4.57031"
-                        stroke="#FF4F3F"
+                        stroke="#dc2626"
                         strokeLinecap="round"
                         strokeLinejoin="round"
                       />
                       <path
                         d="M5.16504 8.25H6.83004"
-                        stroke="#FF4F3F"
+                        stroke="#dc2626"
                         strokeLinecap="round"
                         strokeLinejoin="round"
                       />
                       <path
                         d="M4.75 6.25H7.25"
-                        stroke="#FF4F3F"
+                        stroke="#dc2626"
                         strokeLinecap="round"
                         strokeLinejoin="round"
                       />
@@ -1493,7 +1485,7 @@ export default function SteponeComponent({
                     const date = new Date();
                     downloadImage(
                       bothFactor.imageUrl,
-                      `${date.toISOString()}.${bothFactor?.finalPaymentType}`
+                      `${date.toISOString()}.${bothFactor?.finalPaymentType}`,
                     );
                   }
                 }}
@@ -1516,31 +1508,31 @@ export default function SteponeComponent({
                     >
                       <path
                         d="M10.5 2.98828C8.835 2.82328 7.16 2.73828 5.49 2.73828C4.5 2.73828 3.51 2.78828 2.52 2.88828L1.5 2.98828"
-                        stroke="#FF4F3F"
+                        stroke="#dc2626"
                         strokeLinecap="round"
                         strokeLinejoin="round"
                       />
                       <path
                         d="M4.25 2.485L4.36 1.83C4.44 1.355 4.5 1 5.345 1H6.655C7.5 1 7.565 1.375 7.64 1.835L7.75 2.485"
-                        stroke="#FF4F3F"
+                        stroke="#dc2626"
                         strokeLinecap="round"
                         strokeLinejoin="round"
                       />
                       <path
                         d="M9.4252 4.57031L9.1002 9.60531C9.0452 10.3903 9.0002 11.0003 7.6052 11.0003H4.3952C3.0002 11.0003 2.9552 10.3903 2.9002 9.60531L2.5752 4.57031"
-                        stroke="#FF4F3F"
+                        stroke="#dc2626"
                         strokeLinecap="round"
                         strokeLinejoin="round"
                       />
                       <path
                         d="M5.16504 8.25H6.83004"
-                        stroke="#FF4F3F"
+                        stroke="#dc2626"
                         strokeLinecap="round"
                         strokeLinejoin="round"
                       />
                       <path
                         d="M4.75 6.25H7.25"
-                        stroke="#FF4F3F"
+                        stroke="#dc2626"
                         strokeLinecap="round"
                         strokeLinejoin="round"
                       />
@@ -1558,10 +1550,8 @@ export default function SteponeComponent({
                     const date = new Date();
                     downloadImage(
                       bothFactor.imageUrl,
-                      `${date.toISOString()}.${bothFactor?.finalPaymentType}`
+                      `${date.toISOString()}.${bothFactor?.finalPaymentType}`,
                     );
-                  } else {
-                    handleImageClick(index, fileObj.file);
                   }
                 }}
               >
@@ -1583,31 +1573,31 @@ export default function SteponeComponent({
                     >
                       <path
                         d="M10.5 2.98828C8.835 2.82328 7.16 2.73828 5.49 2.73828C4.5 2.73828 3.51 2.78828 2.52 2.88828L1.5 2.98828"
-                        stroke="#FF4F3F"
+                        stroke="#dc2626"
                         strokeLinecap="round"
                         strokeLinejoin="round"
                       />
                       <path
                         d="M4.25 2.485L4.36 1.83C4.44 1.355 4.5 1 5.345 1H6.655C7.5 1 7.565 1.375 7.64 1.835L7.75 2.485"
-                        stroke="#FF4F3F"
+                        stroke="#dc2626"
                         strokeLinecap="round"
                         strokeLinejoin="round"
                       />
                       <path
                         d="M9.4252 4.57031L9.1002 9.60531C9.0452 10.3903 9.0002 11.0003 7.6052 11.0003H4.3952C3.0002 11.0003 2.9552 10.3903 2.9002 9.60531L2.5752 4.57031"
-                        stroke="#FF4F3F"
+                        stroke="#dc2626"
                         strokeLinecap="round"
                         strokeLinejoin="round"
                       />
                       <path
                         d="M5.16504 8.25H6.83004"
-                        stroke="#FF4F3F"
+                        stroke="#dc2626"
                         strokeLinecap="round"
                         strokeLinejoin="round"
                       />
                       <path
                         d="M4.75 6.25H7.25"
-                        stroke="#FF4F3F"
+                        stroke="#dc2626"
                         strokeLinecap="round"
                         strokeLinejoin="round"
                       />
@@ -1639,31 +1629,31 @@ export default function SteponeComponent({
                   >
                     <path
                       d="M10.5 2.98828C8.835 2.82328 7.16 2.73828 5.49 2.73828C4.5 2.73828 3.51 2.78828 2.52 2.88828L1.5 2.98828"
-                      stroke="#FF4F3F"
+                      stroke="#dc2626"
                       strokeLinecap="round"
                       strokeLinejoin="round"
                     />
                     <path
                       d="M4.25 2.485L4.36 1.83C4.44 1.355 4.5 1 5.345 1H6.655C7.5 1 7.565 1.375 7.64 1.835L7.75 2.485"
-                      stroke="#FF4F3F"
+                      stroke="#dc2626"
                       strokeLinecap="round"
                       strokeLinejoin="round"
                     />
                     <path
                       d="M9.4252 4.57031L9.1002 9.60531C9.0452 10.3903 9.0002 11.0003 7.6052 11.0003H4.3952C3.0002 11.0003 2.9552 10.3903 2.9002 9.60531L2.5752 4.57031"
-                      stroke="#FF4F3F"
+                      stroke="#dc2626"
                       strokeLinecap="round"
                       strokeLinejoin="round"
                     />
                     <path
                       d="M5.16504 8.25H6.83004"
-                      stroke="#FF4F3F"
+                      stroke="#dc2626"
                       strokeLinecap="round"
                       strokeLinejoin="round"
                     />
                     <path
                       d="M4.75 6.25H7.25"
-                      stroke="#FF4F3F"
+                      stroke="#dc2626"
                       strokeLinecap="round"
                       strokeLinejoin="round"
                     />
@@ -1748,12 +1738,11 @@ export default function SteponeComponent({
         )}
       </div>
 
-
       {/* modals */}
       <ErrorModal
         open={openModal3}
         onClose={closeModal3}
-        text={"مشکلی به وجود آمده است، لطفا بعدا تلاش کنید."}
+        text={"خطا در انجام عملیات، لطفاً دوباره تلاش کنید"}
       />
       <ZoomModal
         open={zoomModal}

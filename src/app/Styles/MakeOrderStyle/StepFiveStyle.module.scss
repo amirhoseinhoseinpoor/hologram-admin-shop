@@ -3,8 +3,8 @@
 .continueButton {
   border: none;
   color: white;
-  background-color: #5695f6;
-  border-radius: 4px;
+  background-color: var(--c-primary);
+  border-radius: var(--r-sm);
   padding: 7px 29px !important;
 }
 .resetfontLabel {
@@ -26,14 +26,14 @@
 }
 
 .butttonAddAdress {
-  border: 1.5px solid #5695f6 !important;
+  border: 1px solid var(--c-primary) !important;
   border-radius: 6px !important;
   padding: 5px 10px !important;
   background-color: white !important;
   margin-top: 10px;
   div {
     p {
-      color: #5695f6 !important;
+      color: var(--c-primary) !important;
     }
   }
 }
@@ -47,12 +47,12 @@
 }
 
 .StarFixReq {
-  color: #ff4f3f;
+  color: var(--c-danger);
 }
 
 .inputTextCompanyName {
   border: 1px solid #c0c0c0;
-  border-radius: 4px;
+  border-radius: var(--r-sm);
   padding: 6px 5px;
   margin-top: 5px;
   width: 95%;
@@ -68,10 +68,10 @@
 
 .SubmitModalAdress {
   border: none;
-  background-color: #5695f6;
+  background-color: var(--c-primary);
   color: white;
   padding: 7px 35px;
-  border-radius: 4px;
+  border-radius: var(--r-sm);
   margin-top: 10px;
 }
 
@@ -82,7 +82,7 @@
 .reStyleCardContent {
   display: flex;
   flex-direction: row;
-  justify-content: end;
+  justify-content: flex-end;
   gap: 10px;
   cursor: pointer;
   padding-bottom: 0 !important;
@@ -92,7 +92,7 @@
   border: none;
   box-shadow: none;
   background-color: #f7f8fc;
-  border-radius: 4px;
+  border-radius: var(--r-sm);
   height: 100%;
   cursor: pointer;
 }
@@ -112,10 +112,10 @@
 }
 
 .SeeLastStepButton{
-  border: 1.5px solid #5695F6 !important;
-  color: #5695F6 !important;
+  border: 1px solid var(--c-primary) !important;
+  color: var(--c-primary) !important;
   background-color: transparent;
-  border-radius: 4px;
+  border-radius: var(--r-sm);
   padding: 2px 8px;
 }
 @media (max-width: 980px) {

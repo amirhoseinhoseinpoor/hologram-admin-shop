@@ -1,8 +1,8 @@
-'use client';
+"use client";
 
-import React, { useEffect } from 'react';
-import { useSelector } from 'react-redux';
-import { useRouter } from 'next/navigation';
+import { useEffect } from "react";
+import { useSelector } from "react-redux";
+import { useRouter } from "next/navigation";
 
 export default function withPageAuthRequired(WrappedComponent) {
   return function WithPageAuthRequired(props) {
@@ -10,12 +10,13 @@ export default function withPageAuthRequired(WrappedComponent) {
     const router = useRouter();
 
     useEffect(() => {
-      if (!authState.token) {
-        router.push('/');
+      // wait until the saved session has been restored before deciding
+      if (authState.authReady && !authState.token) {
+        router.replace("/");
       }
-    }, [authState.token, router]);
+    }, [authState.authReady, authState.token, router]);
 
-    if (!authState.token) {
+    if (!authState.authReady || !authState.token) {
       return null;
     }
 

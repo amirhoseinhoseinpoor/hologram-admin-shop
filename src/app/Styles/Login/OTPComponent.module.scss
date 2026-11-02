@@ -10,25 +10,25 @@
 }
 
 .handelLoginError {
-  border-radius: 4px;
-  background-color: #ff4f3f;
-  padding: 8px;
+  border-radius: var(--r-sm);
+  background-color: var(--c-danger);
+  padding: 10px;
   color: white;
   text-align: center;
   margin-bottom: 15px;
 }
 
 .activeButton {
-  background-color: #5695f6;
+  background-color: var(--c-primary);
   cursor: pointer;
 }
 .activeButton :hover {
-  background-color: #3e73d3;
-  border-radius: 4px;
+  background-color: var(--c-primary-600);
+  border-radius: var(--r-sm);
 }
 
 .disabledButton {
-  background-color: #868686;
+  background-color: #9ca3af;
   cursor: not-allowed;
 }
 
@@ -55,17 +55,18 @@
   height: 44px;
   font-size: 18px;
   text-align: center;
-  border: 1px solid #aeaaaa;
-  border-radius: 5px;
-  margin: 0 15px;
+  border: 1px solid var(--c-border-strong);
+  border-radius: var(--r-sm);
+  margin: 0 6px;
   outline: none;
   transition: border-color 0.3s;
   background-color: transparent;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  
 }
 
 .otpInput:focus {
-  border-color: #5695f6;
+  border-color: var(--c-primary);
+  box-shadow: 0 0 0 3px var(--c-primary-100);
 }
 
 // .timer {
@@ -75,7 +76,10 @@
 // }
 
 .verifyButton {
-  
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 44px;
   color: #fff;
   padding: 10px 20px;
   font-size: 16px;
@@ -83,14 +87,34 @@
   // transition: background-color 0.3s;
   // margin-bottom: 10px;
 
-  border-radius: 4px;
+  border-radius: var(--r-sm);
   border: none;
 }
+.loader {
+  width: 24px;
+  padding: 4px;
+  aspect-ratio: 1;
+  border-radius: 50%;
+  background: #fff;
+  --_m: conic-gradient(#0000 10%, #000), linear-gradient(#000 0 0) content-box;
+  -webkit-mask: var(--_m);
+  mask: var(--_m);
+  -webkit-mask-composite: source-out;
+  mask-composite: subtract;
+  animation: otpSpin 1s infinite linear;
+}
+
+@keyframes otpSpin {
+  to {
+    transform: rotate(1turn);
+  }
+}
+
 .resendButton {
   background-color: transparent;
   border: none;
   display: inline-block;
-  color: #f3802c;
+  color: var(--c-warning);
   text-decoration: underline;
 }
 

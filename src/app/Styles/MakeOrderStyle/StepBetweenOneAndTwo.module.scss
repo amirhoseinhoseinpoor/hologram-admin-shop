@@ -3,11 +3,11 @@
 .continueButton {
   border: none;
   color: white;
-  background-color: #5695f6;
-  border-radius: 4px;
+  background-color: var(--c-primary);
+  border-radius: var(--r-sm);
   padding: 7px 29px;
 }
 
 .numberColorForcall {
-  color: #f3802c;
+  color: var(--c-warning);
 }

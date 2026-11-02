@@ -1,15 +1,13 @@
-import AdminPanelMain from './AdminPanel/page'
-import LoginPage from './Login/LoginPage'
+import LoginPage from "./Login/LoginPage";
 
-import { ThemeProvider } from '@mui/material/styles';
-import theme from './theme'; 
+import { ThemeProvider } from "@mui/material/styles";
+import theme from "./theme";
 
 export default function Home() {
-  
   return (
     <main className="h-100">
       <ThemeProvider theme={theme}>
-        <LoginPage/>
+        <LoginPage />
       </ThemeProvider>
     </main>
   );

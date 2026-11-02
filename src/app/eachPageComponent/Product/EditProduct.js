@@ -33,12 +33,12 @@ const BUTTONSSTYLE = styled.div`
   }
 
   .confirmButtonStyle {
-    background: #43a047;
+    background: var(--c-primary);
     color: #fff;
     border: none;
 
     &:hover {
-      background: #3a8c3e;
+      background: var(--c-primary-600);
       transform: translateY(-1px);
     }
   }
@@ -58,7 +58,7 @@ const BUTTONSSTYLE = styled.div`
 
 const BUTTONADDSECTIONSTYLE = styled.button`
   width: fit-content;
-  background-color: #28a745;
+  background-color: var(--c-primary);
   color: white;
   padding: 6px 12px;
   border: none;
@@ -184,7 +184,7 @@ const NavTabs = styled(Tabs)`
   border-bottom: none;
   gap: 10px;
   width: 100%;
-  border-bottom: 1px solid #282e3f;
+  border-bottom: 1px solid var(--c-ink);
 
   .nav-item {
     border-radius: 10px !important;
@@ -193,19 +193,20 @@ const NavTabs = styled(Tabs)`
     }
   }
   .nav-link {
-    border: 1px solid #282e3f;
+    border: 1px solid var(--c-ink);
     border-radius: 10px !important;
-    color: #282e3f;
+    color: var(--c-ink);
     width: 100%;
     padding: 5px 11px;
     position: relative;
     cursor: pointer;
   }
   .nav-link:hover {
-    border: 1px solid #282e3f !important;
+    border: 1px solid var(--c-ink) !important;
   }
   .nav-link.active {
-    background-image: linear-gradient(195deg, #46506a 0%, #282e3f 100%);
+    background-image: none;
+    background-color: var(--c-primary);
     color: white;
     border: none !important;
     border-radius: 10px;
@@ -275,9 +276,9 @@ const ResponsiveDivFileds = styled.div`
 `;
 
 const ButtonCancelOrder = styled.button`
-  background: #fafafa !important;
-  border: 1px solid #d0d0d0 !important;
-  color: #444 !important;
+  background: var(--c-surface) !important;
+  border: 1px solid var(--c-border-strong) !important;
+  color: var(--c-text) !important;
 
   &:hover {
     background: #f0f0f0 !important;
@@ -287,7 +288,7 @@ const ButtonCancelOrder = styled.button`
 `;
 
 const HeaderEachSection = styled.div`
-  background-color: rgb(225, 223, 223);
+  background-color: #f3f4f6;
   /* border-bottom: 2px solid #ccc; */
   padding: 10px;
   border-radius: 4px;
@@ -295,17 +296,9 @@ const HeaderEachSection = styled.div`
 `;
 
 const DivHeaderInfoMedia = styled.div`
-  background-color: rgb(225, 223, 223);
+  background-color: #f3f4f6;
   padding: 7px;
   border-radius: 4px;
-`;
-const HeaderModalShowAccessMainDiv = styled.div`
-  background-color: rgb(225, 223, 223);
-  border-top-right-radius: 10px;
-  border-top-left-radius: 10px;
-  .HeaderModalShowAccess {
-    padding: 10px;
-  }
 `;
 
 const MediaDivMainGrid = styled.div`
@@ -316,17 +309,6 @@ const MediaDivMainGrid = styled.div`
   border: 1px solid #e7e7e7;
   box-shadow: 0 4px 14px rgba(0, 0, 0, 0.04);
 `;
-
-const modalStyle = {
-  position: "absolute",
-  top: "50%",
-  left: "50%",
-  transform: "translate(-50%, -50%)",
-  width: 400,
-  bgcolor: "background.paper",
-  boxShadow: 24,
-  borderRadius: 2,
-};
 
 const InsideAddSectionForm = styled.div`
   padding: 13px;
@@ -345,7 +327,7 @@ const SelectStyle = styled.select`
 `;
 
 const RedStar = styled.span`
-  color: #e91e63;
+  color: var(--c-danger);
   padding-left: 2px;
   padding-right: 2px;
 `;
@@ -356,8 +338,6 @@ export default function EditHonors({
   setEditedHonor,
   setDataUpdated,
 }) {
-
-
   const dispatch = useDispatch();
 
   // State Variables
@@ -365,14 +345,11 @@ export default function EditHonors({
   const [availableItems, setAvailableItems] = useState([]);
   const [usedNavIds, setUsedNavIds] = useState([]);
 
-
-
   const [name, setName] = useState("");
   const [title, setTitle] = useState("");
   const [subtitle, setSubtitle] = useState("");
   const [subtitleCompelete, setSubtitleCompelete] = useState("");
   const [imgData, setImgData] = useState([{ src: "", type: "1", poster: "" }]);
-
 
   const [media, setMedia] = useState([
     { title: "", description: "", src: "", poster: "" },
@@ -388,7 +365,6 @@ export default function EditHonors({
 
   const [activeTab, setActiveTab] = useState("discrib");
   const [loadingConfirmModal, setLoadingConfirmModal] = useState(false);
-  const [disableConfirm, setDisableConfirm] = useState(true);
 
   // Modal States
   const [openModal, setOpenModal] = useState(false);
@@ -400,9 +376,6 @@ export default function EditHonors({
   const closeModal2 = () => setOpenModal2(false);
   const closeModal3 = () => setOpenModal3(false);
   const closeModal4 = () => setOpenModal4(false);
-
-  const [objectUrls, setObjectUrls] = useState({});
-  const [posterObjectUrls, setPosterObjectUrls] = useState({});
 
   // Fetch Header and Product Data on Mount
   useEffect(() => {
@@ -433,7 +406,7 @@ export default function EditHonors({
           // Process subItems with full path but skip parent-level entry
           if (item.subItems?.length) {
             flatList = flatList.concat(
-              flattenHeader(item.subItems, item.title, false)
+              flattenHeader(item.subItems, item.title, false),
             );
           }
         } else {
@@ -443,7 +416,7 @@ export default function EditHonors({
           // Only add final leaf nodes with full hierarchy
           if (item.subItems?.length) {
             flatList = flatList.concat(
-              flattenHeader(item.subItems, currentPath, false)
+              flattenHeader(item.subItems, currentPath, false),
             );
           } else {
             flatList.push({ id: item.id, title: currentPath });
@@ -457,7 +430,7 @@ export default function EditHonors({
     const filteredItems = allHeaderItems.filter(
       (item) =>
         !usedNavIds.includes(item.id.toString()) ||
-        item.id.toString() === editedHonor?.navId?.toString()
+        item.id.toString() === editedHonor?.navId?.toString(),
     );
 
     setAvailableItems(filteredItems);
@@ -472,7 +445,7 @@ export default function EditHonors({
       setSubtitle(editedHonor.info.subtitle || "");
       setSubtitleCompelete(editedHonor.info.subtitleCompelete || "");
       setImgData(
-        editedHonor.info.imgData || [{ src: "", type: "1", poster: "" }]
+        editedHonor.info.imgData || [{ src: "", type: "1", poster: "" }],
       );
       setSelectedNavId(editedHonor.navId || "");
 
@@ -487,13 +460,13 @@ export default function EditHonors({
       }));
 
       setMedia(
-        prepared || [{ title: "", description: "", src: "", poster: "" }]
+        prepared || [{ title: "", description: "", src: "", poster: "" }],
       );
       setDynamicSections(editedHonor.info.sections || []);
       setFiledOrder(
         editedHonor?.filedOrder || [
           { type: "text", name: "", dropDownOP: [""] },
-        ]
+        ],
       );
     }
   }, [editedHonor]);
@@ -502,10 +475,8 @@ export default function EditHonors({
   const handleFileChange = (e, index, setFunction, state) => {
     const file = e.target.files[0];
     if (file) {
-      const objectUrl = URL.createObjectURL(file);
-
       const updatedState = state.map((item, i) =>
-        i === index ? { ...item, src: file } : item
+        i === index ? { ...item, src: file } : item,
       );
       setFunction(updatedState);
     }
@@ -514,10 +485,8 @@ export default function EditHonors({
   const handleFileChangePoster = (e, index, setFunction, state) => {
     const file = e.target.files[0];
     if (file) {
-      const objectUrl = URL.createObjectURL(file);
-
       const updatedState = state.map((item, i) =>
-        i === index ? { ...item, poster: file } : item
+        i === index ? { ...item, poster: file } : item,
       );
       setFunction(updatedState);
     }
@@ -553,8 +522,8 @@ export default function EditHonors({
       prev.map((m, i) =>
         i === index
           ? { ...m, src: file, srcUrl: url } // store url
-          : m
-      )
+          : m,
+      ),
     );
   };
 
@@ -568,8 +537,8 @@ export default function EditHonors({
       prev.map((m, i) =>
         i === index
           ? { ...m, poster: file, posterUrl: url } // store url
-          : m
-      )
+          : m,
+      ),
     );
   };
 
@@ -688,7 +657,6 @@ export default function EditHonors({
     return { valid: true };
   };
 
-
   useEffect(() => {
     return () => {
       imgData.forEach((item) => {
@@ -709,16 +677,6 @@ export default function EditHonors({
   const handleRemoveImgData = (index) => {
     if (imgData.length > 1) {
       setImgData(imgData.filter((_, i) => i !== index));
-      setObjectUrls((prev) => {
-        const updated = { ...prev };
-        delete updated[index];
-        return updated;
-      });
-      setPosterObjectUrls((prev) => {
-        const updated = { ...prev };
-        delete updated[index];
-        return updated;
-      });
     }
   };
 
@@ -805,7 +763,7 @@ export default function EditHonors({
     const updatedSections = dynamicSections.map((section, sIdx) => {
       if (sIdx === sectionIndex) {
         const updatedItems = section.items.filter(
-          (_, iIdx) => iIdx !== itemIndex
+          (_, iIdx) => iIdx !== itemIndex,
         );
         return { ...section, items: updatedItems };
       }
@@ -855,10 +813,6 @@ export default function EditHonors({
   };
 
   // Handle Delete Confirmation
-  const areYouShureFunction2 = (e) => {
-    e.preventDefault();
-    setOpenModal4(true);
-  };
 
   // Close Confirm Modal After Timeout
   function closeModalOnTimeout() {
@@ -938,7 +892,7 @@ export default function EditHonors({
     try {
       setLoadingConfirmModal(true);
       const deleteProduct = await dispatch(
-        deleted({ code: editedHonor.code, name: editedHonor.name })
+        deleted({ code: editedHonor.code, name: editedHonor.name }),
       ).unwrap();
 
       if (deleteProduct.message === "Success") {
@@ -978,14 +932,14 @@ export default function EditHonors({
                 const file = item.src;
 
                 const fileId = await dispatch(
-                  uploadFile({ file, tag, type, isPublic })
+                  uploadFile({ file, tag, type, isPublic }),
                 ).unwrap();
 
                 uploadedItem.src = fileId;
               }
 
               return uploadedItem;
-            })
+            }),
           );
 
           return {
@@ -993,7 +947,7 @@ export default function EditHonors({
             type: section.type,
             items: uploadedItems,
           };
-        })
+        }),
       );
 
       // Upload imgData
@@ -1008,7 +962,7 @@ export default function EditHonors({
             const file = item.src;
 
             const fileId = await dispatch(
-              uploadFile({ file, tag, type, isPublic })
+              uploadFile({ file, tag, type, isPublic }),
             ).unwrap();
 
             updatedItem.src = fileId;
@@ -1021,14 +975,14 @@ export default function EditHonors({
             const file = item.poster;
 
             const fileId = await dispatch(
-              uploadFile({ file, tag, type, isPublic })
+              uploadFile({ file, tag, type, isPublic }),
             ).unwrap();
 
             updatedItem.poster = fileId;
           }
 
           return updatedItem;
-        })
+        }),
       );
 
       // Upload media
@@ -1043,7 +997,7 @@ export default function EditHonors({
             const file = item.src;
 
             const fileIdSrc = await dispatch(
-              uploadFile({ file, tag, type, isPublic })
+              uploadFile({ file, tag, type, isPublic }),
             ).unwrap();
 
             updatedItem.src = fileIdSrc;
@@ -1056,14 +1010,14 @@ export default function EditHonors({
             const file = item.poster;
 
             const fileIdPoster = await dispatch(
-              uploadFile({ file, tag, type, isPublic })
+              uploadFile({ file, tag, type, isPublic }),
             ).unwrap();
 
             updatedItem.poster = fileIdPoster;
           }
 
           return updatedItem;
-        })
+        }),
       );
 
       // Create the info object with all fields
@@ -1084,11 +1038,9 @@ export default function EditHonors({
         filedOrder,
       };
 
-   
-
       // Dispatch the final product submission
       const dataConfirmComing = await dispatch(
-        productEdit({ productData, code: editedHonor.code })
+        productEdit({ productData, code: editedHonor.code }),
       ).unwrap();
 
       if (dataConfirmComing) {
@@ -1105,26 +1057,8 @@ export default function EditHonors({
   };
 
   // Helper function to get media source
-  const getMediaSrc = (item) => {
-    if (item.src instanceof Blob) {
-      return URL.createObjectURL(item.src);
-    } else if (typeof item.src === "string" && item.type === "1") {
-      return `${process.env.NEXT_PUBLIC_BACK_END_SERVER}/system/download/${item.src}`;
-    } else if (typeof item.src === "string" && item.type === "2") {
-      return `${process.env.NEXT_PUBLIC_BACK_END_SERVER}/system/download/${item.src}`;
-    }
-    return "";
-  };
 
   // Helper function to get poster source
-  const getPosterSrc = (item) => {
-    if (item.poster instanceof Blob) {
-      return URL.createObjectURL(item.poster);
-    } else if (typeof item.poster === "string") {
-      return `${process.env.NEXT_PUBLIC_BACK_END_SERVER}/system/download/${item.poster}`;
-    }
-    return "";
-  };
 
   return (
     <form className="container" onSubmit={areYouShureFunction}>
@@ -1145,7 +1079,7 @@ export default function EditHonors({
           value={selectedNavId}
           onChange={(e) => {
             const selectedItem = availableItems.find(
-              (item) => item.id.toString() === e.target.value
+              (item) => item.id.toString() === e.target.value,
             );
             setSelectedNavId(e.target.value);
             if (selectedItem) {
@@ -1154,7 +1088,6 @@ export default function EditHonors({
             } else {
               setName("");
             }
-            // setName(selectedItem ? selectedItem.title : "");
           }}
         >
           <option value="" disabled>
@@ -1288,36 +1221,6 @@ export default function EditHonors({
                     <option value="image">تصویر</option>
                   </SelectStyle>
                 </div>
-                {/* <div>
-                              <ButtonAddSection
-                                className="bg-success text-white px-2 py-1 rounded"
-                                type="button"
-                                onClick={() => setModalthings(true)}
-                              >
-                                تعریف مقدار مشخصه
-                              </ButtonAddSection>
-                              <Modal
-                                open={modalthings}
-                                onClose={handleCloseModalThings}
-                                aria-labelledby="modal-modal-title"
-                                aria-describedby="modal-modal-description"
-                              >
-                                <Box sx={modalStyle}>
-                                  <HeaderModalShowAccessMainDiv className="d-flex flex-row justify-content-between align-items-center">
-                                    <p className="NormalTextSizing HeaderModalShowAccess">
-                                      دسترسی ها
-                                    </p>
-                                    <CustomCloseButton
-                                      onClick={handleCloseModalThings}
-                                      color={`#e91e63`}
-                                    />
-                                  </HeaderModalShowAccessMainDiv>
-                                  <div className="d-flex flex-column gap-2 justify-content-center align-items-center p-3">
-                                    <p>awpidierf</p>
-                                  </div>
-                                </Box>
-                              </Modal>
-                            </div> */}
               </div>
 
               <div
@@ -1338,7 +1241,7 @@ export default function EditHonors({
                                 src={
                                   section?.items[0]?.src instanceof Blob
                                     ? URL.createObjectURL(
-                                        section?.items[0]?.src
+                                        section?.items[0]?.src,
                                       )
                                     : `${process.env.NEXT_PUBLIC_BACK_END_SERVER}/system/download/${section?.items[0]?.src}`
                                 }
@@ -1505,7 +1408,7 @@ export default function EditHonors({
                                   handleSectionFileChange(
                                     e,
                                     sectionIndex,
-                                    itemIndex
+                                    itemIndex,
                                   )
                                 }
                               />
@@ -1579,8 +1482,8 @@ export default function EditHonors({
                             imgData.map((img, iIdx) =>
                               iIdx === index
                                 ? { ...img, type: e.target.value, src: "" }
-                                : img
-                            )
+                                : img,
+                            ),
                           )
                         }
                       >
@@ -1674,7 +1577,7 @@ export default function EditHonors({
                                     e,
                                     index,
                                     setImgData,
-                                    imgData
+                                    imgData,
                                   ) // Corrected state parameter
                               }
                             />
@@ -1780,7 +1683,7 @@ export default function EditHonors({
                                     e,
                                     index,
                                     setImgData,
-                                    imgData
+                                    imgData,
                                   )
                                 }
                               />
@@ -2013,7 +1916,6 @@ export default function EditHonors({
                             </label>
                             <input
                               id="OnvanFilm"
-                              // style={{ width: "45%" }}
                               type="text"
                               placeholder="عنوان فیلم"
                               value={item.title}
@@ -2022,8 +1924,8 @@ export default function EditHonors({
                                   media.map((m, iIdx) =>
                                     iIdx === index
                                       ? { ...m, title: e.target.value }
-                                      : m
-                                  )
+                                      : m,
+                                  ),
                                 )
                               }
                               className="form-control"
@@ -2046,8 +1948,8 @@ export default function EditHonors({
                                   media.map((m, iIdx) =>
                                     iIdx === index
                                       ? { ...m, description: e.target.value }
-                                      : m
-                                  )
+                                      : m,
+                                  ),
                                 )
                               }
                               className="form-control"
@@ -2107,8 +2009,8 @@ export default function EditHonors({
                                   type: e.target.value,
                                   dropDownOP: [{ text: "", isChecked: false }],
                                 } // Reset dropdown options
-                              : f
-                          )
+                              : f,
+                          ),
                         )
                       }
                       className="mt-2 mb-1 w-50"
@@ -2124,8 +2026,8 @@ export default function EditHonors({
                       onChange={(e) =>
                         setFiledOrder(
                           filedOrder.map((f, iIdx) =>
-                            iIdx === index ? { ...f, name: e.target.value } : f
-                          )
+                            iIdx === index ? { ...f, name: e.target.value } : f,
+                          ),
                         )
                       }
                       className="form-control"
@@ -2155,7 +2057,7 @@ export default function EditHonors({
                           type="button"
                           className="NormalTextSizing"
                           style={{
-                            backgroundColor: "#43A047",
+                            backgroundColor: "var(--c-primary)",
                             width: "fit-content",
                           }}
                           onClick={() => handleAddDropDownOption(index)}
@@ -2182,7 +2084,7 @@ export default function EditHonors({
                                 handleDropDownOptionTextChange(
                                   index,
                                   optIndex,
-                                  e.target.value
+                                  e.target.value,
                                 )
                               }
                               className="form-control"
@@ -2221,13 +2123,12 @@ export default function EditHonors({
 
       {/* Action Buttons */}
       <BUTTONSSTYLE className="d-flex flex-row justify-content-between container">
-        <div className="d-flex flex-row mt-3 mb-3 gap-3 justify-content-around w-100">
+        <div className="d-flex flex-row mt-4 mb-3 gap-3 w-100">
           <button
             type="submit"
             className="confirmButtonStyle"
-            // disabled={disableConfirm}
             style={{
-              backgroundColor: "#43A047",
+              backgroundColor: "var(--c-primary)",
               // cursor: disableConfirm ? "not-allowed" : "pointer",
             }}
           >
@@ -2241,29 +2142,20 @@ export default function EditHonors({
             انصراف
           </button>
         </div>
-        {/* <div>
-          <ButtonCancelOrder
-            className="mt-2 mb-2 deleteButtonStyle"
-            type="button"
-            onClick={areYouShureFunction2}
-          >
-            حذف محصول
-          </ButtonCancelOrder>
-        </div> */}
       </BUTTONSSTYLE>
 
       {/* Confirmation Modals */}
       <AreYouShureModal
         open={openModal}
         onClose={closeModal}
-        text={"ایا از ویرایش محصول مطمئن هستید"}
+        text={"آیا از ویرایش محصول مطمئن هستید؟"}
         func={handleSubmit}
         loading={loadingConfirmModal}
       />
       <AreYouShureModal
         open={openModal4}
         onClose={closeModal4}
-        text={"ایا از حذف محصول مطمئن هستید"}
+        text={"آیا از حذف محصول مطمئن هستید؟"}
         func={handleDelete}
         loading={loadingConfirmModal}
       />
@@ -2275,7 +2167,7 @@ export default function EditHonors({
       <ErrorModal
         open={openModal3}
         onClose={closeModal3}
-        text={"خطا در عملیات، لطفاً دوباره تلاش کنید"}
+        text={"خطا در انجام عملیات، لطفاً دوباره تلاش کنید"}
       />
     </form>
   );

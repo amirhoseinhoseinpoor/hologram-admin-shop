@@ -1,6 +1,6 @@
 "use client";
-import React, { useState, useEffect } from "react";
-import { Modal, Button } from "react-bootstrap";
+import { useState, useEffect } from "react";
+import { Modal, Button, NavDropdown } from "react-bootstrap";
 import styled from "styled-components";
 import MoreHorizIcon from "@mui/icons-material/MoreHoriz";
 // import redux
@@ -8,7 +8,6 @@ import { useDispatch } from "react-redux";
 import { editUser, deleteUser, editUserPassword } from "@/app/Store/thunks";
 // import base component
 import AreYouShureModal from "@/app/BaseComponent/AreYouSureModal";
-import { NavDropdown } from "react-bootstrap";
 import EditIcon from "@mui/icons-material/Edit";
 import DeleteIcon from "@mui/icons-material/Delete";
 import LockIcon from "@mui/icons-material/Lock";
@@ -16,12 +15,12 @@ import LoadingCss from "@/app/BaseComponent/LoadingCss";
 
 const NavDropDown = styled(NavDropdown)`
   .dropdown-menu {
-    border: 1px solid gray;
+    border: 1px solid var(--c-border);
     width: 150px;
     padding: 12px;
     margin-top: 3px;
     border-radius: 4px;
-    box-shadow: 1px 1px 5px gray;
+    box-shadow: var(--shadow-md);
   }
   .dropdown-toggle::after {
     display: none;
@@ -83,12 +82,12 @@ const BUTTONSSTYLE = styled.div`
   }
 
   .confirmButtonStyle {
-    background: #43a047;
+    background: var(--c-primary);
     color: #fff;
     border: none;
 
     &:hover {
-      background: #3a8c3e;
+      background: var(--c-primary-600);
       transform: translateY(-1px);
     }
   }
@@ -126,9 +125,7 @@ function EditUserBtnfunction({
   const [secondPassword, setSecondPassword] = useState("");
   const [loadingDelete, setLoadingDelete] = useState(false);
 
-  const [error, seterror] = useState(null);
-  const hasError = Boolean(error);
-
+  const [, seterror] = useState(null);
   useEffect(() => {
     if (
       firstPassword === secondPassword &&
@@ -191,7 +188,7 @@ function EditUserBtnfunction({
       setLoadingDelete(true);
 
       const deleteUserApiCall = await dispatch(
-        deleteUser({ code: deleteCode })
+        deleteUser({ code: deleteCode }),
       ).unwrap();
 
       setOpenModal(false);
@@ -224,7 +221,7 @@ function EditUserBtnfunction({
           username: userData.username,
           active: factorType,
           domain: whereLogin,
-        })
+        }),
       ).unwrap();
 
       if (sendingEditUser.statusCode == 200) {
@@ -249,7 +246,7 @@ function EditUserBtnfunction({
       setLoadingConfirmEdit(true);
 
       const SendingEditUserAPI = await dispatch(
-        editUserPassword({ code: userData?.code, password: secondPassword })
+        editUserPassword({ code: userData?.code, password: secondPassword }),
       );
 
       if (SendingEditUserAPI.statusCode == 200) {
@@ -273,10 +270,9 @@ function EditUserBtnfunction({
           <>
             <MoreHorizIcon
               style={{
-                color: "#282e3f",
+                color: "var(--c-ink)",
                 cursor: "pointer",
                 fontSize: "28px",
-                cursor: "pointer",
               }}
             />
           </>
@@ -292,7 +288,7 @@ function EditUserBtnfunction({
             }}
             className="d-flex flex-row gap-2 align-items-center pb-1"
           >
-            <div style={{ color: "#F3802C" }}>
+            <div style={{ color: "var(--c-warning)" }}>
               <EditIcon className="subitem" />
             </div>
             <p className="NormalTextSizing text-end">ویرایش</p>
@@ -306,7 +302,7 @@ function EditUserBtnfunction({
             }}
             className="d-flex flex-row gap-2 align-items-center pb-1 pt-1"
           >
-            <div style={{ color: "#F3802C" }}>
+            <div style={{ color: "var(--c-warning)" }}>
               <LockIcon className="subitem" />
             </div>
             <p className="NormalTextSizing text-end">تغییر رمز</p>
@@ -319,7 +315,7 @@ function EditUserBtnfunction({
             }}
             className="d-flex flex-row gap-2 align-items-center mt-2"
           >
-            <div style={{ color: "#F3802C" }}>
+            <div style={{ color: "var(--c-warning)" }}>
               <DeleteIcon className="text-danger subitem" />
             </div>
             <p className="NormalTextSizing text-end">
@@ -397,52 +393,11 @@ function EditUserBtnfunction({
                 <option value="false">غیرفعال</option>
               </select>
             </div>
-            {/* <div className="form-group">
-              <label className="mb-1 me-1" htmlFor="whereLogin">
-                نوع دسترسی
-              </label>
-              <select
-                id="whereLogin"
-                value={whereLogin}
-                name="whereLogin"
-                onChange={handleDomainChange}
-                className="form-select mb-2"
-                style={{ boxShadow: "unset" }}
-              >
-                <option value="1">سایت</option>
-                <option value="2">ادمین و سایت</option>
-              </select>
-            </div> */}
-            {/* <div className="form-group">
-              <label className="mb-1 me-1" htmlFor="rolesChange">
-                دسترسی
-              </label>
-              <select
-                id="rolesChange"
-                value={rolesChange}
-                name="rolesChange"
-                onChange={handleRoleChange}
-                className="form-select mb-2"
-                style={{ boxShadow: "unset" }}
-              >
-                <option value="1">مدیر</option>
-                <option value="2">ادمین</option>
-                <option value="3">مشتری</option>
-              </select>
-            </div> */}
             <div className="d-flex flex-row justify-content-between">
               <BUTTONSSTYLE className="justify-content-end">
                 <Button className="confirmButtonStyle" type="submit">
                   {loadingConfirmEdit ? <LoadingCss /> : "ذخیره"}
                 </Button>
-                {/* <DeleteButtonStyle
-                type="button"
-                onClick={(e) =>
-                  areYouShureFunction(e, { code: userData?.code })
-                }
-              >
-                حذف اکانت
-              </DeleteButtonStyle> */}
               </BUTTONSSTYLE>
             </div>
           </form>
@@ -521,7 +476,7 @@ function EditUserBtnfunction({
       <AreYouShureModal
         open={openModal}
         onClose={closeModal}
-        text={"ایا از حذف کاربر مطمئن هستید"}
+        text={"آیا از حذف کاربر مطمئن هستید؟"}
         func={handleDeleteUser}
       />
     </>

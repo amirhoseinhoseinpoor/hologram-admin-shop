@@ -1,11 +1,8 @@
 "use client";
-import React, { useState, useEffect, useRef } from "react";
-import { useDispatch } from "react-redux";
-import { useSelector } from "react-redux";
-import { token } from "../Store/slice";
-import { login } from "../Store/thunks";
-import { verifyAdminLoginOtp } from "../Store/thunks";
-import { sendAdminLoginOtp } from "../Store/thunks";
+import { useState, useEffect, useRef } from "react";
+import { useDispatch, useSelector } from "react-redux";
+import { token, authReady } from "../Store/slice";
+import { login, verifyAdminLoginOtp, sendAdminLoginOtp } from "../Store/thunks";
 import { useRouter } from "next/navigation";
 import OTPInput from "../eachPageComponent/Login/OTPComponent";
 import style from "../Styles/Login/LoginStyle.module.scss";
@@ -16,9 +13,10 @@ import { Box } from "@mui/material";
 export default function Login() {
   const dispatch = useDispatch();
   const router = useRouter();
-  const phoneNumberRegex = /((0?9)|(\+?989))\d{2}\W?\d{3}\W?\d{4}/g;
+  const phoneNumberRegex = /^09\d{9}$/;
 
   const comeToken = useSelector(token);
+  const isAuthReady = useSelector(authReady);
 
   const [username, setPhoneNumber] = useState("");
   const [password, setPassword] = useState("");
@@ -39,6 +37,13 @@ export default function Login() {
   const numberRef = useRef(null);
   // input ref for moving to the next
   const passwordRef = useRef(null);
+
+  // already logged in (restored session) → skip the login form
+  useEffect(() => {
+    if (isAuthReady && comeToken) {
+      router.replace("/AdminPanel");
+    }
+  }, [isAuthReady, comeToken, router]);
 
   useEffect(() => {
     if (numberRef.current) {
@@ -123,53 +128,6 @@ export default function Login() {
     }
   };
 
-  // const handleLogin = async (event) => {
-  //   event.preventDefault();
-  //   setLodaingStatus(true);
-  //   setErrorMessage(null);
-
-  //   // If captcha is not verified, show error
-  //   if (isCaptchaRequired && !captchaValue) {
-  //     setErrorMessage("لطفا ربات نیستید را تایید کنید.");
-  //     setLodaingStatus(false);
-  //     setIsButtonDisabled(true);
-  //     return;
-  //   }
-
-  //   try {
-  //     const credentials = { username, password };
-
-  //     if (!phoneNumberRegex.test(username)) {
-  //       setErrorMessage("فرمت شماره همراه اشتباه است");
-  //       setLodaingStatus(false);
-  //     } else {
-  //       // const resultAction = await dispatch(login(credentials));
-  //       if (login.rejected.match(resultAction)) {
-  //         setErrorMessage(resultAction.payload || "ورود ناموفق");
-  //         setFailedAttempts((prevRequest) => prevRequest + 1);
-  //         if (isCaptchaRequired) {
-  //           setCaptchaValue(null);
-  //           if (recaptchaRef.current) {
-  //             recaptchaRef.current.reset(); // Reset ReCAPTCHA widget
-  //           }
-  //         }
-  //         setLodaingStatus(false);
-  //       }
-  //     }
-  //   } catch (error) {
-  //     console.error("Login/page.js", error);
-  //     setLodaingStatus(false);
-  //   }
-  // };
-
-  // useEffect(() => {
-  //   if (comeToken) {
-  //     setIsOtpSent(true); // Set OTP sent flag when token is available
-  //   } else if (comeToken === null && isOtpSent) {
-  //     setErrorMessage("Failed to send OTP. Please try again.");
-  //   }
-  // }, [comeToken, isOtpSent]);
-
   // Verify OTP
 
   const handleVerifyOtp = async (otp) => {
@@ -185,7 +143,6 @@ export default function Login() {
       );
 
       if (verifyAdminLoginOtp.fulfilled.match(resultAction)) {
-        console.log("OTP login successful:", resultAction.payload);
         router.push("/AdminPanel");
         return;
       }
@@ -214,11 +171,10 @@ export default function Login() {
       setErrorMessage(null);
       setIsOtpSent(true);
       setOtpResetKey((prev) => prev + 1);
-      return;
+      return true;
     }
-    if (sendAdminLoginOtp.rejected.match(resultAction)) {
-      setErrorMessage(resultAction.payload || "ارسال مجدد کد با خطا مواجه شد");
-    }
+    setErrorMessage(resultAction.payload || "ارسال مجدد کد با خطا مواجه شد");
+    return false;
   };
 
   return (
@@ -288,7 +244,6 @@ export default function Login() {
                   id="password"
                   value={password}
                   ref={passwordRef}
-                  // onChange={(e) => setPassword(e.target.value)}
                   onChange={(e) => {
                     const value = e.target.value;
                     if (/^[0-9]*$/.test(value)) {
@@ -302,32 +257,6 @@ export default function Login() {
                   }}
                   required
                 />
-                {/* <div className="mt-2">
-                    <Link
-                      className={`${style.forgotPasswordStyle}`}
-                      href="/ForgetPassword"
-                      passHref
-                    >
-                      <div className="d-flex flex-row gap-2 align-items-center">
-                        <p className={`discription`}>فراموشی رمز عبور</p>
-                        <svg
-                          width={17}
-                          height={18}
-                          viewBox="0 0 14 15"
-                          fill="none"
-                          xmlns="http://www.w3.org/2000/svg"
-                        >
-                          <path
-                            d="M8.74958 12.5955L4.94625 8.79214C4.49708 8.34297 4.49708 7.60797 4.94625 7.1588L8.74958 3.35547"
-                            stroke="#F3802C"
-                            strokeMiterlimit={10}
-                            strokeLinecap="round"
-                            strokeLinejoin="round"
-                          />
-                        </svg>
-                      </div>
-                    </Link>
-                  </div> */}
               </div>
 
               {/* reCAPTCHA */}
@@ -387,14 +316,6 @@ export default function Login() {
                 </div>
               </button>
 
-              {/* <Link href="/SignUp" className={style.SignUpLink}>
-                  <p
-                    className={`${style.colorForSignUpButton} mb-1  mt-3 VodeoDisSizing`}
-                  >
-                    حساب کاربری ندارید؟ ثبت نام کنید
-                  </p>
-                </Link> */}
-
               <div className="mt-3">
                 <span className={`discription`}>ورود شما به معنای پذیرش</span>
                 <span className={`${style.decoreRole}  discription`}>
@@ -411,6 +332,8 @@ export default function Login() {
               onVerifyOtp={handleVerifyOtp}
               resendOtp={handleResendOtp}
               setIsOtpSent={setIsOtpSent}
+              otpResetKey={otpResetKey}
+              loading={loadinStatus}
             />
           )}
         </div>

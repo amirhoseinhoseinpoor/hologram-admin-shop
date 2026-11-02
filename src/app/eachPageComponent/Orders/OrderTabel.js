@@ -1,8 +1,15 @@
 import React, { useState } from "react";
-import { Select, MenuItem, FormControl, InputLabel } from "@mui/material";
+import {
+  Select,
+  MenuItem,
+  FormControl,
+  InputLabel,
+  Modal,
+  Box,
+} from "@mui/material";
 import styled from "styled-components";
+import CustomCloseButton from "@/app/BaseComponent/CustomCloseButton";
 import { formatPersianDate } from "@/app/utils/persionDateUtils";
-import { Modal, Box } from "@mui/material";
 // import icons
 import MoreHorizIcon from "@mui/icons-material/MoreHoriz";
 import { NavDropdown } from "react-bootstrap";
@@ -10,11 +17,6 @@ import DeleteIcon from "@mui/icons-material/Delete";
 import EditIcon from "@mui/icons-material/Edit";
 import AssignmentIcon from "@mui/icons-material/Assignment";
 // improt areyou sure moda
-
-// const SeeOrderButton = styled.button`
-//   background-color: ${(props) => props.color || "#1572e8"};
-//   background-image: linear-gradient(195deg, #66bb6a 0%, #43a047 100%);
-// `;
 
 const NavBarInsideDiv = styled.div`
   display: flex;
@@ -26,12 +28,12 @@ const NavBarInsideDiv = styled.div`
 
 const NavDropDown = styled(NavDropdown)`
   .dropdown-menu {
-    border: 1px solid gray;
+    border: 1px solid var(--c-border);
     width: 150px;
     padding: 12px;
     margin-top: 3px;
     border-radius: 4px;
-    box-shadow: 1px 1px 5px gray;
+    box-shadow: var(--shadow-md);
   }
   .dropdown-toggle::after {
     display: none;
@@ -51,7 +53,6 @@ const StyledTable = styled.table`
       text-align: center;
     }
     th {
-      padding-top: 55px;
     }
   }
 `;
@@ -73,19 +74,21 @@ const AlignCenter = styled(Select)`
 `;
 
 const MAINTABELSTYLE = styled.div`
-  border: 1.5px solid gray;
-  padding: 7px;
-  border-radius: 4px;
+  border: 1px solid var(--c-border);
+  padding: 12px;
+  border-radius: var(--r-md);
+  background: var(--c-surface);
+  box-shadow: var(--shadow-sm);
   margin-bottom: 10px;
 
   .eachTabelStyle {
     display: grid;
     grid-template-columns: repeat(2, 1fr);
     grid-gap: 10px;
-    border-bottom: 1px solid #ccc;
+    border-bottom: 1px solid var(--c-border);
     text-align: center;
     .tabelheaderStyle {
-      background-color: #f1f1f1;
+      background-color: #f9fafb;
       padding: 12px 0px;
       border-radius: 4px;
       display: flex;
@@ -111,11 +114,12 @@ const modalStyle = {
   top: "50%",
   left: "50%",
   transform: "translate(-50%, -50%)",
-  width: 400,
+  width: "min(400px, calc(100vw - 32px))",
   bgcolor: "background.paper",
   boxShadow: 24,
-  p: 4,
-  borderRadius: 2,
+  p: { xs: 3, sm: 4 },
+  borderRadius: 3,
+  outline: "none",
 };
 
 export default function OrderTabelDesctop({
@@ -141,16 +145,9 @@ export default function OrderTabelDesctop({
   };
 
   const handleDataGoInside = async (item) => {
-    // await setUpdateData(true);
-
-    // if (!updateData) {
-    //   await setActiveKey("seeOrder");
-    //   await setSeeOrder(item);
-    // }
     setUpdateData(true);
     setActiveKey("seeOrder");
     setSeeOrder(item);
-
   };
 
   return (
@@ -175,7 +172,7 @@ export default function OrderTabelDesctop({
                   style={{ verticalAlign: "middle" }}
                   className="VodeoDisSizing"
                 >
-                  {++index}
+                  {index + 1}
                 </td>
                 <td style={{ verticalAlign: "middle" }}>
                   {userMainData[item.createdBy]?.firstName}
@@ -190,22 +187,9 @@ export default function OrderTabelDesctop({
                   {formatPersianDate(item.date)}
                 </td>
                 <td style={{ verticalAlign: "middle" }}>
-                  {/* <SeeOrderButton
-                    onClick={() => {
-                      setActiveKey("seeOrder");
-                      setSeeOrder(item);
-                    }}
-                  >
-                    مشاهده سفارش
-                  </SeeOrderButton> */}
                   <p
-                    style={{ color: "#43A047", cursor: "pointer" }}
+                    style={{ color: "var(--c-primary)", cursor: "pointer" }}
                     className="text-decoration-underline"
-                    // onClick={() => {
-                    //   setUpdateData(true);
-                    //   setActiveKey("seeOrder");
-                    //   setSeeOrder(item);
-                    // }}
                     onClick={() => handleDataGoInside(item)}
                   >
                     {item.code}
@@ -219,12 +203,14 @@ export default function OrderTabelDesctop({
                     aria-describedby="modal-modal-description"
                   >
                     <Box sx={modalStyle}>
-                      <p className="mb-3 NormalTextSizing">وضعیت سفارش :</p>
-                      <FormControl
-                        variant="outlined"
-                        size="small"
-                        sx={{ minWidth: 100 }}
-                      >
+                      <div className="d-flex flex-row justify-content-between align-items-center mb-3">
+                        <p className="NormalTextSizing">تغییر وضعیت سفارش</p>
+                        <CustomCloseButton
+                          color="var(--c-danger)"
+                          onClick={() => handleCloseModal(item.code)}
+                        />
+                      </div>
+                      <FormControl variant="outlined" size="small" fullWidth>
                         <InputLabel sx={{ fontFamily: "unset" }}>
                           وضعیت
                         </InputLabel>
@@ -242,16 +228,17 @@ export default function OrderTabelDesctop({
                               [item.code]: newStatus, // Update status in state
                             }));
                             handleStatusChange(item.code, newStatus);
+                            handleCloseModal(item.code);
                           }}
                         >
                           <MenuItem sx={{ fontFamily: "unset" }} value="1">
-                            درحال برسی
+                            در حال بررسی
                           </MenuItem>
                           <MenuItem sx={{ fontFamily: "unset" }} value="2">
-                            درحال تولید
+                            در حال تولید
                           </MenuItem>
                           <MenuItem sx={{ fontFamily: "unset" }} value="3">
-                            درحال ارسال
+                            در حال ارسال
                           </MenuItem>
                           <MenuItem sx={{ fontFamily: "unset" }} value="4">
                             تحویل داده شده
@@ -264,19 +251,14 @@ export default function OrderTabelDesctop({
                     </Box>
                   </Modal>
 
-                  {/* <div onClick={() => handleOpenModal(item.code)}>
-                    <MoreHorizIcon style={{ cursor: "pointer" }} />
-                  </div> */}
-
                   <NavDropDown
                     title={
                       <>
                         <MoreHorizIcon
                           style={{
-                            color: "#282e3f",
+                            color: "var(--c-ink)",
                             cursor: "pointer",
                             fontSize: "28px",
-                            cursor: "pointer",
                           }}
                         />
                       </>
@@ -292,7 +274,7 @@ export default function OrderTabelDesctop({
                         }}
                         className="d-flex flex-row gap-2 align-items-center pb-2"
                       >
-                        <div style={{ color: "#F3802C" }}>
+                        <div style={{ color: "var(--c-warning)" }}>
                           <AssignmentIcon className="subitem" />
                         </div>
                         <p className="VodeoDisSizing  text-end">تغیروضعیت</p>
@@ -308,7 +290,7 @@ export default function OrderTabelDesctop({
                         }}
                         className="d-flex flex-row gap-2 align-items-center pb-2 mt-2"
                       >
-                        <div style={{ color: "#F3802C" }}>
+                        <div style={{ color: "var(--c-warning)" }}>
                           <EditIcon className="subitem" />
                         </div>
                         <p className="VodeoDisSizing  text-end">ویرایش</p>
@@ -321,7 +303,7 @@ export default function OrderTabelDesctop({
                         }}
                         className="d-flex flex-row gap-2 align-items-center mt-2"
                       >
-                        <div style={{ color: "#F3802C" }}>
+                        <div style={{ color: "var(--c-warning)" }}>
                           <DeleteIcon className="text-danger subitem" />
                         </div>
                         <p className="VodeoDisSizing text-end">حذف</p>
@@ -389,7 +371,7 @@ export default function OrderTabelDesctop({
                   style={{ verticalAlign: "middle" }}
                 >
                   <p
-                    style={{ color: "#43A047", cursor: "pointer" }}
+                    style={{ color: "var(--c-primary)", cursor: "pointer" }}
                     className="text-decoration-underline"
                     onClick={() => {
                       setActiveKey("seeOrder");
@@ -413,12 +395,14 @@ export default function OrderTabelDesctop({
                     aria-describedby="modal-modal-description"
                   >
                     <Box sx={modalStyle}>
-                      <p className="mb-3 NormalTextSizing">وضعیت سفارش :</p>
-                      <FormControl
-                        variant="outlined"
-                        size="small"
-                        sx={{ minWidth: 100 }}
-                      >
+                      <div className="d-flex flex-row justify-content-between align-items-center mb-3">
+                        <p className="NormalTextSizing">تغییر وضعیت سفارش</p>
+                        <CustomCloseButton
+                          color="var(--c-danger)"
+                          onClick={() => handleCloseModal(item.code)}
+                        />
+                      </div>
+                      <FormControl variant="outlined" size="small" fullWidth>
                         <InputLabel sx={{ fontFamily: "unset" }}>
                           وضعیت
                         </InputLabel>
@@ -436,16 +420,17 @@ export default function OrderTabelDesctop({
                               [item.code]: newStatus, // Update status in state
                             }));
                             handleStatusChange(item.code, newStatus);
+                            handleCloseModal(item.code);
                           }}
                         >
                           <MenuItem sx={{ fontFamily: "unset" }} value="1">
-                            درحال برسی
+                            در حال بررسی
                           </MenuItem>
                           <MenuItem sx={{ fontFamily: "unset" }} value="2">
-                            درحال تولید
+                            در حال تولید
                           </MenuItem>
                           <MenuItem sx={{ fontFamily: "unset" }} value="3">
-                            درحال ارسال
+                            در حال ارسال
                           </MenuItem>
                           <MenuItem sx={{ fontFamily: "unset" }} value="4">
                             تحویل داده شده
@@ -458,19 +443,14 @@ export default function OrderTabelDesctop({
                     </Box>
                   </Modal>
 
-                  {/* <div onClick={() => handleOpenModal(item.code)}>
-                    <MoreHorizIcon style={{ cursor: "pointer" }} />
-                  </div> */}
-
                   <NavDropDown
                     title={
                       <>
                         <MoreHorizIcon
                           style={{
-                            color: "#282e3f",
+                            color: "var(--c-ink)",
                             cursor: "pointer",
                             fontSize: "28px",
-                            cursor: "pointer",
                           }}
                         />
                       </>
@@ -486,7 +466,7 @@ export default function OrderTabelDesctop({
                         }}
                         className="d-flex flex-row gap-2 align-items-center pb-2"
                       >
-                        <div style={{ color: "#F3802C" }}>
+                        <div style={{ color: "var(--c-warning)" }}>
                           <AssignmentIcon className="subitem" />
                         </div>
                         <p className="VodeoDisSizing  text-end">تغیروضعیت</p>
@@ -502,20 +482,20 @@ export default function OrderTabelDesctop({
                         }}
                         className="d-flex flex-row gap-2 align-items-center pb-2 mt-2"
                       >
-                        <div style={{ color: "#F3802C" }}>
+                        <div style={{ color: "var(--c-warning)" }}>
                           <EditIcon className="subitem" />
                         </div>
                         <p className="VodeoDisSizing  text-end">ویرایش</p>
                       </div>
 
                       <div
-                        onClick={() => areYouShureFunction(product)}
+                        onClick={() => areYouShureFunction(item.code)}
                         style={{
                           cursor: "pointer",
                         }}
                         className="d-flex flex-row gap-2 align-items-center mt-2"
                       >
-                        <div style={{ color: "#F3802C" }}>
+                        <div style={{ color: "var(--c-warning)" }}>
                           <DeleteIcon className="text-danger subitem" />
                         </div>
                         <p className="VodeoDisSizing text-end">حذف</p>

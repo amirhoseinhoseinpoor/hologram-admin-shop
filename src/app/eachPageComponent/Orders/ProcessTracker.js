@@ -1,4 +1,3 @@
-import React from "react";
 import style from "/src/app/Styles/MakeOrderStyle/ProcessTracker.module.scss";
 
 const ProcessTracker = ({ currentStep, setStep, navStep }) => {
@@ -20,8 +19,8 @@ const ProcessTracker = ({ currentStep, setStep, navStep }) => {
               index + 1 === navStep
                 ? style.active
                 : index + 1 < navStep
-                ? style.completed
-                : ""
+                  ? style.completed
+                  : ""
             }`}
           >
             <div className={style.circle}>
@@ -66,7 +65,6 @@ const ProcessTracker = ({ currentStep, setStep, navStep }) => {
               )}
             </div>
             <div className={`${style.label} discription`}>{step.label}</div>
-            {/* {index > steps.length - 7  && <div className={style.line}></div>} */}
             {index > steps.length - 6 && (
               <div
                 className={`${style.line} ${

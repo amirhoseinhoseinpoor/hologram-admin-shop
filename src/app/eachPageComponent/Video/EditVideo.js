@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from "react";
+import { useState, useEffect, useRef } from "react";
 import { Box } from "@mui/material";
 import styled from "styled-components";
 import { useDispatch } from "react-redux";
@@ -36,21 +36,28 @@ const BUTTONSSTYLE = styled.div`
     transition: 160ms ease;
   }
   .confirmButtonStyle {
-    background: #43a047;
+    background: var(--c-primary);
     color: #fff;
     border: none;
-    &:hover { background: #3a8c3e; transform: translateY(-1px); }
+    &:hover {
+      background: var(--c-primary-600);
+      transform: translateY(-1px);
+    }
   }
   .cancelButtonStyle {
     background: #fafafa;
     border: 1px solid #d0d0d0;
     color: #444;
-    &:hover { background: #f0f0f0; border-color: #bdbdbd; transform: translateY(-1px); }
+    &:hover {
+      background: #f0f0f0;
+      border-color: #bdbdbd;
+      transform: translateY(-1px);
+    }
   }
 `;
 
 const RedStar = styled.span`
-  color: #e91e63;
+  color: var(--c-danger);
   padding-left: 2px;
   padding-right: 2px;
 `;
@@ -66,7 +73,10 @@ const UploadZone = styled.label`
   justify-content: center;
   align-items: center;
   transition: 150ms ease;
-  &:hover { border-color: #9a9a9a; background: #fafafa; }
+  &:hover {
+    border-color: #9a9a9a;
+    background: #fafafa;
+  }
 `;
 
 const PreviewWrapper = styled.div`
@@ -92,18 +102,44 @@ const RemoveBtn = styled.button`
   z-index: 10;
   transition: 150ms ease;
   padding: 0;
-  &:hover { background: rgba(176, 0, 32, 0.95); transform: scale(1.1); }
-  svg { font-size: 16px; color: #fff; }
+  &:hover {
+    background: rgba(176, 0, 32, 0.95);
+    transform: scale(1.1);
+  }
+  svg {
+    font-size: 16px;
+    color: #fff;
+  }
 `;
 
 const UploadIcon = () => (
-  <svg width={21} height={21} viewBox="0 0 18 18" fill="none" xmlns="http://www.w3.org/2000/svg">
-    <path d="M2.25 11.25C2.25 13.3713 2.25 14.432 2.90901 15.091C3.56802 15.75 4.62868 15.75 6.75 15.75H11.25C13.3713 15.75 14.432 15.75 15.091 15.091C15.75 14.432 15.75 13.3713 15.75 11.25" stroke="#404040" strokeLinecap="round" strokeLinejoin="round" />
-    <path d="M9 12V2.25M9 2.25L12 5.53125M9 2.25L6 5.53125" stroke="#404040" strokeLinecap="round" strokeLinejoin="round" />
+  <svg
+    width={21}
+    height={21}
+    viewBox="0 0 18 18"
+    fill="none"
+    xmlns="http://www.w3.org/2000/svg"
+  >
+    <path
+      d="M2.25 11.25C2.25 13.3713 2.25 14.432 2.90901 15.091C3.56802 15.75 4.62868 15.75 6.75 15.75H11.25C13.3713 15.75 14.432 15.75 15.091 15.091C15.75 14.432 15.75 13.3713 15.75 11.25"
+      stroke="#404040"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+    />
+    <path
+      d="M9 12V2.25M9 2.25L12 5.53125M9 2.25L6 5.53125"
+      stroke="#404040"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+    />
   </svg>
 );
 
-export default function EditVideo({ setUpdateData, editedHonor, handleCancelEdit }) {
+export default function EditVideo({
+  setUpdateData,
+  editedHonor,
+  handleCancelEdit,
+}) {
   const dispatch = useDispatch();
 
   // text fields
@@ -111,7 +147,7 @@ export default function EditVideo({ setUpdateData, editedHonor, handleCancelEdit
   const [description, setDescription] = useState("");
 
   // video: either a server filename string, a new File object, or null (cleared)
-  const [videoSrc, setVideoSrc] = useState(null);    // string (server) | File | null
+  const [videoSrc, setVideoSrc] = useState(null); // string (server) | File | null
   const [videoPreview, setVideoPreview] = useState(null); // object URL for new file
 
   // poster: same pattern
@@ -121,9 +157,9 @@ export default function EditVideo({ setUpdateData, editedHonor, handleCancelEdit
   const videoInputRef = useRef(null);
   const posterInputRef = useRef(null);
 
-  const [openModal, setOpenModal] = useState(false);   // confirm save
-  const [openModal2, setOpenModal2] = useState(false);  // success
-  const [openModal3, setOpenModal3] = useState(false);  // error
+  const [openModal, setOpenModal] = useState(false); // confirm save
+  const [openModal2, setOpenModal2] = useState(false); // success
+  const [openModal3, setOpenModal3] = useState(false); // error
 
   useEffect(() => {
     if (editedHonor?.media) {
@@ -173,16 +209,22 @@ export default function EditVideo({ setUpdateData, editedHonor, handleCancelEdit
   /* ── validation ── */
   const validateForm = () => {
     if (!title.trim()) return { valid: false, message: "عنوان را وارد کنید" };
-    if (!description.trim()) return { valid: false, message: "توضیحات را وارد کنید" };
-    if (!videoSrc) return { valid: false, message: "فایل ویدیو را انتخاب کنید" };
-    if (!posterSrc) return { valid: false, message: "پوستر ویدیو را انتخاب کنید" };
+    if (!description.trim())
+      return { valid: false, message: "توضیحات را وارد کنید" };
+    if (!videoSrc)
+      return { valid: false, message: "فایل ویدیو را انتخاب کنید" };
+    if (!posterSrc)
+      return { valid: false, message: "پوستر ویدیو را انتخاب کنید" };
     return { valid: true };
   };
 
   const handleSubmitClick = (e) => {
     e.preventDefault();
     const result = validateForm();
-    if (!result.valid) { toast.error(result.message); return; }
+    if (!result.valid) {
+      toast.error(result.message);
+      return;
+    }
     setOpenModal(true);
   };
 
@@ -197,25 +239,42 @@ export default function EditVideo({ setUpdateData, editedHonor, handleCancelEdit
       // upload new video if file object
       if (videoSrc instanceof File) {
         finalSrc = await dispatch(
-          uploadFile({ file: videoSrc, tag: "homePageVideo", type: 2, isPublic: true })
+          uploadFile({
+            file: videoSrc,
+            tag: "homePageVideo",
+            type: 2,
+            isPublic: true,
+          }),
         ).unwrap();
       }
 
       // upload new poster if file object
       if (posterSrc instanceof File) {
         finalPoster = await dispatch(
-          uploadFile({ file: posterSrc, tag: "homePageVideoPoster", type: 1, isPublic: true })
+          uploadFile({
+            file: posterSrc,
+            tag: "homePageVideoPoster",
+            type: 1,
+            isPublic: true,
+          }),
         ).unwrap();
       }
 
-      await dispatch(videoEdit({
-        media: { media: { title, description, src: finalSrc, poster: finalPoster } },
-        code: editedHonor.code,
-      }));
+      await dispatch(
+        videoEdit({
+          media: {
+            media: { title, description, src: finalSrc, poster: finalPoster },
+          },
+          code: editedHonor.code,
+        }),
+      );
 
       setUpdateData(true);
       setOpenModal2(true);
-      setTimeout(() => { setOpenModal2(false); handleCancelEdit(); }, 3000);
+      setTimeout(() => {
+        setOpenModal2(false);
+        handleCancelEdit();
+      }, 3000);
     } catch (error) {
       setOpenModal3(true);
       console.error("Error editing video:", error);
@@ -229,7 +288,9 @@ export default function EditVideo({ setUpdateData, editedHonor, handleCancelEdit
       return (
         <PreviewWrapper>
           <BOX component="video" src={videoPreview} controls />
-          <RemoveBtn type="button" onClick={handleRemoveVideo}><DeleteIcon /></RemoveBtn>
+          <RemoveBtn type="button" onClick={handleRemoveVideo}>
+            <DeleteIcon />
+          </RemoveBtn>
         </PreviewWrapper>
       );
     }
@@ -242,7 +303,9 @@ export default function EditVideo({ setUpdateData, editedHonor, handleCancelEdit
             src={`${process.env.NEXT_PUBLIC_BACK_END_SERVER}/system/download/${videoSrc}`}
             controls
           />
-          <RemoveBtn type="button" onClick={handleRemoveVideo}><DeleteIcon /></RemoveBtn>
+          <RemoveBtn type="button" onClick={handleRemoveVideo}>
+            <DeleteIcon />
+          </RemoveBtn>
         </PreviewWrapper>
       );
     }
@@ -272,7 +335,9 @@ export default function EditVideo({ setUpdateData, editedHonor, handleCancelEdit
       return (
         <PreviewWrapper>
           <BOX component="img" src={posterPreview} alt="poster" />
-          <RemoveBtn type="button" onClick={handleRemovePoster}><DeleteIcon /></RemoveBtn>
+          <RemoveBtn type="button" onClick={handleRemovePoster}>
+            <DeleteIcon />
+          </RemoveBtn>
         </PreviewWrapper>
       );
     }
@@ -284,7 +349,9 @@ export default function EditVideo({ setUpdateData, editedHonor, handleCancelEdit
             src={`${process.env.NEXT_PUBLIC_BACK_END_SERVER}/system/download/${posterSrc}`}
             alt="poster"
           />
-          <RemoveBtn type="button" onClick={handleRemovePoster}><DeleteIcon /></RemoveBtn>
+          <RemoveBtn type="button" onClick={handleRemovePoster}>
+            <DeleteIcon />
+          </RemoveBtn>
         </PreviewWrapper>
       );
     }
@@ -293,7 +360,9 @@ export default function EditVideo({ setUpdateData, editedHonor, handleCancelEdit
         <UploadZone htmlFor="editVideoPoster">
           <div className="d-flex flex-column align-items-center text-center p-1">
             <UploadIcon />
-            <p className="colorTheInputFile discription mt-1">بارگذاری فایل .png یا .jpg</p>
+            <p className="colorTheInputFile discription mt-1">
+              بارگذاری فایل .png یا .jpg
+            </p>
             <p className="colorTheInputFile discription">حداکثر تا 5 مگابایت</p>
           </div>
         </UploadZone>
@@ -314,16 +383,19 @@ export default function EditVideo({ setUpdateData, editedHonor, handleCancelEdit
       <form onSubmit={handleSubmitClick}>
         <BorderInputBox>
           <div className="d-flex flex-row gap-3 align-items-start">
-
             {/* Left: video + poster */}
             <div className="w-50">
               <div className="d-flex flex-column mb-3">
-                <span className="mb-1 NormalTextSizing">فیلم <RedStar>*</RedStar>:</span>
+                <span className="mb-1 NormalTextSizing">
+                  فیلم <RedStar>*</RedStar>:
+                </span>
                 {renderVideoSlot()}
               </div>
 
               <div className="d-flex flex-column">
-                <span className="mb-1 NormalTextSizing">پوستر فیلم <RedStar>*</RedStar>:</span>
+                <span className="mb-1 NormalTextSizing">
+                  پوستر فیلم <RedStar>*</RedStar>:
+                </span>
                 {renderPosterSlot()}
               </div>
             </div>
@@ -331,7 +403,10 @@ export default function EditVideo({ setUpdateData, editedHonor, handleCancelEdit
             {/* Right: title + description */}
             <div className="w-50 d-flex flex-column gap-3 mt-2">
               <div className="d-flex flex-column">
-                <label className="NormalTextSizing mb-1" htmlFor="editVideoTitle">
+                <label
+                  className="NormalTextSizing mb-1"
+                  htmlFor="editVideoTitle"
+                >
                   عنوان <RedStar>*</RedStar>:
                 </label>
                 <input
@@ -344,7 +419,10 @@ export default function EditVideo({ setUpdateData, editedHonor, handleCancelEdit
                 />
               </div>
               <div className="d-flex flex-column">
-                <label className="NormalTextSizing mb-1" htmlFor="editVideoDesc">
+                <label
+                  className="NormalTextSizing mb-1"
+                  htmlFor="editVideoDesc"
+                >
                   توضیحات <RedStar>*</RedStar>:
                 </label>
                 <input
@@ -357,20 +435,40 @@ export default function EditVideo({ setUpdateData, editedHonor, handleCancelEdit
                 />
               </div>
             </div>
-
           </div>
         </BorderInputBox>
 
         <BUTTONSSTYLE>
           <div className="d-flex flex-row mt-3 mb-3 gap-3 justify-content-around w-100">
-            <button type="submit" className="confirmButtonStyle">ذخیره</button>
-            <button type="button" className="cancelButtonStyle" onClick={handleCancelEdit}>انصراف</button>
+            <button type="submit" className="confirmButtonStyle">
+              ذخیره
+            </button>
+            <button
+              type="button"
+              className="cancelButtonStyle"
+              onClick={handleCancelEdit}
+            >
+              انصراف
+            </button>
           </div>
         </BUTTONSSTYLE>
 
-        <AreYouShureModal open={openModal} onClose={() => setOpenModal(false)} text={"آیا از ویرایش ویدیو مطمئن هستید؟"} func={handleSubmit} />
-        <ConfirmModal open={openModal2} onClose={() => setOpenModal2(false)} text={"عملیات با موفقیت انجام شد"} />
-        <ErrorModal open={openModal3} onClose={() => setOpenModal3(false)} text={"خطا در انجام عملیات"} />
+        <AreYouShureModal
+          open={openModal}
+          onClose={() => setOpenModal(false)}
+          text={"آیا از ویرایش ویدیو مطمئن هستید؟"}
+          func={handleSubmit}
+        />
+        <ConfirmModal
+          open={openModal2}
+          onClose={() => setOpenModal2(false)}
+          text={"عملیات با موفقیت انجام شد"}
+        />
+        <ErrorModal
+          open={openModal3}
+          onClose={() => setOpenModal3(false)}
+          text={"خطا در انجام عملیات، لطفاً دوباره تلاش کنید"}
+        />
       </form>
     </div>
   );

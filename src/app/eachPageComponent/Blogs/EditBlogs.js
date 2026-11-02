@@ -1,12 +1,5 @@
-import React, { useState, useEffect } from "react";
-import {
-  Button,
-  TextField,
-  Box,
-  CardMedia,
-  FormControlLabel,
-  Checkbox,
-} from "@mui/material";
+import { useState, useEffect } from "react";
+import { TextField, Box, FormControlLabel, Checkbox } from "@mui/material";
 import styled from "styled-components";
 import { Editor } from "@tinymce/tinymce-react";
 import ConfirmModal from "@/app/BaseComponent/ConfirmingModal";
@@ -15,10 +8,12 @@ import AreYouShureModal from "@/app/BaseComponent/AreYouSureModal";
 
 // import redux
 import { useDispatch } from "react-redux";
-import { uploadFile } from "@/app/Store/thunks";
-import { blogsEdit } from "@/app/Store/thunks";
-import { blogsDeleted } from "@/app/Store/thunks";
-import { prodNameAndNav } from "@/app/Store/thunks";
+import {
+  uploadFile,
+  blogsEdit,
+  blogsDeleted,
+  prodNameAndNav,
+} from "@/app/Store/thunks";
 import toast from "react-hot-toast";
 
 const BUTTONSSTYLE = styled.div`
@@ -35,12 +30,12 @@ const BUTTONSSTYLE = styled.div`
   }
 
   .confirmButtonStyle {
-    background: #43a047;
+    background: var(--c-primary);
     color: #fff;
     border: none;
 
     &:hover {
-      background: #3a8c3e;
+      background: var(--c-primary-600);
       transform: translateY(-1px);
     }
   }
@@ -90,12 +85,32 @@ const DELETEUPLODEDIMAGE = styled.button`
   left: -5%;
   transform: translate(50%, -50%);
   border: none;
-  border-radius: 4px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  min-height: 32px;
+  padding: 0;
+  background: #fff;
+  border-radius: 50%;
+  box-shadow: 0 2px 6px rgba(16, 24, 40, 0.18);
+  cursor: pointer;
 `;
 
 const LABELIMAGEUPLOAD = styled.label`
-  border: 1px solid #c0c0c0;
-  border-radius: 4px;
+  border: 1.5px dashed var(--c-border-strong);
+  border-radius: var(--r-md);
+  background-color: #fafbfc;
+  color: var(--c-muted);
+  cursor: pointer;
+  transition:
+    border-color 0.15s ease,
+    background-color 0.15s ease;
+  &:hover {
+    border-color: var(--c-primary);
+    background-color: var(--c-primary-50);
+  }
   padding: 10px;
   width: 100%;
   height: 77%;
@@ -137,7 +152,7 @@ const BOX = styled(Box)`
 `;
 
 const RedStar = styled.span`
-  color: #e91e63;
+  color: var(--c-danger);
   padding-left: 2px;
   padding-right: 2px;
 `;
@@ -152,7 +167,7 @@ const SelectWidth = styled.select`
   background: #fff;
   &:focus {
     outline: none;
-    border-color: #1976d2;
+    border-color: var(--c-primary);
   }
 `;
 
@@ -173,9 +188,9 @@ const LinkModeToggle = styled.div`
     color: #555;
 
     &.active {
-      background: #1976d2;
+      background: var(--c-primary);
       color: #fff;
-      border-color: #1976d2;
+      border-color: var(--c-primary);
     }
   }
 `;
@@ -196,7 +211,6 @@ export default function EditHonors({
   const [bannerTags, setBannerTags] = useState("");
   const [bannerImage, setBannerImage] = useState(null);
   const [notify, setNotify] = useState(false);
-  console.log(notify);
 
   const [posetives, setposetives] = useState("");
   const [negetive, setnegetive] = useState("");
@@ -223,13 +237,8 @@ export default function EditHonors({
   const closeModal3 = () => setOpenModal3(false);
   const closeModal4 = () => setOpenModal4(false);
 
-  console.log(dataCome);
-
   const validatePriority = (items) => {
-    console.log(items);
-
     const trueItems = items.filter((item) => item?.content?.priority === true);
-    console.log(trueItems);
 
     if (trueItems.length >= 3) {
       return {
@@ -380,11 +389,8 @@ export default function EditHonors({
       const imageUrl = `${process.env.NEXT_PUBLIC_BACK_END_SERVER}/system/download/${fileId}`;
 
       // Ensure the image URL is valid and log it for debugging purposes
-      console.log("Uploaded image URL:", imageUrl);
       const editor = tinymce.activeEditor; // Get the active editor instance
       editor.insertContent(`<img src="${imageUrl}" alt="Image" />`);
-
-      // success(imageUrl);
     } catch (error) {
       console.error("Error uploading image:", error);
       failure("Image upload failed"); // Return an error to TinyMCE if the upload fails
@@ -461,11 +467,6 @@ export default function EditHonors({
     setOpenModal(true);
   };
 
-  const areYouShureFunction2 = (e) => {
-    e.preventDefault();
-    setOpenModal4(true);
-  };
-
   function closeModalOnTimeout() {
     setTimeout(() => {
       setOpenModal2(false);
@@ -499,7 +500,7 @@ export default function EditHonors({
     };
 
     try {
-      const fetchData = await dispatch(
+      await dispatch(
         blogsEdit({ content: finalData, code: editedHonor.code }),
       ).unwrap();
       setOpenModal2(true);
@@ -627,7 +628,6 @@ export default function EditHonors({
                       style={{ width: "fit-content" }}
                     >
                       <BOX
-                        // onClick={() => handleOpen(logo)}
                         component="img"
                         src={
                           `${process.env.NEXT_PUBLIC_BACK_END_SERVER}/system/download/${bannerImage}` ||
@@ -645,31 +645,31 @@ export default function EditHonors({
                         >
                           <path
                             d="M10.5 2.98828C8.835 2.82328 7.16 2.73828 5.49 2.73828C4.5 2.73828 3.51 2.78828 2.52 2.88828L1.5 2.98828"
-                            stroke="#FF4F3F"
+                            stroke="#dc2626"
                             strokeLinecap="round"
                             strokeLinejoin="round"
                           />
                           <path
                             d="M4.25 2.485L4.36 1.83C4.44 1.355 4.5 1 5.345 1H6.655C7.5 1 7.565 1.375 7.64 1.835L7.75 2.485"
-                            stroke="#FF4F3F"
+                            stroke="#dc2626"
                             strokeLinecap="round"
                             strokeLinejoin="round"
                           />
                           <path
                             d="M9.4252 4.57031L9.1002 9.60531C9.0452 10.3903 9.0002 11.0003 7.6052 11.0003H4.3952C3.0002 11.0003 2.9552 10.3903 2.9002 9.60531L2.5752 4.57031"
-                            stroke="#FF4F3F"
+                            stroke="#dc2626"
                             strokeLinecap="round"
                             strokeLinejoin="round"
                           />
                           <path
                             d="M5.16504 8.25H6.83004"
-                            stroke="#FF4F3F"
+                            stroke="#dc2626"
                             strokeLinecap="round"
                             strokeLinejoin="round"
                           />
                           <path
                             d="M4.75 6.25H7.25"
-                            stroke="#FF4F3F"
+                            stroke="#dc2626"
                             strokeLinecap="round"
                             strokeLinejoin="round"
                           />
@@ -844,7 +844,6 @@ export default function EditHonors({
                     style={{ width: "fit-content" }}
                   >
                     <BOX
-                      // onClick={() => handleOpen(logo)}
                       component="img"
                       src={
                         `${process.env.NEXT_PUBLIC_BACK_END_SERVER}/system/download/${productSrc}` ||
@@ -863,31 +862,31 @@ export default function EditHonors({
                       >
                         <path
                           d="M10.5 2.98828C8.835 2.82328 7.16 2.73828 5.49 2.73828C4.5 2.73828 3.51 2.78828 2.52 2.88828L1.5 2.98828"
-                          stroke="#FF4F3F"
+                          stroke="#dc2626"
                           strokeLinecap="round"
                           strokeLinejoin="round"
                         />
                         <path
                           d="M4.25 2.485L4.36 1.83C4.44 1.355 4.5 1 5.345 1H6.655C7.5 1 7.565 1.375 7.64 1.835L7.75 2.485"
-                          stroke="#FF4F3F"
+                          stroke="#dc2626"
                           strokeLinecap="round"
                           strokeLinejoin="round"
                         />
                         <path
                           d="M9.4252 4.57031L9.1002 9.60531C9.0452 10.3903 9.0002 11.0003 7.6052 11.0003H4.3952C3.0002 11.0003 2.9552 10.3903 2.9002 9.60531L2.5752 4.57031"
-                          stroke="#FF4F3F"
+                          stroke="#dc2626"
                           strokeLinecap="round"
                           strokeLinejoin="round"
                         />
                         <path
                           d="M5.16504 8.25H6.83004"
-                          stroke="#FF4F3F"
+                          stroke="#dc2626"
                           strokeLinecap="round"
                           strokeLinejoin="round"
                         />
                         <path
                           d="M4.75 6.25H7.25"
-                          stroke="#FF4F3F"
+                          stroke="#dc2626"
                           strokeLinecap="round"
                           strokeLinejoin="round"
                         />
@@ -994,29 +993,19 @@ export default function EditHonors({
           <button className="cancelButtonStyle" onClick={handleCancelEdit}>
             انصراف
           </button>
-
-          {/* <div>
-            <button
-              className="mt-2 mb-2 deleteButtonStyle"
-              type="button"
-              onClick={areYouShureFunction2}
-            >
-              حذف مقاله
-            </button>
-          </div> */}
         </BUTTONSSTYLE>
 
         {/* modal  */}
         <AreYouShureModal
           open={openModal}
           onClose={closeModal}
-          text={"ایا از ویرایش وبلاگ مطمئن هستید"}
+          text={"آیا از ویرایش مقاله مطمئن هستید؟"}
           func={handleSubmit}
         />
         <AreYouShureModal
           open={openModal4}
           onClose={closeModal4}
-          text={"ایا از حذف وبلاگ مطمئن هستید"}
+          text={"آیا از حذف مقاله مطمئن هستید؟"}
           func={handleDelete}
         />
         <ConfirmModal
@@ -1027,7 +1016,7 @@ export default function EditHonors({
         <ErrorModal
           open={openModal3}
           onClose={closeModal3}
-          text={"خطا از لاگین بودن خود اطمینان حاصل فرمایید"}
+          text={"خطا در انجام عملیات، لطفاً دوباره تلاش کنید"}
         />
       </form>
     </div>

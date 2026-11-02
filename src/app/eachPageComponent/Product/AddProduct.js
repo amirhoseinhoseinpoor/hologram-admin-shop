@@ -13,8 +13,7 @@ import Tabs from "react-bootstrap/Tabs";
 import styled from "styled-components";
 import AreYouShureModal from "@/app/BaseComponent/AreYouSureModal";
 import ConfirmModal from "@/app/BaseComponent/ConfirmingModal";
-import { Modal, Box } from "@mui/material";
-import CustomCloseButton from "@/app/BaseComponent/CustomCloseButton";
+import { Box } from "@mui/material";
 import { fixTitleSize } from "@/app/utils/fixTitleSize";
 import toast from "react-hot-toast";
 
@@ -139,7 +138,7 @@ const NavTabs = styled(Tabs)`
   border-bottom: none;
   gap: 10px;
   width: 100%;
-  border-bottom: 1px solid #282e3f;
+  border-bottom: 1px solid var(--c-ink);
 
   .nav-item {
     border-radius: 10px !important;
@@ -148,19 +147,20 @@ const NavTabs = styled(Tabs)`
     }
   }
   .nav-link {
-    border: 1px solid #282e3f;
+    border: 1px solid var(--c-ink);
     border-radius: 10px !important;
-    color: #282e3f;
+    color: var(--c-ink);
     width: 100%;
     padding: 5px 11px;
     position: relative;
     cursor: pointer;
   }
   .nav-link:hover {
-    border: 1px solid #282e3f !important;
+    border: 1px solid var(--c-ink) !important;
   }
   .nav-link.active {
-    background-image: linear-gradient(195deg, #46506a 0%, #282e3f 100%);
+    background-image: none;
+    background-color: var(--c-primary);
     color: white;
     border: none !important;
     border-radius: 10px;
@@ -217,9 +217,9 @@ const ResponsiveDivFileds = styled.div`
 `;
 
 const ButtonCancelOrder = styled.button`
-  background: #fafafa !important;
-  border: 1px solid #d0d0d0 !important;
-  color: #444 !important;
+  background: var(--c-surface) !important;
+  border: 1px solid var(--c-border-strong) !important;
+  color: var(--c-text) !important;
 
   &:hover {
     background: #f0f0f0 !important;
@@ -229,7 +229,7 @@ const ButtonCancelOrder = styled.button`
 `;
 
 const HeaderEachSection = styled.div`
-  background-color: rgb(225, 223, 223);
+  background-color: #f3f4f6;
   /* border-bottom: 2px solid #ccc; */
   padding: 10px;
   border-radius: 4px;
@@ -240,16 +240,8 @@ const InsideAddSectionForm = styled.div`
   padding: 13px;
 `;
 
-const HeaderModalShowAccessMainDiv = styled.div`
-  background-color: rgb(225, 223, 223);
-  border-top-right-radius: 10px;
-  border-top-left-radius: 10px;
-  .HeaderModalShowAccess {
-    padding: 10px;
-  }
-`;
 const DivHeaderInfoMedia = styled.div`
-  background-color: rgb(225, 223, 223);
+  background-color: #f3f4f6;
   padding: 7px;
   border-radius: 4px;
 `;
@@ -262,23 +254,6 @@ const MediaDivMainGrid = styled.div`
   border: 1px solid #e7e7e7;
   box-shadow: 0 4px 14px rgba(0, 0, 0, 0.04);
 `;
-
-const StyleGridInsideMedia = styled.div`
-  display: grid;
-  grid-template-columns: repeat(1, 1fr);
-  grid-gap: 10px;
-`;
-
-const modalStyle = {
-  position: "absolute",
-  top: "50%",
-  left: "50%",
-  transform: "translate(-50%, -50%)",
-  width: 400,
-  bgcolor: "background.paper",
-  boxShadow: 24,
-  borderRadius: 2,
-};
 
 const SelectStyle = styled.select`
   /* border: none; */
@@ -294,7 +269,7 @@ const SelectStyle = styled.select`
 `;
 
 const RedStar = styled.span`
-  color: #e91e63;
+  color: var(--c-danger);
   padding-left: 2px;
   padding-right: 2px;
 `;
@@ -319,14 +294,12 @@ export default function AddHonors({ setDataUpdated, setActiveKey }) {
     { type: "text", name: "", dropDownOP: [] },
   ]);
 
-
   const [headerCome, setHeaderCome] = useState([]);
   const [availableItems, setAvailableItems] = useState([]);
   const [usedNavIds, setUsedNavIds] = useState([]);
 
   const [activeTab, setActiveTab] = useState("discrib");
   const [loadingConfirmModal, setLoadingConfirmModal] = useState(false);
-  const [disableConfirm, setDisableConfirm] = useState(true);
 
   // Modal States
   const [openModal, setOpenModal] = useState(false);
@@ -338,8 +311,6 @@ export default function AddHonors({ setDataUpdated, setActiveKey }) {
   const closeModal3 = () => setOpenModal3(false);
 
   // custom modal state
-  const [modalthings, setModalthings] = useState(null);
-  const handleCloseModalThings = () => setModalthings(false);
 
   // Fetch Header and Product Data on Mount
   useEffect(() => {
@@ -370,7 +341,7 @@ export default function AddHonors({ setDataUpdated, setActiveKey }) {
           // Process subItems with full path but skip parent-level entry
           if (item.subItems?.length) {
             flatList = flatList.concat(
-              flattenHeader(item.subItems, item.title, false)
+              flattenHeader(item.subItems, item.title, false),
             );
           }
         } else {
@@ -380,7 +351,7 @@ export default function AddHonors({ setDataUpdated, setActiveKey }) {
           // Only add final leaf nodes with full hierarchy
           if (item.subItems?.length) {
             flatList = flatList.concat(
-              flattenHeader(item.subItems, currentPath, false)
+              flattenHeader(item.subItems, currentPath, false),
             );
           } else {
             flatList.push({ id: item.id, title: currentPath });
@@ -394,7 +365,7 @@ export default function AddHonors({ setDataUpdated, setActiveKey }) {
     const filteredItems = allHeaderItems.filter(
       (item) =>
         !usedNavIds.includes(item.id.toString()) ||
-        item.id.toString() === selectedNavId.toString()
+        item.id.toString() === selectedNavId.toString(),
     );
     setAvailableItems(filteredItems);
   }, [headerCome, usedNavIds, selectedNavId]);
@@ -425,7 +396,8 @@ export default function AddHonors({ setDataUpdated, setActiveKey }) {
 
   const validateForm = () => {
     // Main fields
-    if (!name.trim()) return { valid: false, message: "محصول خود را انتخاب کنید" };
+    if (!name.trim())
+      return { valid: false, message: "محصول خود را انتخاب کنید" };
     if (!title.trim())
       return { valid: false, message: "فیلد شرح مختصر را پر کنید" };
     if (!subtitle.trim())
@@ -537,8 +509,6 @@ export default function AddHonors({ setDataUpdated, setActiveKey }) {
     return { valid: true };
   };
 
- 
-
   const handleAddSectionForm = (e) => {
     e.preventDefault();
     if (!newSectionName.trim()) {
@@ -599,7 +569,7 @@ export default function AddHonors({ setDataUpdated, setActiveKey }) {
     const updatedSections = dynamicSections.map((section, sIdx) => {
       if (sIdx === sectionIndex) {
         const updatedItems = section.items.filter(
-          (_, iIdx) => iIdx !== itemIndex
+          (_, iIdx) => iIdx !== itemIndex,
         );
         return { ...section, items: updatedItems };
       }
@@ -670,7 +640,7 @@ export default function AddHonors({ setDataUpdated, setActiveKey }) {
     const url = URL.createObjectURL(file);
 
     setMedia((prev) =>
-      prev.map((m, i) => (i === index ? { ...m, src: file, srcUrl: url } : m))
+      prev.map((m, i) => (i === index ? { ...m, src: file, srcUrl: url } : m)),
     );
   };
 
@@ -682,8 +652,8 @@ export default function AddHonors({ setDataUpdated, setActiveKey }) {
 
     setMedia((prev) =>
       prev.map((m, i) =>
-        i === index ? { ...m, poster: file, posterUrl: url } : m
-      )
+        i === index ? { ...m, poster: file, posterUrl: url } : m,
+      ),
     );
   };
 
@@ -777,14 +747,14 @@ export default function AddHonors({ setDataUpdated, setActiveKey }) {
                 const file = item.src;
 
                 const fileId = await dispatch(
-                  uploadFile({ file, tag, type, isPublic })
+                  uploadFile({ file, tag, type, isPublic }),
                 ).unwrap();
 
                 uploadedItem.src = fileId;
               }
 
               return uploadedItem;
-            })
+            }),
           );
 
           return {
@@ -792,7 +762,7 @@ export default function AddHonors({ setDataUpdated, setActiveKey }) {
             type: section.type,
             items: uploadedItems,
           };
-        })
+        }),
       );
 
       // Upload imgData
@@ -807,7 +777,7 @@ export default function AddHonors({ setDataUpdated, setActiveKey }) {
             const file = item.src;
 
             const fileId = await dispatch(
-              uploadFile({ file, tag, type, isPublic })
+              uploadFile({ file, tag, type, isPublic }),
             ).unwrap();
 
             updatedItem.src = fileId;
@@ -820,14 +790,14 @@ export default function AddHonors({ setDataUpdated, setActiveKey }) {
             const file = item.poster;
 
             const fileId = await dispatch(
-              uploadFile({ file, tag, type, isPublic })
+              uploadFile({ file, tag, type, isPublic }),
             ).unwrap();
 
             updatedItem.poster = fileId;
           }
 
           return updatedItem;
-        })
+        }),
       );
 
       // Upload media
@@ -842,7 +812,7 @@ export default function AddHonors({ setDataUpdated, setActiveKey }) {
             const file = item.src;
 
             const fileIdSrc = await dispatch(
-              uploadFile({ file, tag, type, isPublic })
+              uploadFile({ file, tag, type, isPublic }),
             ).unwrap();
 
             updatedItem.src = fileIdSrc;
@@ -855,14 +825,14 @@ export default function AddHonors({ setDataUpdated, setActiveKey }) {
             const file = item.poster;
 
             const fileIdPoster = await dispatch(
-              uploadFile({ file, tag, type, isPublic })
+              uploadFile({ file, tag, type, isPublic }),
             ).unwrap();
 
             updatedItem.poster = fileIdPoster;
           }
 
           return updatedItem;
-        })
+        }),
       );
 
       // Create the info object with all fields
@@ -885,7 +855,7 @@ export default function AddHonors({ setDataUpdated, setActiveKey }) {
 
       // Dispatch the final product submission
       const dataConfirmComing = await dispatch(
-        productpot(productData)
+        productpot(productData),
       ).unwrap();
       if (dataConfirmComing) {
         setOpenModal2(true);
@@ -928,7 +898,7 @@ export default function AddHonors({ setDataUpdated, setActiveKey }) {
             value={selectedNavId}
             onChange={(e) => {
               const selectedItem = availableItems.find(
-                (item) => item.id.toString() === e.target.value
+                (item) => item.id.toString() === e.target.value,
               );
               setSelectedNavId(e.target.value);
               if (selectedItem) {
@@ -938,7 +908,6 @@ export default function AddHonors({ setDataUpdated, setActiveKey }) {
                 setName("");
               }
             }}
-            
           >
             <option value="" disabled>
               انتخاب کنید
@@ -967,7 +936,6 @@ export default function AddHonors({ setDataUpdated, setActiveKey }) {
             placeholder="حداکثر 100 کلمه"
             value={title}
             onChange={(e) => setTitle(e.target.value)}
-            
           />
         </div>
 
@@ -986,7 +954,6 @@ export default function AddHonors({ setDataUpdated, setActiveKey }) {
             className="w-100 form-control"
             value={subtitle}
             onChange={(e) => setSubtitle(e.target.value)}
-            
           />
         </div>
 
@@ -1005,7 +972,6 @@ export default function AddHonors({ setDataUpdated, setActiveKey }) {
             className="w-100 form-control"
             value={subtitleCompelete}
             onChange={(e) => setSubtitleCompelete(e.target.value)}
-            
           />
         </div>
 
@@ -1071,42 +1037,11 @@ export default function AddHonors({ setDataUpdated, setActiveKey }) {
                       value={newSectionType}
                       onChange={(e) => setNewSectionType(e.target.value)}
                       className="w-100"
-                      
                     >
                       <option value="text">متن</option>
                       <option value="image">تصویر</option>
                     </SelectStyle>
                   </div>
-                  {/* <div>
-                  <ButtonAddSection
-                    className="bg-success text-white px-2 py-1 rounded"
-                    type="button"
-                    onClick={() => setModalthings(true)}
-                  >
-                    تعریف مقدار مشخصه
-                  </ButtonAddSection>
-                  <Modal
-                    open={modalthings}
-                    onClose={handleCloseModalThings}
-                    aria-labelledby="modal-modal-title"
-                    aria-describedby="modal-modal-description"
-                  >
-                    <Box sx={modalStyle}>
-                      <HeaderModalShowAccessMainDiv className="d-flex flex-row justify-content-between align-items-center">
-                        <p className="NormalTextSizing HeaderModalShowAccess">
-                          دسترسی ها
-                        </p>
-                        <CustomCloseButton
-                          onClick={handleCloseModalThings}
-                          color={`#e91e63`}
-                        />
-                      </HeaderModalShowAccessMainDiv>
-                      <div className="d-flex flex-column gap-2 justify-content-center align-items-center p-3">
-                        <p>awpidierf</p>
-                      </div>
-                    </Box>
-                  </Modal>
-                </div> */}
                 </div>
 
                 <div
@@ -1125,7 +1060,7 @@ export default function AddHonors({ setDataUpdated, setActiveKey }) {
                                 <BoxFirstSection
                                   component="img"
                                   src={URL?.createObjectURL(
-                                    section?.items[0]?.src
+                                    section?.items[0]?.src,
                                   )}
                                   alt="ItemImage"
                                 />
@@ -1178,7 +1113,6 @@ export default function AddHonors({ setDataUpdated, setActiveKey }) {
                           onChange={(e) =>
                             handleSectionNameChange(e, sectionIndex)
                           }
-                          
                           className="form-control "
                         />
                       </div>
@@ -1239,7 +1173,6 @@ export default function AddHonors({ setDataUpdated, setActiveKey }) {
                                 handleItemNameChange(e, sectionIndex, itemIndex)
                               }
                               className="flex-grow-1 form-control"
-                              
                             />
                           </div>
                           <div>
@@ -1296,7 +1229,7 @@ export default function AddHonors({ setDataUpdated, setActiveKey }) {
                                     handleSectionFileChange(
                                       e,
                                       sectionIndex,
-                                      itemIndex
+                                      itemIndex,
                                     )
                                   }
                                 />
@@ -1366,11 +1299,10 @@ export default function AddHonors({ setDataUpdated, setActiveKey }) {
                               imgData.map((img, iIdx) =>
                                 iIdx === index
                                   ? { ...img, type: e.target.value, src: "" }
-                                  : img
-                              )
+                                  : img,
+                              ),
                             );
                           }}
-                          
                         >
                           <option value={1}>عکس</option>
                           <option value={2}>فیلم</option>
@@ -1457,7 +1389,6 @@ export default function AddHonors({ setDataUpdated, setActiveKey }) {
                                     : `${process.env.NEXT_PUBLIC_INPUT_VIDEO_FORMAT}`
                                 }
                                 onChange={(e) => handleImgDataChange(e, index)}
-                                
                               />
                             </>
                           ) : (
@@ -1543,7 +1474,6 @@ export default function AddHonors({ setDataUpdated, setActiveKey }) {
                                   id={`posterFilm-${index}`}
                                   accept={`${process.env.NEXT_PUBLIC_INPUT_IMAGE_FORMAT}`}
                                   onChange={(e) => handlePosterChange(e, index)}
-                                  
                                 />
                               </>
                             ) : (
@@ -1670,19 +1600,9 @@ export default function AddHonors({ setDataUpdated, setActiveKey }) {
                                 className="d-none"
                                 id={`MediaVideo-${index}`}
                                 accept={`${process.env.NEXT_PUBLIC_INPUT_VIDEO_FORMAT}`}
-                                // onChange={(e) =>
-                                //   setMedia(
-                                //     media.map((m, iIdx) =>
-                                //       iIdx === index
-                                //         ? { ...m, src: e.target.files[0] }
-                                //         : m
-                                //     )
-                                //   )
-                                // }
                                 onChange={(e) =>
                                   handleVideoChangeMedia(e, index)
                                 }
-                                
                               />
 
                               {item.src && (
@@ -1753,22 +1673,9 @@ export default function AddHonors({ setDataUpdated, setActiveKey }) {
                                 className="d-none"
                                 id={`PosterVideo-${index}`}
                                 accept={`${process.env.NEXT_PUBLIC_INPUT_IMAGE_FORMAT}`}
-                                // onChange={(e) =>
-                                //   setMedia(
-                                //     media.map((m, iIdx) =>
-                                //       iIdx === index
-                                //         ? {
-                                //             ...m,
-                                //             poster: e.target.files[0],
-                                //           }
-                                //         : m
-                                //     )
-                                //   )
-                                // }
                                 onChange={(e) =>
                                   handlePosterChangeMedia(e, index)
                                 }
-                                
                               />
 
                               {item?.poster && (
@@ -1798,7 +1705,6 @@ export default function AddHonors({ setDataUpdated, setActiveKey }) {
                               </label>
                               <input
                                 id="OnvanFilm"
-                                // style={{ width: "45%" }}
                                 type="text"
                                 placeholder="عنوان فیلم"
                                 value={item.title}
@@ -1807,11 +1713,10 @@ export default function AddHonors({ setDataUpdated, setActiveKey }) {
                                     media.map((m, iIdx) =>
                                       iIdx === index
                                         ? { ...m, title: e.target.value }
-                                        : m
-                                    )
+                                        : m,
+                                    ),
                                   )
                                 }
-                                
                                 className="form-control"
                               />
                             </div>
@@ -1832,11 +1737,10 @@ export default function AddHonors({ setDataUpdated, setActiveKey }) {
                                     media.map((m, iIdx) =>
                                       iIdx === index
                                         ? { ...m, description: e.target.value }
-                                        : m
-                                    )
+                                        : m,
+                                    ),
                                   )
                                 }
-                                
                                 className="form-control"
                               />
                             </div>
@@ -1894,11 +1798,10 @@ export default function AddHonors({ setDataUpdated, setActiveKey }) {
                                         ? [{ text: "", isChecked: false }]
                                         : [],
                                   }
-                                : f
-                            )
+                                : f,
+                            ),
                           )
                         }
-                        
                         className="mt-2 mb-1 w-50"
                       >
                         <option value="text">متن</option>
@@ -1914,11 +1817,10 @@ export default function AddHonors({ setDataUpdated, setActiveKey }) {
                             filedOrder.map((f, iIdx) =>
                               iIdx === index
                                 ? { ...f, name: e.target.value }
-                                : f
-                            )
+                                : f,
+                            ),
                           )
                         }
-                        
                         className="form-control"
                       />
                       <ButtonCancelOrder
@@ -1945,7 +1847,7 @@ export default function AddHonors({ setDataUpdated, setActiveKey }) {
                             type="button"
                             className="NormalTextSizing"
                             style={{
-                              backgroundColor: "#43A047",
+                              backgroundColor: "var(--c-primary)",
                               width: "fit-content",
                             }}
                             onClick={() => handleAddDropDownOption(index)}
@@ -1974,7 +1876,6 @@ export default function AddHonors({ setDataUpdated, setActiveKey }) {
                                   ].text = e.target.value;
                                   setFiledOrder(updatedFiledOrder);
                                 }}
-                                
                                 style={{ width: "60%" }}
                                 className="form-control"
                               />
@@ -2017,32 +1918,24 @@ export default function AddHonors({ setDataUpdated, setActiveKey }) {
         )}
 
         {/* Submit Button */}
-        <div className="d-flex flex-row align-items-center justify-content-around">
-          <button
-            type="submit"
-            className="mt-3 mb-3 text-white px-4 py-2 rounded"
-            // disabled={disableConfirm}
-            style={{
-              backgroundColor: "#43A047",
-              // cursor: disableConfirm ? "not-allowed" : "pointer",
-            }}
-          >
+        <div className="d-flex flex-row align-items-center gap-3 mt-4 mb-3">
+          <button type="submit" className="confirmButtonStyle">
             ذخیره
           </button>
-          <ButtonCancelOrder
+          <button
             type="button"
-            className="mt-3 mb-3 text-white px-3 py-2 rounded"
+            className="cancelButtonStyle"
             onClick={() => setActiveKey("editUserPage")}
           >
             انصراف
-          </ButtonCancelOrder>
+          </button>
         </div>
 
         {/* Confirmation Modals */}
         <AreYouShureModal
           open={openModal}
           onClose={closeModal}
-          text={"ایا از اضافه کردن محصول مطمئن هستید"}
+          text={"آیا از اضافه کردن محصول مطمئن هستید؟"}
           func={handleSubmit}
           loading={loadingConfirmModal}
         />

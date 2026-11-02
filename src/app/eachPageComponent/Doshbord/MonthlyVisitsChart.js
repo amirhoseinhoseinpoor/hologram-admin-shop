@@ -1,14 +1,14 @@
 // src/components/MonthlyVisitsChart.js
 
-'use client';
+"use client";
 
-import React, { useEffect, useState } from 'react';
-// import redux 
-import { useSelector } from 'react-redux';
-import { token } from '@/app/Store/slice';
+import { useEffect, useState } from "react";
+// import redux
+import { useSelector } from "react-redux";
+import { token } from "@/app/Store/slice";
 
-import axios from 'axios';
-import { Bar } from 'react-chartjs-2';
+import axios from "axios";
+import { Bar } from "react-chartjs-2";
 import {
   Chart as ChartJS,
   CategoryScale,
@@ -17,32 +17,49 @@ import {
   Title,
   Tooltip,
   Legend,
-} from 'chart.js';
-import styled from 'styled-components';
+} from "chart.js";
+import styled from "styled-components";
 
 const ChartContainer = styled.div`
   position: relative;
   width: 100%;
-  height: 400px; /* می‌توانید این مقدار را به نیاز خود تنظیم کنید */
+  height: 360px;
+
+  @media (max-width: 768px) {
+    height: 280px;
+  }
+`;
+
+const StateText = styled.p`
+  padding: 48px 0;
+  text-align: center;
+  color: var(--c-muted);
 `;
 
 // ثبت کامپوننت‌های مورد نیاز Chart.js
-ChartJS.register(CategoryScale, LinearScale, BarElement, Title, Tooltip, Legend);
+ChartJS.register(
+  CategoryScale,
+  LinearScale,
+  BarElement,
+  Title,
+  Tooltip,
+  Legend,
+);
 
 // تعریف نام ماه‌های تقویم فارسی
 const persianMonths = [
-  'فروردین',
-  'اردیبهشت',
-  'خرداد',
-  'تیر',
-  'مرداد',
-  'شهریور',
-  'مهر',
-  'آبان',
-  'آذر',
-  'دی',
-  'بهمن',
-  'اسفند',
+  "فروردین",
+  "اردیبهشت",
+  "خرداد",
+  "تیر",
+  "مرداد",
+  "شهریور",
+  "مهر",
+  "آبان",
+  "آذر",
+  "دی",
+  "بهمن",
+  "اسفند",
 ];
 
 const MonthlyVisitsChart = () => {
@@ -52,12 +69,11 @@ const MonthlyVisitsChart = () => {
 
   // انتخاب توکن از استور Redux
   const tokenCome = useSelector(token);
-  
 
   useEffect(() => {
     const fetchMonthlyVisits = async () => {
       if (!tokenCome) {
-        console.error('توکن احراز هویت یافت نشد.');
+        console.error("توکن احراز هویت یافت نشد.");
         setError(true);
         setLoading(false);
         return;
@@ -68,12 +84,12 @@ const MonthlyVisitsChart = () => {
           `${process.env.NEXT_PUBLIC_BACK_END_SERVER}/analytics/monthly-visits`,
           {
             headers: {
-              Authorization: `Bearer ${tokenCome?.token}`,
+              Authorization: `Bearer ${tokenCome}`,
             },
             params: {
               year: new Date().getFullYear(), // دریافت داده‌ها برای سال جاری
             },
-          }
+          },
         );
 
         // فرض می‌کنیم که response.data یک آرایه از { month: number, count: number } است
@@ -91,7 +107,7 @@ const MonthlyVisitsChart = () => {
         setMonthlyData(completeData);
         setLoading(false);
       } catch (err) {
-        console.error('خطا در دریافت داده‌های بازدید ماهانه:', err);
+        console.error("خطا در دریافت داده‌های بازدید ماهانه:", err);
         setError(true);
         setLoading(false);
       }
@@ -105,74 +121,42 @@ const MonthlyVisitsChart = () => {
     labels: monthlyData.map((item) => persianMonths[item.month - 1]),
     datasets: [
       {
-        label: 'تعداد بازدیدکنندگان',
+        label: "تعداد بازدیدکنندگان",
         data: monthlyData.map((item) => item.count),
-        backgroundColor: 'rgba(75, 192, 192, 0.6)',
+        backgroundColor: "#2f5bd9",
+        hoverBackgroundColor: "#2548b4",
+        borderRadius: 6,
+        maxBarThickness: 36,
       },
     ],
   };
+
+  const font = { family: "IRANSansXVF, sans-serif", size: 12 };
 
   const options = {
     responsive: true,
     maintainAspectRatio: false,
     plugins: {
-      legend: {
-        position: 'top',
-        labels: {
-          // تنظیم فونت برای راهنما
-          font: {
-            family: 'IRANSansXVF, sans-serif', // اعمال فونت سفارشی
-            size: 14, // افزایش اندازه فونت
-          },
-        },
-      },
-      title: {
-        display: true,
-        text: 'تعداد بازدیدکنندگان ماهانه',
-        font: {
-          family: 'IRANSansXVF, sans-serif', // اعمال فونت سفارشی
-          size: 18, // افزایش اندازه فونت
-        },
-      },
+      legend: { display: false },
+      tooltip: { titleFont: font, bodyFont: font, rtl: true },
     },
     scales: {
       x: {
-        ticks: {
-          font: {
-            family: 'IRANSansXVF, sans-serif', // اعمال فونت سفارشی
-            size: 14, // افزایش اندازه فونت
-          },
-        },
-        title: {
-          display: true,
-          text: 'ماه',
-          font: {
-            family: 'IRANSansXVF, sans-serif', // اعمال فونت سفارشی
-            size: 16, // افزایش اندازه فونت
-          },
-        },
+        grid: { display: false },
+        ticks: { font, color: "#6b7280" },
       },
       y: {
-        ticks: {
-          font: {
-            family: 'IRANSansXVF, sans-serif', // اعمال فونت سفارشی
-            size: 14, // افزایش اندازه فونت
-          },
-        },
-        title: {
-          display: true,
-          text: 'تعداد بازدید',
-          font: {
-            family: 'IRANSansXVF, sans-serif', // اعمال فونت سفارشی
-            size: 16, // افزایش اندازه فونت
-          },
-        },
+        beginAtZero: true,
+        grid: { color: "#eef0f4" },
+        border: { display: false },
+        ticks: { font, color: "#6b7280", precision: 0 },
       },
     },
   };
 
-  if (loading) return <p>در حال بارگذاری داده‌های بازدیدکنندگان ماهانه...</p>;
-  if (error) return <p>خطا در بارگذاری داده‌ها. لطفاً دوباره تلاش کنید.</p>;
+  if (loading) return <StateText>در حال بارگذاری داده‌ها...</StateText>;
+  if (error)
+    return <StateText>خطا در بارگذاری داده‌ها. لطفاً دوباره تلاش کنید.</StateText>;
 
   return (
     <ChartContainer>

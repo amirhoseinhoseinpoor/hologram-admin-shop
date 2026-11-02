@@ -19,7 +19,7 @@
 }
 
 .CopyTextRahgir {
-  color: #5695f6;
+  color: var(--c-primary);
 }
 
 .CopySvgButton {
@@ -29,8 +29,8 @@
 .buttonNavigatePeigiri {
   border: none;
   padding: 8px 18px;
-  border-radius: 4px;
-  background-color: #5695f6;
+  border-radius: var(--r-sm);
+  background-color: var(--c-primary);
   color: white;
   margin-top: 25px;
   margin-bottom: 30px;

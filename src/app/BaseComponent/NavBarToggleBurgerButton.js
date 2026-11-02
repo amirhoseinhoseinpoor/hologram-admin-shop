@@ -1,20 +1,37 @@
-import React from "react";
-import style from "../Styles/BaseComponentStyle/NavBarToggleBurgerButton.module.scss";
-import { Navbar } from "react-bootstrap";
+import styled from "styled-components";
+import MenuIcon from "@mui/icons-material/Menu";
 
-export default function NavBarToggleBurgerButton({func}) {
+const MenuButton = styled.button`
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 40px;
+  height: 40px;
+  padding: 0;
+  color: var(--c-ink);
+  background: transparent;
+  border: 1px solid var(--c-border);
+  border-radius: var(--r-sm);
+  cursor: pointer;
+  transition:
+    background-color 0.15s ease,
+    border-color 0.15s ease;
+
+  &:hover {
+    background-color: var(--c-primary-50);
+    border-color: var(--c-primary-100);
+  }
+`;
+
+export default function NavBarToggleBurgerButton({ func }) {
   return (
-    <Navbar.Toggle
+    <MenuButton
+      type="button"
+      data-plain
       onClick={func}
-      className={`basic-navbar-nav`}
-      aria-controls="basic-navbar-nav"
+      aria-label="باز کردن منو"
     >
-      <div className={style.navIcon3}>
-        <span></span>
-        <span></span>
-        <span></span>
-        <span></span>
-      </div>
-    </Navbar.Toggle>
+      <MenuIcon />
+    </MenuButton>
   );
 }

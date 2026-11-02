@@ -1,10 +1,13 @@
 "use client";
 
-import React, { useState, useEffect } from "react";
+import { useState, useEffect } from "react";
 // improt redux
 import { useDispatch } from "react-redux";
-import { fetchPrivateImage } from "@/app/Store/thunks";
-import { increaseStep, sendingSecondStep } from "@/app/Store/thunks";
+import {
+  fetchPrivateImage,
+  increaseStep,
+  sendingSecondStep,
+} from "@/app/Store/thunks";
 // import base component
 import ZoomModal from "@/app/BaseComponent/ZoomModal";
 import LoadingCss from "@/app/BaseComponent/LoadingCss";
@@ -43,9 +46,8 @@ export default function StepTwoComponent({
   const dispatch = useDispatch();
   const [value, setValue] = useState("خصوصی");
   const [uploadedFiles, setUploadedFiles] = useState(
-    dataDocument.preparedData || []
+    dataDocument.preparedData || [],
   );
-
 
   const [logo, setLogo] = useState(null);
   const [moveForward, setMoveForward] = useState(false);
@@ -87,7 +89,7 @@ export default function StepTwoComponent({
   useEffect(() => {
     const fetchLogo = async () => {
       const result = await dispatch(
-        fetchPrivateImage({ filename: dataDocument.uploadLogo })
+        fetchPrivateImage({ filename: dataDocument.uploadLogo }),
       );
       setLogo(result.payload);
     };
@@ -106,23 +108,6 @@ export default function StepTwoComponent({
   }, [dataDocument.value]);
 
   // Handle form data and file uploads
-  const handleFileUpload = (event) => {
-    const files = Array.from(event.target.files);
-    const validImageTypes = ["image/png", "image/jpeg"];
-
-    const newFiles = files
-      .filter((file) => validImageTypes.includes(file.type))
-      .map((file) => ({
-        imageUrl: URL.createObjectURL(file),
-        file: file,
-        title: "",
-        status: 1,
-        type: file?.name.split(".").pop(),
-        isFixed: false,
-      }));
-
-    setUploadedFiles((prevFiles) => [...prevFiles, ...newFiles]);
-  };
 
   const handleLogoChange = (event) => {
     const file = event.target.files[0]; // Only get the first file
@@ -131,10 +116,6 @@ export default function StepTwoComponent({
       imageUrl,
       file,
     });
-  };
-
-  const handleDeleteLogo = () => {
-    setLogo(null);
   };
 
   const handleDeleteImage = (index) => {
@@ -164,7 +145,7 @@ export default function StepTwoComponent({
         setNavStep(3);
       }
       setLoading(false);
-    } catch (error) {
+    } catch {
       setLoading(false);
     }
   };
@@ -189,7 +170,7 @@ export default function StepTwoComponent({
 
       // Dispatch the updated dataDocument
       const finalDataDispatch = await dispatch(
-        sendingSecondStep({ code, sendingFinalData: dataDocument })
+        sendingSecondStep({ code, sendingFinalData: dataDocument }),
       ).unwrap();
 
       if (finalDataDispatch.statusCode === 200) {
@@ -218,7 +199,7 @@ export default function StepTwoComponent({
   const getDocStatus = (status) => {
     switch (status) {
       case 1:
-        return "درحال برسی";
+        return "در حال بررسی";
       case 2:
         return "تایید شده";
       case 3:
@@ -417,7 +398,7 @@ export default function StepTwoComponent({
                                       const date = new Date();
                                       downloadImage(
                                         imageUrls[index],
-                                        `${date.toISOString()}.${fileObj.type}`
+                                        `${date.toISOString()}.${fileObj.type}`,
                                       );
                                     } else {
                                       handleImageClick(index, fileObj.file);
@@ -444,31 +425,31 @@ export default function StepTwoComponent({
                                           >
                                             <path
                                               d="M10.5 2.98828C8.835 2.82328 7.16 2.73828 5.49 2.73828C4.5 2.73828 3.51 2.78828 2.52 2.88828L1.5 2.98828"
-                                              stroke="#FF4F3F"
+                                              stroke="#dc2626"
                                               strokeLinecap="round"
                                               strokeLinejoin="round"
                                             />
                                             <path
                                               d="M4.25 2.485L4.36 1.83C4.44 1.355 4.5 1 5.345 1H6.655C7.5 1 7.565 1.375 7.64 1.835L7.75 2.485"
-                                              stroke="#FF4F3F"
+                                              stroke="#dc2626"
                                               strokeLinecap="round"
                                               strokeLinejoin="round"
                                             />
                                             <path
                                               d="M9.4252 4.57031L9.1002 9.60531C9.0452 10.3903 9.0002 11.0003 7.6052 11.0003H4.3952C3.0002 11.0003 2.9552 10.3903 2.9002 9.60531L2.5752 4.57031"
-                                              stroke="#FF4F3F"
+                                              stroke="#dc2626"
                                               strokeLinecap="round"
                                               strokeLinejoin="round"
                                             />
                                             <path
                                               d="M5.16504 8.25H6.83004"
-                                              stroke="#FF4F3F"
+                                              stroke="#dc2626"
                                               strokeLinecap="round"
                                               strokeLinejoin="round"
                                             />
                                             <path
                                               d="M4.75 6.25H7.25"
-                                              stroke="#FF4F3F"
+                                              stroke="#dc2626"
                                               strokeLinecap="round"
                                               strokeLinejoin="round"
                                             />
@@ -492,7 +473,7 @@ export default function StepTwoComponent({
                                       const date = new Date();
                                       downloadImage(
                                         imageUrls[index],
-                                        `${date.toISOString()}.${fileObj.type}`
+                                        `${date.toISOString()}.${fileObj.type}`,
                                       );
                                     } else {
                                       handleImageClick(index, fileObj.file);
@@ -519,31 +500,31 @@ export default function StepTwoComponent({
                                           >
                                             <path
                                               d="M10.5 2.98828C8.835 2.82328 7.16 2.73828 5.49 2.73828C4.5 2.73828 3.51 2.78828 2.52 2.88828L1.5 2.98828"
-                                              stroke="#FF4F3F"
+                                              stroke="#dc2626"
                                               strokeLinecap="round"
                                               strokeLinejoin="round"
                                             />
                                             <path
                                               d="M4.25 2.485L4.36 1.83C4.44 1.355 4.5 1 5.345 1H6.655C7.5 1 7.565 1.375 7.64 1.835L7.75 2.485"
-                                              stroke="#FF4F3F"
+                                              stroke="#dc2626"
                                               strokeLinecap="round"
                                               strokeLinejoin="round"
                                             />
                                             <path
                                               d="M9.4252 4.57031L9.1002 9.60531C9.0452 10.3903 9.0002 11.0003 7.6052 11.0003H4.3952C3.0002 11.0003 2.9552 10.3903 2.9002 9.60531L2.5752 4.57031"
-                                              stroke="#FF4F3F"
+                                              stroke="#dc2626"
                                               strokeLinecap="round"
                                               strokeLinejoin="round"
                                             />
                                             <path
                                               d="M5.16504 8.25H6.83004"
-                                              stroke="#FF4F3F"
+                                              stroke="#dc2626"
                                               strokeLinecap="round"
                                               strokeLinejoin="round"
                                             />
                                             <path
                                               d="M4.75 6.25H7.25"
-                                              stroke="#FF4F3F"
+                                              stroke="#dc2626"
                                               strokeLinecap="round"
                                               strokeLinejoin="round"
                                             />
@@ -575,12 +556,12 @@ export default function StepTwoComponent({
                                         const date = new Date();
                                         downloadImage(
                                           imageUrls[index],
-                                          `${date.toISOString()}.png`
+                                          `${date.toISOString()}.png`,
                                         );
                                       }}
                                     >
                                       <ArrowDownwardIcon
-                                        style={{ color: "#282e3f" }}
+                                        style={{ color: "var(--c-ink)" }}
                                       />
                                     </button>
                                   </>

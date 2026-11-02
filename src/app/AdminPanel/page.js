@@ -1,12 +1,10 @@
 "use client";
 import Hoc from "../Components/HOCcomponent.js";
 import style from "../Styles/AdminStyle/AdminStyle.module.scss";
-import Tab from "react-bootstrap/Tab";
-import Tabs from "react-bootstrap/Tabs";
-import { Offcanvas, Navbar, Nav } from "react-bootstrap";
-import React, { useState, lazy, Suspense } from "react";
+import { Offcanvas } from "react-bootstrap";
+import SidebarNav from "./SidebarNav.js";
+import { useState, lazy, Suspense } from "react";
 import dynamic from "next/dynamic";
-import CustomCloseButton from "../BaseComponent/CustomCloseButton.js";
 import { DndProvider } from "react-dnd";
 import { HTML5Backend } from "react-dnd-html5-backend";
 
@@ -25,26 +23,22 @@ import BalconyIcon from "@mui/icons-material/Balcony";
 import ViewArrayIcon from "@mui/icons-material/ViewArray";
 import VideocamIcon from "@mui/icons-material/Videocam";
 import PeopleIcon from "@mui/icons-material/People";
-import SettingsIcon from "@mui/icons-material/Settings";
 import PersonIcon from "@mui/icons-material/Person";
-import ArrowDropDownIcon from "@mui/icons-material/ArrowDropDown";
 import AccessibilityIcon from "@mui/icons-material/Accessibility";
 import MailOutlineIcon from "@mui/icons-material/MailOutline";
-import { Box } from "@mui/material";
-import ShowVersionServer from "../Components/ShowVersionServer.js";
 import SoftLoader from "../BaseComponent/SoftLoader.js";
 
 // import components
-const DefineUser = lazy(() =>
-  import("../eachPageComponent/DefineUser/DefineUserTable.js")
+const DefineUser = lazy(
+  () => import("../eachPageComponent/DefineUser/DefineUserTable.js"),
 );
 
-const CustomerUser = lazy(() =>
-  import("../eachPageComponent/CustomerUser/CustomerUserTabel.js")
+const CustomerUser = lazy(
+  () => import("../eachPageComponent/CustomerUser/CustomerUserTabel.js"),
 );
 
-const HonorsMainComponent = lazy(() =>
-  import("../eachPageComponent/Honors/HonorsMainComponent.js")
+const HonorsMainComponent = lazy(
+  () => import("../eachPageComponent/Honors/HonorsMainComponent.js"),
 );
 
 const DoshbordMainComponent = dynamic(
@@ -52,7 +46,7 @@ const DoshbordMainComponent = dynamic(
   {
     ssr: false,
     loading: () => <SoftLoader />,
-  }
+  },
 );
 
 const OrderMainComponent = dynamic(
@@ -60,7 +54,7 @@ const OrderMainComponent = dynamic(
   {
     ssr: false,
     loading: () => <SoftLoader />,
-  }
+  },
 );
 
 const ExhibitionMainComponent = dynamic(
@@ -68,7 +62,7 @@ const ExhibitionMainComponent = dynamic(
   {
     ssr: false,
     loading: () => <SoftLoader />,
-  }
+  },
 );
 
 const BlogsMainComponent = dynamic(
@@ -76,15 +70,15 @@ const BlogsMainComponent = dynamic(
   {
     ssr: false,
     loading: () => <SoftLoader />,
-  }
+  },
 );
 
 const VideoMainComponent = dynamic(
   () => import("../eachPageComponent/Video/VideoMainComponent.js"),
   {
     ssr: false,
-   loading: () => <SoftLoader />,
-  }
+    loading: () => <SoftLoader />,
+  },
 );
 
 const ProductMainComponent = dynamic(
@@ -92,7 +86,7 @@ const ProductMainComponent = dynamic(
   {
     ssr: false,
     loading: () => <SoftLoader />,
-  }
+  },
 );
 
 const BannerMainComponent = dynamic(
@@ -100,7 +94,7 @@ const BannerMainComponent = dynamic(
   {
     ssr: false,
     loading: () => <SoftLoader />,
-  }
+  },
 );
 
 const HeaderMainComponent = dynamic(
@@ -108,7 +102,7 @@ const HeaderMainComponent = dynamic(
   {
     ssr: false,
     loading: () => <SoftLoader />,
-  }
+  },
 );
 
 const AccessibilityMainComponent = dynamic(
@@ -117,7 +111,7 @@ const AccessibilityMainComponent = dynamic(
   {
     ssr: false,
     loading: () => <SoftLoader />,
-  }
+  },
 );
 
 const ContactMainComponent = dynamic(
@@ -125,7 +119,7 @@ const ContactMainComponent = dynamic(
   {
     ssr: false,
     loading: () => <SoftLoader />,
-  }
+  },
 );
 
 const AdminPanel = () => {
@@ -134,88 +128,55 @@ const AdminPanel = () => {
   const [activeTab, setActiveTab] = useState("Orders");
   const [visibility, setVisibility] = useState({});
 
-  const tabs = [
-    { id: "Doshbord", title: "داشبورد", icon: <SpaceDashboardIcon /> },
-    { id: "Orders", title: "سفارشات", icon: <ListAltIcon /> },
-    { id: "separator1", isDecorative: true },
+  const navGroups = [
     {
-      id: "settingsHeader",
-      isDecorative: true,
-      title: (
-        <div
-          style={{ cursor: "default" }}
-          className="d-flex flex-row justify-content-between"
-        >
-          <div>
-            <SettingsIcon /> تنظیمات
-          </div>
-          <div>
-            <ArrowDropDownIcon />
-          </div>
-        </div>
-      ),
-    },
-    { id: "header", style: "pe-2", title: "ساخت هدر", icon: <PatternIcon /> },
-    {
-      id: "Product",
-      style: "pe-2",
-      title: "محصولات",
-      icon: <StorefrontIcon />,
-    },
-    { id: "Blogs", style: "pe-2", title: "مقالات", icon: <BookIcon /> },
-    {
-      id: "Honors",
-      style: "pe-2",
-      title: "افتخارات",
-      icon: <MilitaryTechIcon />,
+      title: "اصلی",
+      items: [
+        { id: "Doshbord", title: "داشبورد", icon: <SpaceDashboardIcon /> },
+        { id: "Orders", title: "سفارشات", icon: <ListAltIcon /> },
+      ],
     },
     {
-      id: "Exhibition",
-      style: "pe-2",
-      title: "نمایشگاه ها",
-      icon: <BalconyIcon />,
-    },
-    { id: "Banner", style: "pe-2", title: "بنر", icon: <ViewArrayIcon /> },
-    { id: "Video", style: "pe-2", title: "ویدیو", icon: <VideocamIcon /> },
-    {
-      id: "defineUser",
-      style: "pe-2",
-      title: "کاربر های سیستم",
-      icon: <PersonIcon />,
-    },
-    {
-      id: "customerUser",
-      style: "pe-2",
-      title: "مدیریت مشتریان",
-      icon: <PeopleIcon />,
+      title: "مدیریت محتوا",
+      items: [
+        { id: "header", title: "ساخت هدر", icon: <PatternIcon /> },
+        { id: "Product", title: "محصولات", icon: <StorefrontIcon /> },
+        { id: "Blogs", title: "مقالات", icon: <BookIcon /> },
+        { id: "Honors", title: "افتخارات", icon: <MilitaryTechIcon /> },
+        { id: "Exhibition", title: "نمایشگاه ها", icon: <BalconyIcon /> },
+        { id: "Banner", title: "بنر", icon: <ViewArrayIcon /> },
+        { id: "Video", title: "ویدیو", icon: <VideocamIcon /> },
+        { id: "ContactUs", title: "تماس با ما", icon: <MailOutlineIcon /> },
+      ],
     },
     {
-      id: "Accessibility",
-      style: "pe-2",
-      title: "سطح دسترسی ها",
-      icon: <AccessibilityIcon />,
-    },
-    {
-      id: "ContactUs",
-      style: "pe-2",
-      title: "تماس با ما",
-      icon: <MailOutlineIcon />,
-    },
-    {
-      id: "versionTab",
-      isDecorative: true,
-      title: (
-        <ShowVersionServer />
-      ),
+      title: "کاربران و دسترسی",
+      items: [
+        { id: "defineUser", title: "کاربر های سیستم", icon: <PersonIcon /> },
+        { id: "customerUser", title: "مدیریت مشتریان", icon: <PeopleIcon /> },
+        {
+          id: "Accessibility",
+          title: "سطح دسترسی ها",
+          icon: <AccessibilityIcon />,
+        },
+      ],
     },
   ];
 
-  // Filter only functional tabs based on permissions
-  const filteredTabs = tabs.filter(
-    (tab) =>
-      tab.isDecorative ||
-      permission?.some((permission) => permission.htmlId === tab.id)
-  );
+  // Only show the sections the signed-in admin is allowed to open.
+  const visibleGroups = navGroups
+    .map((group) => ({
+      ...group,
+      items: group.items.filter((item) =>
+        permission?.some((p) => p.htmlId === item.id),
+      ),
+    }))
+    .filter((group) => group.items.length > 0);
+
+  const handleSelect = (id) => {
+    setActiveTab(id);
+    handleClose("main");
+  };
 
   // Function to close a specific off-canvas
   const handleClose = (key) => {
@@ -229,303 +190,99 @@ const AdminPanel = () => {
 
   return (
     <section className={` ${style.adminPanel}`}>
-      <aside className={`${style.sidebar} d-lg-flex d-none me-2 my-2`}>
-        <h4
-          className={`${style.titleStyleHeader} title d-flex flex-column justify-content-center gap-2 align-items-center`}
-        >
-          <Box
-            component="img"
-            sx={{
-              width: "70px",
-              height: "100%",
-              objectFit: "cover",
-            }}
-            alt="image."
-            src="/LOGO/cropped-com.chakavak.adv_512x512.png"
-          />
-        </h4>
-
-        <Tabs
-          activeKey={activeTab}
-          onSelect={(k) => setActiveTab(k)}
-          id="admin-tabs1"
-          className={`${style.sidebarMain} discription mt-3`}
-        >
-          {filteredTabs.map((tab) =>
-            tab.isDecorative ? (
-              // Render decorative tabs
-              <Tab
-                key={tab.id}
-                title={
-                  tab.title || <div className={style.addBorderSideBar}></div>
-                }
-              />
-            ) : (
-              // Render functional tabs
-              <Tab
-                key={tab.id}
-                eventKey={tab.id}
-                title={
-                  <div className={`${tab.style}`}>
-                    {tab.icon} {tab.title}
-                  </div>
-                }
-              />
-            )
-          )}
-        </Tabs>
+      <aside className={`${style.sidebar} d-lg-block d-none`}>
+        <SidebarNav
+          groups={visibleGroups}
+          activeTab={activeTab}
+          onSelect={setActiveTab}
+        />
       </aside>
 
-      <div className={`${style.content} mb-3`}>
-        <div className="w-100 ">
-          <Navbar.Offcanvas
-            placement="end"
-            className={` ${style.navbaritemheader}`}
-            show={visibility["main"]}
-            onHide={() => handleClose("main")}
-            id="basic-navbar-nav"
-          >
-            <Offcanvas.Header
-              className={`${style.offcanvasheader} ${style.nextoffcanvas} ${style.offcanvasHeaderResponsive} justify-content-between position-relative`}
-              closeButton={false}
-            >
-              <Offcanvas.Title className="me-2 w-100 h-100">
-                <Box
-                  component="img"
-                  sx={{
-                    width: "50px",
-                    height: "100%",
-                    objectFit: "cover",
-                  }}
-                  alt="image."
-                  src="/LOGO/cropped-com.chakavak.adv_512x512.png"
-                />
-              </Offcanvas.Title>
-              <CustomCloseButton
-                className="me-2"
-                color={"#262626"}
-                onClick={() => handleClose("main")}
-              />
+      <Offcanvas
+        placement="end"
+        className={style.offcanvas}
+        show={!!visibility["main"]}
+        onHide={() => handleClose("main")}
+        id="basic-navbar-nav"
+      >
+        <SidebarNav
+          groups={visibleGroups}
+          activeTab={activeTab}
+          onSelect={handleSelect}
+        />
+      </Offcanvas>
 
-              <div
-                className={`${style.addBorderSideBar2} position-absolute`}
-              ></div>
-            </Offcanvas.Header>
-
-            <Nav className="align-items-center gap-3">
-              <Tabs
-                activeKey={activeTab}
-                onSelect={(k) => setActiveTab(k)}
-                id="admin-tabs2"
-                className={`${style.sidebarMain} NormalTextSizing`}
-              >
-                {filteredTabs.map((tab) =>
-                  tab.isDecorative ? (
-                    // Render decorative tabs
-                    <Tab
-                      key={tab.id}
-                      title={
-                        tab.title || (
-                          <div className={style.addBorderSideBar}></div>
-                        )
-                      }
-                    />
-                  ) : (
-                    // Render functional tabs
-                    <Tab
-                      key={tab.id}
-                      eventKey={tab.id}
-                      title={
-                        <div className={`${tab.style}`}>
-                          {tab.icon} {tab.title}
-                        </div>
-                      }
-                    />
-                  )
-                )}
-
-                {/* <Tab
-                  eventKey="Doshbord"
-                  title={
-                    <>
-                      <SpaceDashboardIcon /> داشبورد
-                    </>
-                  }
-                ></Tab>
-                <Tab
-                  eventKey="Orders"
-                  title={
-                    <>
-                      <ListAltIcon /> سفارشات
-                    </>
-                  }
-                ></Tab>
-
-                <Tab title={<div className={style.addBorderSideBar}></div>} />
-
-                <Tab
-                  title={
-                    <div
-                      style={{ cursor: "default" }}
-                      className="d-flex flex-row justify-content-between"
-                    >
-                      <div>
-                        <SettingsIcon /> تنظیمات
-                      </div>
-                      <div>
-                        <ArrowDropDownIcon />
-                      </div>
-                    </div>
-                  }
-                />
-
-                <Tab
-                  eventKey="header"
-                  title={
-                    <div className="pe-2">
-                      <PatternIcon /> ساخت هدر
-                    </div>
-                  }
-                ></Tab>
-                <Tab
-                  eventKey="Product"
-                  title={
-                    <div className="pe-2">
-                      <StorefrontIcon /> محصولات
-                    </div>
-                  }
-                ></Tab>
-                <Tab
-                  eventKey="Blogs"
-                  title={
-                    <div className="pe-2">
-                      <BookIcon /> مقالات
-                    </div>
-                  }
-                ></Tab>
-                <Tab
-                  eventKey="Honors"
-                  title={
-                    <div className="pe-2">
-                      <MilitaryTechIcon /> افتخارات
-                    </div>
-                  }
-                ></Tab>
-                <Tab
-                  eventKey="Exhibition"
-                  title={
-                    <div className="pe-2">
-                      <BalconyIcon /> نمایشگاه ها
-                    </div>
-                  }
-                ></Tab>
-                <Tab
-                  eventKey="Banner"
-                  title={
-                    <div className="pe-2">
-                      <ViewArrayIcon /> بنر
-                    </div>
-                  }
-                ></Tab>
-                <Tab
-                  eventKey="Video"
-                  title={
-                    <div className="pe-2">
-                      <VideocamIcon /> ویدیو
-                    </div>
-                  }
-                ></Tab>
-                <Tab
-                  eventKey="defineUser"
-                  title={
-                    <div className="pe-2">
-                      <PersonIcon /> کاربر های سیستم
-                    </div>
-                  }
-                ></Tab>
-                <Tab
-                  eventKey="customerUser"
-                  title={
-                    <div className="pe-2">
-                      <PeopleIcon /> مدیریت مشتریان
-                    </div>
-                  }
-                ></Tab> */}
-              </Tabs>
-            </Nav>
-          </Navbar.Offcanvas>
-        </div>
-
+      <div className={style.content}>
         {activeTab === "Doshbord" && (
-          <div className={style.tabContent}>
+          <div className={`${style.tabContent} app-content`}>
             <DoshbordMainComponent toggleShow={toggleShow} />
           </div>
         )}
         {activeTab === "Orders" && (
-          <div className={style.tabContent}>
+          <div className={`${style.tabContent} app-content`}>
             <OrderMainComponent toggleShow={toggleShow} />
           </div>
         )}
         {activeTab === "header" && (
-          <div className={style.tabContent}>
+          <div className={`${style.tabContent} app-content`}>
             <DndProvider backend={HTML5Backend}>
               <HeaderMainComponent toggleShow={toggleShow} />
             </DndProvider>
           </div>
         )}
         {activeTab === "Product" && (
-          <div className={style.tabContent}>
+          <div className={`${style.tabContent} app-content`}>
             <ProductMainComponent toggleShow={toggleShow} />
           </div>
         )}
         {activeTab === "Blogs" && (
-          <div className={style.tabContent}>
+          <div className={`${style.tabContent} app-content`}>
             <BlogsMainComponent toggleShow={toggleShow} />
           </div>
         )}
         {activeTab === "Honors" && (
-          <div className={style.tabContent}>
+          <div className={`${style.tabContent} app-content`}>
             <Suspense fallback={<SoftLoader />}>
               <HonorsMainComponent toggleShow={toggleShow} />
             </Suspense>
           </div>
         )}
         {activeTab === "Exhibition" && (
-          <div className={style.tabContent}>
+          <div className={`${style.tabContent} app-content`}>
             <ExhibitionMainComponent toggleShow={toggleShow} />
           </div>
         )}
         {activeTab === "Banner" && (
-          <div className={style.tabContent}>
+          <div className={`${style.tabContent} app-content`}>
             <BannerMainComponent toggleShow={toggleShow} />
           </div>
         )}
         {activeTab === "Video" && (
-          <div className={style.tabContent}>
+          <div className={`${style.tabContent} app-content`}>
             <VideoMainComponent toggleShow={toggleShow} />
           </div>
         )}
         {activeTab === "defineUser" && (
-          <div className={style.tabContent}>
+          <div className={`${style.tabContent} app-content`}>
             <Suspense fallback={<SoftLoader />}>
               <DefineUser toggleShow={toggleShow} />
             </Suspense>
           </div>
         )}
         {activeTab === "customerUser" && (
-          <div className={style.tabContent}>
+          <div className={`${style.tabContent} app-content`}>
             <Suspense fallback={<SoftLoader />}>
               <CustomerUser toggleShow={toggleShow} />
             </Suspense>
           </div>
         )}
         {activeTab === "Accessibility" && (
-          <div className={style.tabContent}>
+          <div className={`${style.tabContent} app-content`}>
             <AccessibilityMainComponent toggleShow={toggleShow} />
           </div>
         )}
         {activeTab === "ContactUs" && (
-          <div className={style.tabContent}>
+          <div className={`${style.tabContent} app-content`}>
             <ContactMainComponent toggleShow={toggleShow} />
           </div>
         )}

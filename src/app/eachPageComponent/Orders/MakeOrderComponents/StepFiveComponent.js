@@ -157,7 +157,7 @@ export default function StepFiveComponent({
   const handleSubmit = async () => {
     try {
       const response = await dispatch(
-        sendingAdressStep({ code: code, finalData: finalData })
+        sendingAdressStep({ code: code, finalData: finalData }),
       );
 
       if (response.payload.statusCode == 200) {
@@ -167,15 +167,13 @@ export default function StepFiveComponent({
           handleNextStep();
         }
       }
-    } catch (error) {
+    } catch {
       alert("خطا در ارسال دیتا");
     }
   };
 
   const handleDisabelInput = () => {
     handleSubmit();
-    // setDisabelInputStep4(true);
-    // handleNextStep();
   };
 
   const handleDeleteAdress = (index) => {
@@ -307,7 +305,8 @@ export default function StepFiveComponent({
     <div>
       <div>
         <p className="NormalTextSizing mb-3">
-          بعد از آماده سازی و تولید، دوست دارید بسته خود را چگونه تحویل بگیرید.{" "}
+          بعد از آماده سازی و تولید، دوست دارید بسته خود را چگونه تحویل
+          بگیرید.{" "}
         </p>
         <FormControl
           disabled={disabelInputStep4}
@@ -496,7 +495,7 @@ export default function StepFiveComponent({
                       className={style.MainBOXCardStyle}
                       style={{
                         border:
-                          trackactiveAdress === index && "1px solid #5695F6",
+                          trackactiveAdress === index && "1px solid var(--c-primary)",
                       }}
                       onClick={() => handleImageClick(index)}
                     >
@@ -747,7 +746,7 @@ export default function StepFiveComponent({
                       className={style.MainBOXCardStyle}
                       style={{
                         border:
-                          trackactiveAdress2 === index && "1px solid #5695F6",
+                          trackactiveAdress2 === index && "1px solid var(--c-primary)",
                       }}
                       onClick={() => handleImageClick2(index)}
                     >

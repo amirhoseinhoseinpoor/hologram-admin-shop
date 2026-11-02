@@ -10,12 +10,11 @@ import Tooltip from "@mui/material/Tooltip";
 
 import style from "../../../Styles/MakeOrderStyle/StepSixStyle.module.scss";
 
-// import redux 
+// import redux
 import { useDispatch } from "react-redux";
 import { fetchPrivateImage } from "@/app/Store/thunks";
 // import base modal
 import ZoomModal from "@/app/BaseComponent/ZoomModal";
-
 
 export default function StepSixComponent({
   finalFactor,
@@ -36,7 +35,7 @@ export default function StepSixComponent({
   useEffect(() => {
     const fetchFinalPayment = async () => {
       const gettingFinalImageAPI = await dispatch(
-        fetchPrivateImage({ filename: finalFactor?.finalPayment })
+        fetchPrivateImage({ filename: finalFactor?.finalPayment }),
       ).unwrap();
       setFinalPaymentImage(gettingFinalImageAPI);
     };
@@ -280,7 +279,6 @@ export default function StepSixComponent({
                 مرحله‌ی قبلی
               </button>
               <div className="d-flex justify-content-center">
-               
                 <button
                   type="button"
                   className={`${style.downloadFactor} d-flex fwlex-row gap-2`}

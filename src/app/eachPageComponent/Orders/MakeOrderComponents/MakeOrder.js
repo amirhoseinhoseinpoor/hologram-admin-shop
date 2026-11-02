@@ -1,36 +1,17 @@
 "use client";
 
+import { HeadermakeOrder } from "@/app/BaseComponent/PageHeader";
 import dynamic from "next/dynamic";
-import React, { useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import style from "../../../Styles/MakeOrderStyle/MakeOrder.module.scss";
 import ProcessTracker from "../ProcessTracker";
-import styled from "styled-components";
 import Image from "next/image";
 import { Modal, Box } from "@mui/material";
 // import base component
 import NavBarToggleBurgerButton from "@/app/BaseComponent/NavBarToggleBurgerButton";
 import ProfileComponent from "@/app/BaseComponent/ProfileComponent";
 
-const HeadermakeOrder = styled.div`
-  padding: 10px;
-  color: white;
-  background-color: rgb(225, 223, 223);
-  border-radius: 4px;
-  margin: 7px 15px;
-  .textHeaderStyle {
-    color: black;
-  }
-
-  @media (max-width: 980px) {
-    .textHeaderStyle {
-      /* color: white !important; */
-    }
-  }
-`;
-
 const SteponeComponent = dynamic(() => import("./StepOneComponent"));
-
-// const StepBetweenOneAndTwo = dynamic(() => import("./StepBetweenOneAndTwo"))
 
 const StepTwoComponent = dynamic(() => import("./StepTwoComponent"), {
   ssr: false,
@@ -66,11 +47,11 @@ export default function MakeOrder({
   const getStatusText = (status) => {
     switch (status) {
       case 1:
-        return "درحال برسی";
+        return "در حال بررسی";
       case 2:
-        return "درحال تولید";
+        return "در حال تولید";
       case 3:
-        return "درحال ارسال";
+        return "در حال ارسال";
       case 4:
         return "تحویل داده شده";
       case 5:
@@ -209,7 +190,7 @@ export default function MakeOrder({
         >
           بازگشت به سفارشات
         </div>
-        <ProfileComponent colorGet={"#282e3f"} />
+        <ProfileComponent />
       </HeadermakeOrder>
 
       <div className="container">

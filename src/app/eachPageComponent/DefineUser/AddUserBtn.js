@@ -1,5 +1,7 @@
 "use client";
-import React, { useState, useEffect } from "react";
+import { PrimaryButton } from "@/app/BaseComponent/Buttons";
+import AddIcon from "@mui/icons-material/Add";
+import { useState, useEffect } from "react";
 import { Modal, Button } from "react-bootstrap";
 import styled from "styled-components";
 // import base component
@@ -7,7 +9,7 @@ import LoadingCss from "@/app/BaseComponent/LoadingCss";
 
 // import redux
 import { useDispatch } from "react-redux";
-import { addUser, getuser, gettingAllRoles } from "@/app/Store/thunks";
+import { addUser, gettingAllRoles } from "@/app/Store/thunks";
 
 const AddUserModal = styled(Modal)`
   .modal-dialog {
@@ -43,15 +45,7 @@ const AddUserModal = styled(Modal)`
     border: 1px solid black;
   }
 `;
-const AddUserBtnstyle = styled(Button)`
-  border: none;
-  color: white;
-  padding: 5px !important;
-  text-align: center;
-  cursor: pointer;
-  border-radius: 4px;
-  background-image: linear-gradient(195deg, #66bb6a 0%, #43a047 100%);
-`;
+const AddUserBtnstyle = PrimaryButton;
 
 const BUTTONSSTYLE = styled.div`
   display: flex;
@@ -67,12 +61,12 @@ const BUTTONSSTYLE = styled.div`
   }
 
   .confirmButtonStyle {
-    background: #43a047;
+    background: var(--c-primary);
     color: #fff;
     border: none;
 
     &:hover {
-      background: #3a8c3e;
+      background: var(--c-primary-600);
       transform: translateY(-1px);
     }
   }
@@ -109,8 +103,7 @@ export default function AddUserBtn({
 
   const [rolesData, setRolesData] = useState(null);
   const [updateData, setUpdateData] = useState(false);
-  const [selectedValues, setSelectedValues] = useState([]);
-  console.log(selectedValues);
+  const [, setSelectedValues] = useState([]);
 
   const [loadingAddUser, setLoadingAddUser] = useState(false);
   const [newUserData, setNewUserData] = useState({
@@ -228,12 +221,9 @@ export default function AddUserBtn({
   };
   return (
     <section>
-      <AddUserBtnstyle
-        className="NormalTextSizing"
-        variant="primary"
-        onClick={handleAddModalShow}
-      >
-        اضافه کردن
+      <AddUserBtnstyle onClick={handleAddModalShow}>
+        <AddIcon />
+        افزودن کاربر
       </AddUserBtnstyle>
       <AddUserModal show={showAddModal} onHide={handleAddModalClose}>
         <Modal.Header closeButton>
@@ -244,7 +234,7 @@ export default function AddUserBtn({
             <>
               <p
                 className="d-flex justify-content-center mb-2"
-                style={{ color: "#e91e63" }}
+                style={{ color: "var(--c-danger)" }}
               >
                 {error}
               </p>
@@ -256,7 +246,7 @@ export default function AddUserBtn({
                 نام
               </label>
               <input
-                style={{ border: hasError ? "1.2px solid #FF4F3F" : "" }}
+                style={{ border: hasError ? "1.2px solid var(--c-danger)" : "" }}
                 type="text"
                 id="firstName"
                 name="firstName"
@@ -273,7 +263,7 @@ export default function AddUserBtn({
                 نام خانوادگی
               </label>
               <input
-                style={{ border: hasError ? "1.2px solid #FF4F3F" : "" }}
+                style={{ border: hasError ? "1.2px solid var(--c-danger)" : "" }}
                 type="text"
                 id="lastName"
                 name="lastName"
@@ -284,25 +274,13 @@ export default function AddUserBtn({
                 required
               />
             </div>
-            {/* <div className="form-group">
-            <label className="mb-1 me-1" htmlFor="age">سن</label>
-              <input
-                type="number"
-                id="age"
-                name="age"
-                placeholder="سن"
-                className="form-control"
-                value={newUserData.age}
-                onChange={handleInputChange}
-              />
-            </div> */}
 
             <div className="form-group">
               <label className="mb-1 me-1" htmlFor="username">
                 شماره همراه
               </label>
               <input
-                style={{ border: hasError ? "1.2px solid #FF4F3F" : "" }}
+                style={{ border: hasError ? "1.2px solid var(--c-danger)" : "" }}
                 type="number"
                 id="username"
                 name="username"
@@ -319,7 +297,7 @@ export default function AddUserBtn({
                 رمز
               </label>
               <input
-                style={{ border: hasError ? "1.2px solid #FF4F3F" : "" }}
+                style={{ border: hasError ? "1.2px solid var(--c-danger)" : "" }}
                 type="password"
                 id="password"
                 name="password"
@@ -336,7 +314,7 @@ export default function AddUserBtn({
                 تکرار رمز
               </label>
               <input
-                style={{ border: hasError ? "1.2px solid #FF4F3F" : "" }}
+                style={{ border: hasError ? "1.2px solid var(--c-danger)" : "" }}
                 type="password"
                 id="confirmPassword"
                 name="confirmPassword"
@@ -348,27 +326,12 @@ export default function AddUserBtn({
               />
             </div>
 
-            {/* <div className="form-group">  
-              <label className="mb-1 me-1" htmlFor="gender">جنسیت</label>  
-              <select  
-                id="gender"  
-                name="gender"  
-                className="form-control"  
-                value={newUserData.gender}  
-                onChange={handleInputChange}  
-              >  
-                <option value="" disabled>انتخاب کنید</option>  
-                <option value="m">مرد</option>  
-                <option value="f">زن</option>  
-              </select>  
-            </div>  */}
-
             <div className="form-group">
               <label className="mb-1 me-1" htmlFor="domain">
                 امکان دسترسی
               </label>
               <select
-              style={{ border: hasError ? "1.2px solid #FF4F3F" : "" }}
+                style={{ border: hasError ? "1.2px solid var(--c-danger)" : "" }}
                 id="domain"
                 name="domain"
                 className="form-control"
@@ -384,25 +347,6 @@ export default function AddUserBtn({
               </select>
             </div>
 
-            {/* <div className="form-group">
-              <label className="mb-1 me-1" htmlFor="roleId">
-                سطح دسترسی
-              </label>
-              <select
-                id="roleId"
-                name="roleId"
-                className="form-control"
-                value={newUserData.roleId}
-                onChange={handleInputChange}
-                required
-              >
-                {rolesData?.map((item, index) => (
-                  <>
-                    <option value="1">{item.name}</option>
-                  </>
-                ))}
-              </select>
-            </div> */}
             {hideAcceseebility && (
               <div className="form-group">
                 <label className="mb-1 me-1">سطح دسترسی</label>
@@ -414,7 +358,7 @@ export default function AddUserBtn({
                     >
                       <input
                         style={{
-                          border: hasError ? "1.2px solid #FF4F3F" : "",
+                          border: hasError ? "1.2px solid var(--c-danger)" : "",
                         }}
                         type="checkbox"
                         value={item.id}
@@ -443,7 +387,6 @@ export default function AddUserBtn({
               disabled={isButtonDisabled}
               className="confirmButtonStyle"
               style={{
-                border: "unset",
                 backgroundColor: isButtonDisabled ? "#868686" : "",
                 border: isButtonDisabled ? "#868686" : "",
                 cursor: isButtonDisabled ? "not-allowed" : "pointer",

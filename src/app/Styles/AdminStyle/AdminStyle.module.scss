@@ -1,160 +1,33 @@
-@use "../variable" as var;
-
 .adminPanel {
   display: flex;
-  height: fit-content;
-  min-height: 100%;
-  background-color: var.$mainBackgroundColor;
-  gap: 10px;
-}
-
-.titleStyleHeader{
-  color: var.$sidebarColor;
-  display: flex;
-  margin-top: 5px;
-  padding-bottom: 10px;
-  justify-content: center;
-  width: 90%;
-  border-bottom: 1px solid #42424a;
-}
-
-
-
-.offcanvasheader :global {
-  button {
-    margin: 0 !important;
-  }
-  .offcanvas-title{
-    color: var.$sidebarColorActive;
-  }
-}
-
-.offcanvasHeaderResponsive{
-  width: 100% !important;
-}
-
-
-.navbaritemheader{
-  background-color: white;
-  width: 215px !important;
-  overflow-y: auto;
-  scrollbar-width: none;
-  -ms-overflow-style: none;
-}
-
-.navbaritemheader::-webkit-scrollbar {
-  display: none;
+  align-items: flex-start;
+  min-height: 100vh;
+  background-color: var(--c-bg);
 }
 
 .sidebar {
-  width: 20%;
-  background-color: white;
-  color: #fff;
-  box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
-  align-items: center;
-  flex-direction: column;
-  border-radius: 0.5rem;
-}
-
-.sidebarMain {
   position: sticky;
   top: 0;
-  display: flex;
-  flex-direction: column;
-  gap: 7px;
-  width: 94%;
-  justify-content: center;
-  border-bottom: none;
-}
-.sidebarMain :global {
-  .nav-item{
-    border-radius: 10px !important;
-    .css-i4bv87-MuiSvgIcon-root{
-      opacity: 0.7;
-    }
-  }
-  .nav-link {
-    color: var.$sidebarColorActive;
-    text-align: start;
-    width: 100%;
-    border: none;
-    padding: 7px 7px 7px 7px;
-    position: relative;
-  }
-  .nav-link.active {
-    background-image: var.$sideBarMainBackground;
-    color: white;
-    border: none;
-    border-radius: 10px;
-  }
-
+  flex: 0 0 var(--sidebar-w);
+  width: var(--sidebar-w);
+  height: 100vh;
+  background-color: var(--c-surface);
+  border-inline-end: 1px solid var(--c-border);
 }
 
-.addBorderSideBar{
-  border-bottom: 1px solid #42424a !important;
+.offcanvas {
+  width: 280px !important;
+  background-color: var(--c-surface);
 }
-.addBorderSideBar2{
-  width: 87%;
-  border-bottom: 1px solid #42424a !important;
-  bottom: 0;
-}
-
-.sidebarMain .nav {
-  display: flex;
-  flex-direction: row;
-  justify-content: space-around;
-}
-
 
 .content {
   flex: 1;
-  background-color: var.$mainBackgroundColor;
-  overflow-y: auto;
+  min-width: 0;
+  overflow-x: clip;
+  min-height: 100vh;
+  padding-bottom: 32px;
 }
 
 .tabContent {
-  padding: 0px;
-}
-
-.tabContent h2 {
-  margin-bottom: 20px;
-}
-
-.tabContent form {
-  display: flex;
-  flex-direction: column;
-}
-
-.tabContent label {
-  margin-bottom: 5px;
-}
-
-.tabContent input,
-.tabContent textarea {
-  // margin-bottom: 5px;
-  padding: 4px;
-  border: 1px solid #ccc;
-  border-radius: 4px;
-}
-
-.tabContent button {
-  padding: 3px 5px; 
-  color: #fff;
-  border: none;
-  border-radius: 4px;
-  cursor: pointer;
-}
-
-.nextoffcanvas {
-  justify-content: space-between;
-}
-
-@media (max-width: 980px) {
-  .navbaritemheader {
-    margin: 0 !important;
-  }
-  .navbaritemheader > div {
-    align-items: center !important;
-    justify-content: center;
-  }
+  width: 100%;
 }

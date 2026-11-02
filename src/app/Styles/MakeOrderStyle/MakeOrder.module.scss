@@ -4,7 +4,7 @@
   background-color: white;
   height: 100%;
   padding: 15px;
-  border-radius: 4px;
+  border-radius: var(--r-sm);
 }
 
 .makeorderHeader {
@@ -16,14 +16,14 @@
 .mianDiVNvaBarOrder{
   background-color: white;
   padding: 10px;
-  border-radius: 4px;
+  border-radius: var(--r-sm);
 }
 
 .seeOrderButtonStyle {
   cursor: pointer;
   border: 1px solid #dee2e6;
   padding: 3px 5px;
-  border-radius: 4px;
+  border-radius: var(--r-sm);
   background-image: var.$greenImageColor;
   color: white;
   width: fit-content;
@@ -31,7 +31,7 @@
 }
 
 .numberColorForcall {
-  color: #f3802c;
+  color: var(--c-warning);
 }
 
 .effectMainDivStyle {
@@ -82,13 +82,13 @@
 .continueButton {
   border: none;
   color: white;
-  background-color: #5695f6;
-  border-radius: 4px;
+  background-color: var(--c-primary);
+  border-radius: var(--r-sm);
   padding: 7px 29px;
 }
 
 .StarFixReq {
-  color: #ff4f3f;
+  color: var(--c-danger);
 }
 
 .displayNoneTheInput {
@@ -97,7 +97,7 @@
 
 .labelInsteadOfInput {
   border: 1px solid #c0c0c0;
-  border-radius: 4px;
+  border-radius: var(--r-sm);
   padding: 10px;
 }
 .colorTheInputFile {
@@ -106,7 +106,7 @@
 
 .inputTextCompanyName {
   border: 1px solid #c0c0c0;
-  border-radius: 4px;
+  border-radius: var(--r-sm);
   padding: 7px 15px;
 }
 
@@ -129,6 +129,6 @@
     cursor: pointer;
     border: 1px solid #dee2e6;
     padding: 3px 5px;
-    border-radius: 4px;
+    border-radius: var(--r-sm);
   }
 }

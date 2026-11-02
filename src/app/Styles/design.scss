@@ -1,0 +1,386 @@
+// Central design system for the admin panel.
+// NOTE: page content is wrapped in the global class `.app-content`
+// (CSS-module class names are hashed, so global rules must not use them).
+
+:root {
+  --c-primary: #2f5bd9;
+  --c-primary-600: #2548b4;
+  --c-primary-50: #eef2ff;
+  --c-primary-100: #dbe4ff;
+  --c-ink: #1b2236;
+  --c-text: #1f2937;
+  --c-muted: #6b7280;
+  --c-border: #e5e7eb;
+  --c-border-strong: #d1d5db;
+  --c-bg: #f5f6fa;
+  --c-surface: #ffffff;
+  --c-success: #16a34a;
+  --c-success-50: #dcfce7;
+  --c-danger: #dc2626;
+  --c-danger-600: #b91c1c;
+  --c-danger-50: #fee2e2;
+  --c-warning: #d97706;
+  --c-warning-50: #fef3c7;
+
+  --r-sm: 8px;
+  --r-md: 12px;
+  --r-lg: 16px;
+
+  --shadow-sm: 0 1px 2px rgba(16, 24, 40, 0.06);
+  --shadow-md: 0 4px 12px rgba(16, 24, 40, 0.08);
+
+  --sp-1: 4px;
+  --sp-2: 8px;
+  --sp-3: 12px;
+  --sp-4: 16px;
+  --sp-5: 24px;
+  --sp-6: 32px;
+
+  --control-h: 40px;
+  --sidebar-w: 260px;
+}
+
+body {
+  background-color: var(--c-bg) !important;
+  color: var(--c-text);
+}
+
+// =====================================================================
+// Buttons
+// =====================================================================
+// 1) Base layer with ZERO specificity: every button in the pages and in
+//    bootstrap modals gets a clean shape (no browser border / grey face).
+//    Anything with its own class or styled-component still wins.
+:where(.app-content, .modal-content)
+  :where(button:not([data-plain]):not(.btn):not(.dropdown-item):not(.nav-link):not([class*="Mui"])) {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  min-height: 38px;
+  padding: 0 16px;
+  font-family: inherit;
+  font-size: 14px;
+  font-weight: 500;
+  line-height: 1.2;
+  color: #fff;
+  background-color: var(--c-primary);
+  border: 1px solid transparent;
+  border-radius: var(--r-sm);
+  cursor: pointer;
+  white-space: nowrap;
+  transition:
+    background-color 0.15s ease,
+    border-color 0.15s ease,
+    color 0.15s ease,
+    box-shadow 0.15s ease;
+}
+
+:where(.app-content, .modal-content) :where(button:disabled) {
+  opacity: 0.55;
+  cursor: not-allowed;
+}
+
+:where(.app-content, .modal-content) :where(button:focus-visible) {
+  outline: 3px solid var(--c-primary-100);
+  outline-offset: 1px;
+}
+
+// 2) Named variants. These are used across the forms; they win over the
+//    per-file styled wrappers so every form looks the same.
+:is(.app-content, .modal-content) button:is(.confirmButtonStyle, .confirm),
+.ui-btn-primary {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  min-height: 40px;
+  min-width: 120px;
+  padding: 0 22px;
+  font-size: 14px;
+  font-weight: 600;
+  color: #fff;
+  background: var(--c-primary);
+  border: 1px solid var(--c-primary);
+  border-radius: var(--r-sm);
+  box-shadow: var(--shadow-sm);
+  transform: none;
+
+  &:hover:not(:disabled) {
+    background: var(--c-primary-600);
+    border-color: var(--c-primary-600);
+    transform: none;
+  }
+}
+
+:is(.app-content, .modal-content) button:is(.cancelButtonStyle, .cancel),
+.ui-btn-secondary {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  min-height: 40px;
+  min-width: 120px;
+  padding: 0 22px;
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--c-text);
+  background: var(--c-surface);
+  border: 1px solid var(--c-border-strong);
+  border-radius: var(--r-sm);
+  box-shadow: var(--shadow-sm);
+  transform: none;
+
+  &:hover:not(:disabled) {
+    color: var(--c-ink);
+    background: #f3f4f6;
+    border-color: var(--c-border-strong);
+    transform: none;
+  }
+}
+
+// Wrapper that holds the save / cancel pair at the end of every form.
+:is(.app-content, .modal-content) :has(> button.confirmButtonStyle) {
+  justify-content: flex-start !important;
+  gap: 12px;
+}
+
+// Bootstrap buttons inside the panel follow the same palette.
+.btn {
+  border-radius: var(--r-sm);
+  font-weight: 500;
+  font-size: 14px;
+}
+.btn-primary,
+.btn-success {
+  --bs-btn-bg: var(--c-primary);
+  --bs-btn-border-color: var(--c-primary);
+  --bs-btn-hover-bg: var(--c-primary-600);
+  --bs-btn-hover-border-color: var(--c-primary-600);
+  --bs-btn-active-bg: var(--c-primary-600);
+  --bs-btn-active-border-color: var(--c-primary-600);
+}
+.btn-secondary,
+.btn-light {
+  --bs-btn-color: var(--c-text);
+  --bs-btn-bg: var(--c-surface);
+  --bs-btn-border-color: var(--c-border-strong);
+  --bs-btn-hover-color: var(--c-ink);
+  --bs-btn-hover-bg: #f3f4f6;
+  --bs-btn-hover-border-color: var(--c-border-strong);
+}
+.btn-danger {
+  --bs-btn-bg: var(--c-danger);
+  --bs-btn-border-color: var(--c-danger);
+  --bs-btn-hover-bg: var(--c-danger-600);
+  --bs-btn-hover-border-color: var(--c-danger-600);
+}
+
+// =====================================================================
+// Forms
+// =====================================================================
+:is(.app-content, .modal-content) label,
+.form-label {
+  margin-bottom: 6px;
+  font-size: 13.5px;
+  font-weight: 500;
+  color: var(--c-text);
+}
+
+:is(.app-content, .modal-content)
+  input:not([type="checkbox"]):not([type="radio"]):not([type="file"]):not([type="range"]):not([class*="Mui"]),
+:is(.app-content, .modal-content) textarea:not([class*="Mui"]),
+:is(.app-content, .modal-content) select:not([class*="Mui"]),
+.form-control,
+.form-select {
+  min-height: var(--control-h);
+  padding: 8px 12px;
+  font-family: inherit;
+  font-size: 14px;
+  color: var(--c-text);
+  background-color: var(--c-surface);
+  border: 1px solid var(--c-border-strong);
+  border-radius: var(--r-sm);
+  outline: none;
+  transition:
+    border-color 0.15s ease,
+    box-shadow 0.15s ease;
+
+  &::placeholder {
+    color: #9ca3af;
+  }
+  &:focus {
+    border-color: var(--c-primary);
+    box-shadow: 0 0 0 3px var(--c-primary-100);
+  }
+  &:disabled {
+    background-color: #f3f4f6;
+    color: var(--c-muted);
+  }
+}
+
+:is(.app-content, .modal-content) textarea:not([class*="Mui"]) {
+  min-height: 96px;
+}
+
+:is(.app-content, .modal-content) input:is([type="checkbox"], [type="radio"]) {
+  accent-color: var(--c-primary);
+}
+
+// MUI inputs follow the same look.
+.MuiOutlinedInput-root {
+  border-radius: var(--r-sm) !important;
+  font-family: inherit !important;
+  background-color: var(--c-surface);
+
+  .MuiOutlinedInput-notchedOutline {
+    border-color: var(--c-border-strong);
+  }
+  &.Mui-focused .MuiOutlinedInput-notchedOutline {
+    border-color: var(--c-primary) !important;
+    border-width: 1px !important;
+    box-shadow: 0 0 0 3px var(--c-primary-100);
+  }
+}
+.MuiInputBase-input,
+.MuiMenuItem-root,
+.MuiInputLabel-root,
+.MuiFormLabel-root,
+.MuiTypography-root {
+  font-family: inherit !important;
+}
+.MuiMenu-paper,
+.MuiPopover-paper {
+  border-radius: var(--r-md) !important;
+  box-shadow: var(--shadow-md) !important;
+  border: 1px solid var(--c-border);
+}
+
+// =====================================================================
+// Tables
+// =====================================================================
+.app-content table {
+  width: 100%;
+  border-collapse: separate;
+  border-spacing: 0;
+  background: var(--c-surface);
+
+  thead th {
+    padding: 12px 14px;
+    font-size: 12.5px;
+    font-weight: 600;
+    color: var(--c-muted);
+    background: #f9fafb !important;
+    border-bottom: 1px solid var(--c-border);
+    white-space: nowrap;
+  }
+  tbody td {
+    padding: 12px 14px;
+    font-size: 14px;
+    vertical-align: middle;
+    border-bottom: 1px solid var(--c-border);
+  }
+  tbody tr:last-child td {
+    border-bottom: none;
+  }
+}
+
+.app-content .table {
+  --bs-table-striped-bg: #fafbfd;
+  --bs-table-hover-bg: #f5f7ff;
+  margin-bottom: 0;
+}
+
+// =====================================================================
+// Layout helpers
+// =====================================================================
+// Bootstrap containers inside pages fill the content column.
+.app-content .container,
+.app-content .container-fluid {
+  max-width: none;
+  padding-inline: 0;
+}
+
+// Page gutters live on the content wrapper; the page header bleeds to the edges.
+.app-content {
+  padding: 0 var(--sp-5) var(--sp-6);
+
+  @media (max-width: 768px) {
+    padding: 0 var(--sp-3) var(--sp-5);
+  }
+}
+
+.app-content .MuiCardMedia-img {
+  aspect-ratio: 16 / 10;
+  object-fit: cover;
+}
+
+.ui-card {
+  background: var(--c-surface);
+  border: 1px solid var(--c-border);
+  border-radius: var(--r-md);
+  box-shadow: var(--shadow-sm);
+}
+
+// =====================================================================
+// Menus, modals, tabs
+// =====================================================================
+.dropdown-menu {
+  border: 1px solid var(--c-border);
+  border-radius: var(--r-md);
+  box-shadow: var(--shadow-md);
+  padding: 6px;
+}
+.dropdown-item {
+  border-radius: 6px;
+  font-size: 14px;
+  padding: 8px 12px;
+}
+
+.modal-content {
+  border: none;
+  border-radius: var(--r-lg);
+  box-shadow: 0 20px 40px rgba(16, 24, 40, 0.18);
+}
+.modal-header {
+  border-bottom: 1px solid var(--c-border);
+  padding: 16px 20px;
+}
+.modal-footer {
+  border-top: 1px solid var(--c-border);
+  gap: 8px;
+}
+.modal-backdrop.show {
+  opacity: 0.45;
+}
+
+// Bootstrap tabs used inside pages (product / blog forms).
+.app-content .nav-tabs {
+  gap: 6px;
+  border-bottom: 1px solid var(--c-border);
+
+  .nav-link {
+    color: var(--c-muted);
+    font-weight: 500;
+    border: none !important;
+    border-bottom: 2px solid transparent !important;
+    border-radius: 0 !important;
+    background: none !important;
+
+    &:hover {
+      color: var(--c-ink);
+    }
+    &.active {
+      color: var(--c-primary) !important;
+      border-bottom-color: var(--c-primary) !important;
+    }
+  }
+}
+
+// =====================================================================
+// Misc
+// =====================================================================
+* {
+  scrollbar-width: thin;
+  scrollbar-color: var(--c-border-strong) transparent;
+}

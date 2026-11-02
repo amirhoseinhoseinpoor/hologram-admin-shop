@@ -1,5 +1,7 @@
 "use client";
 
+import { PrimaryButton } from "@/app/BaseComponent/Buttons";
+import { HeadermakeOrder } from "@/app/BaseComponent/PageHeader";
 import React, { useState, useEffect } from "react";
 import AddHonors from "./AddHonors";
 import EditHonors from "./EditHoors";
@@ -11,37 +13,22 @@ import ConfirmingModal from "@/app/BaseComponent/ConfirmingModal";
 import ErrorModal from "@/app/BaseComponent/ErrorModal";
 //redux import
 import { useDispatch } from "react-redux";
-import { honorsList } from "../../Store/thunks.js";
-import { honorsDeleted } from "../../Store/thunks.js";
-import { Card, CardContent, CardMedia, Typography } from "@mui/material";
+import { honorsList, honorsDeleted } from "../../Store/thunks.js";
+import {
+  Card,
+  CardContent,
+  CardMedia,
+  Typography,
+  Skeleton,
+} from "@mui/material";
 import { formatPersianDate } from "@/app/utils/persionDateUtils";
 
 import styled from "styled-components";
-import PreviewIcon from "@mui/icons-material/Preview";
-import VisibilityIcon from "@mui/icons-material/Visibility";
+import AddIcon from "@mui/icons-material/Add";
+import PageToolbar from "@/app/BaseComponent/PageToolbar";
 import DeleteIcon from "@mui/icons-material/Delete";
-import { Skeleton } from "@mui/material";
 
-const HeadermakeOrder = styled.div`
-  padding: 10px;
-  color: white;
-  background-color: rgb(225, 223, 223);
-  border-radius: 4px;
-  margin: 7px 15px;
-  .textHeaderStyle {
-    color: black;
-  }
-
-  @media (max-width: 980px) {
-    background-color: white !important;
-    .textHeaderStyle {
-    }
-  }
-`;
-
-const ButtonColor = styled.button`
-  background-image: linear-gradient(195deg, #66bb6a 0%, #43a047 100%);
-`;
+const ButtonColor = PrimaryButton;
 
 const CARD = styled(Card)`
   background-color: white !important;
@@ -57,36 +44,37 @@ const CARD = styled(Card)`
   }
 
   position: relative;
-  border-radius: 20px;
+  border-radius: var(--r-md);
   overflow: hidden;
-  box-shadow: 0px 10px 20px rgba(0, 0, 0, 0.2);
+  box-shadow: var(--shadow-sm);
   background-color: #f7f7f7;
   transition: transform 0.3s ease;
   cursor: pointer;
-  max-width: 500px;
-  max-height: 500px;
   min-height: 100px;
 
   &:hover {
-    transform: translateY(-5px);
+    transform: translateY(-3px);
+    box-shadow: var(--shadow-md);
   }
 
   .deleteDiv {
-    background-color: rgba(255, 255, 255, 0.2);
+    background-color: rgba(255, 255, 255, 0.92);
     border-radius: 50%;
-    padding: 10px;
+    padding: 6px;
+    display: flex;
+    transition: background-color 0.15s ease;
     &:hover {
-      background-color: #66bb6a;
+      background-color: var(--c-danger-50);
     }
   }
   .MuiCardContent-root {
     position: absolute;
     bottom: 0;
     color: white;
-    padding: 1.5rem;
+    padding: 1rem;
 
     .titleHonors {
-      font-size: 1.5rem;
+      font-size: 1.05rem;
       font-weight: 600;
     }
   }
@@ -104,16 +92,12 @@ const GradientOverlay = styled.div`
 
 const GridbaseDiv = styled.div`
   display: grid;
-  grid-template-columns: repeat(2, 1fr);
-  grid-gap: 50px;
-  width: 70%;
-  @media (max-width: 980px) {
-    grid-template-columns: repeat(2, 1fr);
-  }
-  @media (max-width: 768px) {
-    grid-template-columns: repeat(1, 1fr);
-    width: 70%;
-    grid-gap: 40px;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 20px;
+  width: 100%;
+
+  @media (max-width: 576px) {
+    grid-template-columns: 1fr;
   }
 `;
 
@@ -225,41 +209,26 @@ export default function HonorsMainComponent({ toggleShow }) {
             </div>
           </>
         )}
-        <ProfileComponent colorGet={"#282e3f"} />
+        <ProfileComponent />
       </HeadermakeOrder>
       {/* tabs */}
-      <div className="d-flex justify-content-end ms-3">
-        {activekey === "editUserPage" && !editedHonor && (
-          <>
-            <div>
-              <ButtonColor onClick={() => setActiveKey("addUser")}>
-                افزودن افتخارات
-              </ButtonColor>
-            </div>
-          </>
-        )}
-        {/* {activekey === "addUser" && !editedHonor && (
-          <>
-            <div>
-              <ButtonColor onClick={() => setActiveKey("editUserPage")}>
-                ویرایش افتخارات
-              </ButtonColor>
-            </div>
-          </>
-        )}
-        {editedHonor && (
-          <>
-            <div>
-              <ButtonColor onClick={handleCancelEdit}>افتخارات</ButtonColor>
-            </div>
-          </>
-        )} */}
-      </div>
+      {activekey === "editUserPage" && !editedHonor && (
+        <PageToolbar
+          title="افتخارات"
+          count={dataCome.length}
+          loading={trackLoadingProduct}
+        >
+          <ButtonColor onClick={() => setActiveKey("addUser")}>
+            <AddIcon />
+            افزودن افتخارات
+          </ButtonColor>
+        </PageToolbar>
+      )}
 
       {/* content */}
       {activekey === "editUserPage" && !editedHonor && (
         <>
-          <GridbaseDiv className="mt-3 container" style={{ cursor: "pointer" }}>
+          <GridbaseDiv className="mt-3" style={{ cursor: "pointer" }}>
             {trackLoadingProduct ? (
               <>
                 <Skeleton
@@ -283,16 +252,6 @@ export default function HonorsMainComponent({ toggleShow }) {
                       <CARD className="position-relative">
                         <div className="position-absolute zIndex  w-100 top-0 ">
                           <div className="d-flex mb-1 mt-1 justify-content-end align-items-center container ">
-                            {/* <div
-                           
-                            className="preiweDiv"
-                            onClick={() => {
-                              setEditedHonor(data);
-                            }}
-                          >
-                            <VisibilityIcon style={{ color: "#262626" }} />
-                          </div> */}
-
                             <div
                               className="deleteDiv"
                               onClick={(e) => {
@@ -364,7 +323,7 @@ export default function HonorsMainComponent({ toggleShow }) {
       <AreYouShureModal
         open={openModal4}
         onClose={closeModal4}
-        text={"ایا از حذف افتخار مطمعن هستید"}
+        text={"آیا از حذف افتخار مطمئن هستید؟"}
         func={handleDelete}
       />
       <ConfirmingModal
@@ -375,7 +334,7 @@ export default function HonorsMainComponent({ toggleShow }) {
       <ErrorModal
         open={openModal3}
         onClose={closeModal3}
-        text={"خطا از لاگین بودن خود اطمینان حاصل فرمایید"}
+        text={"خطا در انجام عملیات، لطفاً دوباره تلاش کنید"}
       />
     </section>
   );

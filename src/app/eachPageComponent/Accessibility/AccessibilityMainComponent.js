@@ -1,9 +1,12 @@
-import React, { useState, useEffect } from "react";
+import { PrimaryButton } from "@/app/BaseComponent/Buttons";
+import AddIcon from "@mui/icons-material/Add";
+import { HeadermakeOrder } from "@/app/BaseComponent/PageHeader";
+import { useState, useEffect } from "react";
 import ProfileComponent from "@/app/BaseComponent/ProfileComponent";
 import NavBarToggleBurgerButton from "@/app/BaseComponent/NavBarToggleBurgerButton";
 import styled from "styled-components";
 // import redux
-import { useDispatch, useSelector } from "react-redux";
+import { useDispatch } from "react-redux";
 import {
   gettingAllRoles,
   deleteRole,
@@ -12,7 +15,6 @@ import {
 } from "@/app/Store/thunks";
 
 import { Modal, Box } from "@mui/material";
-import { Select, MenuItem, FormControl, InputLabel } from "@mui/material";
 // import icons
 import MoreHorizIcon from "@mui/icons-material/MoreHoriz";
 import { NavDropdown } from "react-bootstrap";
@@ -26,31 +28,13 @@ import ErrorModal from "@/app/BaseComponent/ErrorModal";
 import CustomCloseButton from "@/app/BaseComponent/CustomCloseButton";
 import LoadingCss from "@/app/BaseComponent/LoadingCss";
 
-const HeadermakeOrder = styled.div`
-  padding: 10px;
-  color: white;
-  background-color: rgb(225, 223, 223);
-  border-radius: 4px;
-  margin: 7px 15px;
-  .textHeaderStyle {
-    color: black;
-  }
-
-  @media (max-width: 980px) {
-    /* background-color: rgb(26, 32, 53) !important; */
-    .textHeaderStyle {
-      /* color: white !important; */
-    }
-  }
-`;
-
 const SectionMain = styled.section`
   /* padding: 10px; */
   /* border-radius: 4px;
   border: 2px solid #ccc; */
 
   /* .addRoleButtonStyle {
-    background-color: #43a047;
+    background-color: var(--c-primary);
     color: white;
     border: none;
     border-radius: 4px;
@@ -58,47 +42,18 @@ const SectionMain = styled.section`
     cursor: pointer;
   } */
   /* .headerBAckGroundColor {
-    background-color: rgb(225, 223, 223);
+    background-color: #f3f4f6;
     border-radius: 4px;
     padding: 8px;
   } */
 `;
 
-const AddRoleButton = styled.button`
-  background-color: #43a047;
-  color: white;
-  border: none;
-  border-radius: 4px;
-  padding: 5px 12px !important;
-  cursor: pointer;
-`;
+const AddRoleButton = PrimaryButton;
 
 const ModalHimselfStyle = styled(Modal)`
   display: flex;
   align-items: center;
   justify-content: center;
-`;
-
-const StyledTable = styled.table`
-  @media (min-width: 980px) {
-    border-collapse: separate;
-    border-radius: 12px;
-    /* overflow: hidden; */
-    width: 100%;
-
-    th,
-    td {
-      padding: 10px;
-      text-align: center;
-    }
-    th {
-      /* padding-top: 55px; */
-    }
-  }
-  .SeeAccessButtom {
-    cursor: pointer;
-    color: #43a047;
-  }
 `;
 
 const NavBarInsideDiv = styled.div`
@@ -109,24 +64,8 @@ const NavBarInsideDiv = styled.div`
   /* border-bottom: 1.4px solid #e1e5ea; */
 `;
 
-const AlignCenter = styled(Select)`
-  .css-jedpe8-MuiSelect-select-MuiInputBase-input-MuiOutlinedInput-input.MuiSelect-select {
-    text-align: center;
-  }
-  .MuiSelect-icon {
-    right: auto !important; /* Reset default positioning */
-    left: 0px !important; /* Position arrow on the left */
-  }
-  .css-jedpe8-MuiSelect-select-MuiInputBase-input-MuiOutlinedInput-input.css-jedpe8-MuiSelect-select-MuiInputBase-input-MuiOutlinedInput-input.css-jedpe8-MuiSelect-select-MuiInputBase-input-MuiOutlinedInput-input {
-    padding-left: 32px;
-  }
-  .css-jedpe8-MuiSelect-select-MuiInputBase-input-MuiOutlinedInput-input.css-jedpe8-MuiSelect-select-MuiInputBase-input-MuiOutlinedInput-input.css-jedpe8-MuiSelect-select-MuiInputBase-input-MuiOutlinedInput-input {
-    padding-right: 10px !important;
-  }
-`;
-
 const HeaderModalShowAccessMainDiv = styled.div`
-  background-color: rgb(225, 223, 223);
+  background-color: #f3f4f6;
   border-top-right-radius: 10px;
   border-top-left-radius: 10px;
   padding: 10px;
@@ -157,12 +96,12 @@ const modalStyle = {
 
 const NavDropDown = styled(NavDropdown)`
   .dropdown-menu {
-    border: 1px solid gray;
+    border: 1px solid var(--c-border);
     width: 150px;
     padding: 12px;
     margin-top: 3px;
     border-radius: 4px;
-    box-shadow: 1px 1px 5px gray;
+    box-shadow: var(--shadow-md);
   }
   .dropdown-toggle::after {
     display: none;
@@ -171,27 +110,27 @@ const NavDropDown = styled(NavDropdown)`
 
 const BUTTONSSTYLE = styled.div`
   .cancelButtonStyle {
-    color: #e91e63;
+    color: var(--c-danger);
     background-color: unset;
-    border: 1px solid #e91e63;
+    border: 1px solid var(--c-danger);
     padding-right: 10px;
     padding-left: 10px;
     border-radius: 4px;
   }
 
   .deleteButtonStyle {
-    color: #ff4f3f !important;
+    color: var(--c-danger) !important;
     background-color: transparent;
   }
   .confirmButtonStyle {
     padding: 4px 20px;
     color: white;
-    background-color: #43a047;
+    background-color: var(--c-primary);
     border: none;
     border-radius: 4px;
   }
   .editRole {
-    background-color: rgb(225, 223, 223);
+    background-color: #f3f4f6;
     border-top: 1px solid gray;
     border-bottom-left-radius: 4px !important;
     border-bottom-right-radius: 4px !important;
@@ -205,27 +144,22 @@ const BorderStyleAccessbility = styled.label`
   padding-top: 4px;
 `;
 
-const SeeAccessTableStyle = styled.p`
-  /* border-top: 1px solid gray; */
-  width: 100%;
-  /* text-align: center; */
-  padding-top: 3px;
-`;
-
 const FixTablePlace = styled.div`
   @media (min-width: 980px) {
     position: relative;
-    margin-top: 60px;
+    overflow: hidden;
+    background: var(--c-surface);
+    border: 1px solid var(--c-border);
+    border-radius: var(--r-md);
+    box-shadow: var(--shadow-sm);
     .pTagForStyle {
-      position: absolute;
-      transform: translate(-50%, 50%);
-      left: 50%;
-      width: 94%;
-      top: -55px;
-      border-radius: 10px;
-      padding: 18px 12px;
-      background-image: linear-gradient(195deg, #46506a 0%, #282e3f 100%);
-      color: white;
+      padding: 16px 20px;
+      margin: 0 !important;
+      font-size: 15px;
+      font-weight: 600;
+      color: var(--c-ink);
+      background-color: var(--c-surface);
+      border-bottom: 1px solid var(--c-border);
     }
     .tabelStyle {
       border-collapse: separate;
@@ -238,14 +172,13 @@ const FixTablePlace = styled.div`
         text-align: center;
       }
       th {
-        padding-top: 55px;
       }
     }
   }
 
   .SeeAccessButtom {
     cursor: pointer;
-    color: #43a047;
+    color: var(--c-primary);
   }
 `;
 
@@ -324,7 +257,7 @@ const ModalFooter = styled.div`
   justify-content: space-between;
 
   .confirm {
-    background: #43a047;
+    background: var(--c-primary);
     border: none;
     padding: 8px 20px;
     border-radius: 6px;
@@ -338,8 +271,8 @@ const ModalFooter = styled.div`
   }
 
   .cancel {
-    border: 1px solid #e91e63;
-    color: #e91e63;
+    border: 1px solid var(--c-danger);
+    color: var(--c-danger);
     background: white;
     padding: 8px 20px;
     border-radius: 6px;
@@ -360,7 +293,7 @@ export default function Accessibility({ toggleShow }) {
   const [dataForDelete, setDataForDelete] = useState(null);
   const [selectedValues, setSelectedValues] = useState([]);
   const [selectedValueCreateAccess, setSelectedValueCreateAccess] = useState(
-    []
+    [],
   );
   const [nameCreateNewAccess, setNameCreateNewAccess] = useState("");
 
@@ -395,30 +328,16 @@ export default function Accessibility({ toggleShow }) {
   };
 
   const handlechangeAccess = (index) => {
-    console.log(index);
-
-    const selectedRole = rolesData[--index];
-    console.log(selectedRole);
+    const selectedRole = rolesData[index - 1];
 
     const permissions =
       selectedRole?.permissions?.map((p) => p.permission.id) || [];
-    console.log(permissions);
 
     setSelectedValues(permissions); // Preload selected values from the role's permissions
-    setModalchangeAccess(++index);
+    setModalchangeAccess(index);
   };
 
   const handlechangeAccessCreate = () => {
-    // console.log(index);
-
-    // const selectedRole = rolesData[--index];
-    // console.log(selectedRole);
-
-    // const permissions =
-    //   selectedRole?.permissions?.map((p) => p.permission.id) || [];
-    // console.log(permissions);
-
-    // setSelectedValueCreateAccess(permissions);
     setModalCreateAccess(true);
   };
 
@@ -463,17 +382,15 @@ export default function Accessibility({ toggleShow }) {
   const handleDeleteRole = async () => {
     try {
       const dataReturnAPI = await dispatch(
-        deleteRole({ id: dataForDelete })
+        deleteRole({ id: dataForDelete }),
       ).unwrap();
-      console.log(dataReturnAPI);
       if (dataReturnAPI) {
         setOpenModal2(true);
         setTimeout(() => {
           setOpenModal2(false);
         }, 3000);
       }
-    } catch (error) {
-      console.log(error);
+    } catch {
       setErrormodal(true);
     } finally {
       setUpdateData(true);
@@ -488,7 +405,7 @@ export default function Accessibility({ toggleShow }) {
         updatePermissionRole({
           roleId: storeRoleId,
           permissionIds: selectedValues,
-        })
+        }),
       ).unwrap();
 
       if (dataReturnAPI) {
@@ -497,8 +414,7 @@ export default function Accessibility({ toggleShow }) {
           setOpenModal2(false);
         }, 3000);
       }
-    } catch (error) {
-      console.log(error);
+    } catch {
       setErrormodal(true);
     } finally {
       setLoadingUpdateAccess(false);
@@ -515,9 +431,8 @@ export default function Accessibility({ toggleShow }) {
         createPermissionRole({
           name: nameCreateNewAccess,
           permissionIds: selectedValueCreateAccess,
-        })
+        }),
       ).unwrap();
-      console.log(dataReturnAPI);
       if (dataReturnAPI) {
         setOpenModal2(true);
         setTimeout(() => {
@@ -540,20 +455,21 @@ export default function Accessibility({ toggleShow }) {
         <div className="d-block d-lg-none">
           <NavBarToggleBurgerButton func={() => toggleShow("main")} />
         </div>
-
-        <ProfileComponent colorGet={"#282e3f"} />
+        <div className="textHeaderStyle d-flex align-items-center">
+          سطح دسترسی ها
+        </div>
+        <ProfileComponent />
       </HeadermakeOrder>
 
       <div className="container">
-        <div className="d-flex justify-content-end">
+        <div className="d-flex justify-content-end mb-4">
           <AddRoleButton
             onClick={() => {
               handlechangeAccessCreate();
             }}
-            type="buttton"
-            className="NormalTextSizing "
           >
-            اضافه کردن
+            <AddIcon />
+            افزودن نقش جدید
           </AddRoleButton>
         </div>
         <SectionMain>
@@ -571,7 +487,7 @@ export default function Accessibility({ toggleShow }) {
                   </p>
                   <CustomCloseButton
                     onClick={handleCloseModalCreateAccess}
-                    color={`#e91e63`}
+                    color={`var(--c-danger)`}
                   />
                 </HeaderModalShowAccessMainDiv>
 
@@ -603,7 +519,7 @@ export default function Accessibility({ toggleShow }) {
                   className="d-flex flex-column gap-2 justify-content-center align-items-center p-3"
                   style={{ flex: 1, overflowY: "auto" }}
                 >
-                  {[1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12 , 13].map((value) => (
+                  {[1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13].map((value) => (
                     <BorderStyleAccessbility
                       key={value}
                       className="d-flex flex-row align-items-center gap-2"
@@ -697,7 +613,7 @@ export default function Accessibility({ toggleShow }) {
                                 <p>دسترسی‌ها</p>
                                 <CustomCloseButton
                                   onClick={handleCloseModal}
-                                  color="#e91e63"
+                                  color="var(--c-danger)"
                                 />
                               </ModalHeader>
 
@@ -730,7 +646,7 @@ export default function Accessibility({ toggleShow }) {
                               <p>{item.name}</p>
                               <CustomCloseButton
                                 onClick={handleclosemodalChangeAccess}
-                                color="#e91e63"
+                                color="var(--c-danger)"
                               />
                             </ModalHeader>
 
@@ -741,7 +657,7 @@ export default function Accessibility({ toggleShow }) {
                                 overflowY: "auto",
                               }}
                             >
-                              {[1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12 ,13].map(
+                              {[1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13].map(
                                 (value) => (
                                   <CheckboxRow key={value}>
                                     <input
@@ -766,7 +682,7 @@ export default function Accessibility({ toggleShow }) {
                                       {value === 13 && "تماس با ما"}
                                     </div>
                                   </CheckboxRow>
-                                )
+                                ),
                               )}
                             </div>
 
@@ -793,10 +709,9 @@ export default function Accessibility({ toggleShow }) {
                             <>
                               <MoreHorizIcon
                                 style={{
-                                  color: "#282e3f",
+                                  color: "var(--c-ink)",
                                   cursor: "pointer",
                                   fontSize: "28px",
-                                  cursor: "pointer",
                                 }}
                               />
                             </>
@@ -815,7 +730,7 @@ export default function Accessibility({ toggleShow }) {
                               }}
                               className="d-flex flex-row gap-2 align-items-center pb-2"
                             >
-                              <div style={{ color: "#F3802C" }}>
+                              <div style={{ color: "var(--c-warning)" }}>
                                 <EditIcon className="subitem" />
                               </div>
                               <p className="VodeoDisSizing  text-end">ویرایش</p>
@@ -828,7 +743,7 @@ export default function Accessibility({ toggleShow }) {
                               }}
                               className="d-flex flex-row gap-2 align-items-center mt-2"
                             >
-                              <div style={{ color: "#F3802C" }}>
+                              <div style={{ color: "var(--c-warning)" }}>
                                 <DeleteIcon className="text-danger subitem" />
                               </div>
                               <p className="VodeoDisSizing text-end">حذف</p>
@@ -849,7 +764,7 @@ export default function Accessibility({ toggleShow }) {
       <AreYouShureModal
         open={openModal}
         onClose={closeModal}
-        text={"ایا از حذف دسترسی مطمئن هستید؟"}
+        text={"آیا از حذف دسترسی مطمئن هستید؟"}
         func={handleDeleteRole}
       />
       <ConfirmingModal
@@ -860,7 +775,7 @@ export default function Accessibility({ toggleShow }) {
       <ErrorModal
         open={errormodal}
         onClose={handleCloseErrorModal}
-        text={"خطا در انجام عملیات"}
+        text={"خطا در انجام عملیات، لطفاً دوباره تلاش کنید"}
       />
     </section>
   );

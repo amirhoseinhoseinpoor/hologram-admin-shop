@@ -1,20 +1,18 @@
 import { createSlice } from "@reduxjs/toolkit";
 import {
-  login,
   logout,
   sendAdminLoginOtp,
   verifyAdminLoginOtp,
-  Adduser,
   list,
   homePageVideo,
-  bannerdata,
-  addBanner,
-  uploadFile,
+  refreshSession,
 } from "./thunks";
 
 // start auth slice
 
-const authinitialState = {
+const authInitialState = {
+  // false until the persisted session has been read from storage (client only)
+  authReady: false,
   token: null,
   firstName: null,
   lastName: null,
@@ -35,7 +33,7 @@ const authinitialState = {
 
 const authSlice = createSlice({
   name: "auth",
-  initialState: authinitialState,
+  initialState: authInitialState,
   reducers: {
     setUserData: (state, action) => {
       state.firstName = action.payload.firstName;
@@ -44,12 +42,30 @@ const authSlice = createSlice({
       state.gender = action.payload.gender;
       state.permissions = action.payload.permissions;
     },
-    resetToken: (state) => {
-      state.token = null;
-      state.firstName = null;
-      state.lastName = null;
-      state.phoneNumber = null;
+    hydrateAuth: (state, action) => {
+      const saved = action.payload;
+      if (saved?.token) {
+        state.token = saved.token;
+        state.firstName = saved.firstName;
+        state.lastName = saved.lastName;
+        state.phoneNumber = saved.phoneNumber;
+        state.code = saved.code;
+        state.email = saved.email;
+        state.gender = saved.gender;
+        state.permissions = saved.permissions;
+      } else {
+        state.token = null;
+        state.firstName = null;
+        state.lastName = null;
+        state.phoneNumber = null;
+        state.code = null;
+        state.email = null;
+        state.gender = null;
+        state.permissions = null;
+      }
+      state.authReady = true;
     },
+    resetToken: () => ({ ...authInitialState, authReady: true }),
   },
   extraReducers: (builder) => {
     builder
@@ -98,14 +114,17 @@ const authSlice = createSlice({
         state.loading = false;
         state.error = action.payload || action.error.message;
       })
+      .addCase(refreshSession.fulfilled, (state, action) => {
+        if (state.token) state.permissions = action.payload.permissions;
+      })
       .addCase(logout.pending, (state) => {
         state.loading = true;
         state.error = null;
       })
-      .addCase(logout.fulfilled, (state) => {
-        state.loading = false;
-        state.token = null;
-      })
+      .addCase(logout.fulfilled, () => ({
+        ...authInitialState,
+        authReady: true,
+      }))
       .addCase(logout.rejected, (state, action) => {
         state.loading = false;
         state.error = action.payload || "Logout failed";
@@ -122,8 +141,8 @@ export const code = (state) => state.auth.code;
 export const email = (state) => state.auth.email;
 export const gender = (state) => state.auth.gender;
 export const permissions = (state) => state.auth.permissions;
-export const { resetToken } = authSlice.actions;
-export const { setUserData } = authSlice.actions;
+export const { resetToken, hydrateAuth, setUserData } = authSlice.actions;
+export const authReady = (state) => state.auth.authReady;
 export const signUpSattus = (state) => state.auth.signUpSattus;
 export const otpSent = (state) => state.auth.otpSent;
 export const otpUsername = (state) => state.auth.otpUsername;
@@ -134,16 +153,15 @@ export const error = (state) => state.auth.error;
 
 // start product slice
 
-const peoductinitialState = {
+const productInitialState = {
   productListData: null,
-  // uploadedFiles: {},
   loading: false,
   error: null,
 };
 
 const productSlice = createSlice({
   name: "product",
-  initialState: peoductinitialState,
+  initialState: productInitialState,
   reducers: {},
   extraReducers: (builder) => {
     builder
@@ -159,18 +177,6 @@ const productSlice = createSlice({
         state.loading = false;
         state.error = action.error.message;
       });
-    // .addCase(uploadFile.pending, (state) => {
-    //   state.loading = true;
-    //   state.error = null;
-    // })
-    // .addCase(uploadFile.fulfilled, (state, action) => {
-    //   state.loading = false;
-    //   state.uploadedFiles[action.meta.arg.name] = action.payload;
-    // })
-    // .addCase(uploadFile.rejected, (state, action) => {
-    //   state.loading = false;
-    //   state.error = action.error.message;
-    // });
   },
 });
 
@@ -179,55 +185,9 @@ export const productListData = (state) => state.product.productListData;
 
 // end product slice
 
-// start Banner
-
-// const bannerinitialState = {
-//   bannerImg: null,
-//   loading: false,
-//   error: null,
-// };
-
-// const bannerSlice = createSlice({
-//   name: "banner",
-//   initialState: bannerinitialState,
-//   reducers: {},
-//   extraReducers: (builder) => {
-//     builder
-//       .addCase(bannerdata.pending, (state) => {
-//         state.loading = true;
-//         state.error = null;
-//       })
-//       .addCase(bannerdata.fulfilled, (state, action) => {
-//         state.loading = false;
-//         state.bannerImg = action.payload;
-//       })
-//       .addCase(bannerdata.rejected, (state, action) => {
-//         state.loading = false;
-//         state.error = action.error.message;
-//       });
-//     // .addCase(addBanner.pending, (state) => {
-//     //   state.loading = true;
-//     //   state.error = null;
-//     // })
-//     // .addCase(addBanner.fulfilled, (state, action) => {
-//     //   state.loading = false;
-//     //   state.bannerImg = action.payload;
-//     // })
-//     // .addCase(addBanner.rejected, (state, action) => {
-//     //   state.loading = false;
-//     //   state.error = action.error.message;
-//     // })
-//   },
-// });
-
-// export const bannerSliceV = bannerSlice.reducer;
-// export const bannerImg = (state) => state.banner.bannerImg;
-
-// end Banner
-
 // start HomePageVideo
 
-const homePageinitialState = {
+const homePageInitialState = {
   homeVideoFileName: null,
   loading: false,
   error: null,
@@ -235,7 +195,7 @@ const homePageinitialState = {
 
 const homePage = createSlice({
   name: "homePage",
-  initialState: homePageinitialState,
+  initialState: homePageInitialState,
   reducers: {},
   extraReducers: (builder) => {
     builder
@@ -259,36 +219,7 @@ export const homeVideoFileName = (state) => state.homePage.homeVideoFileName;
 
 // end HomePageVideo
 
-const AdminInitialState = {
-  banner: null,
-  loading: false,
-  error: null,
-};
-
-// const adminSlice = createSlice({
-//   name: "users",
-//   initialState: AdminInitialState,
-//   reducers: {},
-//   extraReducers: (builder) => {
-//     builder
-
-//       .addCase(Adduser.pending, (state) => {
-//         state.loading = true;
-//         state.error = null;
-//       })
-//       .addCase(Adduser.fulfilled, (state, action) => {
-//         state.loading = false;
-//         state.banner = action.payload;
-//       })
-//       .addCase(Adduser.rejected, (state, action) => {
-//         state.loading = false;
-//         state.error = action.error.message;
-//       });
-//   },
-// });
-
-// export const adminsliceV = adminSlice.reducer;
-// export const banner = (state) => state.admin.banner;
+// start Honors
 
 const HonorsInitialState = {
   honors: [],
@@ -300,12 +231,11 @@ const HonorsSlice = createSlice({
   name: "honors",
   initialState: HonorsInitialState,
   reducers: {},
-  extraReducers: (builder) => {
-    builder;
-  },
 });
 
 export const HonorsSliceV = HonorsSlice.reducer;
 export const honors = (state) => state.honors.honors;
 export const status = (state) => state.honors.status;
 export const errorHonors = (state) => state.honors.errorHonors;
+
+// end Honors

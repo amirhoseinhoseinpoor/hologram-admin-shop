@@ -1,5 +1,4 @@
 // Pagination.jsx
-import React from "react";
 import ArrowBackIosIcon from "@mui/icons-material/ArrowBackIos";
 import ArrowForwardIosIcon from "@mui/icons-material/ArrowForwardIos";
 import styled from "styled-components";
@@ -10,54 +9,65 @@ const PaginationContainer = styled.div`
   display: flex;
   justify-content: center;
   align-items: center;
-  margin: 20px 0;
+  margin: 24px 0 8px;
 `;
 
 const ButtonStyle = styled.button`
-  background-color: transparent;
-  color: #007bff !important;
-  border: none;
-  cursor: pointer;
-  padding: 0.5rem;
-  margin: 0 0.5rem;
-  border-radius: 50% !important;
   display: flex;
   align-items: center;
   justify-content: center;
-  transition: background-color 0.3s, color 0.3s;
+  width: 36px;
+  height: 36px;
+  padding: 0;
+  margin: 0 6px;
+  color: var(--c-muted);
+  background-color: var(--c-surface);
+  border: 1px solid var(--c-border);
+  border-radius: var(--r-sm);
+  cursor: pointer;
+  transition:
+    background-color 0.15s ease,
+    color 0.15s ease;
+
+  svg {
+    font-size: 15px;
+  }
 
   &:hover:not(:disabled) {
-    background-color: #007bff !important;
-    color: white !important;
-    border-radius: 50% !important;
-    padding : 4px !important;
+    color: var(--c-primary);
+    background-color: var(--c-primary-50);
   }
 
   &:disabled {
     cursor: not-allowed;
-    opacity: 0.5;
+    opacity: 0.45;
   }
 `;
 
-// Using transient props by prefixing with '$' to prevent them from being passed to the DOM
 const PageNumber = styled.button`
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  width: 2.5rem;
-  height: 2.5rem;
-  margin: 0 0.25rem;
-  border-radius: 50% !important;
+  min-width: 36px;
+  height: 36px;
+  margin: 0 3px;
+  padding: 0 6px;
+  font-size: 14px;
+  font-weight: 500;
+  color: ${(props) => (props.$isCurrent ? "#fff" : "var(--c-text)")};
   background-color: ${(props) =>
-    props.$isCurrent ? "#007bff" : "white"} !important;
-  color: ${(props) => (props.$isCurrent ? "#fff" : "#000")} !important;
-  border: none;
+    props.$isCurrent ? "var(--c-primary)" : "var(--c-surface)"};
+  border: 1px solid
+    ${(props) => (props.$isCurrent ? "var(--c-primary)" : "var(--c-border)")};
+  border-radius: var(--r-sm);
   cursor: pointer;
-  transition: background-color 0.3s, color 0.3s, transform 0.2s;
+  transition:
+    background-color 0.15s ease,
+    color 0.15s ease;
 
   &:hover:not(:disabled) {
-    background-color: ${(props) => (props.$isCurrent ? "#0056b3" : "#dcdcdc")};
-    transform: scale(1.05);
+    background-color: ${(props) =>
+      props.$isCurrent ? "var(--c-primary-600)" : "var(--c-primary-50)"};
   }
 
   &:disabled {
@@ -96,19 +106,22 @@ const Pagination = ({ currentPage, totalPages, onPageChange }) => {
 
   return (
     <PaginationContainer>
-       <ButtonStyle
+      <ButtonStyle
+        type="button"
+        data-plain
         onClick={() => onPageChange(currentPage + 1)}
         disabled={currentPage === totalPages}
         aria-label="Next Page"
       >
-         <ArrowForwardIosIcon />
+        <ArrowForwardIosIcon />
       </ButtonStyle>
-     
 
       {/* Page Numbers */}
-      <div style={{direction :"ltr"}}>
+      <div style={{ direction: "ltr" }}>
         {pageNumbers.map((page) => (
           <PageNumber
+            type="button"
+            data-plain
             key={page}
             $isCurrent={page === currentPage}
             onClick={() => onPageChange(page)}
@@ -119,10 +132,9 @@ const Pagination = ({ currentPage, totalPages, onPageChange }) => {
         ))}
       </div>
 
-      
-     
-
       <ButtonStyle
+        type="button"
+        data-plain
         onClick={() => onPageChange(currentPage - 1)}
         disabled={currentPage === 1}
         aria-label="Previous Page"

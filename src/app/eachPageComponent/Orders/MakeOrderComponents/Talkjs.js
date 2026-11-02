@@ -17,12 +17,10 @@ import AreYouShureModal from "@/app/BaseComponent/AreYouSureModal";
 import ConfirmingModal from "@/app/BaseComponent/ConfirmingModal";
 import ZoomModal from "@/app/BaseComponent/ZoomModal";
 import FileDownloadIcon from "@mui/icons-material/FileDownload";
-import { Skeleton } from "@mui/material";
 import LoadingCss from "@/app/BaseComponent/LoadingCss";
 import socket from "@/app/utils/socket";
 import { downloadImage } from "@/app/utils/downloadImage";
 import MessageItem from "./MessageItem";
-import ArrowDownwardIcon from "@mui/icons-material/ArrowDownward";
 import InsertDriveFileIcon from "@mui/icons-material/InsertDriveFile";
 // import base compoenent
 import CustomCloseButton from "@/app/BaseComponent/CustomCloseButton";
@@ -55,7 +53,7 @@ const ChatBox = ({
   const [message, setMessage] = useState("");
   const [messages, setMessages] = useState([]);
   const [chatImage, setChatImage] = useState(
-    initialChatImage || { images: [], userChoices: [] }
+    initialChatImage || { images: [], userChoices: [] },
   );
   const [image, setImage] = useState(null);
   const chatBoxRef = useRef(null);
@@ -63,7 +61,7 @@ const ChatBox = ({
   const [isEditing, setIsEditing] = useState(false);
   const [selectedImage, setSelectedImage] = useState(null);
   const [openModal, setOpenModal] = useState(false); // Defined here
-  const [imageCache, setImageCache] = useState({});
+  const [imageCache] = useState({});
   const [messageToDeleteIndex, setMessageToDeleteIndex] = useState(null);
   const [moveForward, setMoveForward] = useState(false);
   const [FinalPatternModal, setFinalPatternModal] = useState(false); // Corrected Typo
@@ -80,10 +78,9 @@ const ChatBox = ({
   // Close modal functions using useCallback for stability
   const closeModal = useCallback(() => setOpenModal(false), []);
   const closeModal2 = useCallback(() => setOpenModal2(false), []);
-  const closeModal3 = useCallback(() => setOpenModal3(null), []);
   const closeFinalPatternModal = useCallback(
     () => setFinalPatternModal(false),
-    []
+    [],
   );
   const closeZoomModal = useCallback(() => {
     setOpenModal3(null);
@@ -157,7 +154,7 @@ const ChatBox = ({
       if (chatImage?.userChoices && chatImage.userChoices.length > 0) {
         try {
           const imageData = await dispatch(
-            fetchPrivateImage({ filename: chatImage.userChoices[0] })
+            fetchPrivateImage({ filename: chatImage.userChoices[0] }),
           ).unwrap();
           setUserChoiseImage(imageData);
         } catch (error) {
@@ -175,15 +172,10 @@ const ChatBox = ({
       setIsEditing(true);
       setMessage(messages[index].text || "");
     },
-    [messages]
+    [messages],
   );
 
   // Cancel editing
-  const cancelEdit = useCallback(() => {
-    setEditIndex(null);
-    setIsEditing(false);
-    setMessage("");
-  }, []);
 
   // Handle deleting a message
   const handleDeleteMessage = useCallback(
@@ -194,7 +186,7 @@ const ChatBox = ({
       setOpenModal(false);
       setMessageToDeleteIndex(null);
     },
-    [messages]
+    [messages],
   );
 
   // Send or edit a message
@@ -204,7 +196,7 @@ const ChatBox = ({
     if (isEditing) {
       // Editing an existing message
       const updatedMessages = messages.map((msg, i) =>
-        i === editIndex ? { ...msg, text: message.trim() } : msg
+        i === editIndex ? { ...msg, text: message.trim() } : msg,
       );
       setMessages(updatedMessages);
       setEditIndex(null);
@@ -233,7 +225,7 @@ const ChatBox = ({
           const isPublic = false;
 
           const response = await dispatch(
-            uploadFile({ file: image, tag, type, isPublic })
+            uploadFile({ file: image, tag, type, isPublic }),
           ).unwrap();
 
           newMessageObject.imageUrl = response;
@@ -262,13 +254,13 @@ const ChatBox = ({
     async (updatedMessages) => {
       try {
         await dispatch(
-          sendNewMessage({ code, newMessageSend: updatedMessages })
+          sendNewMessage({ code, newMessageSend: updatedMessages }),
         );
       } catch (error) {
         console.error("Failed to update messages:", error);
       }
     },
-    [dispatch, code]
+    [dispatch, code],
   );
 
   // Scroll to bottom when messages are updated
@@ -318,10 +310,10 @@ const ChatBox = ({
           const imageUrls = await Promise.all(
             chatImage.images.map(async (filename) => {
               const imageData = await dispatch(
-                fetchPrivateImage({ filename })
+                fetchPrivateImage({ filename }),
               ).unwrap();
               return { filename, url: imageData };
-            })
+            }),
           );
 
           setPatternImageUrls((prevUrls) => {
@@ -380,7 +372,7 @@ const ChatBox = ({
             const file = item.file;
 
             const fileIdSrc = await dispatch(
-              uploadFile({ file, tag, type, isPublic })
+              uploadFile({ file, tag, type, isPublic }),
             ).unwrap();
             return fileIdSrc; // filename returned from thunk
           } else if (typeof item === "string") {
@@ -389,7 +381,7 @@ const ChatBox = ({
             console.warn("Unexpected item in SendingFinalPattern:", item);
             return null;
           }
-        })
+        }),
       );
 
       const validFileIds = fileIds.filter((id) => id !== null);
@@ -398,7 +390,7 @@ const ChatBox = ({
         chatImageSend({
           code,
           chatImage: { images: validFileIds },
-        })
+        }),
       ).unwrap();
 
       if (responseDispatchImage?.statusCode === 200) {
@@ -442,7 +434,7 @@ const ChatBox = ({
             {modalChat && (
               <div>
                 <CustomCloseButton
-                  color={"#e91e63"}
+                  color={"var(--c-danger)"}
                   onClick={handleCloseChat}
                 />
               </div>
@@ -506,7 +498,7 @@ const ChatBox = ({
                       const date = new Date();
                       downloadImage(
                         userChoiseImage,
-                        `${date.toISOString()}.png`
+                        `${date.toISOString()}.png`,
                       );
                     }}
                     className={`me-2 text-center ${style.donsloadFinalUserStyle} NormalTextSizing`}
@@ -543,12 +535,6 @@ const ChatBox = ({
                         src={selectedImage}
                         alt="uploaded"
                         className={style.selectedImageForSend}
-                        // style={{
-                        //   cursor: "pointer",
-                        //   objectFit: "cover",
-                        //   width: "100px",
-                        //   height: "100px",
-                        // }}
                       ></Box>
                     </>
                   )}
@@ -695,7 +681,7 @@ const ChatBox = ({
               </div>
               <div>
                 <CustomCloseButton
-                  color={"#e91e63"}
+                  color={"var(--c-danger)"}
                   onClick={closeFinalPatternModal}
                 />
               </div>
@@ -716,7 +702,7 @@ const ChatBox = ({
                       handleZoomFinalPattern(
                         typeof fileObj === "string"
                           ? patternImageUrls[fileObj] || fileObj
-                          : fileObj?.imageUrl
+                          : fileObj?.imageUrl,
                       )
                     }
                   />
@@ -736,31 +722,31 @@ const ChatBox = ({
                       {/* SVG Paths */}
                       <path
                         d="M10.5 2.98828C8.835 2.82328 7.16 2.73828 5.49 2.73828C4.5 2.73828 3.51 2.78828 2.52 2.88828L1.5 2.98828"
-                        stroke="#FF4F3F"
+                        stroke="#dc2626"
                         strokeLinecap="round"
                         strokeLinejoin="round"
                       />
                       <path
                         d="M4.25 2.485L4.36 1.83C4.44 1.355 4.5 1 5.345 1H6.655C7.5 1 7.565 1.375 7.64 1.835L7.75 2.485"
-                        stroke="#FF4F3F"
+                        stroke="#dc2626"
                         strokeLinecap="round"
                         strokeLinejoin="round"
                       />
                       <path
                         d="M9.4252 4.57031L9.1002 9.60531C9.0452 10.3903 9.0002 11.0003 7.6052 11.0003H4.3952C3.0002 11.0003 2.9552 10.3903 2.9002 9.60531L2.5752 4.57031"
-                        stroke="#FF4F3F"
+                        stroke="#dc2626"
                         strokeLinecap="round"
                         strokeLinejoin="round"
                       />
                       <path
                         d="M5.16504 8.25H6.83004"
-                        stroke="#FF4F3F"
+                        stroke="#dc2626"
                         strokeLinecap="round"
                         strokeLinejoin="round"
                       />
                       <path
                         d="M4.75 6.25H7.25"
-                        stroke="#FF4F3F"
+                        stroke="#dc2626"
                         strokeLinecap="round"
                         strokeLinejoin="round"
                       />
@@ -778,14 +764,14 @@ const ChatBox = ({
                       if (typeof fileObj === "string") {
                         if (
                           patternImageUrls[fileObj]?.includes(
-                            "data:image/png"
+                            "data:image/png",
                           ) ||
                           patternImageUrls[fileObj]?.includes("data:image/jpeg")
                         ) {
                           filename = "finalPayment.png";
                         } else if (
                           patternImageUrls[fileObj]?.includes(
-                            "data:image/svg+xml"
+                            "data:image/svg+xml",
                           )
                         ) {
                           filename = "finalPayment.svg";
@@ -867,7 +853,7 @@ const ChatBox = ({
       <AreYouShureModal
         open={openModal}
         onClose={closeModal}
-        text={"ایا از حذف پیام مطمئن هستید ؟"}
+        text={"آیا از حذف پیام مطمئن هستید؟"}
         func={() => handleDeleteMessage(messageToDeleteIndex)}
       />
 

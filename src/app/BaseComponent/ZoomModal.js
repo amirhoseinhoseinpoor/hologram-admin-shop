@@ -7,14 +7,17 @@ const ModalStyle = {
   left: "50%",
   transform: "translate(-50%, -50%)",
   bgcolor: "background.paper",
-  border: "1.5px solid #000",
+  borderRadius: "12px",
+  maxWidth: "92vw",
+  maxHeight: "90vh",
+  objectFit: "contain",
+  outline: "none",
   boxShadow: 24,
   p: 0,
 };
 
 const BOXSTYLE = styled(Box)`
   width: 600px;
-  border-radius: 3px;
 
   @media (max-width: 980px) {
     width: 500px;
@@ -33,7 +36,7 @@ export default function ZoomModal({ open, onClose, src, alt }) {
         onClose={onClose}
         aria-labelledby="modal-modal-title2"
         aria-describedby="modal-modal-description2"
-      >        
+      >
         <BOXSTYLE
           component="img"
           src={src}

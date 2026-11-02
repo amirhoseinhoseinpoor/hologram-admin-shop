@@ -1,12 +1,17 @@
 @use "../variable" as var;
 
 .LoginMainDiv {
-  border: 1.5px solid #dde0e4;
-  border-radius: 6px;
-  padding: 60px;
-  max-width: fit-content;
   width: 100%;
-  background-color: white;
+  max-width: 440px;
+  padding: 40px 32px;
+  background-color: var(--c-surface);
+  border: 1px solid var(--c-border);
+  border-radius: var(--r-lg);
+  box-shadow: var(--shadow-md);
+
+  @media (max-width: 576px) {
+    padding: 28px 16px;
+  }
 }
 
 .captchaContainer {
@@ -18,9 +23,9 @@
 }
 
 .sectionLoginStyle {
-  background-color: #f7f8fc;
-  height: fit-content;
-  min-height: 100%;
+  align-items: center;
+  min-height: 100vh;
+  background-color: var(--c-bg);
 }
 
 .closeIconImg {
@@ -30,32 +35,34 @@
   transform: translate(50, -50);
 }
 .submitButton {
-  border-radius: 4px;
-  color: white;
+  color: #fff;
   border: none;
   padding: 0;
+  border-radius: var(--r-sm);
+  transition: background-color 0.15s ease;
 }
 .justPaddingButton {
   padding: 8px 0;
 }
 .disabledButton {
-  background-color: #868686;
+  background-color: #9ca3af;
   cursor: not-allowed;
 }
 .activeButton {
-  background-color: #5695f6;
+  background-color: var(--c-primary);
   cursor: pointer;
 }
 .activeButton :hover {
-  background-color: #3e73d3;
-  border-radius: 4px;
+  background-color: var(--c-primary-600);
+  border-radius: var(--r-sm);
 }
 .formInputNumber:focus {
   box-shadow: unset !important;
-  border: 1.3px solid #5695f6;
+  border: 1px solid var(--c-primary);
+  box-shadow: 0 0 0 3px var(--c-primary-100) !important;
 }
 .formInputNumber {
-  border-radius: 4px !important;
+  border-radius: var(--r-sm) !important;
 }
 .formInputNumber::-webkit-inner-spin-button {
   -webkit-appearance: none;
@@ -81,12 +88,12 @@
 }
 
 .formInputCapcha {
-  border-radius: 4px !important;
+  border-radius: var(--r-sm) !important;
   width: 100%;
 }
 .formInputCapcha:focus {
   box-shadow: unset !important;
-  border: 1px solid #5695f6;
+  border: 1px solid var(--c-primary);
 }
 
 .formInputCapcha::-webkit-inner-spin-button {
@@ -95,8 +102,8 @@
   margin: 0;
 }
 .handelLoginError {
-  border-radius: 4px;
-  background-color: #ff4f3f;
+  border-radius: var(--r-sm);
+  background-color: var(--c-danger);
   padding: 8px;
   color: white;
   text-align: center;
@@ -108,7 +115,7 @@
 }
 
 .colorForSignUpButton {
-  color: #5695f6;
+  color: var(--c-primary);
 }
 
 // loader style
@@ -118,8 +125,8 @@
   padding: 8px;
   aspect-ratio: 1;
   border-radius: 50%;
-  background: #f3802c !important;
-  background-color: #f3802c !important;
+  background: var(--c-warning) !important;
+  background-color: var(--c-warning) !important;
   --_m: conic-gradient(#0000 10%, #000), linear-gradient(#000 0 0) content-box;
   -webkit-mask: var(--_m);
   mask: var(--_m);

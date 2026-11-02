@@ -1,6 +1,8 @@
 // src/app/eachPageComponent/Orders/OrderMainComponent.jsx
 
-import React, { useEffect, useState } from "react";
+import { SearchInputMainDiv } from "@/app/BaseComponent/SearchField";
+import { HeadermakeOrder } from "@/app/BaseComponent/PageHeader";
+import { useEffect, useState } from "react";
 import MakeOrder from "./MakeOrderComponents/MakeOrder";
 // Import Redux hooks and thunks
 import { useDispatch } from "react-redux";
@@ -35,61 +37,25 @@ import EmptyState from "@/app/BaseComponent/EmptyState";
 const FixTablePlace = styled.div`
   @media (min-width: 980px) {
     position: relative;
-    margin-top: 60px;
+    overflow: hidden;
+    background: var(--c-surface);
+    border: 1px solid var(--c-border);
+    border-radius: var(--r-md);
+    box-shadow: var(--shadow-sm);
     .fixingTabel {
-      position: absolute;
-      transform: translate(-50%, 50%);
-      left: 50%;
-      width: 94%;
-      top: -55px;
-      border-radius: 10px;
-      padding: 18px 12px;
-      background-image: linear-gradient(195deg, #46506a 0%, #282e3f 100%);
-      color: white;
+      padding: 16px 20px;
+      margin: 0 !important;
+      font-size: 15px;
+      font-weight: 600;
+      color: var(--c-ink);
+      background-color: var(--c-surface);
+      border-bottom: 1px solid var(--c-border);
     }
   }
-`;
-
-const HeadermakeOrder = styled.div`
-  padding: 10px;
-  color: white;
-  background-color: rgb(225, 223, 223);
-  border-radius: 4px;
-  margin: 7px 15px;
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-
-  .textHeaderStyle {
-    color: black;
-  }
-
-  @media (max-width: 980px) {
-    /* Responsive styles if needed */
-    .textHeaderStyle {
-      /* Additional styles */
+  @media (max-width: 979px) {
+    .fixingTabel {
+      display: none;
     }
-  }
-`;
-
-const SearchInputMainDiv = styled.div`
-  margin-bottom: 10px;
-  width: 50%;
-  position: relative;
-
-  .inputSreachStyle {
-    font-size: 15px;
-    width: 100%;
-    padding: 5px 4px 5px 30px;
-    border: 1px solid #ccc;
-    border-radius: 4px;
-  }
-
-  .SearchIconStyle {
-    position: absolute;
-    transform: translate(50%, -50%);
-    left: 0;
-    top: 50%;
   }
 `;
 
@@ -104,20 +70,6 @@ const AlignCenter = styled(Select)`
   .MuiSelect-select {
     padding-left: 32px;
     padding-right: 10px !important;
-  }
-`;
-
-const SortControls = styled.div`
-  display: flex;
-  justify-content: flex-end;
-  align-items: center;
-  margin-bottom: 10px;
-
-  select {
-    padding: 5px 10px;
-    margin-left: 10px;
-    border-radius: 4px;
-    border: 1px solid #ccc;
   }
 `;
 
@@ -143,8 +95,8 @@ export default function OrderMainComponent({ toggleShow }) {
   const [totalPages, setTotalPages] = useState(1);
 
   // Sorting states
-  const [sortField, setSortField] = useState("createdAt"); // default sort field
-  const [sortOrder, setSortOrder] = useState("desc"); // default sort order
+  const sortField = "createdAt";
+  const sortOrder = "desc";
 
   // Status selection states
   const [selectedStatus, setSelectedStatus] = useState({}); // Initialize as an empty object
@@ -152,6 +104,7 @@ export default function OrderMainComponent({ toggleShow }) {
   // Modal states
   const [openModal, setOpenModal] = useState(false);
   const [openModal2, setOpenModal2] = useState(false);
+  const [successText, setSuccessText] = useState("عملیات با موفقیت انجام شد");
   const [openModal3, setOpenModal3] = useState(false);
   // Close modals
   const closeModal = () => setOpenModal(false);
@@ -166,14 +119,13 @@ export default function OrderMainComponent({ toggleShow }) {
     try {
       setTrackLoadingProduct(true);
       const ordersData = await dispatch(
-        listorders({ status, sortBy: sortField, sortOrder, page, limit })
+        listorders({ status, sortBy: sortField, sortOrder, page, limit }),
       ).unwrap();
- 
 
       // Fetch user data for all orders
       const userPromises = ordersData.data.map(async (item) => {
         const userDataCome = await dispatch(
-          whosOrder({ id: item.createdBy })
+          whosOrder({ id: item.createdBy }),
         ).unwrap();
         return { id: item.createdBy, userData: userDataCome[0] }; // Access the first element of userData array
       });
@@ -241,8 +193,6 @@ export default function OrderMainComponent({ toggleShow }) {
       });
     }
 
-    // setTotalPages(Math.ceil(filtered.length / itemsPerPage));
-    // setCurrentPage(1); 
     setFilteredOrders(filtered);
   }, [
     orders,
@@ -253,48 +203,24 @@ export default function OrderMainComponent({ toggleShow }) {
     itemsPerPage,
   ]);
 
-
   useEffect(() => {
     if (seeOrder) {
       const updatedOrder = orders?.find(
-        (order) => order.code === seeOrder?.code
-      );     
+        (order) => order.code === seeOrder?.code,
+      );
       setSeeOrder(updatedOrder);
-      
     }
-  }, [updateData , seeOrder ,orders]);
+  }, [updateData, seeOrder, orders]);
 
-  
   // Handle Sorting Change
-  const handleSortChange = (e) => {
-    const value = e.target.value;
-    if (value === "createdAt_asc") {
-      setSortField("createdAt");
-      setSortOrder("asc");
-    } else if (value === "createdAt_desc") {
-      setSortField("createdAt");
-      setSortOrder("desc");
-    } else if (value === "firstName_asc") {
-      setSortField("firstName");
-      setSortOrder("asc");
-    } else if (value === "firstName_desc") {
-      setSortField("firstName");
-      setSortOrder("desc");
-    } else if (value === "lastName_asc") {
-      setSortField("lastName");
-      setSortOrder("asc");
-    } else if (value === "lastName_desc") {
-      setSortField("lastName");
-      setSortOrder("desc");
-    }
-  };
 
   // Handle Status Change
   const handleStatusChange = async (orderCode, newStatus) => {
     try {
       await dispatch(
-        updateOrderStatus({ code: orderCode, status: newStatus })
+        updateOrderStatus({ code: orderCode, status: newStatus }),
       ).unwrap();
+      setSuccessText("وضعیت سفارش با موفقیت تغییر یافت");
       setOpenModal2(true);
       setTimeout(() => {
         setOpenModal2(false);
@@ -332,18 +258,19 @@ export default function OrderMainComponent({ toggleShow }) {
   const handleDelete = async () => {
     try {
       const fetchData = await dispatch(
-        deleteOrder({ code: dataForDelete })
+        deleteOrder({ code: dataForDelete }),
       ).unwrap();
       if (
         fetchData.firstData.statusCode === 200 &&
         fetchData.secondData.statusCode === 200
       ) {
+        setSuccessText("سفارش با موفقیت حذف شد");
         setOpenModal2(true);
         setTimeout(() => {
           setOpenModal2(false);
         }, 3000);
       }
-    } catch (error) {
+    } catch {
       setOpenModal3(true);
     } finally {
       setOpenModal(false);
@@ -367,12 +294,12 @@ export default function OrderMainComponent({ toggleShow }) {
             <div className="NormalTextSizing text-decoration-underline textHeaderStyle d-flex align-items-center">
               مدیریت سفارشات
             </div>
-            <ProfileComponent colorGet={"#282e3f"} />
+            <ProfileComponent />
           </HeadermakeOrder>
 
-          <div className="d-flex flex-row justify-content-between container align-items-center">
+          <div className="d-flex flex-row flex-wrap gap-3 justify-content-between align-items-end mb-4">
             {/* Search Field */}
-            <SearchInputMainDiv className="me-2 mt-4">
+            <SearchInputMainDiv>
               <input
                 className="inputSreachStyle"
                 type="text"
@@ -408,7 +335,7 @@ export default function OrderMainComponent({ toggleShow }) {
                   onChange={handleDropdownChange}
                 >
                   <MenuItem sx={{ fontFamily: "unset" }} value="1">
-                    درحال برسی
+                    در حال بررسی
                   </MenuItem>
                   <MenuItem sx={{ fontFamily: "unset" }} value="1_admin">
                     منتظر تایید مدیر
@@ -417,10 +344,10 @@ export default function OrderMainComponent({ toggleShow }) {
                     منتظر تایید کاربر
                   </MenuItem>
                   <MenuItem sx={{ fontFamily: "unset" }} value="2">
-                    درحال تولید
+                    در حال تولید
                   </MenuItem>
                   <MenuItem sx={{ fontFamily: "unset" }} value="3">
-                    درحال ارسال
+                    در حال ارسال
                   </MenuItem>
                   <MenuItem sx={{ fontFamily: "unset" }} value="4">
                     تحویل داده شده
@@ -434,21 +361,6 @@ export default function OrderMainComponent({ toggleShow }) {
           </div>
 
           {/* Sorting Controls */}
-          {/* <SortControls className="container">
-            <label htmlFor="sort">مرتب‌سازی بر اساس:</label>
-            <select
-              id="sort"
-              onChange={handleSortChange}
-              value={`${sortField}_${sortOrder}`}
-            >
-              <option value="createdAt_desc">تاریخ (نزولی)</option>
-              <option value="createdAt_asc">تاریخ (صعودی)</option>
-              <option value="firstName_asc">نام (الفبایی صعودی)</option>
-              <option value="firstName_desc">نام (الفبایی نزولی)</option>
-              <option value="lastName_asc">نام خانوادگی (الفبایی صعودی)</option>
-              <option value="lastName_desc">نام خانوادگی (الفبایی نزولی)</option>
-            </select>
-          </SortControls> */}
 
           <FixTablePlace className="container">
             <>
@@ -517,18 +429,18 @@ export default function OrderMainComponent({ toggleShow }) {
       <AreYouShureModal
         open={openModal}
         onClose={closeModal}
-        text={"ایا از حذف سفارش مطمئن هستید؟"}
+        text={"آیا از حذف سفارش مطمئن هستید؟"}
         func={handleDelete}
       />
       <ConfirmingModal
         open={openModal2}
         onClose={closeModal2}
-        text={"وضعیت با موفقیت تغییر یافت"}
+        text={successText}
       />
       <ErrorModal
         open={openModal3}
         onClose={closeModal3}
-        text={"خطا در انجام عملیات "}
+        text={"خطا در انجام عملیات، لطفاً دوباره تلاش کنید"}
       />
     </section>
   );
