@@ -15,6 +15,7 @@ export const metadata = {
   icons: {
     icon: "/LOGO/azarhologram-icon.png",
   },
+  robots: { index: false, follow: false },
 };
 
 export const viewport = {
