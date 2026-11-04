@@ -13,7 +13,7 @@ export const metadata = {
   title: "آذر هولوگرام",
   description: "پنل مدیریت آذر هولوگرام",
   icons: {
-    icon: "/LOGO/cropped-com.chakavak.adv_512x512.png",
+    icon: "/LOGO/azarhologram-icon.png",
   },
 };
 

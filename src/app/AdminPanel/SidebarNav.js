@@ -115,11 +115,10 @@ export default function SidebarNav({ groups, activeTab, onSelect }) {
       <div className="brand">
         <Box
           component="img"
-          sx={{ width: 40, height: 40, objectFit: "contain" }}
+          sx={{ width: "100%", maxWidth: 190, height: "auto", display: "block" }}
           alt="آذر هولوگرام"
-          src="/LOGO/cropped-com.chakavak.adv_512x512.png"
+          src="/LOGO/azarhologram-logo.png"
         />
-        <span>آذر هولوگرام</span>
       </div>
 
       <div className="scroll">
