@@ -1152,7 +1152,13 @@ export default function EditHonors({
           value={subtitleCompelete}
           onChange={(e) => setSubtitleCompelete(e.target.value)}
           className="w-100 form-control"
+          rows={12}
+          aria-describedby="DiscriptionCompeleteHint"
         />
+        <small id="DiscriptionCompeleteHint" className="text-muted d-block mt-1">
+          خطی که با «### » شروع شود در سایت تیتر می‌شود و خطی که با «- » شروع
+          شود، یک مورد از فهرست.
+        </small>
       </div>
 
       {/* Navigation Tabs */}
