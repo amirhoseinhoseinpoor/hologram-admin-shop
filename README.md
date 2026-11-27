@@ -1,36 +1,29 @@
-This is a [Next.js](https://nextjs.org/) project bootstrapped with [`create-next-app`](https://github.com/vercel/next.js/tree/canary/packages/create-next-app).
+# Azar Hologram Admin Panel
 
-## Getting Started
+Next.js staff interface for the Azar Hologram storefront. The panel provides a dedicated login and an administration area for managing the shop through the backend API.
 
-First, run the development server:
+## Architecture
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+- Next.js App Router and React
+- Material UI and Redux Toolkit for the interface and client state
+- Administration routes in `src/app/AdminPanel/`, sign-in in `src/app/Login/`, and shared hooks in `src/hooks/`
+
+## Local development
+
+```sh
+npm ci
+npm run dev -- --port 3001
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Open `http://localhost:3001`. To sign in and exercise administration flows, use a local or staging backend and a test account configured for that environment. For a production build, use `npm run build` followed by `npm start`. The start script serves the build on port 3001.
 
-You can start editing the page by modifying `app/page.js`. The page auto-updates as you edit the file.
+## Project repositories
 
-This project uses [`next/font`](https://nextjs.org/docs/basic-features/font-optimization) to automatically optimize and load Inter, a custom Google Font.
+| Repository | Role |
+| --- | --- |
+| [hologram-web-shop](https://github.com/amirhoseinhoseinpoor/hologram-web-shop) | Customer storefront |
+| [hologram-admin-shop](https://github.com/amirhoseinhoseinpoor/hologram-admin-shop) | Staff administration interface |
+| [hologram-core-shop](https://github.com/amirhoseinhoseinpoor/hologram-core-shop) | Backend API and business logic |
 
-## Learn More
+[View the live storefront](https://azarhologram.net/)
 
-To learn more about Next.js, take a look at the following resources:
-
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
-
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js/) - your feedback and contributions are welcome!
-
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/deployment) for more details.
